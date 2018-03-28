@@ -1,0 +1,19 @@
+{
+  "name": "pacyber-api",
+  "version": "0.0.1",
+  "description": "ASP.NET Core/C# application for managing API endpoints for PA Cyber billing application.", "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "create-db": "gulp create-database-environment",
+    "remove-db": "gulp remove-database-environment",
+    "run-db": "gulp run-database-environment",
+    "stop-db": "gulp stop-database-environment"
+  },
+  "author": "William D. Moore",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-docker": "0.0.12",
+    "gulp-docker-dest": "^0.2.2"
+  }
+}

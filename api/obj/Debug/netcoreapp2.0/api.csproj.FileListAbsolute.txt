@@ -1,0 +1,11 @@
+/Users/willdmoore/dev/Rivers/PA Cyber/app/api/bin/Debug/netcoreapp2.0/api.deps.json
+/Users/willdmoore/dev/Rivers/PA Cyber/app/api/bin/Debug/netcoreapp2.0/api.runtimeconfig.json
+/Users/willdmoore/dev/Rivers/PA Cyber/app/api/bin/Debug/netcoreapp2.0/api.runtimeconfig.dev.json
+/Users/willdmoore/dev/Rivers/PA Cyber/app/api/bin/Debug/netcoreapp2.0/api.dll
+/Users/willdmoore/dev/Rivers/PA Cyber/app/api/bin/Debug/netcoreapp2.0/api.pdb
+/Users/willdmoore/dev/Rivers/PA Cyber/app/api/obj/Debug/netcoreapp2.0/api.csprojResolveAssemblyReference.cache
+/Users/willdmoore/dev/Rivers/PA Cyber/app/api/obj/Debug/netcoreapp2.0/api.csproj.CoreCompileInputs.cache
+/Users/willdmoore/dev/Rivers/PA Cyber/app/api/obj/Debug/netcoreapp2.0/api.AssemblyInfoInputs.cache
+/Users/willdmoore/dev/Rivers/PA Cyber/app/api/obj/Debug/netcoreapp2.0/api.AssemblyInfo.cs
+/Users/willdmoore/dev/Rivers/PA Cyber/app/api/obj/Debug/netcoreapp2.0/api.dll
+/Users/willdmoore/dev/Rivers/PA Cyber/app/api/obj/Debug/netcoreapp2.0/api.pdb
