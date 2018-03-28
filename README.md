@@ -1,2 +1,2 @@
-# billing-app-api
-Back-end API for PA Cyber web application
+# billing-app
+ASP.NET solution for PA Cyber billing application
