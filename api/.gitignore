@@ -234,3 +234,6 @@ _Pvt_Extensions
 
 # Environment-specific appsettings
 appsettings.Development.json
+
+# dotenv
+.env

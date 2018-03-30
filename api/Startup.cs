@@ -42,7 +42,8 @@ namespace api
             var password = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
             var port = Environment.GetEnvironmentVariable("DATABASE_PORT");
 
-            var connectionString = $"Server=192.168.99.100,1401;Database=pacyber_dev;User ID=pacyber_dev;Password=I h@te VSIMS;Trusted_Connection=True";
+            var connectionString = $"Server={hostName},{port};Database={databaseName};User ID={userName};Password={password};Trusted_Connection=True";
+
             _logger.LogDebug("Startup.ConfigureServices(): connectionString is {connectionString}.");
             _logger.LogInformation("Startup.ConfigureServices():  WTF?");
 
