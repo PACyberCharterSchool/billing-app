@@ -4,36 +4,47 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
-using Microsoft.Extensions.Logging.Debug;
 
 using api.Models;
+
+using dotenv;
+
+using System;
 
 namespace api
 {
     public class Startup
     {   
-        public Startup(IHostingEnvironment environment, IConfiguration configuration, ILoggerFactory loggerFactory)
+        public Startup(IHostingEnvironment environment, IConfiguration configuration, ILogger<Startup> logger)
         {
             _env = environment;
             _conf = configuration;
-            _loggerFactory = loggerFactory;
+            _logger = logger;
+
+            var builder = new ConfigurationBuilder();
+
+            if (_env.IsDevelopment())
+            {
+                builder.AddUserSecrets<Startup>();
+            }
+            _conf = builder.Build();
         }
 
         private IHostingEnvironment _env { get; set; }
         private IConfiguration _conf { get; set; }
-        public ILoggerFactory _loggerFactory { get; }
+        private ILogger<Startup> _logger;
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var hostName = _conf["environmentVariables:Database:SQLSERVER_HOST"] ?? "localhost";
-            var userName = _conf["environmentVariables:Database:USERNAME"] ?? "sa";
-            var password = _conf["environmentVariables:Database:PASSWORD"] ?? "Br0ken horse carrot";
-            var port = _conf["environmentVariables:Database:PORT"] ?? "1401";
-            var connectionString = $"Data Source={hostName},{port};User ID={userName};Password={password}";
+            var hostName = Environment.GetEnvironmentVariable("DATABASE_HOST");
+            var databaseName = Environment.GetEnvironmentVariable("DATABASE_NAME");
+            var userName = Environment.GetEnvironmentVariable("DATABASE_USERNAME");
+            var password = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
+            var port = Environment.GetEnvironmentVariable("DATABASE_PORT");
 
-            var logger = _loggerFactory.CreateLogger<ConsoleLogger>();
-            logger.LogDebug($"Startup.ConfigureServices(): connectionString is {connectionString}."); 
+            var connectionString = $"Server=192.168.99.100,1401;Database=pacyber_dev;User ID=pacyber_dev;Password=I h@te VSIMS;Trusted_Connection=True";
+            _logger.LogDebug("Startup.ConfigureServices(): connectionString is {connectionString}.");
+            _logger.LogInformation("Startup.ConfigureServices():  WTF?");
 
             services.AddDbContext<StudentContext>(opt => opt.UseSqlServer(connectionString));
             services.AddMvc();
@@ -41,9 +52,7 @@ namespace api
 
         public void Configure(IApplicationBuilder app)
         {
-            // this establishes the foundation for a single, comprehensive logging mechanism within the entire app
-            _loggerFactory.AddConsole();
-            _loggerFactory.AddDebug();
+            dotenv.net.DotEnv.Config();
 
             app.UseMvc();
         }
