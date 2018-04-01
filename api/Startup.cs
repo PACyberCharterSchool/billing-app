@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 using api.Models;
 
-using dotenv;
+using dotenv.net;
 
 using System;
 
@@ -25,6 +25,7 @@ namespace api
 
             if (_env.IsDevelopment())
             {
+                DotEnv.Config();
                 builder.AddUserSecrets<Startup>();
             }
             _conf = builder.Build();
@@ -42,10 +43,10 @@ namespace api
             var password = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
             var port = Environment.GetEnvironmentVariable("DATABASE_PORT");
 
-            var connectionString = $"Server={hostName},{port};Database={databaseName};User ID={userName};Password={password};Trusted_Connection=True";
+            var connectionString = $"Server={hostName},{port};Database={databaseName};User Id={userName};Password={password}";
 
-            _logger.LogDebug("Startup.ConfigureServices(): connectionString is {connectionString}.");
-            _logger.LogInformation("Startup.ConfigureServices():  WTF?");
+            _logger.LogInformation($"Startup.ConfigureServices(): connectionString is {connectionString}.");
+            _logger.LogInformation($"Startup.ConfigureServices():  WTF?");
 
             services.AddDbContext<StudentContext>(opt => opt.UseSqlServer(connectionString));
             services.AddMvc();
@@ -53,8 +54,6 @@ namespace api
 
         public void Configure(IApplicationBuilder app)
         {
-            dotenv.net.DotEnv.Config();
-
             app.UseMvc();
         }
     }
