@@ -5,10 +5,10 @@
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "create-db": "gulp create-database-environment",
+    "create-db-user": "gulp create-db-user",
     "remove-db": "gulp remove-database-environment",
-    "run-db": "gulp run-database-environment",
-    "stop-db": "gulp stop-database-environment"
+    "start-db": "gulp start-db",
+    "stop-db": "gulp stop-db"
   },
   "author": "William D. Moore",
   "license": "ISC",
