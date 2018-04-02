@@ -31,7 +31,7 @@ In order to stand up the Docker container the first time, the `docker run` comma
 be exposed.
 
 ```
-docker run -e 'ACCEPT_EULA=Y' -e 'MSSQL_SA_PASSWORD=Br0ken horse carrot' --name sqlserver -d sqlserver -p 1401:1433
+docker run -e 'ACCEPT_EULA=Y' -e 'MSSQL_SA_PASSWORD=Br0ken horse carrot' --name sqlserver -d sqlserver -p 1401:1433 sqlserver
 ```
 
 ## Application

@@ -154,5 +154,4 @@ gulp.task('create-db', ['set-dev-db-env'], function(cb) {
 // Running application
 //
 gulp.task('billing-app-debug', ['set-dev-env', 'set-dev-db-env'], function(cb) {
-
 });
