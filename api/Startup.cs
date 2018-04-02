@@ -13,48 +13,46 @@ using System;
 
 namespace api
 {
-    public class Startup
-    {   
-        public Startup(IHostingEnvironment environment, IConfiguration configuration, ILogger<Startup> logger)
-        {
-            _env = environment;
-            _conf = configuration;
-            _logger = logger;
+	public class Startup
+	{
+		public Startup(IHostingEnvironment environment, IConfiguration configuration, ILogger<Startup> logger)
+		{
+			_env = environment;
+			_conf = configuration;
+			_logger = logger;
 
-            var builder = new ConfigurationBuilder();
+			var builder = new ConfigurationBuilder();
 
-            if (_env.IsDevelopment())
-            {
-                DotEnv.Config();
-                builder.AddUserSecrets<Startup>();
-            }
-            _conf = builder.Build();
-        }
+			DotEnv.Config();
+			builder.AddUserSecrets<Startup>();
+			_conf = builder.Build();
+		}
 
-        private IHostingEnvironment _env { get; set; }
-        private IConfiguration _conf { get; set; }
-        private ILogger<Startup> _logger;
+		private IHostingEnvironment _env { get; set; }
+		private IConfiguration _conf { get; set; }
+		private ILogger<Startup> _logger;
 
-        public void ConfigureServices(IServiceCollection services)
-        {
-            var hostName = Environment.GetEnvironmentVariable("DATABASE_HOST");
-            var databaseName = Environment.GetEnvironmentVariable("DATABASE_NAME");
-            var userName = Environment.GetEnvironmentVariable("DATABASE_USERNAME");
-            var password = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
-            var port = Environment.GetEnvironmentVariable("DATABASE_PORT");
+		public void ConfigureServices(IServiceCollection services)
+		{
+			var hostName = Environment.GetEnvironmentVariable("DATABASE_HOST");
+			var databaseName = Environment.GetEnvironmentVariable("DATABASE_NAME");
+			var userName = Environment.GetEnvironmentVariable("DATABASE_USERNAME");
+			var password = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
+			var port = Environment.GetEnvironmentVariable("DATABASE_PORT");
 
-            var connectionString = $"Server={hostName},{port};Database={databaseName};User Id={userName};Password={password}";
+			var connectionString = $"Server={hostName},{port};Database={databaseName};User Id={userName};Password={password}";
 
-            _logger.LogInformation($"Startup.ConfigureServices(): connectionString is {connectionString}.");
-            _logger.LogInformation($"Startup.ConfigureServices():  WTF?");
+			_logger.LogInformation($"Startup.ConfigureServices(): connectionString is {connectionString}.");
+			_logger.LogInformation($"Startup.ConfigureServices():  WTF?");
 
-            services.AddDbContext<StudentContext>(opt => opt.UseSqlServer(connectionString));
-            services.AddMvc();
-        }
+			services.AddDbContext<StudentContext>(opt => opt.UseSqlServer(connectionString));
+			services.AddMvc();
+		}
 
-        public void Configure(IApplicationBuilder app)
-        {
-            app.UseMvc();
-        }
-    }
+		public void Configure(IApplicationBuilder app, StudentContext context)
+		{
+			app.UseMvc();
+			context.Database.Migrate();
+		}
+	}
 }

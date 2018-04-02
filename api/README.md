@@ -16,7 +16,7 @@ docker-machine create --driver virtualbox --virtualbox-memory "2048" sqlserver
 ```
 
 #### Build Docker image
-Microsoft provides an image for creating a Docker container that will run SQL Server 2017 on a Linux system.  Use the provided Dockerfile to 
+Microsoft provides an image for creating a Docker container that will run SQL Server 2017 on a Linux system.  Use the provided Dockerfile to
 build the image.
 
 ```
@@ -31,7 +31,7 @@ In order to stand up the Docker container the first time, the `docker run` comma
 be exposed.
 
 ```
-docker run -e 'ACCEPT_EULA=Y' -e 'MSSQL_SA_PASSWORD=Br0ken horse carrot' --name sqlserver -d sqlserver -p 1401:1433 sqlserver
+docker run -e 'ACCEPT_EULA=Y' -e 'MSSQL_SA_PASSWORD=Br0ken horse carrot' --name sqlserver -d -p 1401:1433 sqlserver
 ```
 
 ## Application

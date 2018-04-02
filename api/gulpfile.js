@@ -27,11 +27,11 @@ gulp.task('set-dev-db-env', function(cb) {
 //
 // Docker
 //
-gulp.task('is-sqlserver-running', function() {
+gulp.task('is-docker-machine-running', function() {
     return shell('docker-machine status sqlserver');
 });
 
-gulp.task('doesSQLServerDockerMachineExist', function(cb) {
+gulp.task('does-docker-machine-exist', function(cb) {
     exec('docker-machine ls -q | grep \'^sqlserver\'', function(err, stdout, stderr) {
         if (err) {
             console.log(stderr);
@@ -43,7 +43,7 @@ gulp.task('doesSQLServerDockerMachineExist', function(cb) {
     });
 });
 
-gulp.task('create-database-environment', ['doesSQLServerDockerMachineExist'], function(cb) {
+gulp.task('create-database-environment', ['does-docker-machine-exist'], function(cb) {
     exec('docker inspect --type=image \'sqlserver\'', function(err, stdout, stderr) {
         if (err) {
             cb(err);
@@ -102,9 +102,9 @@ gulp.task('create-db-user', ['set-dev-db-env'], (cb) => {
     async () => {
         try {
             const pool = await mssql.connect(`mssql://${config.user}:${config.password}@${config.server},${config.port}/${config.database}`);
-            const login_result = await mssql.query(`create login ${config.user} with password ${config.password}`);
+            const login_result = await mssql.query(`create login ${config.user} with password=${config.password}`);
             const user_result = await mssql.query(`create user ${config.user} for login ${config.user}`);
-        } catch(e) {
+        } catch (e) {
             log(`create-db-user():  failed to create user:  ${e}.`);
         }
     }
@@ -125,7 +125,7 @@ gulp.task('list-db-users', ['set-dev-db-env'], (cb) => {
             const pool = await mssql.connect(`mssql://${config.user}:${config.password}@${config.server},${config.port}/${config.database}`);
             const login_result = await mssql.query(`select * from master.sys.server_principals`);
             log(`list-db-users():  ${login_result}`);
-        } catch(e) {
+        } catch (e) {
             log(`list-db-users():  failed to list users:  ${e}.`);
         }
     }
