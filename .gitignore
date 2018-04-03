@@ -1,1 +1,8 @@
 .vscode/
+
+# .NET artifacts
+obj/
+bin/
+
+# Nodejs
+node_modules/
