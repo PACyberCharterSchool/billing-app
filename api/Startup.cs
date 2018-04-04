@@ -5,11 +5,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-using api.Models;
+using System;
 
 using dotenv.net;
 
-using System;
+using api.Models;
+using api.Services;
 
 namespace api
 {
@@ -34,6 +35,7 @@ namespace api
 
 		public void ConfigureServices(IServiceCollection services)
 		{
+			#region DB
 			var hostName = Environment.GetEnvironmentVariable("DATABASE_HOST");
 			var databaseName = Environment.GetEnvironmentVariable("DATABASE_NAME");
 			var userName = Environment.GetEnvironmentVariable("DATABASE_USERNAME");
@@ -41,11 +43,22 @@ namespace api
 			var port = Environment.GetEnvironmentVariable("DATABASE_PORT");
 
 			var connectionString = $"Server={hostName},{port};Database={databaseName};User Id={userName};Password={password}";
-
 			_logger.LogInformation($"Startup.ConfigureServices(): connectionString is {connectionString}.");
-			_logger.LogInformation($"Startup.ConfigureServices():  WTF?");
 
 			services.AddDbContext<StudentContext>(opt => opt.UseSqlServer(connectionString));
+			#endregion
+
+			#region LDAP
+			services.AddTransient<ILdapService, LdapService>();
+			#endregion
+
+			#region JWT
+			var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+			var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+			services.AddSingleton<JwtConfig>(new JwtConfig(jwtIssuer, jwtKey));
+			services.AddTransient<IJwtService, JwtService>();
+			#endregion
+
 			services.AddMvc();
 		}
 
