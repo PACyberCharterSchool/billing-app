@@ -98,18 +98,8 @@ namespace api.Tests.Controllers
 			var user = new LdapUser(username);
 			_ldap.Setup(l => l.GetUser(username, password)).Returns(user);
 
-			// TODO(Erik): compare raw JSON to returned token?
-			var claims = new[] {
-				new Claim(JwtRegisteredClaimNames.Sub, user.Username)
-			};
-			var key = new SymmetricSecurityKey(Encoding.Unicode.GetBytes("thisisasecret"));
-			var token = new JwtSecurityToken(
-				issuer: "issuer",
-				audience: "issuer?",
-				claims: claims,
-				expires: DateTime.Now.AddHours(1),
-				signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
-			);
+			var token = new JwtSecurityToken();
+			// verify necessary claims are passed
 			_jwt.Setup(j => j.BuildToken(It.Is<Claim[]>(cs => cs[0].Value == user.Username))).Returns(token);
 
 			var result = await _uut.Login($"Basic {auth}");
