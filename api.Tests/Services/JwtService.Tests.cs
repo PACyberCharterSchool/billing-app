@@ -24,7 +24,7 @@ namespace api.Tests.Services
 		public void BuildTokenWithClaims()
 		{
 			var issuer = "issuer";
-			var key = "key";
+			var key = "thisisakey";
 			var uut = new JwtService(new JwtConfig(issuer, key));
 
 			var username = "username";
@@ -35,6 +35,9 @@ namespace api.Tests.Services
 			};
 			var now = DateTime.Now;
 			var result = uut.BuildToken(now, claims);
+
+			// ensure token is writable?
+			new JwtSecurityTokenHandler().WriteToken(result);
 
 			var iss = result.Claims.First(c => c.Type == "iss").Value;
 			Assert.That(iss, Is.EqualTo(issuer));
