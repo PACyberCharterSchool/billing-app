@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+// using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -28,11 +29,11 @@ namespace api.Controllers
 
 		public struct LoginArgs
 		{
-			[Required]
-			public string Username;
+			[Required(AllowEmptyStrings = false)]
+			public string Username { get; set; }
 
-			[Required]
-			public string Password;
+			[Required(AllowEmptyStrings = false)]
+			public string Password { get; set; }
 		}
 
 		public struct ErrorResponse
@@ -73,6 +74,10 @@ namespace api.Controllers
 			catch (LdapUnauthorizedException)
 			{
 				return Unauthorized();
+			}
+			catch (NotImplementedException)
+			{
+				return StatusCode(500, new ErrorResponse("can't do that yet"));
 			}
 
 			var token = _jwt.BuildToken(new[]{
