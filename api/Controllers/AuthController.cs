@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -25,11 +26,20 @@ namespace api.Controllers
 			_logger = logger;
 		}
 
-		public struct ConnectionError
+		public struct LoginArgs
+		{
+			[Required]
+			public string Username;
+
+			[Required]
+			public string Password;
+		}
+
+		public struct ErrorResponse
 		{
 			public string Error { get; }
 
-			public ConnectionError(string error)
+			public ErrorResponse(string error)
 			{
 				Error = error;
 			}
@@ -46,30 +56,19 @@ namespace api.Controllers
 		}
 
 		[HttpPost("login")]
-		public async Task<IActionResult> Login([FromHeader]string authorization)
+		public async Task<IActionResult> Login([FromBody]LoginArgs args)
 		{
-			if (string.IsNullOrEmpty(authorization))
-				return BadRequest();
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
 
-			if (!authorization.StartsWith("Basic "))
-				return BadRequest();
-
-			authorization = authorization.Substring("Basic ".Length);
-			authorization = Encoding.Unicode.GetString(Convert.FromBase64String(authorization));
-			var parts = authorization.Split(":");
-			if (parts.Length != 2)
-				return BadRequest();
-
-			var username = parts[0];
-			var password = parts[1];
 			LdapUser user;
 			try
 			{
-				user = _ldap.GetUser(username, password);
+				user = _ldap.GetUser(args.Username, args.Password);
 			}
 			catch (LdapConnectionException)
 			{
-				return StatusCode(500, new ConnectionError("could not connect to LDAP server"));
+				return StatusCode(500, new ErrorResponse("could not connect to LDAP server"));
 			}
 			catch (LdapUnauthorizedException)
 			{

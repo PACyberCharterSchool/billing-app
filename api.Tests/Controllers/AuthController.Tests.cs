@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,26 +37,17 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async Task BadRequestWhenMissingHeader()
+		public async Task BadRequestWhenModelStateInvalid()
 		{
-			var result = await _uut.Login(null);
-			Assert.That(result, Is.TypeOf(typeof(BadRequestResult)));
-		}
+			var key = "error key";
+			var msg = "error message";
+			_uut.ModelState.AddModelError(key, msg);
 
-		[Test]
-		public async Task BadRequestWhenAuthorizationNotBasic()
-		{
-			var auth = Convert.ToBase64String(Encoding.Unicode.GetBytes("username:password"));
-			var result = await _uut.Login(auth);
-			Assert.That(result, Is.TypeOf(typeof(BadRequestResult)));
-		}
+			var result = await _uut.Login(new AuthController.LoginArgs());
+			Assert.That(result, Is.TypeOf(typeof(BadRequestObjectResult)));
 
-		[Test]
-		public async Task BadRequestWhenAuthorizationBadFormat()
-		{
-			var auth = Convert.ToBase64String(Encoding.Unicode.GetBytes("badauth"));
-			var result = await _uut.Login($"Basic {auth}");
-			Assert.That(result, Is.TypeOf(typeof(BadRequestResult)));
+			var value = (Dictionary<string, object>)((BadRequestObjectResult)result).Value;
+			Assert.That(((string[])value.GetValueOrDefault(key))[0], Is.EqualTo(msg));
 		}
 
 		[Test]
@@ -62,17 +55,20 @@ namespace api.Tests.Controllers
 		{
 			var username = "username";
 			var password = "password";
-			var auth = Convert.ToBase64String(Encoding.Unicode.GetBytes($"{username}:{password}"));
 
 			_ldap.Setup(l => l.GetUser(username, password)).Throws(new LdapConnectionException());
 
-			var result = await _uut.Login($"Basic {auth}");
+			var result = await _uut.Login(new AuthController.LoginArgs
+			{
+				Username = username,
+				Password = password,
+			});
 			Assert.That(result, Is.TypeOf(typeof(ObjectResult)));
 			Assert.That(((ObjectResult)result).StatusCode, Is.EqualTo(500));
 
 			var value = ((ObjectResult)result).Value;
-			Assert.That(value, Is.TypeOf(typeof(AuthController.ConnectionError)));
-			Assert.That(((AuthController.ConnectionError)value).Error, Is.EqualTo("could not connect to LDAP server"));
+			Assert.That(value, Is.TypeOf(typeof(AuthController.ErrorResponse)));
+			Assert.That(((AuthController.ErrorResponse)value).Error, Is.EqualTo("could not connect to LDAP server"));
 		}
 
 		[Test]
@@ -80,11 +76,13 @@ namespace api.Tests.Controllers
 		{
 			var username = "username";
 			var password = "password";
-			var auth = Convert.ToBase64String(Encoding.Unicode.GetBytes($"{username}:{password}"));
-
 			_ldap.Setup(l => l.GetUser(username, password)).Throws(new LdapUnauthorizedException());
 
-			var result = await _uut.Login($"Basic {auth}");
+			var result = await _uut.Login(new AuthController.LoginArgs
+			{
+				Username = username,
+				Password = password,
+			});
 			Assert.That(result, Is.TypeOf(typeof(UnauthorizedResult)));
 		}
 
@@ -93,8 +91,6 @@ namespace api.Tests.Controllers
 		{
 			var username = "username";
 			var password = "password";
-			var auth = Convert.ToBase64String(Encoding.Unicode.GetBytes($"{username}:{password}"));
-
 			var user = new LdapUser(username);
 			_ldap.Setup(l => l.GetUser(username, password)).Returns(user);
 
@@ -102,7 +98,11 @@ namespace api.Tests.Controllers
 			// verify necessary claims are passed
 			_jwt.Setup(j => j.BuildToken(It.Is<Claim[]>(cs => cs[0].Value == user.Username))).Returns(token);
 
-			var result = await _uut.Login($"Basic {auth}");
+			var result = await _uut.Login(new AuthController.LoginArgs
+			{
+				Username = username,
+				Password = password,
+			});
 
 			Assert.That(result, Is.TypeOf(typeof(OkObjectResult)));
 			var value = ((OkObjectResult)result).Value;
