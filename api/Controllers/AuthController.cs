@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-// using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using System;
@@ -65,7 +64,7 @@ namespace api.Controllers
 			LdapUser user;
 			try
 			{
-				user = _ldap.GetUser(args.Username, args.Password);
+				user = await Task.Run(() => _ldap.GetUser(args.Username, args.Password));
 			}
 			catch (LdapConnectionException)
 			{
@@ -77,7 +76,7 @@ namespace api.Controllers
 			}
 			catch (NotImplementedException)
 			{
-				return StatusCode(500, new ErrorResponse("can't do that yet"));
+				return StatusCode(501, new ErrorResponse("can't do that yet"));
 			}
 
 			var token = _jwt.BuildToken(new[]{
