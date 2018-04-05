@@ -1,6 +1,8 @@
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace api.Services
 {
@@ -19,6 +21,7 @@ namespace api.Services
 	public interface IJwtService
 	{
 		JwtSecurityToken BuildToken(Claim[] claims = null);
+		JwtSecurityToken BuildToken(DateTime time, Claim[] claims = null);
 	}
 
 	public class JwtService : IJwtService
@@ -32,6 +35,18 @@ namespace api.Services
 			_key = cfg.Key;
 		}
 
-		public JwtSecurityToken BuildToken(Claim[] claims = null) => throw new NotImplementedException();
+		public JwtSecurityToken BuildToken(Claim[] claims = null) => BuildToken(DateTime.Now, claims);
+
+		public JwtSecurityToken BuildToken(DateTime time, Claim[] claims = null)
+		{
+			var key = new SymmetricSecurityKey(Encoding.Unicode.GetBytes(_key));
+			return new JwtSecurityToken(
+				issuer: _issuer,
+				audience: _issuer,
+				claims: claims,
+				expires: time.AddHours(1), // TODO(Erik): configurable?
+				signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+			);
+		}
 	}
 }
