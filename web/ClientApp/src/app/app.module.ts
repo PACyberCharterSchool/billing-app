@@ -14,6 +14,12 @@ import { TitleBarComponent } from './title-bar/title-bar.component';
 import { ContentAreaComponent } from './content-area/content-area.component';
 import { FooterComponent } from './footer/footer.component';
 import { ActionContentComponent } from './action-content/action-content.component';
+import { LoginPopupComponent } from './login-popup/login-popup.component';
+
+// Angular Material components
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { MatMenuModule, MatIconModule, MatButtonModule, MatSidenavModule } from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -26,17 +32,23 @@ import { ActionContentComponent } from './action-content/action-content.componen
     TitleBarComponent,
     ContentAreaComponent,
     FooterComponent,
-    ActionContentComponent
+    ActionContentComponent,
+    LoginPopupComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
+    BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot([
       // { path: '', component: HomeComponent, pathMatch: 'full' },
       // { path: 'counter', component: CounterComponent },
       // { path: 'fetch-data', component: FetchDataComponent },
-    ])
+    ]),
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    MatSidenavModule
   ],
   providers: [],
   bootstrap: [AppComponent]
