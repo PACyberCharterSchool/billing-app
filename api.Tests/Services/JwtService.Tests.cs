@@ -48,7 +48,11 @@ namespace api.Tests.Services
 			var aud = result.Claims.First(c => c.Type == "aud").Value;
 			Assert.That(aud, Is.EqualTo(issuer));
 
-			var time = GetSecondsFromEpoch(now.AddHours(1));
+			var time = GetSecondsFromEpoch(now);
+			var nbf = result.Claims.First(c => c.Type == "nbf").Value;
+			Assert.That(nbf, Is.EqualTo(time.TotalSeconds.ToString("0")));
+
+			time = GetSecondsFromEpoch(now.AddHours(1));
 			var exp = result.Claims.First(c => c.Type == "exp").Value;
 			Assert.That(exp, Is.EqualTo(time.TotalSeconds.ToString("0")));
 

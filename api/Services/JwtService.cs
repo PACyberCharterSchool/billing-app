@@ -43,7 +43,7 @@ namespace api.Services
 				issuer: _issuer,
 				audience: _issuer,
 				claims: claims,
-				// TODO(Erik): notBefore
+				notBefore: time,
 				expires: time.AddHours(1), // TODO(Erik): configurable?
 				signingCredentials: new SigningCredentials(_key, SecurityAlgorithms.HmacSha256)
 			);
