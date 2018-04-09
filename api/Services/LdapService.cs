@@ -32,9 +32,20 @@ namespace api.Services
 		LdapUser GetUser(string username, string password);
 	}
 
-	public class LdapConnectionException : Exception { }
+	public class LdapConnectionException : Exception
+	{
+		private static string _message = "could not connect to Active Directory";
 
-	public class LdapUnauthorizedException : Exception { }
+		public LdapConnectionException(Exception e) : base(_message, e) { }
+	}
+
+	public class LdapUnauthorizedException : Exception
+	{
+		private static string _message = "could not authorize user";
+
+		public LdapUnauthorizedException(Exception e) : base(_message, e) { }
+		public LdapUnauthorizedException(string e) : base(_message, new Exception(e)) { }
+	}
 
 	public class LdapConfig
 	{
@@ -78,9 +89,9 @@ namespace api.Services
 					conn.Connect(_cfg.Url, 389);
 					conn.Bind(_cfg.AuthDistinguishedName, _cfg.AuthPassword);
 				}
-				catch (LdapException)
+				catch (LdapException e)
 				{
-					throw new LdapConnectionException();
+					throw new LdapConnectionException(e);
 				}
 
 				try
@@ -96,21 +107,21 @@ namespace api.Services
 					var entry = result.next();
 					_logger.LogDebug($"entry: {entry}");
 					if (entry == null)
-						throw new LdapUnauthorizedException();
+						throw new LdapUnauthorizedException("did not find user");
 
 					conn.Bind(entry.DN, password);
 					if (!conn.Bound)
-						throw new LdapUnauthorizedException();
+						throw new LdapUnauthorizedException("invalid password");
 
 					var role = GetRole(entry.getAttribute("memberOf").StringValueArray);
 					if (string.IsNullOrEmpty(role))
-						throw new LdapUnauthorizedException();
+						throw new LdapUnauthorizedException("not a member of configured group");
 
 					return new LdapUser(username, role);
 				}
 				catch (Exception e) when (e is LdapException || e is LdapReferralException)
 				{
-					throw new LdapUnauthorizedException();
+					throw new LdapUnauthorizedException(e);
 				}
 			}
 

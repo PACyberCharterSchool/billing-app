@@ -57,7 +57,7 @@ namespace api.Tests.Controllers
 			var username = "username";
 			var password = "password";
 
-			_ldap.Setup(l => l.GetUser(username, password)).Throws(new LdapConnectionException());
+			_ldap.Setup(l => l.GetUser(username, password)).Throws(new LdapConnectionException(new Exception("borked")));
 
 			var result = await _uut.Login(new AuthController.LoginArgs
 			{
@@ -77,7 +77,7 @@ namespace api.Tests.Controllers
 		{
 			var username = "username";
 			var password = "password";
-			_ldap.Setup(l => l.GetUser(username, password)).Throws(new LdapUnauthorizedException());
+			_ldap.Setup(l => l.GetUser(username, password)).Throws(new LdapUnauthorizedException("borked"));
 
 			var result = await _uut.Login(new AuthController.LoginArgs
 			{
