@@ -31,14 +31,14 @@ namespace api.Controllers
 		}
 
 		[HttpGet]
-		[Authorize]
-		public IEnumerable<Student> GetAll()
+		[Authorize(Policy = "STD+")]
+		public IActionResult GetAll()
 		{
-			return _context.Students.ToList();
+			return new ObjectResult(_context.Students.ToList());
 		}
 
 		[HttpGet("{id}", Name = "GetStudent")]
-		[Authorize]
+		[Authorize(Policy = "STD+")]
 		public IActionResult GetById(long id)
 		{
 			var student = _context.Students.FirstOrDefault(s => s.Id == id);
@@ -50,7 +50,7 @@ namespace api.Controllers
 		}
 
 		[HttpPost]
-		[Authorize]
+		[Authorize(Policy = "PAY+")]
 		public IActionResult Create([FromBody] Student s)
 		{
 			_logger.LogDebug("StudentsController.Create():  creating students {s}.");
@@ -69,7 +69,7 @@ namespace api.Controllers
 		}
 
 		[HttpPut("{id}")]
-		[Authorize]
+		[Authorize(Policy = "PAY+")]
 		public IActionResult Update(int id, [FromBody]Student model)
 		{
 			if (!ModelState.IsValid)
@@ -92,7 +92,7 @@ namespace api.Controllers
 		}
 
 		[HttpDelete("{id}")]
-		[Authorize]
+		[Authorize(Policy = "ADM=")]
 		public IActionResult Delete(int id)
 		{
 			var student = _context.Students.Find(id);

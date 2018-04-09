@@ -70,9 +70,9 @@ namespace api
 			services.AddSingleton<JwtConfig>(new JwtConfig(jwtIssuer, jwtKey));
 			services.AddTransient<IJwtService, JwtService>();
 			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
-				AddJwtBearer(options =>
+				AddJwtBearer(o =>
 				{
-					options.TokenValidationParameters = new TokenValidationParameters
+					o.TokenValidationParameters = new TokenValidationParameters
 					{
 						ValidateIssuer = true,
 						ValidIssuer = jwtIssuer,
@@ -83,9 +83,23 @@ namespace api
 						ValidateIssuerSigningKey = true,
 						IssuerSigningKey = jwtKey,
 
+						RequireExpirationTime = true,
 						ValidateLifetime = true,
 					};
 				});
+			services.AddAuthorization(o =>
+			{
+				o.AddPolicy("STD+", p => p.RequireRole(new[] {
+					LdapUser.RoleStandardUser,
+					LdapUser.RolePayManager,
+					LdapUser.RoleAdmin,
+				}));
+				o.AddPolicy("PAY+", p => p.RequireRole(new[] {
+					LdapUser.RolePayManager,
+					LdapUser.RoleAdmin
+				}));
+				o.AddPolicy("ADM=", p => p.RequireRole(new[] { LdapUser.RoleAdmin }));
+			});
 			#endregion
 
 			services.AddMvc();
