@@ -1,7 +1,9 @@
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 
 using NUnit.Framework;
 
@@ -24,7 +26,7 @@ namespace api.Tests.Services
 		public void BuildTokenWithClaims()
 		{
 			var issuer = "issuer";
-			var key = "thisisakey";
+			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("thisisasupersecretkey"));
 			var uut = new JwtService(new JwtConfig(issuer, key));
 
 			var username = "username";
@@ -36,9 +38,10 @@ namespace api.Tests.Services
 			var now = DateTime.Now;
 			var result = uut.BuildToken(now, claims);
 
-			// ensure token is writable?
+			// ensure token is writable; if key is too short will fail
 			new JwtSecurityTokenHandler().WriteToken(result);
 
+			// assert always-present claims
 			var iss = result.Claims.First(c => c.Type == "iss").Value;
 			Assert.That(iss, Is.EqualTo(issuer));
 
@@ -49,6 +52,7 @@ namespace api.Tests.Services
 			var exp = result.Claims.First(c => c.Type == "exp").Value;
 			Assert.That(exp, Is.EqualTo(time.TotalSeconds.ToString("0")));
 
+			// assert additional claims
 			var sub = result.Claims.First(c => c.Type == "sub").Value;
 			Assert.That(sub, Is.EqualTo(username));
 

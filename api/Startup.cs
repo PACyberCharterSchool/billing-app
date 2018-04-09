@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Text;
 
 using dotenv.net;
 
@@ -63,9 +66,26 @@ namespace api
 
 			#region JWT
 			var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
-			var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+			var jwtKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")));
 			services.AddSingleton<JwtConfig>(new JwtConfig(jwtIssuer, jwtKey));
 			services.AddTransient<IJwtService, JwtService>();
+			services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).
+				AddJwtBearer(options =>
+				{
+					options.TokenValidationParameters = new TokenValidationParameters
+					{
+						ValidateIssuer = true,
+						ValidIssuer = jwtIssuer,
+
+						ValidateAudience = true,
+						ValidAudience = jwtIssuer,
+
+						ValidateIssuerSigningKey = true,
+						IssuerSigningKey = jwtKey,
+
+						ValidateLifetime = true,
+					};
+				});
 			#endregion
 
 			services.AddMvc();
@@ -73,6 +93,7 @@ namespace api
 
 		public void Configure(IApplicationBuilder app, StudentContext context)
 		{
+			app.UseAuthentication();
 			app.UseMvc();
 			context.Database.Migrate();
 		}

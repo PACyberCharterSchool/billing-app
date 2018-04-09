@@ -9,9 +9,9 @@ namespace api.Services
 	public class JwtConfig
 	{
 		public string Issuer { get; }
-		public string Key { get; }
+		public SecurityKey Key { get; }
 
-		public JwtConfig(string issuer, string key)
+		public JwtConfig(string issuer, SecurityKey key)
 		{
 			Issuer = issuer;
 			Key = key;
@@ -27,7 +27,7 @@ namespace api.Services
 	public class JwtService : IJwtService
 	{
 		private readonly string _issuer;
-		private readonly string _key;
+		private readonly SecurityKey _key;
 
 		public JwtService(JwtConfig cfg)
 		{
@@ -39,13 +39,12 @@ namespace api.Services
 
 		public JwtSecurityToken BuildToken(DateTime time, Claim[] claims = null)
 		{
-			var key = new SymmetricSecurityKey(Encoding.Unicode.GetBytes(_key));
 			return new JwtSecurityToken(
 				issuer: _issuer,
 				audience: _issuer,
 				claims: claims,
 				expires: time.AddHours(1), // TODO(Erik): configurable?
-				signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+				signingCredentials: new SigningCredentials(_key, SecurityAlgorithms.HmacSha256)
 			);
 		}
 	}
