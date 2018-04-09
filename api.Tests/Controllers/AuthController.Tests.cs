@@ -14,6 +14,7 @@ using NUnit.Framework;
 
 using api.Controllers;
 using api.Services;
+using api.Tests.Util;
 
 namespace api.Tests.Controllers
 {
@@ -22,7 +23,7 @@ namespace api.Tests.Controllers
 	{
 		private Mock<ILdapService> _ldap;
 		private Mock<IJwtService> _jwt;
-		private Mock<ILogger<AuthController>> _logger;
+		private ILogger<AuthController> _logger;
 
 		private AuthController _uut;
 
@@ -31,9 +32,9 @@ namespace api.Tests.Controllers
 		{
 			_ldap = new Mock<ILdapService>();
 			_jwt = new Mock<IJwtService>();
-			_logger = new Mock<ILogger<AuthController>>();
+			_logger = new TestLogger<AuthController>();
 
-			_uut = new AuthController(_ldap.Object, _jwt.Object, _logger.Object);
+			_uut = new AuthController(_ldap.Object, _jwt.Object, _logger);
 		}
 
 		[Test]
@@ -91,12 +92,15 @@ namespace api.Tests.Controllers
 		{
 			var username = "username";
 			var password = "password";
-			var user = new LdapUser(username);
+			var user = new LdapUser(username, LdapUser.RoleAdmin);
 			_ldap.Setup(l => l.GetUser(username, password)).Returns(user);
 
 			var token = new JwtSecurityToken();
 			// verify necessary claims are passed
-			_jwt.Setup(j => j.BuildToken(It.Is<Claim[]>(cs => cs[0].Value == user.Username))).Returns(token);
+			_jwt.Setup(j => j.BuildToken(It.Is<Claim[]>(cs =>
+				cs[0].Type == "sub" && cs[0].Value == user.Username &&
+				cs[1].Type == "role" && cs[1].Value == user.Role
+			))).Returns(token);
 
 			var result = await _uut.Login(new AuthController.LoginArgs
 			{

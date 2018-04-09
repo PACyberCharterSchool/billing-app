@@ -64,7 +64,7 @@ namespace api.Controllers
 			LdapUser user;
 			if (args.Username == "radev" && args.Password == "secret")
 			{
-				user = new LdapUser(args.Username);
+				user = new LdapUser(args.Username, LdapUser.RoleAdmin);
 			}
 			else
 			{
@@ -72,24 +72,27 @@ namespace api.Controllers
 				{
 					user = await Task.Run(() => _ldap.GetUser(args.Username, args.Password));
 				}
-				catch (LdapConnectionException)
+				catch (LdapConnectionException e)
 				{
+					_logger.LogError($"exception: {e}");
 					return StatusCode(500, new ErrorResponse("could not connect to LDAP server"));
 				}
-				catch (LdapUnauthorizedException)
+				catch (LdapUnauthorizedException e)
 				{
+					_logger.LogWarning($"exception: {e}");
 					return Unauthorized();
 				}
-				catch (NotImplementedException)
+				catch (NotImplementedException e)
 				{
+					_logger.LogDebug($"exception: {e}");
 					return StatusCode(501, new ErrorResponse("can't do that yet"));
 				}
 			}
 
-			var token = _jwt.BuildToken(new[]{
-				new Claim(JwtRegisteredClaimNames.Sub, user.Username)
-			});
-			return Ok(new TokenResponse(new JwtSecurityTokenHandler().WriteToken(token)));
+			return Ok(new TokenResponse(new JwtSecurityTokenHandler().WriteToken(_jwt.BuildToken(new[]{
+				new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+				new Claim("role", user.Role)
+			}))));
 		}
 	}
 }

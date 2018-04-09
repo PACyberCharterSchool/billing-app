@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-
 using System;
 
 using dotenv.net;
@@ -49,6 +48,16 @@ namespace api
 			#endregion
 
 			#region LDAP
+			services.AddSingleton<LdapConfig>(new LdapConfig
+			{
+				Url = Environment.GetEnvironmentVariable("LDAP_URL"),
+				AuthDistinguishedName = Environment.GetEnvironmentVariable("LDAP_AUTHDN"),
+				AuthPassword = Environment.GetEnvironmentVariable("LDAP_AUTHPWD"),
+				SearchBase = Environment.GetEnvironmentVariable("LDAP_SEARCHBASE"),
+				AdminDistinguishedName = Environment.GetEnvironmentVariable("LDAP_ADMINDN"),
+				PayDistinguishedName = Environment.GetEnvironmentVariable("LDAP_PAYDN"),
+				StandardDistinguishedName = Environment.GetEnvironmentVariable("LDAP_STDDN"),
+			});
 			services.AddTransient<ILdapService, LdapService>();
 			#endregion
 

@@ -1,14 +1,29 @@
+using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
+
+using Novell.Directory.Ldap;
 
 namespace api.Services
 {
 	public struct LdapUser
 	{
-		public string Username { get; }
+		public static readonly string RoleAdmin = "ADM";
+		public static readonly string RolePayManager = "PAY";
+		public static readonly string RoleStandardUser = "STD";
 
-		public LdapUser(string username)
+		public string Username { get; }
+		public string Role { get; }
+
+		public LdapUser(string username, string role)
 		{
 			Username = username;
+			Role = role;
+		}
+
+		public override string ToString()
+		{
+			return $"[LdapUser: Username: {Username}; Role: {Role}]";
 		}
 	}
 
@@ -21,8 +36,95 @@ namespace api.Services
 
 	public class LdapUnauthorizedException : Exception { }
 
+	public class LdapConfig
+	{
+		public string Url { get; set; }
+		public string AuthDistinguishedName { get; set; }
+		public string AuthPassword { get; set; }
+		public string SearchBase { get; set; }
+		public string AdminDistinguishedName { get; set; }
+		public string PayDistinguishedName { get; set; }
+		public string StandardDistinguishedName { get; set; }
+
+		public override string ToString()
+		{
+			return $"[\n\tUrl: {Url}" +
+			$"\n\tAuthDN: {AuthDistinguishedName}\n\tAuthPwd: {AuthPassword}" +
+			$"\n\tSearchBase: {SearchBase}" +
+			$"\n\tAdmin: {AdminDistinguishedName}\n\tPay: {PayDistinguishedName}\n\tStandard: {StandardDistinguishedName}" +
+			$"\n]";
+		}
+	}
+
 	public class LdapService : ILdapService
 	{
-		public LdapUser GetUser(string username, string password) => throw new NotImplementedException();
+		private readonly LdapConfig _cfg;
+		private readonly ILogger<LdapService> _logger;
+
+		public LdapService(LdapConfig cfg, ILogger<LdapService> logger)
+		{
+			_cfg = cfg;
+			_logger = logger;
+		}
+
+		public LdapUser GetUser(string username, string password)
+		{
+			_logger.LogDebug($"config: {_cfg}");
+
+			using (var conn = new LdapConnection())
+			{
+				try
+				{
+					conn.Connect(_cfg.Url, 389);
+					conn.Bind(_cfg.AuthDistinguishedName, _cfg.AuthPassword);
+				}
+				catch (LdapException)
+				{
+					throw new LdapConnectionException();
+				}
+
+				try
+				{
+					var result = conn.Search(
+						@base: _cfg.SearchBase,
+						scope: LdapConnection.SCOPE_SUB,
+						filter: $"cn={username}",
+						attrs: new[] { "memberOf" },
+						typesOnly: false
+					);
+
+					var entry = result.next();
+					_logger.LogDebug($"entry: {entry}");
+					if (entry == null)
+						throw new LdapUnauthorizedException();
+
+					conn.Bind(entry.DN, password);
+					if (!conn.Bound)
+						throw new LdapUnauthorizedException();
+
+					var role = GetRole(entry.getAttribute("memberOf").StringValueArray);
+					if (string.IsNullOrEmpty(role))
+						throw new LdapUnauthorizedException();
+
+					return new LdapUser(username, role);
+				}
+				catch (Exception e) when (e is LdapException || e is LdapReferralException)
+				{
+					throw new LdapUnauthorizedException();
+				}
+			}
+
+			string GetRole(string[] roles)
+			{
+				if (roles.Contains(_cfg.AdminDistinguishedName))
+					return LdapUser.RoleAdmin;
+				else if (roles.Contains(_cfg.PayDistinguishedName))
+					return LdapUser.RolePayManager;
+				else if (roles.Contains(_cfg.StandardDistinguishedName))
+					return LdapUser.RoleStandardUser;
+
+				return null;
+			}
+		}
 	}
 }
