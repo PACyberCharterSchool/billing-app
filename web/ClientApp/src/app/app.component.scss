@@ -1,4 +1,4 @@
-:host {
+host {
   position: absolute;
   left: 0;
   right: 0;
@@ -6,7 +6,9 @@
   top: 0;
 
   .container-fluid {
+    background-color: transparent;
     height: 100vh;
+
     .row {
       height: 100vh;
       .body-content {

@@ -1,9 +1,86 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
 
+/* Some custom fonts used by PACBill */
+@font-face {
+  font-family: 'Museo Sans';
+  src: url('assets/fonts/MuseoSans_500.otf');
+}
+
+@font-face {
+  font-family: 'Museo Sans Regular';
+  src: url('assets/fonts/Museo500-Regular.otf');
+}
+
+@font-face {
+  font-family: 'Museo Slab';
+  src: url('assets/fonts/Museo_Slab_500.otf');
+}
+
 body, html {
+  background-image: url('assets/images/bg.jpg');
+  font-family: 'Museo Sans';
+  font-size: 15px;
   height: 100vh;
+  line-height: 18px;
   margin: 0;
   overflow: hidden;
   padding: 0;
+
+  h2 {
+    font-family: 'Museo Slab';
+    font-size: 22px;
+  }
+
+  table {
+    color: #4d4d4d;
+    font-family: 'Museo Sans';
+    font-size: 13px;
+    line-height: 35px;
+  }
+
+  select {
+    color: #4d4d4d;
+    font-family: 'Museo Sans';
+    font-size: 15px;
+    line-height: 18px;
+  }
+
+  .validation {
+    font-family: 'Museo Slab';
+    font-size: 22px;
+  }
+
+  .btn-action {
+    background-color: #005a92;
+  }
+
+  .btn-active {
+    background-color: #4d4d4d;
+    color: #ffffff;
+  }
+
+  .btn-inactive {
+    background-color: #ffffff;
+    border: 1px solid #d6d6d6;
+    color: #4d4d4d;
+  }
+
+  .btn-primary {
+    background-color: #58a719;
+    border: none;
+    color: #ffffff;
+    font-family: 'Museo Slab';
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .btn-secondary {
+    border: 1px solid #4d4d4d;
+  }
+
+  .btn-validate {
+    background-color: #fe4848;
+    color: #ffffff;
+  }
 }
