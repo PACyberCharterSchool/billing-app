@@ -26,7 +26,7 @@ namespace api
 
 			var builder = new ConfigurationBuilder();
 
-			DotEnv.Config();
+			DotEnv.Config(false);
 			builder.AddUserSecrets<Startup>();
 			_conf = builder.Build();
 		}
