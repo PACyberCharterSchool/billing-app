@@ -109,7 +109,15 @@ namespace api
 		public void Configure(IApplicationBuilder app, StudentContext context)
 		{
 			app.UseAuthentication();
+			// TODO(Erik): figure something out for production
+			app.UseCors(builder => builder.
+				AllowAnyOrigin().
+				AllowAnyMethod().
+				AllowAnyHeader().
+				AllowCredentials());
+
 			app.UseMvc();
+
 			context.Database.Migrate();
 		}
 	}
