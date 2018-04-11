@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 
+using static api.Common.UserRoles;
 using api.Controllers;
 using api.Services;
 using api.Tests.Util;
@@ -92,7 +93,7 @@ namespace api.Tests.Controllers
 		{
 			var username = "username";
 			var password = "password";
-			var user = new LdapUser(username, LdapUser.RoleAdmin);
+			var user = new LdapUser(username, ADMIN);
 			_ldap.Setup(l => l.GetUser(username, password)).Returns(user);
 
 			var token = new JwtSecurityToken();

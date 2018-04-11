@@ -11,6 +11,7 @@ using System.Text;
 
 using dotenv.net;
 
+using static api.Common.UserRoles;
 using api.Models;
 using api.Services;
 
@@ -90,15 +91,15 @@ namespace api
 			services.AddAuthorization(o =>
 			{
 				o.AddPolicy("STD+", p => p.RequireRole(new[] {
-					LdapUser.RoleStandardUser,
-					LdapUser.RolePayManager,
-					LdapUser.RoleAdmin,
+					STANDARD_USER,
+					PAYMENT_MANAGER,
+					ADMIN,
 				}));
 				o.AddPolicy("PAY+", p => p.RequireRole(new[] {
-					LdapUser.RolePayManager,
-					LdapUser.RoleAdmin
+					PAYMENT_MANAGER,
+					ADMIN,
 				}));
-				o.AddPolicy("ADM=", p => p.RequireRole(new[] { LdapUser.RoleAdmin }));
+				o.AddPolicy("ADM=", p => p.RequireRole(new[] { ADMIN }));
 			});
 			#endregion
 

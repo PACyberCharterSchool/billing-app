@@ -4,14 +4,12 @@ using System.Linq;
 
 using Novell.Directory.Ldap;
 
+using static api.Common.UserRoles;
+
 namespace api.Services
 {
 	public struct LdapUser
 	{
-		public static readonly string RoleAdmin = "ADM";
-		public static readonly string RolePayManager = "PAY";
-		public static readonly string RoleStandardUser = "STD";
-
 		public string Username { get; }
 		public string Role { get; }
 
@@ -128,11 +126,11 @@ namespace api.Services
 			string GetRole(string[] roles)
 			{
 				if (roles.Contains(_cfg.AdminDistinguishedName))
-					return LdapUser.RoleAdmin;
+					return ADMIN;
 				else if (roles.Contains(_cfg.PayDistinguishedName))
-					return LdapUser.RolePayManager;
+					return PAYMENT_MANAGER;
 				else if (roles.Contains(_cfg.StandardDistinguishedName))
-					return LdapUser.RoleStandardUser;
+					return STANDARD_USER;
 
 				return null;
 			}
