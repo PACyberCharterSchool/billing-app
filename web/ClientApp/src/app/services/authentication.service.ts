@@ -4,14 +4,17 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs/Observable';
 
+import { environment } from '../../environments/environment';
 import { User } from '../models/user.model';
 
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 @Injectable()
 export class AuthenticationService {
-  baseUrl = 'http://localhost:5000/api/auth/login';
-  constructor(private http: HttpClient) { }
+  private apiLoginUrl = '';
+  constructor(private http: HttpClient) {
+    this.apiLoginUrl = environment.apiBaseUrl + '/api/auth/login';
+  }
 
   public isAuthenticated(): boolean {
     const token = localStorage.getItem('jwt-token');
@@ -31,6 +34,7 @@ export class AuthenticationService {
     };
 
     const credentials = { username: email, password: password };
-    return this.http.post(this.baseUrl, JSON.stringify(credentials), headers);
+    console.log('AuthenticationService.authenticate():  apiLoginUrl is ', this.apiLoginUrl);
+    return this.http.post(this.apiLoginUrl, JSON.stringify(credentials), headers);
   }
 }
