@@ -29,6 +29,8 @@ import { MAT_MENU_DEFAULT_OPTIONS } from '@angular/material';
 import { MatMenu } from '@angular/material';
 
 import { AppTitleService } from './services/app-title.service';
+import { AuthenticationService } from './services/authentication.service';
+import { AuthenticationGuardService } from './services/authentication-guard.service';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -66,8 +68,9 @@ const pacbillImports = [
 ];
 
 const pacbillProviders = [
-  AppTitleService
-  // { provide: MAT_MENU_DEFAULT_OPTIONS, useValue: {} }
+  AppTitleService,
+  AuthenticationGuardService,
+  AuthenticationService
 ];
 
 @NgModule({

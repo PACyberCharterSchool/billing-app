@@ -19,12 +19,17 @@ export class LoginPanelFormComponent implements OnInit {
   }
 
   login(): void {
+    console.log('LoginPanelFormComponent.login():  email is ', this.email);
+    console.log('LoginPanelFormComponent.login():  password is ', this.password);
+
     this.authService.authenticate(this.email, this.password).subscribe(
       data => {
-        console.log('LoginPanelFormComponent.login():  authentication successful.  data is ' + data);
+        console.log('LoginPanelFormComponent.login():  authentication successful.  data is ', data);
+        localStorage.setItem('jwt-token', data.token);
+        this.router.navigate(['']);
       },
       error => {
-        console.log('LoginPanelFormComponent.login():  authentication failed.  error is ' + error);
+        console.log('LoginPanelFormComponent.login():  authentication failed.  error is ', error);
       }
     );
   }
