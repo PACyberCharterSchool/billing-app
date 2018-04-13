@@ -1,4 +1,17 @@
+div.alert, div.alert-danger {
+  text-align: left;
+  background-color: #ffffff;
+  border: none;
+  color: #fe4848;
+  padding: 5px 0 0 0;
+}
+
 input {
   font-family: 'Museo Sans Regular';
   font-size: 14px;
+}
+
+.login-response-error {
+  color: #fe4848;
+  margin-bottom: 20px;
 }

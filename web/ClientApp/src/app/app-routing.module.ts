@@ -14,7 +14,7 @@ const routes: Routes = [
   // { path: 'fetch-data', component: FetchDataComponent },
   { path: '', component: HomeComponent, canActivate: [ AuthenticationGuardService ] },
   { path: 'login', component: LoginComponent },
-  { path: 'payments-refunds', component: PaymentsRefundsComponent },
+  { path: 'payments-refunds', component: PaymentsRefundsComponent, canActivate: [ AuthenticationGuardService ] },
 ];
 
 @NgModule({
