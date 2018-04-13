@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
+
+import * as HttpStatus from 'http-status-codes';
 
 import { AuthenticationService } from '../../services/authentication.service';
 
@@ -12,10 +15,34 @@ export class LoginPanelFormComponent implements OnInit {
 
   private email: string;
   private password: string;
+  private loginError: string;
 
   constructor(private router: Router, private authService: AuthenticationService) { }
 
   ngOnInit() {
+  }
+
+  private handleLoginError(error: HttpErrorResponse) {
+    console.log('LoginPanelFormComponent.handleLoginError(): error status is ', error.status);
+
+    switch (error.status) {
+      case HttpStatus.UNAUTHORIZED: {
+        this.loginError = 'The username or password were incorrect.';
+        break;
+      }
+      case HttpStatus.FORBIDDEN: {
+        this.loginError = 'The username has been forbidden access to the application.';
+        break;
+      }
+      case HttpStatus.BAD_REQUEST: {
+        this.loginError = 'The username or password were not in the correct format.';
+        break;
+      }
+      default: {
+        this.loginError = null;
+        break;
+      }
+    }
   }
 
   login(): void {
@@ -29,6 +56,7 @@ export class LoginPanelFormComponent implements OnInit {
         this.router.navigate(['']);
       },
       error => {
+        this.handleLoginError(error);
         console.log('LoginPanelFormComponent.login():  authentication failed.  error is ', error);
       }
     );

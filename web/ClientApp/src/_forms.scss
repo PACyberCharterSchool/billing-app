@@ -1,0 +1,6 @@
+.ng-valid[required], .ng-valid.required  {
+}
+
+.ng-invalid:not(form).ng-touched {
+  border: 1px solid #fe4848;
+}
