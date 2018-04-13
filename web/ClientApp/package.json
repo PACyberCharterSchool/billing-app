@@ -11,7 +11,7 @@
     "test:headless": "ng test --single-run --browsers ChromeHeadless --reporters teamcity",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "postinstall": "webpack --config webpack.config.js"
+    "pack": "webpack --config webpack.config.js --display-error-details"
   },
   "private": true,
   "dependencies": {
