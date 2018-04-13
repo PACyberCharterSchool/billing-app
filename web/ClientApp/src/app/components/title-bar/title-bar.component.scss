@@ -1,20 +1,16 @@
 .title-bar-row {
-  font: "Times New Roman", Times, serif;
-  font-size: 1.25em;
-  height: 70px;
-  margin-bottom: 10px;
-  padding-left: 4px;
-  padding-right: 4px;
-  padding-top: 14px;
+  background-color: #ffffff;
+  height: 75px;
+  padding-left: 20px;
+  padding-top: 10px;
 
   div {
     height: 100%;
   }
-}
 
-.logo {
-  height: 100%;
-  background: url('../../../assets/images/PA_Cyber_Logo.png');
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
+  .logo {
+    height: 100%;
+    background: url('../../../assets/images/PA_Cyber_Logo_55PX.png');
+    background-repeat: no-repeat;
+  }
 }

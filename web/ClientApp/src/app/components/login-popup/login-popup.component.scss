@@ -1,8 +1,17 @@
 div {
+  font-size: 1.5em;
   height: 100%;
 
-  button {
+  mat-menu {
+    button[mat-menu-item] {
+      font-family: 'Museo Sans' !important;
+      height: 100%;
+    }
+  }
+
+  button[mat-icon-button] {
     height: 100%;
+
     .fa-ellipsis-v {
       font-size: 24px;
     }
