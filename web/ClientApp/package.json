@@ -8,6 +8,7 @@
     "build": "ng build --extract-css",
     "build:ssr": "npm run build -- --app=ssr --output-hashing=media",
     "test": "ng test",
+    "test:headless": "ng test --single-run --browsers ChromeHeadless --reporters teamcity",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "postinstall": "webpack --config webpack.config.js"
@@ -52,6 +53,7 @@
     "karma-coverage-istanbul-reporter": "^1.2.1",
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
+    "karma-teamcity-reporter": "^1.1.0",
     "protractor": "~5.1.2",
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
