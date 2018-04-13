@@ -8,7 +8,7 @@
     "build": "ng build --extract-css",
     "build:ssr": "npm run build -- --app=ssr --output-hashing=media",
     "test": "ng test",
-    "test:headless": "ng test --single-run --browsers ChromeHeadless --reporters teamcity",
+    "test:headless": "ng test --progress false --single-run --browsers ChromeHeadless --reporters teamcity",
     "lint": "ng lint",
     "e2e": "ng e2e",
     "pack": "webpack --config webpack.config.js --display-error-details"
