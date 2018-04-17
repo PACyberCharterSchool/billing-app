@@ -13,7 +13,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 export class AuthenticationService {
   private apiLoginUrl = '';
   constructor(private http: HttpClient) {
-    this.apiLoginUrl = environment.apiBaseUrl + '/api/auth/login';
+    this.apiLoginUrl = '/api/auth/login';
   }
 
   public isAuthenticated(): boolean {
