@@ -13,9 +13,9 @@ import { AuthenticationService } from '../../services/authentication.service';
 })
 export class LoginPanelFormComponent implements OnInit {
 
-  private email: string;
-  private password: string;
-  private loginError: string;
+  public email: string;
+  public password: string;
+  public loginError: string;
 
   constructor(private router: Router, private authService: AuthenticationService) { }
 
