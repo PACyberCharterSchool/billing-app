@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace api.Models
 {
@@ -21,5 +23,11 @@ namespace api.Models
 		public DateTime CurrentIep { get; set; }
 		public DateTime FormerIep { get; set; }
 		public int SchoolDistrictId { get; set; }
+
+		private static readonly IEnumerable<string> _fields = typeof(Student).GetProperties().Select(p => p.Name);
+		public static bool IsValidField(string field)
+		{
+			return _fields.Contains(field);
+		}
 	}
 }
