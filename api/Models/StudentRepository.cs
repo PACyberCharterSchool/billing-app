@@ -45,19 +45,19 @@ namespace api.Models
 				field = "Id";
 
 			if (!Student.IsValidField(field))
-				throw new ArgumentException($"Invalid sort field '{field}'.", "field");
+				throw new ArgumentException($"Invalid sort field '{field}'.");
 
 			if (string.IsNullOrWhiteSpace(dir))
 				dir = "asc";
 
 			if (dir != "asc" && dir != "desc")
-				throw new ArgumentException($"Invalid sort direction '{dir}'.", "dir");
+				throw new ArgumentException($"Sort direction must be 'asc' or 'desc'; was '{dir}'.");
 
 			if (skip < 0)
-				throw new ArgumentException($"Skip must be 0 or greater; was '{skip}'.", "skip");
+				throw new ArgumentException($"Skip must be 0 or greater; was '{skip}'.");
 
 			if (take < 0)
-				throw new ArgumentException($"Take must be 0 or greater; was '{take}'.", "take");
+				throw new ArgumentException($"Take must be 0 or greater; was '{take}'.");
 
 			var students = _students.SortBy(field, dir);
 			if (skip > 0)

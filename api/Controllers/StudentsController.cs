@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -42,12 +43,21 @@ namespace api.Controllers
 		[Authorize(Policy = "STD+")]
 		public async Task<IActionResult> GetMany([FromQuery]GetManyArgs args)
 		{
-			var students = await Task.Run(() => _students.GetMany(
-				field: args.Field,
-				dir: args.Dir,
-				skip: args.Skip,
-				take: args.Take
-			));
+			IList<Student> students = null;
+			try
+			{
+				students = await Task.Run(() => _students.GetMany(
+					field: args.Field,
+					dir: args.Dir,
+					skip: args.Skip,
+					take: args.Take
+				));
+			}
+			catch (ArgumentException e)
+			{
+				return new BadRequestObjectResult(new ErrorResponse(e.Message));
+			}
+
 			if (students == null)
 				students = new List<Student>();
 

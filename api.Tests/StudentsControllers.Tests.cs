@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -38,7 +39,7 @@ namespace api.Tests.Controllers
 			_students.Setup(s => s.GetMany(null, null, 0, 0)).Returns(students);
 
 			var result = await _uut.GetMany(new StudentsController.GetManyArgs());
-			Assert.That(result, Is.TypeOf(typeof(ObjectResult)));
+			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
 			var actual = ((StudentsController.StudentsResponse)value).Students;
@@ -64,7 +65,7 @@ namespace api.Tests.Controllers
 				Skip = skip,
 				Take = take,
 			});
-			Assert.That(result, Is.TypeOf(typeof(ObjectResult)));
+			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
 			var actual = ((StudentsController.StudentsResponse)value).Students;
@@ -77,7 +78,7 @@ namespace api.Tests.Controllers
 			_students.Setup(s => s.GetMany(null, null, 0, 0)).Returns(new List<Student>());
 
 			var result = await _uut.GetMany(new StudentsController.GetManyArgs());
-			Assert.That(result, Is.TypeOf(typeof(ObjectResult)));
+			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
 			var actual = ((StudentsController.StudentsResponse)value).Students;
@@ -90,11 +91,25 @@ namespace api.Tests.Controllers
 			_students.Setup(s => s.GetMany(null, null, 0, 0)).Returns((List<Student>)null);
 
 			var result = await _uut.GetMany(new StudentsController.GetManyArgs());
-			Assert.That(result, Is.TypeOf(typeof(ObjectResult)));
+			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
 			var actual = ((StudentsController.StudentsResponse)value).Students;
 			Assert.Zero(actual.Count);
+		}
+
+		[Test]
+		public async Task GetManyReturnsBadRequestOnArgumentException()
+		{
+			_students.Setup(s => s.GetMany(null, null, 0, 0)).Throws(new ArgumentException("bad argument"));
+
+			var result = await _uut.GetMany(new StudentsController.GetManyArgs());
+			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+			var value = ((BadRequestObjectResult)result).Value;
+
+			Assert.That(value, Is.TypeOf<ErrorResponse>());
+			var error = ((ErrorResponse)value).Error;
+			Assert.That(error, Is.EqualTo("bad argument"));
 		}
 
 		[Test]
@@ -108,7 +123,7 @@ namespace api.Tests.Controllers
 			_students.Setup(s => s.Get(id)).Returns(student);
 
 			var result = await _uut.GetById(id);
-			Assert.That(result, Is.TypeOf(typeof(ObjectResult)));
+			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
 			var actual = ((StudentsController.StudentResponse)value).Student;
@@ -122,7 +137,7 @@ namespace api.Tests.Controllers
 			_students.Setup(s => s.Get(id)).Returns((Student)null);
 
 			var result = await _uut.GetById(id);
-			Assert.That(result, Is.TypeOf(typeof(NotFoundResult)));
+			Assert.That(result, Is.TypeOf<NotFoundResult>());
 		}
 	}
 }

@@ -35,16 +35,6 @@ namespace api.Controllers
 			public string Password { get; set; }
 		}
 
-		public struct ErrorResponse
-		{
-			public string Error { get; }
-
-			public ErrorResponse(string error)
-			{
-				Error = error;
-			}
-		}
-
 		public struct TokenResponse
 		{
 			public string Token { get; }

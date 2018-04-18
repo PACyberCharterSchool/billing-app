@@ -46,7 +46,7 @@ namespace api.Tests.Controllers
 			_uut.ModelState.AddModelError(key, msg);
 
 			var result = await _uut.Login(new AuthController.LoginArgs());
-			Assert.That(result, Is.TypeOf(typeof(BadRequestObjectResult)));
+			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
 
 			var value = (Dictionary<string, object>)((BadRequestObjectResult)result).Value;
 			Assert.That(((string[])value.GetValueOrDefault(key))[0], Is.EqualTo(msg));
@@ -65,12 +65,12 @@ namespace api.Tests.Controllers
 				Username = username,
 				Password = password,
 			});
-			Assert.That(result, Is.TypeOf(typeof(ObjectResult)));
+			Assert.That(result, Is.TypeOf<ObjectResult>());
 			Assert.That(((ObjectResult)result).StatusCode, Is.EqualTo(500));
 
 			var value = ((ObjectResult)result).Value;
-			Assert.That(value, Is.TypeOf(typeof(AuthController.ErrorResponse)));
-			Assert.That(((AuthController.ErrorResponse)value).Error, Is.EqualTo("could not connect to LDAP server"));
+			Assert.That(value, Is.TypeOf<ErrorResponse>());
+			Assert.That(((ErrorResponse)value).Error, Is.EqualTo("could not connect to LDAP server"));
 		}
 
 		[Test]
@@ -85,7 +85,7 @@ namespace api.Tests.Controllers
 				Username = username,
 				Password = password,
 			});
-			Assert.That(result, Is.TypeOf(typeof(UnauthorizedResult)));
+			Assert.That(result, Is.TypeOf<UnauthorizedResult>());
 		}
 
 		[Test]
@@ -109,9 +109,9 @@ namespace api.Tests.Controllers
 				Password = password,
 			});
 
-			Assert.That(result, Is.TypeOf(typeof(OkObjectResult)));
+			Assert.That(result, Is.TypeOf<OkObjectResult>());
 			var value = ((OkObjectResult)result).Value;
-			Assert.That(value, Is.TypeOf(typeof(AuthController.TokenResponse)));
+			Assert.That(value, Is.TypeOf<AuthController.TokenResponse>());
 
 			var actual = ((AuthController.TokenResponse)value).Token;
 			var expected = new JwtSecurityTokenHandler().WriteToken(token);
