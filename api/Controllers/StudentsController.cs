@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 using api.Models;
@@ -33,9 +34,16 @@ namespace api.Controllers
 
 		public class GetManyArgs
 		{
+			[StudentField]
 			public string Field { get; set; }
+
+			[RegularExpression("^(?:a|de)sc$")]
 			public string Dir { get; set; }
+
+			[Range(0, int.MaxValue)]
 			public int Skip { get; set; }
+
+			[Range(0, int.MaxValue)]
 			public int Take { get; set; }
 		}
 
@@ -43,17 +51,8 @@ namespace api.Controllers
 		[Authorize(Policy = "STD+")]
 		public async Task<IActionResult> GetMany([FromQuery]GetManyArgs args)
 		{
-			if (!string.IsNullOrWhiteSpace(args.Field) && !Student.IsValidField(args.Field))
-				return new BadRequestObjectResult(new ErrorResponse($"Invalid sort field '{args.Field}'."));
-
-			if (!string.IsNullOrWhiteSpace(args.Dir) && (args.Dir != "asc" && args.Dir != "desc"))
-				return new BadRequestObjectResult(new ErrorResponse($"Sort direction must be 'asc' or 'desc'; was '{args.Dir}'."));
-
-			if (args.Skip < 0)
-				return new BadRequestObjectResult(new ErrorResponse($"Skip must be 0 or greater; was '{args.Skip}'."));
-
-			if (args.Take < 0)
-				return new BadRequestObjectResult(new ErrorResponse($"Take must be 0 or greater; was '{args.Take}'."));
+			if (!ModelState.IsValid)
+				return BadRequest(ModelState);
 
 			IList<Student> students = null;
 			try
