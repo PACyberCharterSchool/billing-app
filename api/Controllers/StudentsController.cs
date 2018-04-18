@@ -43,6 +43,18 @@ namespace api.Controllers
 		[Authorize(Policy = "STD+")]
 		public async Task<IActionResult> GetMany([FromQuery]GetManyArgs args)
 		{
+			if (!string.IsNullOrWhiteSpace(args.Field) && !Student.IsValidField(args.Field))
+				return new BadRequestObjectResult(new ErrorResponse($"Invalid sort field '{args.Field}'."));
+
+			if (!string.IsNullOrWhiteSpace(args.Dir) && (args.Dir != "asc" && args.Dir != "desc"))
+				return new BadRequestObjectResult(new ErrorResponse($"Sort direction must be 'asc' or 'desc'; was '{args.Dir}'."));
+
+			if (args.Skip < 0)
+				return new BadRequestObjectResult(new ErrorResponse($"Skip must be 0 or greater; was '{args.Skip}'."));
+
+			if (args.Take < 0)
+				return new BadRequestObjectResult(new ErrorResponse($"Take must be 0 or greater; was '{args.Take}'."));
+
 			IList<Student> students = null;
 			try
 			{

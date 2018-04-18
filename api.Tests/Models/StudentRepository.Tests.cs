@@ -94,12 +94,6 @@ namespace api.Tests.Models
 		}
 
 		[Test]
-		public void GetManyWithBadFieldThrows()
-		{
-			Assert.That(() => _uut.GetMany("bad"), Throws.TypeOf<ArgumentException>());
-		}
-
-		[Test]
 		public void GetManyWithDescSortsDesc()
 		{
 			var students = new[] {
@@ -115,12 +109,6 @@ namespace api.Tests.Models
 			Assert.That(actual[0].Id, Is.EqualTo(3));
 			Assert.That(actual[1].Id, Is.EqualTo(2));
 			Assert.That(actual[2].Id, Is.EqualTo(1));
-		}
-
-		[Test]
-		public void GetManyWithBadDirThrows()
-		{
-			Assert.That(() => _uut.GetMany("Id", "bad"), Throws.TypeOf<ArgumentException>());
 		}
 
 		[Test]
@@ -141,12 +129,6 @@ namespace api.Tests.Models
 		}
 
 		[Test]
-		public void GetManyWithSkipLessThanZeroThrows()
-		{
-			Assert.That(() => _uut.GetMany(-1, 0), Throws.TypeOf<ArgumentException>());
-		}
-
-		[Test]
 		public void GetManyWithTakeNotZeroTakes()
 		{
 			var students = new[] {
@@ -160,12 +142,6 @@ namespace api.Tests.Models
 			var actual = _uut.GetMany(0, 1);
 			Assert.That(actual, Has.Count.EqualTo(1));
 			Assert.That(actual[0].Id, Is.EqualTo(1));
-		}
-
-		[Test]
-		public void GetManyWithTakeLessThanZeroThrows()
-		{
-			Assert.That(() => _uut.GetMany(0, -1), Throws.TypeOf<ArgumentException>());
 		}
 	}
 }

@@ -99,17 +99,71 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async Task GetManyReturnsBadRequestOnArgumentException()
+		public async Task GetManyBadRequestOnBadField()
 		{
-			_students.Setup(s => s.GetMany(null, null, 0, 0)).Throws(new ArgumentException("bad argument"));
+			var args = new StudentsController.GetManyArgs
+			{
+				Field = "bob",
+			};
+			var result = await _uut.GetMany(args);
 
-			var result = await _uut.GetMany(new StudentsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
 			var value = ((BadRequestObjectResult)result).Value;
 
 			Assert.That(value, Is.TypeOf<ErrorResponse>());
 			var error = ((ErrorResponse)value).Error;
-			Assert.That(error, Is.EqualTo("bad argument"));
+			Assert.That(error, Is.EqualTo("Invalid sort field 'bob'."));
+		}
+
+		[Test]
+		public async Task GetManyBadRequestOnBadDir()
+		{
+			var args = new StudentsController.GetManyArgs
+			{
+				Dir = "bob",
+			};
+			var result = await _uut.GetMany(args);
+
+			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+			var value = ((BadRequestObjectResult)result).Value;
+
+			Assert.That(value, Is.TypeOf<ErrorResponse>());
+			var error = ((ErrorResponse)value).Error;
+			Assert.That(error, Is.EqualTo("Sort direction must be 'asc' or 'desc'; was 'bob'."));
+		}
+
+		[Test]
+		public async Task GetManyBadRequestOnBadSkip()
+		{
+			var args = new StudentsController.GetManyArgs
+			{
+				Skip = -1,
+			};
+			var result = await _uut.GetMany(args);
+
+			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+			var value = ((BadRequestObjectResult)result).Value;
+
+			Assert.That(value, Is.TypeOf<ErrorResponse>());
+			var error = ((ErrorResponse)value).Error;
+			Assert.That(error, Is.EqualTo("Skip must be 0 or greater; was '-1'."));
+		}
+
+		[Test]
+		public async Task GetManyBadRequestOnBadTake()
+		{
+			var args = new StudentsController.GetManyArgs
+			{
+				Take = -1,
+			};
+			var result = await _uut.GetMany(args);
+
+			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+			var value = ((BadRequestObjectResult)result).Value;
+
+			Assert.That(value, Is.TypeOf<ErrorResponse>());
+			var error = ((ErrorResponse)value).Error;
+			Assert.That(error, Is.EqualTo("Take must be 0 or greater; was '-1'."));
 		}
 
 		[Test]
