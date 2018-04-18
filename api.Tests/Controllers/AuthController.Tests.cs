@@ -39,7 +39,7 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async void LoginBadRequestWhenModelStateInvalid()
+		public async Task LoginBadRequestWhenModelStateInvalid()
 		{
 			var key = "error key";
 			var msg = "error message";
@@ -53,7 +53,7 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async void LoginInternalServerErrorWhenLdapServiceThrowsConnectionException()
+		public async Task LoginInternalServerErrorWhenLdapServiceThrowsConnectionException()
 		{
 			var username = "username";
 			var password = "password";
@@ -74,7 +74,7 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async void LoginUnauthorizedWhenLdapServiceThrowsUnauthorizedException()
+		public async Task LoginUnauthorizedWhenLdapServiceThrowsUnauthorizedException()
 		{
 			var username = "username";
 			var password = "password";
@@ -89,7 +89,7 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async void LoginReturnsTokenWithUserData()
+		public async Task LoginReturnsTokenWithUserData()
 		{
 			var username = "username";
 			var password = "password";
