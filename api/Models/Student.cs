@@ -27,8 +27,7 @@ namespace api.Models
 		private static readonly IEnumerable<string> _fields = typeof(Student).GetProperties().Select(p => p.Name);
 		public static bool IsValidField(string field)
 		{
-			// TODO(Erik): case-insensitive?
-			return _fields.Contains(field);
+			return _fields.Select(f => f.ToLower()).Contains(field.ToLower());
 		}
 	}
 }
