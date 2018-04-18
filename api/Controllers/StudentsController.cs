@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 using api.Models;
@@ -31,11 +30,24 @@ namespace api.Controllers
 			}
 		}
 
+		public class GetManyArgs
+		{
+			public string Field { get; set; }
+			public string Dir { get; set; }
+			public int Skip { get; set; }
+			public int Take { get; set; }
+		}
+
 		[HttpGet]
 		[Authorize(Policy = "STD+")]
-		public async Task<IActionResult> GetAll()
+		public async Task<IActionResult> GetMany([FromQuery]GetManyArgs args)
 		{
-			var students = await Task.Run(() => _students.GetMany());
+			var students = await Task.Run(() => _students.GetMany(
+				field: args.Field,
+				dir: args.Dir,
+				skip: args.Skip,
+				take: args.Take
+			));
 			if (students == null)
 				students = new List<Student>();
 

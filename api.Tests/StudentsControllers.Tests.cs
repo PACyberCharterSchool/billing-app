@@ -30,15 +30,14 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async Task GetAllReturnsList()
+		public async Task GetManyNoArgsReturnsList()
 		{
 			var students = new List<Student>{
 				new Student(),
-				new Student(),
 			};
-			_students.Setup(s => s.GetMany()).Returns(students);
+			_students.Setup(s => s.GetMany(null, null, 0, 0)).Returns(students);
 
-			var result = await _uut.GetAll();
+			var result = await _uut.GetMany(new StudentsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf(typeof(ObjectResult)));
 			var value = ((ObjectResult)result).Value;
 
@@ -47,11 +46,37 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async Task GetAllReturnsEmptyListWhenEmpty()
+		public async Task GetManyAllArgsReturnsList()
 		{
-			_students.Setup(s => s.GetMany()).Returns(new List<Student>());
+			var field = "FirstName";
+			var dir = "asc";
+			var skip = 10;
+			var take = 100;
+			var students = new List<Student>{
+				new Student(),
+			};
+			_students.Setup(s => s.GetMany(field, dir, skip, take)).Returns(students);
 
-			var result = await _uut.GetAll();
+			var result = await _uut.GetMany(new StudentsController.GetManyArgs
+			{
+				Field = field,
+				Dir = dir,
+				Skip = skip,
+				Take = take,
+			});
+			Assert.That(result, Is.TypeOf(typeof(ObjectResult)));
+			var value = ((ObjectResult)result).Value;
+
+			var actual = ((StudentsController.StudentsResponse)value).Students;
+			Assert.That(actual, Is.EqualTo(students));
+		}
+
+		[Test]
+		public async Task GetManyReturnsEmptyListWhenEmpty()
+		{
+			_students.Setup(s => s.GetMany(null, null, 0, 0)).Returns(new List<Student>());
+
+			var result = await _uut.GetMany(new StudentsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf(typeof(ObjectResult)));
 			var value = ((ObjectResult)result).Value;
 
@@ -60,11 +85,11 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async Task GetAllReturnsEmptyListWhenNull()
+		public async Task GetManyReturnsEmptyListWhenNull()
 		{
-			_students.Setup(s => s.GetMany()).Returns((List<Student>)null);
+			_students.Setup(s => s.GetMany(null, null, 0, 0)).Returns((List<Student>)null);
 
-			var result = await _uut.GetAll();
+			var result = await _uut.GetMany(new StudentsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf(typeof(ObjectResult)));
 			var value = ((ObjectResult)result).Value;
 
