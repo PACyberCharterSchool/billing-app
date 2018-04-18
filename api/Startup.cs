@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +48,8 @@ namespace api
 			var connectionString = $"Server={hostName},{port};Database={databaseName};User Id={userName};Password={password}";
 			_logger.LogInformation($"Startup.ConfigureServices(): connectionString is {connectionString}.");
 
-			services.AddDbContext<StudentContext>(opt => opt.UseSqlServer(connectionString));
+			services.AddDbContext<PacBillContext>(opt => opt.UseSqlServer(connectionString));
+			services.AddTransient<IStudentRepository, StudentRepository>();
 			#endregion
 
 			#region LDAP
@@ -106,7 +107,7 @@ namespace api
 			services.AddMvc();
 		}
 
-		public void Configure(IApplicationBuilder app, StudentContext context)
+		public void Configure(IApplicationBuilder app, PacBillContext context)
 		{
 			app.UseAuthentication();
 			// TODO(Erik): figure something out for production
