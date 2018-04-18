@@ -52,7 +52,7 @@ namespace api.Controllers
 		public async Task<IActionResult> GetMany([FromQuery]GetManyArgs args)
 		{
 			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
+				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
 			IList<Student> students = null;
 			try

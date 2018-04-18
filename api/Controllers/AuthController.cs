@@ -49,7 +49,7 @@ namespace api.Controllers
 		public async Task<IActionResult> Login([FromBody]LoginArgs args)
 		{
 			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
+				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
 			LdapUser user;
 			try

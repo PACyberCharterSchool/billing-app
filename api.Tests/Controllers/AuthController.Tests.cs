@@ -47,9 +47,12 @@ namespace api.Tests.Controllers
 
 			var result = await _uut.Login(new AuthController.LoginArgs());
 			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+			var value = ((BadRequestObjectResult)result).Value;
 
-			var value = (Dictionary<string, object>)((BadRequestObjectResult)result).Value;
-			Assert.That(((string[])value.GetValueOrDefault(key))[0], Is.EqualTo(msg));
+			Assert.That(value, Is.TypeOf<ErrorsResponse>());
+			var errors = ((ErrorsResponse)value).Errors;
+			Assert.That(errors, Has.Count.EqualTo(1));
+			Assert.That(errors[0], Is.EqualTo(msg));
 		}
 
 		[Test]
