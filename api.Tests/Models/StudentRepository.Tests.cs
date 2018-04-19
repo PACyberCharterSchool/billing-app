@@ -159,5 +159,22 @@ namespace api.Tests.Models
 			Assert.That(actual, Has.Count.EqualTo(1));
 			Assert.That(actual[0], Is.EqualTo(students[1]));
 		}
+
+		[Test]
+		public void GetManyWithDateFilterFilters()
+		{
+			var now = DateTime.Now.Date;
+			var students = new[] {
+				new Student{Id = 1, DateOfBirth = now.AddDays(-1)},
+				new Student{Id = 2, DateOfBirth = now},
+				new Student{Id = 3, DateOfBirth = now.AddDays(1)},
+			};
+			_context.AddRange(students);
+			_context.SaveChanges();
+
+			var actual = _uut.GetMany("DateOfBirth", "eq", now.Date.ToString());
+			Assert.That(actual, Has.Count.EqualTo(1));
+			Assert.That(actual[0], Is.EqualTo(students[1]));
+		}
 	}
 }

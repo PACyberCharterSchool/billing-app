@@ -10,7 +10,7 @@ using OpDictionary = System.Collections.Generic.Dictionary<
 		System.Linq.Expressions.MemberExpression,
 		object,
 		System.Type,
-		System.Linq.Expressions.BinaryExpression
+		System.Linq.Expressions.Expression
 	>
 >;
 
@@ -44,8 +44,13 @@ namespace api.Models
 			{"ge", (s, v, t) => Expression.GreaterThanOrEqual(s, Expression.Constant(v, t))},
 			{"lt", (s, v, t) => Expression.LessThan(s, Expression.Constant(v, t))},
 			{"le", (s, v, t) => Expression.LessThanOrEqual(s, Expression.Constant(v, t))},
+			{"has", (s, v, t) => Expression.Call(s, typeof(string).GetMethod("Contains"), Expression.Constant(v, t))},
+			{"bgn", (s, v, t) => Expression.Call(s, typeof(string).GetMethod("StartsWith", new[]{typeof(string)}), Expression.Constant(v, t))},
+			{"end", (s, v, t) => Expression.Call(s, typeof(string).GetMethod("EndsWith", new[]{typeof(string)}), Expression.Constant(v, t))},
 		};
 
+		// Dynamically build SQL where clause.
+		// See: https://stackoverflow.com/a/39183597
 		public static IQueryable<T> Filter<T>(this IQueryable<T> source, string field, string op, object value)
 		{
 			var param = Expression.Parameter(typeof(T), "x");
@@ -54,13 +59,13 @@ namespace api.Models
 			if (value != null && value.GetType() != type)
 				value = Convert.ChangeType(value, type);
 
-			BinaryExpression method;
+			Expression method;
 			if (!OpExpressions.ContainsKey(op))
 				throw new ArgumentException($"Invalid WhereFilter operation '{op}'.");
-			else
-				method = OpExpressions[op](selector, value, type);
 
+			method = OpExpressions[op](selector, value, type);
 			var pred = Expression.Lambda<Func<T, bool>>(method, param);
+
 			Console.WriteLine($"pred: {pred}");
 			return source.Where(pred);
 		}
