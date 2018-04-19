@@ -1,7 +1,14 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHandler } from '@angular/common/http';
+
+import { RouterTestingModule } from '@angular/router/testing';
+
 import { LoginComponent } from './login.component';
 import { LoginPanelComponent } from '../login-panel/login-panel.component';
+import { LoginPanelFormComponent } from '../login-panel-form/login-panel-form.component';
+import { AuthenticationService } from '../../services/authentication.service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -11,7 +18,17 @@ describe('LoginComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         LoginComponent,
-        LoginPanelComponent
+        LoginPanelComponent,
+        LoginPanelFormComponent
+      ],
+      imports: [
+        FormsModule,
+        RouterTestingModule
+      ],
+      providers: [
+        AuthenticationService,
+        HttpClient,
+        HttpHandler
       ]
     })
     .compileComponents();

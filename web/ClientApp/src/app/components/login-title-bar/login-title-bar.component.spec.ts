@@ -1,9 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { RouterTestingModule } from '@angular/router/testing';
+
 import { MatMenuModule, MatIconModule } from '@angular/material';
+import { HttpClient, HttpHandler } from '@angular/common/http';
 
 import { LoginTitleBarComponent } from './login-title-bar.component';
 import { LoginPopupComponent } from '../login-popup/login-popup.component';
+import { AuthenticationService } from '../../services/authentication.service';
 
 describe(LoginTitleBarComponent.name, () => {
   let component: LoginTitleBarComponent;
@@ -16,7 +20,13 @@ describe(LoginTitleBarComponent.name, () => {
       ],
       imports: [
         MatMenuModule,
-        MatIconModule
+        MatIconModule,
+        RouterTestingModule
+      ],
+      providers: [
+        AuthenticationService,
+        HttpClient,
+        HttpHandler
       ]
     })
     .compileComponents();

@@ -1,6 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { RouterModule } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { ContentAreaComponent } from './content-area.component';
 import { NavMenuComponent } from '../nav-menu/nav-menu.component';
@@ -20,7 +19,7 @@ describe('ContentAreaComponent', () => {
         ContentAreaComponent
       ],
       imports: [
-        RouterModule
+        RouterTestingModule
       ],
       providers: [
         AppTitleService

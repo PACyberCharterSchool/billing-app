@@ -12,9 +12,9 @@ const routes: Routes = [
   // { path: '', component: HomeComponent, pathMatch: 'full' },
   // { path: 'counter', component: CounterComponent },
   // { path: 'fetch-data', component: FetchDataComponent },
-  { path: '', component: HomeComponent, canActivate: [ AuthenticationGuardService ] },
   { path: 'login', component: LoginComponent },
   { path: 'payments-refunds', component: PaymentsRefundsComponent, canActivate: [ AuthenticationGuardService ] },
+  { path: '', component: HomeComponent, canActivate: [ AuthenticationGuardService ] }
 ];
 
 @NgModule({
