@@ -46,13 +46,7 @@ namespace api.Controllers
 			[Range(0, int.MaxValue)]
 			public int Take { get; set; }
 
-			// TODO(Erik): change these to be a single string? "firstname eq bob and lastname eq testy"
-			[StudentField]
 			public string Filter { get; set; }
-
-			public string Op { get; set; }
-
-			public string Val { get; set; }
 		}
 
 		[HttpGet]
@@ -70,9 +64,7 @@ namespace api.Controllers
 					dir: args.Dir,
 					skip: args.Skip,
 					take: args.Take,
-					filter: args.Filter,
-					op: args.Op,
-					value: args.Val
+					filter: args.Filter
 				));
 			}
 			catch (ArgumentException e)

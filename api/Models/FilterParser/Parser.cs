@@ -26,26 +26,19 @@ namespace api.Models.FilterParser
 {
 	public interface IParser
 	{
-		LambdaExpression Parse();
+		LambdaExpression Parse<T>(string param, string filter);
+		LambdaExpression Parse<T>(string filter);
 	}
 
-	public class Parser<T> : IParser
+	public class Parser : IParser
 	{
 		private const char OPEN = '(';
 		private const char CLOSE = ')';
 
-		private readonly ParameterExpression _param;
-		private readonly string _filter;
+		private ParameterExpression _param;
+		private string _filter;
 
 		private int _pos = 0;
-
-		public Parser(string param, string filter)
-		{
-			_param = Expression.Parameter(typeof(T), param);
-			_filter = filter;
-		}
-
-		public Parser(string filter) : this("x", filter) { }
 
 		private char Next()
 		{
@@ -137,7 +130,7 @@ namespace api.Models.FilterParser
 			}
 		}
 
-		private LambdaExpression ParseBooleanClause()
+		private LambdaExpression ParseBooleanClause<T>()
 		{
 			IgnoreWhitespace();
 
@@ -180,24 +173,24 @@ namespace api.Models.FilterParser
 			}
 		}
 
-		private LambdaExpression ParseCompoundClause()
+		private LambdaExpression ParseCompoundClause<T>()
 		{
 			IgnoreWhitespace();
 
-			var left = ParseClause();
+			var left = ParseClause<T>();
 			IgnoreWhitespace();
 
 			var op = ParseCompoundOp();
 			IgnoreWhitespace();
 
-			var right = ParseClause();
+			var right = ParseClause<T>();
 			IgnoreWhitespace();
 
 			var method = op(left.Body, right.Body);
 			return Expression.Lambda<Func<T, bool>>(method, _param);
 		}
 
-		private LambdaExpression ParseClause()
+		private LambdaExpression ParseClause<T>()
 		{
 			var c = Next();
 			if (c != OPEN)
@@ -211,12 +204,12 @@ namespace api.Models.FilterParser
 			if (c == OPEN)
 			{
 				Backup();
-				exp = ParseCompoundClause();
+				exp = ParseCompoundClause<T>();
 			}
 			else // isValidIdent?
 			{
 				Backup();
-				exp = ParseBooleanClause();
+				exp = ParseBooleanClause<T>();
 			}
 
 			IgnoreWhitespace();
@@ -228,10 +221,15 @@ namespace api.Models.FilterParser
 			return exp;
 		}
 
-		public LambdaExpression Parse()
+		public LambdaExpression Parse<T>(string param, string filter)
 		{
+			_param = Expression.Parameter(typeof(T), param);
+			_filter = filter;
 			_pos = -1;
-			return ParseClause();
+
+			return ParseClause<T>();
 		}
+
+		public LambdaExpression Parse<T>(string filter) => Parse<T>("x", filter);
 	}
 }

@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq.Expressions;
 
 using Moq;
 using NUnit.Framework;
 
 using api.Models;
+using api.Models.FilterParser;
 using api.Tests.Util;
 
 namespace api.Tests.Models
@@ -14,6 +16,7 @@ namespace api.Tests.Models
 	public class StudentRepositoryTests
 	{
 		private PacBillContext _context;
+		private Mock<IParser> _parser;
 		private ILogger<StudentRepository> _logger;
 
 		private StudentRepository _uut;
@@ -23,9 +26,10 @@ namespace api.Tests.Models
 		{
 			_context = new PacBillContext(new DbContextOptionsBuilder<PacBillContext>().
 				UseInMemoryDatabase("students").Options);
+			_parser = new Mock<IParser>();
 			_logger = new TestLogger<StudentRepository>();
 
-			_uut = new StudentRepository(_context, _logger);
+			_uut = new StudentRepository(_context, _parser.Object, _logger);
 		}
 
 		[TearDown]
@@ -86,7 +90,7 @@ namespace api.Tests.Models
 			_context.AddRange(students);
 			_context.SaveChanges();
 
-			var actual = _uut.GetMany("FirstName");
+			var actual = _uut.GetMany("FirstName", null);
 			Assert.That(actual, Has.Count.EqualTo(3));
 			Assert.That(actual[0].Id, Is.EqualTo(3));
 			Assert.That(actual[1].Id, Is.EqualTo(2));
@@ -155,26 +159,16 @@ namespace api.Tests.Models
 			_context.AddRange(students);
 			_context.SaveChanges();
 
-			var actual = _uut.GetMany("FirstName", "eq", "Bob");
-			Assert.That(actual, Has.Count.EqualTo(1));
-			Assert.That(actual[0], Is.EqualTo(students[1]));
-		}
+			var filter = "(FirstName eq Bob)";
+			var param = Expression.Parameter(typeof(Student), "x");
+			var field = Expression.PropertyOrField(param, "FirstName");
+			var method = Expression.Equal(field, Expression.Constant("Bob"));
+			var exp = Expression.Lambda<Func<Student, bool>>(method, param);
+			_parser.Setup(p => p.Parse<Student>("x", filter)).Returns(exp);
 
-		[Test]
-		public void GetManyWithDateFilterFilters()
-		{
-			var now = DateTime.Now.Date;
-			var students = new[] {
-				new Student{Id = 1, DateOfBirth = now.AddDays(-1)},
-				new Student{Id = 2, DateOfBirth = now},
-				new Student{Id = 3, DateOfBirth = now.AddDays(1)},
-			};
-			_context.AddRange(students);
-			_context.SaveChanges();
-
-			var actual = _uut.GetMany("DateOfBirth", "eq", now.Date.ToString());
+			var actual = _uut.GetMany(filter);
 			Assert.That(actual, Has.Count.EqualTo(1));
-			Assert.That(actual[0], Is.EqualTo(students[1]));
+			Assert.That(actual[0].FirstName, Is.EqualTo(students[1].FirstName));
 		}
 	}
 }

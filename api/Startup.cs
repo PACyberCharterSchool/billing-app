@@ -13,6 +13,7 @@ using dotenv.net;
 
 using static api.Common.UserRoles;
 using api.Models;
+using api.Models.FilterParser;
 using api.Services;
 
 namespace api
@@ -89,6 +90,7 @@ namespace api
 						ValidateLifetime = true,
 					};
 				});
+
 			services.AddAuthorization(o =>
 			{
 				o.AddPolicy("STD+", p => p.RequireRole(new[] {
@@ -103,6 +105,8 @@ namespace api
 				o.AddPolicy("ADM=", p => p.RequireRole(new[] { ADMIN }));
 			});
 			#endregion
+
+			services.AddTransient<IParser, Parser>();
 
 			services.AddMvc();
 		}
