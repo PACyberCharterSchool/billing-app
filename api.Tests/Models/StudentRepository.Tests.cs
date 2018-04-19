@@ -143,5 +143,21 @@ namespace api.Tests.Models
 			Assert.That(actual, Has.Count.EqualTo(1));
 			Assert.That(actual[0].Id, Is.EqualTo(1));
 		}
+
+		[Test]
+		public void GetManyWithFilterFilters()
+		{
+			var students = new[] {
+				new Student{Id = 1, FirstName = "Alice"},
+				new Student{Id = 2, FirstName = "Bob"},
+				new Student{Id = 3, FirstName = "Charlie"},
+			};
+			_context.AddRange(students);
+			_context.SaveChanges();
+
+			var actual = _uut.GetMany("FirstName", "eq", "Bob");
+			Assert.That(actual, Has.Count.EqualTo(1));
+			Assert.That(actual[0], Is.EqualTo(students[1]));
+		}
 	}
 }

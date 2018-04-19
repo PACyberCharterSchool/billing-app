@@ -35,7 +35,7 @@ namespace api.Controllers
 		public class GetManyArgs
 		{
 			[StudentField]
-			public string Field { get; set; }
+			public string Sort { get; set; }
 
 			[RegularExpression("^(?:a|de)sc$")]
 			public string Dir { get; set; }
@@ -45,6 +45,14 @@ namespace api.Controllers
 
 			[Range(0, int.MaxValue)]
 			public int Take { get; set; }
+
+			// TODO(Erik): change these to be a single string? "firstname eq bob and lastname eq testy"
+			[StudentField]
+			public string Filter { get; set; }
+
+			public string Op { get; set; }
+
+			public string Val { get; set; }
 		}
 
 		[HttpGet]
@@ -58,10 +66,13 @@ namespace api.Controllers
 			try
 			{
 				students = await Task.Run(() => _students.GetMany(
-					field: args.Field,
+					sort: args.Sort,
 					dir: args.Dir,
 					skip: args.Skip,
-					take: args.Take
+					take: args.Take,
+					filter: args.Filter,
+					op: args.Op,
+					value: args.Val
 				));
 			}
 			catch (ArgumentException e)

@@ -36,7 +36,7 @@ namespace api.Tests.Controllers
 			var students = new List<Student>{
 				new Student(),
 			};
-			_students.Setup(s => s.GetMany(null, null, 0, 0)).Returns(students);
+			_students.Setup(s => s.GetMany(null, null, 0, 0, null, null, null)).Returns(students);
 
 			var result = await _uut.GetMany(new StudentsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<ObjectResult>());
@@ -49,18 +49,18 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task GetManyAllArgsReturnsList()
 		{
-			var field = "FirstName";
+			var sort = "FirstName";
 			var dir = "asc";
 			var skip = 10;
 			var take = 100;
 			var students = new List<Student>{
 				new Student(),
 			};
-			_students.Setup(s => s.GetMany(field, dir, skip, take)).Returns(students);
+			_students.Setup(s => s.GetMany(sort, dir, skip, take, null, null, null)).Returns(students);
 
 			var result = await _uut.GetMany(new StudentsController.GetManyArgs
 			{
-				Field = field,
+				Sort = sort,
 				Dir = dir,
 				Skip = skip,
 				Take = take,
@@ -75,7 +75,7 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task GetManyReturnsEmptyListWhenEmpty()
 		{
-			_students.Setup(s => s.GetMany(null, null, 0, 0)).Returns(new List<Student>());
+			_students.Setup(s => s.GetMany(null, null, 0, 0, null, null, null)).Returns(new List<Student>());
 
 			var result = await _uut.GetMany(new StudentsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<ObjectResult>());
