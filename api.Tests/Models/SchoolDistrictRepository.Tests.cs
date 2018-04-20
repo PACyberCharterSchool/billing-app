@@ -69,5 +69,23 @@ namespace api.Tests.Models
 			Assert.That(actual, Has.Count.EqualTo(3));
 			Assert.That(actual, Is.EqualTo(districts));
 		}
+
+		[Test]
+		public void GetManyReturnsAllOrderedByName()
+		{
+			var districts = new[] {
+				new SchoolDistrict{Id = 1, Name = "C"},
+				new SchoolDistrict{Id = 2, Name = "A"},
+				new SchoolDistrict{Id = 3, Name = "B"},
+			};
+			_context.AddRange(districts);
+			_context.SaveChanges();
+
+			var actual = _uut.GetMany();
+			Assert.That(actual, Has.Count.EqualTo(3));
+			Assert.That(actual[0].Name, Is.EqualTo(districts[1].Name));
+			Assert.That(actual[1].Name, Is.EqualTo(districts[2].Name));
+			Assert.That(actual[2].Name, Is.EqualTo(districts[0].Name));
+		}
 	}
 }
