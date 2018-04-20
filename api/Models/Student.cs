@@ -22,7 +22,8 @@ namespace api.Models
 		public bool IsSpecialEducation { get; set; }
 		public DateTime CurrentIep { get; set; }
 		public DateTime FormerIep { get; set; }
-		public int SchoolDistrictId { get; set; }
+
+		public SchoolDistrict SchoolDistrict { get; set; }
 
 		private static readonly IEnumerable<string> _fields = typeof(Student).GetProperties().Select(p => p.Name);
 		public static bool IsValidField(string field)
