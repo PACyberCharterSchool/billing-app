@@ -30,8 +30,6 @@ namespace api.Models
 		public static IQueryable<T> Filter<T>(this IQueryable<T> source, IFilterParser parser, string filter)
 		{
 			var pred = parser.Parse<T>("x", filter);
-			Console.WriteLine($"pred: {pred}");
-
 			return source.Where(pred as Expression<Func<T, bool>>);
 		}
 	}
