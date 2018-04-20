@@ -10,6 +10,7 @@ using System;
 using System.Text;
 
 using dotenv.net;
+using Swashbuckle.AspNetCore.Swagger;
 
 using static api.Common.UserRoles;
 using api.Models;
@@ -38,7 +39,7 @@ namespace api
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			#region DB
+			#region Models
 			var hostName = Environment.GetEnvironmentVariable("DATABASE_HOST");
 			var databaseName = Environment.GetEnvironmentVariable("DATABASE_NAME");
 			var userName = Environment.GetEnvironmentVariable("DATABASE_USERNAME");
@@ -51,6 +52,8 @@ namespace api
 			services.AddDbContext<PacBillContext>(opt => opt.UseSqlServer(connectionString));
 			services.AddTransient<IStudentRepository, StudentRepository>();
 			services.AddTransient<ISchoolDistrictRepository, SchoolDistrictRepository>();
+
+			services.AddTransient<IFilterParser, FilterParser>();
 			#endregion
 
 			#region LDAP
@@ -106,7 +109,9 @@ namespace api
 			});
 			#endregion
 
-			services.AddTransient<IFilterParser, FilterParser>();
+			#region Swagger
+			services.AddSwaggerGen(o => o.SwaggerDoc("v1", new Info { Title = "PACBill API", Version = "v1" }));
+			#endregion
 
 			services.AddMvc();
 		}
@@ -114,12 +119,16 @@ namespace api
 		public void Configure(IApplicationBuilder app, PacBillContext context)
 		{
 			app.UseAuthentication();
+
 			// TODO(Erik): figure something out for production
 			app.UseCors(builder => builder.
 				AllowAnyOrigin().
 				AllowAnyMethod().
 				AllowAnyHeader().
 				AllowCredentials());
+
+			app.UseSwagger();
+			app.UseSwaggerUI(o => o.SwaggerEndpoint("/swagger/v1/swagger.json", "PACBill API"));
 
 			app.UseMvc();
 

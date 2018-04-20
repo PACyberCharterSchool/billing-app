@@ -30,6 +30,7 @@ namespace api.Controllers
 
 		[HttpGet("{id}")]
 		[Authorize(Policy = "STD+")]
+		[ProducesResponseType(typeof(SchoolDistrictResponse), 200)]
 		public async Task<IActionResult> GetById(int id)
 		{
 			var district = await Task.Run(() => _schoolDistricts.Get(id));
@@ -46,6 +47,7 @@ namespace api.Controllers
 
 		[HttpGet]
 		[Authorize(Policy = "STD+")]
+		[ProducesResponseType(typeof(SchoolDistrictsResponse), 200)]
 		public async Task<IActionResult> GetMany()
 		{
 			var districts = await Task.Run(() => _schoolDistricts.GetMany());
