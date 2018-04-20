@@ -1,20 +1,19 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+// import { BrowserModule } from '@angular/platform-browser';
 
 import { ContentAreaModule } from './content-area/content-area.module';
 
 import { HomeRoutingModule } from './home-routing.module';
 
-import { HomeComponent } from './home.component';
+import { HomeComponent } from './home/home.component';
 import { NavMenuComponent } from './content-area/nav-menu/nav-menu.component';
 import { ActionContentComponent } from './content-area/action-content/action-content.component';
 import { ContentAreaComponent } from './content-area/content-area.component';
-import { TitleBarComponent } from './title-bar/title-bar/title-bar.component';
 import { LoginPopupComponent } from './title-bar/login-popup/login-popup.component';
 import { LoginTitleBarComponent } from './title-bar/login-title-bar/login-title-bar.component';
-
+import { TitleBarComponent } from './title-bar/title-bar/title-bar.component';
 import { FooterComponent } from './footer/footer/footer.component';
 
 // Angular Material components
@@ -24,8 +23,18 @@ import { MAT_MENU_DEFAULT_OPTIONS } from '@angular/material';
 import { MatMenu } from '@angular/material';
 
 @NgModule({
+  declarations: [
+    ContentAreaComponent,
+    FooterComponent,
+    HomeComponent,
+    LoginPopupComponent,
+    LoginTitleBarComponent,
+    NavMenuComponent,
+    ActionContentComponent,
+    TitleBarComponent
+  ],
   imports: [
-    BrowserModule,
+    // BrowserModule,
     CommonModule,
     FormsModule,
     ContentAreaModule,
@@ -36,16 +45,6 @@ import { MatMenu } from '@angular/material';
     MatInputModule,
     MatMenuModule,
     MatSidenavModule
-  ],
-  declarations: [
-    ContentAreaComponent,
-    FooterComponent,
-    HomeComponent,
-    LoginPopupComponent,
-    LoginTitleBarComponent,
-    NavMenuComponent,
-    ActionContentComponent,
-    TitleBarComponent
   ],
   providers: []
 })

@@ -6,6 +6,8 @@ import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
 
+import { AppRoutingModule } from './app-routing.module';
+
 import { LoginModule } from './login/login.module';
 import { HomeModule } from './home/home.module';
 
@@ -15,10 +17,8 @@ import { AppTitleService } from './services/app-title.service';
 import { AuthenticationService } from './services/authentication.service';
 import { AuthenticationGuardService } from './services/authentication-guard.service';
 
-import { AppRoutingModule } from './app-routing.module';
-
 const pacbillDeclarations = [
-    AppComponent,
+    AppComponent
 ];
 
 const pacbillImports = [
@@ -26,11 +26,11 @@ const pacbillImports = [
     BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
+    RouterModule,
     LoginModule,
     HomeModule,
     AppRoutingModule,
-    RouterModule
-];
+ ];
 
 const pacbillProviders = [
   AppTitleService,

@@ -5,14 +5,11 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { ContentAreaRoutingModule } from './content-area-routing.module';
 
-import { ActionContentModule } from './action-content/action-content.module';
-
 @NgModule({
   imports: [
     BrowserModule,
     CommonModule,
     FormsModule,
-    ActionContentModule,
     ContentAreaRoutingModule
   ],
   declarations: [],

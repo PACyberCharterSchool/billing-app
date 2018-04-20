@@ -8,7 +8,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { LoginComponent } from './login.component';
 import { LoginPanelComponent } from '../login-panel/login-panel.component';
 import { LoginPanelFormComponent } from '../login-panel-form/login-panel-form.component';
-import { AuthenticationService } from '../../../services/authentication.service';
+import { AuthenticationService } from '../../services/authentication.service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
