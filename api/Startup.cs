@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 using dotenv.net;
@@ -111,7 +112,20 @@ namespace api
 			#endregion
 
 			#region Swagger
-			services.AddSwaggerGen(o => o.SwaggerDoc("v1", new Info { Title = "PACBill API", Version = "v1" }));
+			services.AddSwaggerGen(o =>
+			{
+				o.SwaggerDoc("v1", new Info { Title = "PACBill API", Version = "v1" });
+				o.AddSecurityDefinition("Bearer", new ApiKeyScheme
+				{
+					Type = "apiKey",
+					Name = "Authorization",
+					Description = "JSON Web Token: http://jwt.io.",
+					In = "header",
+				});
+				o.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>{
+						{"Bearer", null},
+				});
+			});
 			#endregion
 
 			services.AddMvc();
