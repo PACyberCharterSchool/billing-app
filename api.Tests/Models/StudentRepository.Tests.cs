@@ -7,7 +7,6 @@ using Moq;
 using NUnit.Framework;
 
 using api.Models;
-using api.Models.FilterParser;
 using api.Tests.Util;
 
 namespace api.Tests.Models
@@ -16,7 +15,7 @@ namespace api.Tests.Models
 	public class StudentRepositoryTests
 	{
 		private PacBillContext _context;
-		private Mock<IParser> _parser;
+		private Mock<IFilterParser> _parser;
 		private ILogger<StudentRepository> _logger;
 
 		private StudentRepository _uut;
@@ -26,7 +25,7 @@ namespace api.Tests.Models
 		{
 			_context = new PacBillContext(new DbContextOptionsBuilder<PacBillContext>().
 				UseInMemoryDatabase("students").Options);
-			_parser = new Mock<IParser>();
+			_parser = new Mock<IFilterParser>();
 			_logger = new TestLogger<StudentRepository>();
 
 			_uut = new StudentRepository(_context, _parser.Object, _logger);

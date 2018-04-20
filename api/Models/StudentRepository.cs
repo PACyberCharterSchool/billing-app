@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using api.Models.FilterParser;
+using api.Models;
 
 namespace api.Models
 {
@@ -24,10 +24,10 @@ namespace api.Models
 	public class StudentRepository : IStudentRepository
 	{
 		private readonly DbSet<Student> _students;
-		private readonly IParser _parser;
+		private readonly IFilterParser _parser;
 		private readonly ILogger<StudentRepository> _logger;
 
-		public StudentRepository(PacBillContext ctx, IParser parser, ILogger<StudentRepository> logger)
+		public StudentRepository(PacBillContext ctx, IFilterParser parser, ILogger<StudentRepository> logger)
 		{
 			_students = ctx.Students;
 			_parser = parser;

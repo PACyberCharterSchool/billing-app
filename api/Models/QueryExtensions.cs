@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-using api.Models.FilterParser;
-
 namespace api.Models
 {
 	// Dynamically build SQL sort clause.
@@ -29,7 +27,7 @@ namespace api.Models
 
 		// Dynamically build SQL where clause.
 		// See: https://stackoverflow.com/a/39183597
-		public static IQueryable<T> Filter<T>(this IQueryable<T> source, IParser parser, string filter)
+		public static IQueryable<T> Filter<T>(this IQueryable<T> source, IFilterParser parser, string filter)
 		{
 			var pred = parser.Parse<T>("x", filter);
 			Console.WriteLine($"pred: {pred}");

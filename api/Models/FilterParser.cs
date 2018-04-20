@@ -22,15 +22,15 @@ using CompoundOpDictionary = System.Collections.Generic.Dictionary<
 	>
 >;
 
-namespace api.Models.FilterParser
+namespace api.Models
 {
-	public interface IParser
+	public interface IFilterParser
 	{
 		LambdaExpression Parse<T>(string param, string filter);
 		LambdaExpression Parse<T>(string filter);
 	}
 
-	public class Parser : IParser
+	public class FilterParser : IFilterParser
 	{
 		private const char OPEN = '(';
 		private const char CLOSE = ')';

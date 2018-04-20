@@ -2,9 +2,9 @@ using System;
 
 using NUnit.Framework;
 
-using api.Models.FilterParser;
+using api.Models;
 
-namespace api.Tests.Models.FilterParser
+namespace api.Tests.Models
 {
 	public class TestClass
 	{
@@ -32,7 +32,7 @@ namespace api.Tests.Models.FilterParser
 		[TestCase("(((a eq 1) and (b eq 2)) or (c eq 3))", "x => (((x.A == 1) AndAlso (x.B == 2)) OrElse (x.C == 3))")]
 		public void ParseProducesLambda(string clause, string lambda)
 		{
-			var actual = new Parser().Parse<TestClass>(clause);
+			var actual = new FilterParser().Parse<TestClass>(clause);
 
 			Assert.That(actual.ToString(), Is.EqualTo(lambda));
 		}
@@ -45,7 +45,7 @@ namespace api.Tests.Models.FilterParser
 		[TestCase("((a eq 1) bob (b eq 2))", "Invalid compound operation 'bob' ending at [12].")]
 		public void ParseThrowsArgumentException(string clause, string message)
 		{
-			Assert.That(() => { new Parser().Parse<TestClass>(clause); },
+			Assert.That(() => { new FilterParser().Parse<TestClass>(clause); },
 				Throws.TypeOf<ArgumentException>().With.
 				Message.EqualTo(message));
 		}
