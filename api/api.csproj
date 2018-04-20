@@ -16,6 +16,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.1.0-preview1-final" />
     <PackageReference Include="Novell.Directory.Ldap.NetStandard" Version="2.3.8" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="2.4.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="2.4.0" />
   </ItemGroup>
 
   <ItemGroup>

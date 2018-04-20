@@ -11,6 +11,7 @@ using System.Text;
 
 using dotenv.net;
 using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.ReDoc;
 
 using static api.Common.UserRoles;
 using api.Models;
@@ -121,6 +122,7 @@ namespace api
 			app.UseAuthentication();
 
 			// TODO(Erik): figure something out for production
+			#region Development
 			app.UseCors(builder => builder.
 				AllowAnyOrigin().
 				AllowAnyMethod().
@@ -128,7 +130,13 @@ namespace api
 				AllowCredentials());
 
 			app.UseSwagger();
-			app.UseSwaggerUI(o => o.SwaggerEndpoint("/swagger/v1/swagger.json", "PACBill API"));
+			app.UseReDoc(o =>
+			{
+				o.SpecUrl = "v1/swagger.json";
+				o.RoutePrefix = "swagger";
+			});
+			// app.UseSwaggerUI(o => o.SwaggerEndpoint("/swagger/v1/swagger.json", "PACBill API"));
+			#endregion
 
 			app.UseMvc();
 
