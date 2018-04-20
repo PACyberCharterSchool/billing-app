@@ -34,7 +34,7 @@ namespace api.Models
 			_logger = logger;
 		}
 
-		public Student Get(int id) => _students.Where(s => s.Id == id).SingleOrDefault();
+		public Student Get(int id) => _students.SingleOrDefault(s => s.Id == id);
 
 		public IList<Student> GetMany() => GetMany(null, null, 0, 0);
 
