@@ -50,6 +50,7 @@ namespace api
 
 			services.AddDbContext<PacBillContext>(opt => opt.UseSqlServer(connectionString));
 			services.AddTransient<IStudentRepository, StudentRepository>();
+			services.AddTransient<ISchoolDistrictRepository, SchoolDistrictRepository>();
 			#endregion
 
 			#region LDAP
