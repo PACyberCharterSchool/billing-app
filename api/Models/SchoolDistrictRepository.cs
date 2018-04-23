@@ -28,7 +28,7 @@ namespace api.Models
 
 		public SchoolDistrict Get(int id) => _schoolDistricts.SingleOrDefault(d => d.Id == id);
 
-		public IList<SchoolDistrict> GetMany() => _schoolDistricts.OrderBy(d => d.Name).ToList();
+		public IList<SchoolDistrict> GetMany() => _schoolDistricts.OrderBy(d => d.Id).ToList();
 
 		public SchoolDistrict CreateOrUpdate(SchoolDistrict update)
 		{
