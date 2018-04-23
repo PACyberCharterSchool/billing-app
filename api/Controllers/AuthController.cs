@@ -46,6 +46,7 @@ namespace api.Controllers
 		}
 
 		[HttpPost("login")]
+		[ProducesResponseType(typeof(TokenResponse), 200)]
 		public async Task<IActionResult> Login([FromBody]LoginArgs args)
 		{
 			if (!ModelState.IsValid)

@@ -51,6 +51,7 @@ namespace api.Controllers
 
 		[HttpGet]
 		[Authorize(Policy = "STD+")]
+		[ProducesResponseType(typeof(StudentsResponse), 200)]
 		public async Task<IActionResult> GetMany([FromQuery]GetManyArgs args)
 		{
 			if (!ModelState.IsValid)
@@ -90,6 +91,7 @@ namespace api.Controllers
 
 		[HttpGet("{id}")]
 		[Authorize(Policy = "STD+")]
+		[ProducesResponseType(typeof(StudentResponse), 200)]
 		public async Task<IActionResult> GetById(int id)
 		{
 			var student = await Task.Run(() => _students.Get(id));
