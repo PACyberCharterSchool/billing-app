@@ -109,6 +109,16 @@ namespace api.Tests.Models
 		}
 
 		[Test]
+		public void CreateOrUpdateSetsDefaultRateIfNotPresent()
+		{
+			var district = new SchoolDistrict { Name = "Bob" };
+
+			var result = _uut.CreateOrUpdate(district);
+			var actual = _context.SchoolDistricts.First(d => d.Id == result.Id);
+			Assert.That(actual.Rate, Is.EqualTo(0m));
+		}
+
+		[Test]
 		public void CreateOrUpdateWithSameObjectUpdates()
 		{
 			var id = 3;
