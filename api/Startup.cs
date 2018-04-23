@@ -125,6 +125,7 @@ namespace api
 				o.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>{
 						{"Bearer", null},
 				});
+				o.DescribeAllEnumsAsStrings();
 			});
 			#endregion
 

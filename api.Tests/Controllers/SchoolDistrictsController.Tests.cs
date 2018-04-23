@@ -105,5 +105,43 @@ namespace api.Tests.Controllers
 			var actual = ((SchoolDistrictsController.SchoolDistrictsResponse)value).SchoolDistricts;
 			Assert.That(actual, Is.Empty);
 		}
+
+		[Test]
+		public async Task UpdateUpdates()
+		{
+			var id = 3;
+			_schoolDistricts.Setup(d => d.Get(id)).Returns(new SchoolDistrict());
+
+			var result = await _uut.Update(id, new SchoolDistrictsController.SchoolDistrictUpdate());
+			Assert.That(result, Is.TypeOf<OkResult>());
+			_schoolDistricts.Verify(d => d.CreateOrUpdate(It.IsAny<SchoolDistrict>()), Times.Once);
+		}
+
+		[Test]
+		public async Task UpdateReturnsBadRequest()
+		{
+			var key = "err";
+			var msg = "msg";
+			_uut.ModelState.AddModelError(key, msg);
+
+			var result = await _uut.Update(3, new SchoolDistrictsController.SchoolDistrictUpdate());
+			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+
+			var value = ((BadRequestObjectResult)result).Value;
+			Assert.That(value, Is.TypeOf<ErrorsResponse>());
+
+			var actual = ((ErrorsResponse)value).Errors;
+			Assert.That(actual[0], Is.EqualTo(msg));
+		}
+
+		[Test]
+		public async Task UpdateReturnsNotFound()
+		{
+			var id = 3;
+			_schoolDistricts.Setup(d => d.Get(id)).Returns((SchoolDistrict)null);
+
+			var result = await _uut.Update(id, new SchoolDistrictsController.SchoolDistrictUpdate());
+			Assert.That(result, Is.TypeOf<NotFoundResult>());
+		}
 	}
 }

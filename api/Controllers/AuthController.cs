@@ -29,9 +29,11 @@ namespace api.Controllers
 		public struct LoginArgs
 		{
 			[Required(AllowEmptyStrings = false)]
+			[MinLength(1)]
 			public string Username { get; set; }
 
 			[Required(AllowEmptyStrings = false)]
+			[MinLength(1)]
 			public string Password { get; set; }
 		}
 

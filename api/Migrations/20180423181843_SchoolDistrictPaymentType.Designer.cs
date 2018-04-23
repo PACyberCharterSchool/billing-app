@@ -12,9 +12,10 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(PacBillContext))]
-    partial class StudentContextModelSnapshot : ModelSnapshot
+    [Migration("20180423181843_SchoolDistrictPaymentType")]
+    partial class SchoolDistrictPaymentType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,8 +68,6 @@ namespace api.Migrations
                     b.Property<string>("LastName");
 
                     b.Property<string>("MiddleInitial");
-
-                    b.Property<DateTime>("NOREP");
 
                     b.Property<int>("PACyberId");
 
