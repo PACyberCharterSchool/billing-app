@@ -22,6 +22,7 @@ namespace api.Models
 		public bool IsSpecialEducation { get; set; }
 		public DateTime CurrentIep { get; set; }
 		public DateTime FormerIep { get; set; }
+		public DateTime NOREP { get; set; }
 
 		public SchoolDistrict SchoolDistrict { get; set; }
 
