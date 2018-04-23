@@ -9,7 +9,7 @@ import { MatIconModule, MatMenuModule } from '@angular/material';
 
 import { LoginPanelComponent } from './login-panel.component';
 import { LoginPanelFormComponent } from '../login-panel-form/login-panel-form.component';
-import { AuthenticationService } from '../../../services/authentication.service';
+import { AuthenticationService } from '../../services/authentication.service';
 
 
 describe('LoginPanelComponent', () => {

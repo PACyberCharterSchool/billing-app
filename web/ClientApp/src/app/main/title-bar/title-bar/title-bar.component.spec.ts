@@ -1,26 +1,28 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-
-import { FormsModule } from '@angular/forms';
 
 import { HttpClient, HttpHandler } from '@angular/common/http';
 
-import { LoginPanelFormComponent } from './login-panel-form.component';
-import { AuthenticationService } from '../../services/authentication.service';
+import { RouterTestingModule } from '@angular/router/testing';
+
+import { TitleBarComponent } from './title-bar.component';
+import { LoginTitleBarComponent } from '../login-title-bar/login-title-bar.component';
+import { LoginPopupComponent } from '../login-popup/login-popup.component';
+import { AuthenticationService } from '../../../services/authentication.service';
 
 import { MatMenuModule, MatIconModule } from '@angular/material';
 
-describe('LoginPanelFormComponent', () => {
-  let component: LoginPanelFormComponent;
-  let fixture: ComponentFixture<LoginPanelFormComponent>;
+describe('TitleBarComponent', () => {
+  let component: TitleBarComponent;
+  let fixture: ComponentFixture<TitleBarComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        LoginPanelFormComponent
+        LoginTitleBarComponent,
+        TitleBarComponent,
+        LoginPopupComponent
       ],
       imports: [
-        FormsModule,
         MatMenuModule,
         MatIconModule,
         RouterTestingModule
@@ -35,7 +37,7 @@ describe('LoginPanelFormComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LoginPanelFormComponent);
+    fixture = TestBed.createComponent(TitleBarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

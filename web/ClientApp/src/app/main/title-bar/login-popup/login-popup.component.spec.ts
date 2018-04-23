@@ -1,28 +1,25 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { FormsModule } from '@angular/forms';
-
 import { HttpClient, HttpHandler } from '@angular/common/http';
-
-import { LoginPanelFormComponent } from './login-panel-form.component';
-import { AuthenticationService } from '../../services/authentication.service';
 
 import { MatMenuModule, MatIconModule } from '@angular/material';
 
-describe('LoginPanelFormComponent', () => {
-  let component: LoginPanelFormComponent;
-  let fixture: ComponentFixture<LoginPanelFormComponent>;
+import { LoginPopupComponent } from '../login-popup/login-popup.component';
+import { AuthenticationService } from '../../../services/authentication.service';
+
+describe(LoginPopupComponent.name, () => {
+  let component: LoginPopupComponent;
+  let fixture: ComponentFixture<LoginPopupComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        LoginPanelFormComponent
+        LoginPopupComponent
       ],
       imports: [
-        FormsModule,
-        MatMenuModule,
         MatIconModule,
+        MatMenuModule,
         RouterTestingModule
       ],
       providers: [
@@ -35,7 +32,7 @@ describe('LoginPanelFormComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LoginPanelFormComponent);
+    fixture = TestBed.createComponent(LoginPopupComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

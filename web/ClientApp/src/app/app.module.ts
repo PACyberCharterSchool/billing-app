@@ -9,7 +9,7 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
 import { LoginModule } from './login/login.module';
-import { HomeModule } from './home/home.module';
+import { MainModule } from './main/main.module';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -28,8 +28,8 @@ const pacbillImports = [
     FormsModule,
     RouterModule,
     LoginModule,
-    HomeModule,
-    AppRoutingModule,
+    MainModule,
+    AppRoutingModule
  ];
 
 const pacbillProviders = [
