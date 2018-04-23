@@ -11,32 +11,15 @@ using System;
 namespace api.Migrations
 {
     [DbContext(typeof(PacBillContext))]
-    partial class StudentContextModelSnapshot : ModelSnapshot
+    [Migration("20180417204624_ExpandStudent")]
+    partial class ExpandStudent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.0.2-rtm-10011")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("api.Models.SchoolDistrict", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<decimal>("AlternateRate");
-
-                    b.Property<int>("Aun");
-
-                    b.Property<string>("Name");
-
-                    b.Property<decimal>("Rate");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SchoolDistricts");
-                });
 
             modelBuilder.Entity("api.Models.Student", b =>
                 {
@@ -65,7 +48,7 @@ namespace api.Migrations
 
                     b.Property<int>("PASecuredId");
 
-                    b.Property<int?>("SchoolDistrictId");
+                    b.Property<int>("SchoolDistrictId");
 
                     b.Property<string>("State");
 
@@ -77,16 +60,7 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SchoolDistrictId");
-
                     b.ToTable("Students");
-                });
-
-            modelBuilder.Entity("api.Models.Student", b =>
-                {
-                    b.HasOne("api.Models.SchoolDistrict", "SchoolDistrict")
-                        .WithMany("Students")
-                        .HasForeignKey("SchoolDistrictId");
                 });
 #pragma warning restore 612, 618
         }

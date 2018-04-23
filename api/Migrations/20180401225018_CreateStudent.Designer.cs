@@ -10,31 +10,31 @@ using System;
 
 namespace api.Migrations
 {
-    [DbContext(typeof(StudentContext))]
-    [Migration("20180401225018_CreateStudent")]
-    partial class CreateStudent
-    {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
-        {
+	[DbContext(typeof(PacBillContext))]
+	[Migration("20180401225018_CreateStudent")]
+	partial class CreateStudent
+	{
+		protected override void BuildTargetModel(ModelBuilder modelBuilder)
+		{
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.2-rtm-10011")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+			modelBuilder
+					.HasAnnotation("ProductVersion", "2.0.2-rtm-10011")
+					.HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("api.Models.Student", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+			modelBuilder.Entity("api.Models.Student", b =>
+					{
+						b.Property<int>("Id")
+											.ValueGeneratedOnAdd();
 
-                    b.Property<string>("firstName");
+						b.Property<string>("firstName");
 
-                    b.Property<string>("lastName");
+						b.Property<string>("lastName");
 
-                    b.HasKey("Id");
+						b.HasKey("Id");
 
-                    b.ToTable("Students");
-                });
+						b.ToTable("Students");
+					});
 #pragma warning restore 612, 618
-        }
-    }
+		}
+	}
 }

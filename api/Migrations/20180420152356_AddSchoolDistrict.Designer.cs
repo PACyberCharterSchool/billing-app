@@ -11,9 +11,10 @@ using System;
 namespace api.Migrations
 {
     [DbContext(typeof(PacBillContext))]
-    partial class StudentContextModelSnapshot : ModelSnapshot
+    [Migration("20180420152356_AddSchoolDistrict")]
+    partial class AddSchoolDistrict
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -35,16 +35,6 @@ namespace api.Controllers
 			public string Password { get; set; }
 		}
 
-		public struct ErrorResponse
-		{
-			public string Error { get; }
-
-			public ErrorResponse(string error)
-			{
-				Error = error;
-			}
-		}
-
 		public struct TokenResponse
 		{
 			public string Token { get; }
@@ -56,10 +46,11 @@ namespace api.Controllers
 		}
 
 		[HttpPost("login")]
+		[ProducesResponseType(typeof(TokenResponse), 200)]
 		public async Task<IActionResult> Login([FromBody]LoginArgs args)
 		{
 			if (!ModelState.IsValid)
-				return BadRequest(ModelState);
+				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
 			LdapUser user;
 			try
