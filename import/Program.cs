@@ -46,7 +46,7 @@ namespace import
 			{
 				try
 				{
-					var table = nameof(_context.PendingStudentActivityRecords);
+					var table = nameof(_context.PendingStudentStatusRecords);
 					Console.WriteLine($"Truncating {table}...");
 					_context.Database.ExecuteSqlCommand($"TRUNCATE TABLE " + table + ";");
 					_context.SaveChanges();
@@ -65,9 +65,9 @@ namespace import
 					using (var streamReader = File.OpenText(e.FullPath))
 					{
 						var csvReader = new CsvReader(streamReader);
-						csvReader.Configuration.RegisterClassMap<StudentActivityRecordClassMap>();
+						csvReader.Configuration.RegisterClassMap<StudentStatusRecordClassMap>();
 
-						var records = csvReader.GetRecords<StudentActivityRecord>();
+						var records = csvReader.GetRecords<StudentStatusRecord>();
 						foreach (var record in records)
 						{
 							_context.Add(record);

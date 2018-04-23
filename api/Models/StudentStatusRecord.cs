@@ -2,7 +2,7 @@ using System;
 
 namespace api.Models
 {
-	public class StudentActivityRecord
+	public class StudentStatusRecord
 	{
 		public int Id { get; set; }
 		public int SchoolDistrictId { get; set; }
