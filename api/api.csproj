@@ -12,7 +12,8 @@
   <ItemGroup>
     <PackageReference Include="dotenv.net" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.0-preview1-final" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.0-preview1-final" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.1.0-preview1-final" />
     <PackageReference Include="Novell.Directory.Ldap.NetStandard" Version="2.3.8" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="2.4.0" />

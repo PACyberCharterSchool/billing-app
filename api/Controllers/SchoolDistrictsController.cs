@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 using api.Models;
@@ -60,10 +63,24 @@ namespace api.Controllers
 
 		public class SchoolDistrictUpdate
 		{
+			[Required]
+			[Range(100000000, 999999999)]
 			public int Aun { get; set; }
+
+			[Required]
+			[MinLength(1)]
 			public string Name { get; set; }
+
+			[Required]
+			[Range(0, double.PositiveInfinity)]
 			public decimal Rate { get; set; }
+
+			[Range(0, double.PositiveInfinity)]
 			public decimal? AlternateRate { get; set; }
+
+			[Required]
+			[RegularExpression("^ACH|Check$")]
+			public string PaymentType { get; set; }
 		}
 
 		[HttpPut("{id}")]
@@ -85,6 +102,7 @@ namespace api.Controllers
 				Name = update.Name,
 				Rate = update.Rate,
 				AlternateRate = update.AlternateRate,
+				PaymentType = update.PaymentType,
 			};
 			await Task.Run(() => _schoolDistricts.CreateOrUpdate(district));
 			return Ok();

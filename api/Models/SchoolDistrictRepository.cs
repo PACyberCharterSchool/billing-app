@@ -40,6 +40,9 @@ namespace api.Models
 				return update;
 			}
 
+			if (district.Aun != update.Aun)
+				district.Aun = update.Aun;
+
 			if (district.Name != update.Name)
 				district.Name = update.Name;
 
@@ -48,6 +51,9 @@ namespace api.Models
 
 			if (district.AlternateRate != update.AlternateRate)
 				district.AlternateRate = update.AlternateRate;
+
+			if (district.PaymentType != update.PaymentType)
+				district.PaymentType = update.PaymentType;
 
 			_schoolDistricts.Update(district);
 			_context.SaveChanges();

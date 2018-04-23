@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.Converters;
 
 namespace api.Models
 {
@@ -12,8 +13,12 @@ namespace api.Models
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
 			builder.Entity<SchoolDistrict>().
-				Property(d => d.Rate).
+				Property(e => e.Rate).
 				HasDefaultValue(0m);
+
+			builder.Entity<SchoolDistrict>().
+				Property(e => e.PaymentType).
+				HasDefaultValue(SchoolDistrictPaymentType.ACH);
 		}
 	}
 }
