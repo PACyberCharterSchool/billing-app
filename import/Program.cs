@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 using CsvHelper;
@@ -40,6 +42,19 @@ namespace import
 			while (true) { }
 		}
 
+		private static string HashBatch(DateTime time, string filename)
+		{
+			var milli = time.Millisecond.ToString();
+			var bytes = Encoding.UTF8.GetBytes($"{milli}-{filename}");
+			var hash = SHA256.Create().ComputeHash(bytes);
+
+			var sb = new StringBuilder();
+			foreach (var b in hash)
+				sb.Append(b.ToString("x2"));
+
+			return sb.ToString().Substring(0, 10);
+		}
+
 		private static void HandleFileChange(object source, FileSystemEventArgs e)
 		{
 			using (var tx = _context.Database.BeginTransaction())
@@ -67,9 +82,20 @@ namespace import
 						var csvReader = new CsvReader(streamReader);
 						csvReader.Configuration.RegisterClassMap<StudentStatusRecordClassMap>();
 
+						var batchFilename = e.Name;
+						var batchTime = DateTime.Now;
+						var batchHash = HashBatch(batchTime, batchFilename);
+						Console.WriteLine($"Filename: {batchFilename}");
+						Console.WriteLine($"Batch time: {batchTime}");
+						Console.WriteLine($"Hash: {batchHash}");
+
 						var records = csvReader.GetRecords<StudentStatusRecord>();
 						foreach (var record in records)
 						{
+							record.BatchTime = batchTime;
+							record.BatchFilename = batchFilename;
+							record.BatchHash = batchHash;
+
 							_context.Add(record);
 							count++;
 

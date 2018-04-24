@@ -26,5 +26,8 @@ namespace api.Models
 		public DateTime? StudentFormerIep { get; set; }
 		public DateTime? StudentNorep { get; set; }
 		public ulong? StudentPaSecuredId { get; set; }
+		public DateTime BatchTime { get; set; }
+		public string BatchFilename { get; set; }
+		public string BatchHash { get; set; }
 	}
 }
