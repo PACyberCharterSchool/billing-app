@@ -53,7 +53,7 @@ export class LoginPanelFormComponent implements OnInit {
       data => {
         console.log('LoginPanelFormComponent.login():  authentication successful.  data is ', data);
         localStorage.setItem('jwt-token', data.token);
-        this.router.navigate(['']);
+        this.router.navigate(['main']);
       },
       error => {
         this.handleLoginError(error);

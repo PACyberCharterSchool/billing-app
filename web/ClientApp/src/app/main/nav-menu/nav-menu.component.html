@@ -28,12 +28,12 @@
           </a>
         </li>
         <li [routerLinkActive]='["link-active"]'>
-          <a [routerLink]='["/students"]' (click)='collapse()'>
+          <a [routerLink]='["/students", { outlets: { "action": ["list"] } }]' (click)='collapse()'>
               <span class='glyphicon glyphicon-user'></span> Students
           </a>
         </li>
         <li [routerLinkActive]='["link-active"]'>
-          <a [routerLink]='["/administration"]' (click)='collapse()'>
+          <a [routerLink]='["/main/administration"]' (click)='collapse()'>
               <span class='glyphicon glyphicon-cog'></span> Administration
           </a>
         </li>

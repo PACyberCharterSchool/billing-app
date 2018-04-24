@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AppTitleService } from '../../../../services/app-title.service';
+import { AppTitleService } from '../../services/app-title.service';
 
 @Component({
   selector: 'app-nav-menu',

@@ -1,0 +1,38 @@
+<div class='row'>
+  <div class='col-md-6'>
+    <label>Students</label>
+    <input type='text' />
+  </div>
+  <div class='col-md-3'>
+    <label>More Filters</label>
+    <button><i class='fa fa-bars'></i></button>
+  </div>
+  <div class='col-md-3'>
+  </div>
+</div>
+<div class='row'>
+
+</div>
+<div class='row'>
+  <div class='col-md-12'>
+    <table>
+      <thead>
+        <tr>
+          <th>PA Cyber</th>
+          <th>First Name</th>
+          <th>Middle Initial</th>
+          <th>Last Name</th>
+          <th>IEP</th>
+          <th>Grade</th>
+          <th>School District</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of students">{{student}}</tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+

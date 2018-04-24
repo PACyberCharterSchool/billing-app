@@ -16,6 +16,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppTitleService } from './services/app-title.service';
 import { AuthenticationService } from './services/authentication.service';
 import { AuthenticationGuardService } from './services/authentication-guard.service';
+import { StudentsService } from './services/students.service';
 
 const pacbillDeclarations = [
     AppComponent
@@ -35,7 +36,8 @@ const pacbillImports = [
 const pacbillProviders = [
   AppTitleService,
   AuthenticationGuardService,
-  AuthenticationService
+  AuthenticationService,
+  StudentsService
 ];
 
 @NgModule({

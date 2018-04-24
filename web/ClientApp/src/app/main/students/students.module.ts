@@ -9,15 +9,15 @@ import { StudentsListComponent } from './students-list/students-list.component';
 import { StudentsDetailComponent } from './students-detail/students-detail.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    StudentsRoutingModule
-  ],
   declarations: [
     StudentsComponent,
     StudentsListComponent,
     StudentsDetailComponent
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    StudentsRoutingModule
   ],
   providers: []
 })
