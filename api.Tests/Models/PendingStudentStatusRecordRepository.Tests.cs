@@ -47,5 +47,38 @@ namespace api.Tests.Models
 			Assert.That(actual, Has.Count.EqualTo(3));
 			Assert.That(actual, Is.EqualTo(records));
 		}
+
+		[Test]
+		public void GetManyWithSkipSkips()
+		{
+			var records = new[]{
+				new StudentStatusRecord{Id = 1},
+				new StudentStatusRecord{Id = 2},
+				new StudentStatusRecord{Id = 3},
+			};
+			_context.PendingStudentStatusRecords.AddRange(records);
+			_context.SaveChanges();
+
+			var actual = _uut.GetMany(1, 0);
+			Assert.That(actual, Has.Count.EqualTo(2));
+			Assert.That(actual[0], Is.EqualTo(records[1]));
+			Assert.That(actual[1], Is.EqualTo(records[2]));
+		}
+
+		[Test]
+		public void GetManyWithTakeTakes()
+		{
+			var records = new[]{
+				new StudentStatusRecord{Id = 1},
+				new StudentStatusRecord{Id = 2},
+				new StudentStatusRecord{Id = 3},
+			};
+			_context.PendingStudentStatusRecords.AddRange(records);
+			_context.SaveChanges();
+
+			var actual = _uut.GetMany(0, 1);
+			Assert.That(actual, Has.Count.EqualTo(1));
+			Assert.That(actual[0], Is.EqualTo(records[0]));
+		}
 	}
 }

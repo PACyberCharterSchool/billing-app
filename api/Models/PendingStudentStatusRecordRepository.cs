@@ -9,6 +9,7 @@ namespace api.Models
 	public interface IPendingStudentStatusRecordRepository
 	{
 		IList<StudentStatusRecord> GetMany();
+		IList<StudentStatusRecord> GetMany(int skip, int take);
 	}
 
 	public class PendingStudentStatusRecordRepository : IPendingStudentStatusRecordRepository
@@ -24,6 +25,19 @@ namespace api.Models
 			_logger = logger;
 		}
 
-		public IList<StudentStatusRecord> GetMany() => _records.ToList();
+		public IList<StudentStatusRecord> GetMany() => GetMany(0, 0);
+
+		public IList<StudentStatusRecord> GetMany(int skip, int take)
+		{
+			var records = _records.AsQueryable();
+
+			if (skip > 0)
+				records = records.Skip(skip);
+
+			if (take > 0)
+				records = records.Take(take);
+
+			return records.OrderBy(r => r.Id).ToList();
+		}
 	}
 }
