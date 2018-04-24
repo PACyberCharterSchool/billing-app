@@ -20,6 +20,12 @@ import { MatFormFieldModule, MatFormFieldControl, MatInputModule } from '@angula
 // import { MAT_MENU_DEFAULT_OPTIONS } from '@angular/material';
 import { MatMenu } from '@angular/material';
 
+// ng-bootstrap
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { SortableTableDirective } from '../directives/sortable-table.directive';
+import { SortableColumnComponent } from '../main/sortable-column/sortable-column.component';
+
 @NgModule({
   declarations: [
     ContentAreaComponent,
@@ -28,7 +34,9 @@ import { MatMenu } from '@angular/material';
     LoginTitleBarComponent,
     MainComponent,
     TitleBarComponent,
-    NavMenuComponent
+    NavMenuComponent,
+    SortableTableDirective,
+    SortableColumnComponent
   ],
   exports: [],
   imports: [
@@ -41,6 +49,7 @@ import { MatMenu } from '@angular/material';
     MatInputModule,
     MatMenuModule,
     MatSidenavModule,
+    NgbModule,
     StudentsModule
   ],
   providers: []

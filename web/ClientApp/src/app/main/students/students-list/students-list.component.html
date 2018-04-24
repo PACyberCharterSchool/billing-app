@@ -1,36 +1,50 @@
-<div class='row'>
-  <div class='col-md-6'>
-    <label>Students</label>
-    <input type='text' />
+<div class='row base-search-tools-row'>
+  <div class='col-md-4' style='padding-right: 0;'>
+    <h3>Students</h3>
+    <input type='text' placeholder='Search ID, student name...' />
+    <button class='btn-primary search-button'>SEARCH</button>
   </div>
-  <div class='col-md-3'>
-    <label>More Filters</label>
-    <button><i class='fa fa-bars'></i></button>
+  <div class='col-md-3 advanced-search-tools-control-col'>
+    <h4>More Filters</h4>
+    <button mat-icon-button class='advanced-search-tools-toggle-btn'><i class='fa fa-bars'></i></button>
   </div>
-  <div class='col-md-3'>
+  <div class='col-md-5'>
+    <div class='col-md-6'><app-student-datepicker></app-student-datepicker></div>
+    <div class='col-md-6'><app-student-datepicker></app-student-datepicker></div>
   </div>
 </div>
-<div class='row'>
-
+<div class='row advanced-search-tools-row'>
 </div>
-<div class='row'>
+<div class='row student-list-view-row'>
   <div class='col-md-12'>
-    <table>
+    <table app-sortable-table (sorted)="onSorted($event)">
       <thead>
         <tr>
-          <th>PA Cyber</th>
-          <th>First Name</th>
-          <th>Middle Initial</th>
-          <th>Last Name</th>
-          <th>IEP</th>
-          <th>Grade</th>
-          <th>School District</th>
-          <th>Start Date</th>
-          <th>End Date</th>
+          <th app-sortable-column='paCyberId'>PACyber Id</th>
+          <th app-sortable-column='firstName'>First Name</th>
+          <th app-sortable-column='middleInitial'>Middle Initial</th>
+          <th app-sortable-column='lastName'>Last Name</th>
+          <th app-sortable-column='isSpecialEducation'>IEP</th>
+          <th app-sortable-column='grade'>Grade</th>
+          <th app-sortable-column='schoolDistrict'>School District</th>
+          <th app-sortable-column='dateOfBirth'>DOB</th>
+          <th app-sortable-column='startDate'>Start Date</th>
+          <th app-sortable-column='endDate'>End Date</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let student of students">{{student}}</tr>
+        <tr *ngFor="let student of students" (click)="showStudentDetails(student.id)">
+          <td>{{student.paCyberId}}</td>
+          <td>{{student.firstName}}</td>
+          <td>{{student.middleInitial}}</td>
+          <td>{{student.lastName}}</td>
+          <td>{{student.isSpecialEducation | iepEnrolled}}</td>
+          <td>{{student.grade}}</td>
+          <td>{{student.schoolDistrict}}</td>
+          <td>{{student.dateOfBirth | date: 'dd/MM/yyyy'}}</td>
+          <td></td>
+          <td></td>
+        </tr>
       </tbody>
     </table>
   </div>

@@ -7,19 +7,31 @@ import { StudentsRoutingModule } from './students-routing.module';
 import { StudentsComponent } from './students.component';
 import { StudentsListComponent } from './students-list/students-list.component';
 import { StudentsDetailComponent } from './students-detail/students-detail.component';
+import { StudentDatepickerComponent } from './student-datepicker/student-datepicker.component';
+import { StudentDetailsInfoComponent } from './student-details-info/student-details-info.component';
+import { StudentHistoryInfoComponent } from './student-history-info/student-history-info.component';
+
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { IepEnrolledPipe } from '../../pipes/iep-enrolled.pipe';
 
 @NgModule({
   declarations: [
     StudentsComponent,
     StudentsListComponent,
-    StudentsDetailComponent
+    StudentsDetailComponent,
+    StudentDatepickerComponent,
+    StudentDetailsInfoComponent,
+    StudentHistoryInfoComponent,
+    IepEnrolledPipe
   ],
   imports: [
     CommonModule,
     FormsModule,
-    StudentsRoutingModule
+    StudentsRoutingModule,
+    NgbModule
   ],
-  providers: []
+  providers: [ ]
 })
 
 export class StudentsModule { }

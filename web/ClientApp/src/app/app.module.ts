@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
@@ -17,27 +17,40 @@ import { AppTitleService } from './services/app-title.service';
 import { AuthenticationService } from './services/authentication.service';
 import { AuthenticationGuardService } from './services/authentication-guard.service';
 import { StudentsService } from './services/students.service';
+import { SortService } from './services/sort.service';
+
+import { TokenInterceptor } from './interceptors/token.interceptor';
+
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+const tokenInterceptor = {
+  provide: HTTP_INTERCEPTORS,
+  useClass: TokenInterceptor,
+  multi: true
+};
 
 const pacbillDeclarations = [
-    AppComponent
+  AppComponent
 ];
 
 const pacbillImports = [
-    BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
-    BrowserAnimationsModule,
-    HttpClientModule,
-    FormsModule,
-    RouterModule,
-    LoginModule,
-    MainModule,
-    AppRoutingModule
- ];
+  NgbModule.forRoot(),
+  BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
+  BrowserAnimationsModule,
+  HttpClientModule,
+  FormsModule,
+  RouterModule,
+  LoginModule,
+  MainModule,
+  AppRoutingModule
+];
 
 const pacbillProviders = [
   AppTitleService,
   AuthenticationGuardService,
   AuthenticationService,
-  StudentsService
+  StudentsService,
+  tokenInterceptor
 ];
 
 @NgModule({

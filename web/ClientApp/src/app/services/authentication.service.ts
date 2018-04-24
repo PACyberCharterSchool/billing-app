@@ -37,4 +37,8 @@ export class AuthenticationService {
     console.log('AuthenticationService.authenticate():  apiLoginUrl is ', this.apiLoginUrl);
     return this.http.post(this.apiLoginUrl, JSON.stringify(credentials), headers);
   }
+
+  public getAuthenticationToken(): string {
+    return localStorage.getItem('jwt-token');
+  }
 }

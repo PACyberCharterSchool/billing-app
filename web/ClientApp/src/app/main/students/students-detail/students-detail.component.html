@@ -1,3 +1,14 @@
-<p>
-  students-detail works!
-</p>
+<div class='row student-meta-info-row'>
+  <div class='col-md-9'>
+    <h3>Students</h3>|<h3>Detailed Information</h3>|<h3>{{student.firstName}} {{student.middleInitial}} {{student.lastName}}</h3>
+  </div>
+  <div class='col-md-3'>
+    <h3>Last Updated:  </h3><span>{{student.dateOfBirth | date:'mm/dd/yyyy'}}</span>
+  </div>
+</div>
+<div class='row student-info-row'>
+  <app-student-details-info></app-student-details-info>
+</div>
+<div class='row student-history-info'>
+  <app-student-history-info></app-student-history-info>
+</div>

@@ -1,13 +1,19 @@
 export class Student {
   id: number;
+  city: string;
   firstName: string;
   lastName: string;
   middleInitial: string;
-  PACyberId: number;
-  PASecureId: number;
+  paCyberId: number;
+  paSecureId: number;
   grade: number;
-  dob: Date;
+  dateOfBirth: Date;
   isSpecialEducation: boolean;
-  currentIEP: Date;
-  formerIEP: Date;
+  currentIep: Date;
+  formerIep: Date;
+  norep: string;
+  state: string;
+  street1: string;
+  street2: string;
+  zipCode: string;
 }

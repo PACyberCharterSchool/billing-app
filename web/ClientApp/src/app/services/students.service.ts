@@ -18,7 +18,7 @@ export class StudentsService {
   };
 
   constructor(private httpClient: HttpClient) {
-    this.apiStudentsUrl = environment.apiBaseUrl + '/api/students';
+    this.apiStudentsUrl = 'http://localhost:5000/api/students';
   }
 
   public getStudents(): Observable<Student[]> {
