@@ -12,9 +12,10 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(PacBillContext))]
-    partial class StudentContextModelSnapshot : ModelSnapshot
+    [Migration("20180423181843_SchoolDistrictPaymentType")]
+    partial class SchoolDistrictPaymentType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,15 +53,15 @@ namespace api.Migrations
 
                     b.Property<string>("City");
 
-                    b.Property<DateTime?>("CurrentIep");
+                    b.Property<DateTime>("CurrentIep");
 
                     b.Property<DateTime>("DateOfBirth");
 
                     b.Property<string>("FirstName");
 
-                    b.Property<DateTime?>("FormerIep");
+                    b.Property<DateTime>("FormerIep");
 
-                    b.Property<string>("Grade");
+                    b.Property<int>("Grade");
 
                     b.Property<bool>("IsSpecialEducation");
 
@@ -68,11 +69,9 @@ namespace api.Migrations
 
                     b.Property<string>("MiddleInitial");
 
-                    b.Property<DateTime?>("NOREP");
-
                     b.Property<int>("PACyberId");
 
-                    b.Property<ulong?>("PASecuredId");
+                    b.Property<int>("PASecuredId");
 
                     b.Property<int?>("SchoolDistrictId");
 
@@ -89,58 +88,6 @@ namespace api.Migrations
                     b.HasIndex("SchoolDistrictId");
 
                     b.ToTable("Students");
-                });
-
-            modelBuilder.Entity("api.Models.StudentStatusRecord", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("ActivitySchoolYear");
-
-                    b.Property<int>("SchoolDistrictId");
-
-                    b.Property<string>("SchoolDistrictName");
-
-                    b.Property<string>("StudentCity");
-
-                    b.Property<DateTime?>("StudentCurrentIep");
-
-                    b.Property<DateTime>("StudentDateOfBirth");
-
-                    b.Property<DateTime>("StudentEnrollmentDate");
-
-                    b.Property<string>("StudentFirstName");
-
-                    b.Property<DateTime?>("StudentFormerIep");
-
-                    b.Property<string>("StudentGradeLevel");
-
-                    b.Property<int>("StudentId");
-
-                    b.Property<bool>("StudentIsSpecialEducation");
-
-                    b.Property<string>("StudentLastName");
-
-                    b.Property<string>("StudentMiddleInitial");
-
-                    b.Property<DateTime?>("StudentNorep");
-
-                    b.Property<ulong?>("StudentPaSecuredId");
-
-                    b.Property<string>("StudentState");
-
-                    b.Property<string>("StudentStreet1");
-
-                    b.Property<string>("StudentStreet2");
-
-                    b.Property<DateTime?>("StudentWithdrawalDate");
-
-                    b.Property<string>("StudentZipCode");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PendingStudentStatusRecords");
                 });
 
             modelBuilder.Entity("api.Models.Student", b =>

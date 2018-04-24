@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 using api.Models;
 
@@ -11,100 +13,92 @@ namespace api.Controllers
 	[Route("api/[controller]")]
 	public class StudentsController : Controller
 	{
-		private readonly StudentContext _context;
-
+		private readonly IStudentRepository _students;
 		private readonly ILogger _logger;
 
-		public StudentsController(StudentContext context, ILogger<StudentsController> logger)
+		public StudentsController(IStudentRepository students, ILogger<StudentsController> logger)
 		{
-			_context = context;
-
+			_students = students;
 			_logger = logger;
+		}
 
-			if (_context.Students.Count() == 0)
+		public struct StudentsResponse
+		{
+			public IList<Student> Students { get; }
+
+			public StudentsResponse(IList<Student> students)
 			{
-				_context.Students.Add(
-						new Student { firstName = "Student", lastName = "Pennsylvania" }
-						);
-				_context.SaveChanges();
+				Students = students;
 			}
+		}
+
+		public class GetManyArgs
+		{
+			[StudentField]
+			public string Sort { get; set; }
+
+			[RegularExpression("^(?:a|de)sc$")]
+			public string Dir { get; set; }
+
+			[Range(0, int.MaxValue)]
+			public int Skip { get; set; }
+
+			[Range(0, int.MaxValue)]
+			public int Take { get; set; }
+
+			public string Filter { get; set; }
 		}
 
 		[HttpGet]
 		[Authorize(Policy = "STD+")]
-		public IActionResult GetAll()
-		{
-			return new ObjectResult(_context.Students.ToList());
-		}
-
-		[HttpGet("{id}", Name = "GetStudent")]
-		[Authorize(Policy = "STD+")]
-		public IActionResult GetById(long id)
-		{
-			var student = _context.Students.FirstOrDefault(s => s.Id == id);
-			if (student == null)
-			{
-				return NotFound();
-			}
-			return new ObjectResult(student);
-		}
-
-		[HttpPost]
-		[Authorize(Policy = "PAY+")]
-		public IActionResult Create([FromBody] Student s)
-		{
-			_logger.LogDebug("StudentsController.Create():  creating students {s}.");
-
-			if (s == null)
-			{
-				return BadRequest();
-			}
-
-			_logger.LogDebug("StudentsController.Create():  creating students {s}.");
-
-			_context.Students.Add(s);
-			_context.SaveChanges();
-
-			return CreatedAtRoute("GetStudent", new Student { Id = s.Id }, s);
-		}
-
-		[HttpPut("{id}")]
-		[Authorize(Policy = "PAY+")]
-		public IActionResult Update(int id, [FromBody]Student model)
+		[ProducesResponseType(typeof(StudentsResponse), 200)]
+		public async Task<IActionResult> GetMany([FromQuery]GetManyArgs args)
 		{
 			if (!ModelState.IsValid)
+				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
+
+			IList<Student> students = null;
+			try
 			{
-				return BadRequest(ModelState);
+				students = await Task.Run(() => _students.GetMany(
+					sort: args.Sort,
+					dir: args.Dir,
+					skip: args.Skip,
+					take: args.Take,
+					filter: args.Filter
+				));
+			}
+			catch (ArgumentException e)
+			{
+				return new BadRequestObjectResult(new ErrorResponse(e.Message));
 			}
 
-			var student = _context.Students.Find(id);
-			if (student == null)
-			{
-				return NotFound();
-			}
+			if (students == null)
+				students = new List<Student>();
 
-			student.firstName = model.firstName;
-			student.lastName = model.lastName;
-
-			_context.SaveChanges();
-
-			return Ok(student);
+			return new ObjectResult(new StudentsResponse(students));
 		}
 
-		[HttpDelete("{id}")]
-		[Authorize(Policy = "ADM=")]
-		public IActionResult Delete(int id)
+		public struct StudentResponse
 		{
-			var student = _context.Students.Find(id);
-			if (student == null)
+			public Student Student { get; }
+
+			public StudentResponse(Student student)
 			{
-				return NotFound();
+				Student = student;
 			}
+		}
 
-			_context.Remove(student);
-			_context.SaveChanges();
+		[HttpGet("{id}")]
+		[Authorize(Policy = "STD+")]
+		[ProducesResponseType(typeof(StudentResponse), 200)]
+		public async Task<IActionResult> GetById(int id)
+		{
+			var student = await Task.Run(() => _students.Get(id));
+			if (student == null)
+				return NotFound();
 
-			return Ok(student);
+			return new ObjectResult(new StudentResponse(student));
 		}
 	}
 }
