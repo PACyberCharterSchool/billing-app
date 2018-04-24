@@ -70,6 +70,8 @@ namespace import
 				catch (Exception ex)
 				{
 					Console.WriteLine($"Failed to truncate table: {ex.Message}");
+					if (ex.InnerException != null)
+						Console.WriteLine($"  Inner exception: {ex.InnerException.Message}.");
 					return;
 				}
 
@@ -114,7 +116,10 @@ namespace import
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine($"Failure reading CSV: {ex.Message}.");
+					Console.WriteLine($"Failed to read CSV: {ex.Message}.");
+					if (ex.InnerException != null)
+						Console.WriteLine($"  Inner exception: {ex.InnerException.Message}.");
+
 					return;
 				}
 			}
