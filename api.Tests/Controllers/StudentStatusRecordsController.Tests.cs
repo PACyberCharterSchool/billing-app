@@ -7,8 +7,8 @@ using Moq;
 using NUnit.Framework;
 
 using api.Controllers;
-using api.Models;
 using api.Tests.Util;
+using models;
 
 namespace api.Tests.Controllers
 {

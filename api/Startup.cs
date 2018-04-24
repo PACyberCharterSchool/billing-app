@@ -15,8 +15,8 @@ using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.ReDoc;
 
 using static api.Common.UserRoles;
-using api.Models;
 using api.Services;
+using models;
 
 namespace api
 {

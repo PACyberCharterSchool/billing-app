@@ -3,7 +3,7 @@ using System;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 
-using api.Models;
+using models;
 
 namespace import
 {

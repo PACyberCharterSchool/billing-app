@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using CsvHelper;
 using dotenv.net;
 
-using api.Models;
+using models;
 
 namespace import
 {
