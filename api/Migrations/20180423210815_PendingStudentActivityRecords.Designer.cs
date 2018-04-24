@@ -12,9 +12,10 @@ using api.Models;
 namespace api.Migrations
 {
     [DbContext(typeof(PacBillContext))]
-    partial class StudentContextModelSnapshot : ModelSnapshot
+    [Migration("20180423210815_PendingStudentActivityRecords")]
+    partial class PendingStudentActivityRecords
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,7 +92,7 @@ namespace api.Migrations
                     b.ToTable("Students");
                 });
 
-            modelBuilder.Entity("api.Models.StudentStatusRecord", b =>
+            modelBuilder.Entity("api.Models.StudentActivityRecord", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -140,7 +141,7 @@ namespace api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PendingStudentStatusRecords");
+                    b.ToTable("PendingStudentActivityRecords");
                 });
 
             modelBuilder.Entity("api.Models.Student", b =>
