@@ -36,9 +36,9 @@ namespace api.Tests.Models
 		public void GetManyReturnsAll()
 		{
 			var records = new[]{
-				new StudentStatusRecord{Id = 1},
-				new StudentStatusRecord{Id = 2},
-				new StudentStatusRecord{Id = 3},
+				new PendingStudentStatusRecord{Id = 1},
+				new PendingStudentStatusRecord{Id = 2},
+				new PendingStudentStatusRecord{Id = 3},
 			};
 			_context.PendingStudentStatusRecords.AddRange(records);
 			_context.SaveChanges();
@@ -52,9 +52,9 @@ namespace api.Tests.Models
 		public void GetManyWithSkipSkips()
 		{
 			var records = new[]{
-				new StudentStatusRecord{Id = 1},
-				new StudentStatusRecord{Id = 2},
-				new StudentStatusRecord{Id = 3},
+				new PendingStudentStatusRecord{Id = 1},
+				new PendingStudentStatusRecord{Id = 2},
+				new PendingStudentStatusRecord{Id = 3},
 			};
 			_context.PendingStudentStatusRecords.AddRange(records);
 			_context.SaveChanges();
@@ -69,9 +69,9 @@ namespace api.Tests.Models
 		public void GetManyWithTakeTakes()
 		{
 			var records = new[]{
-				new StudentStatusRecord{Id = 1},
-				new StudentStatusRecord{Id = 2},
-				new StudentStatusRecord{Id = 3},
+				new PendingStudentStatusRecord{Id = 1},
+				new PendingStudentStatusRecord{Id = 2},
+				new PendingStudentStatusRecord{Id = 3},
 			};
 			_context.PendingStudentStatusRecords.AddRange(records);
 			_context.SaveChanges();

@@ -22,7 +22,7 @@ namespace import
 		}
 	}
 
-	public class StudentStatusRecordClassMap : ClassMap<StudentStatusRecord>
+	public class StudentStatusRecordClassMap : ClassMap<PendingStudentStatusRecord>
 	{
 		public StudentStatusRecordClassMap()
 		{

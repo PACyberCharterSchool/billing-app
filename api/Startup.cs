@@ -55,6 +55,7 @@ namespace api
 			services.AddTransient<IStudentRepository, StudentRepository>();
 			services.AddTransient<ISchoolDistrictRepository, SchoolDistrictRepository>();
 			services.AddTransient<IPendingStudentStatusRecordRepository, PendingStudentStatusRecordRepository>();
+			services.AddTransient<ICommittedStudentStatusRecordRepository, CommittedStudentStatusRecordRepository>();
 
 			services.AddTransient<IFilterParser, FilterParser>();
 			#endregion

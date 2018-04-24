@@ -9,7 +9,8 @@ namespace api.Models
 
 		public DbSet<Student> Students { get; set; }
 		public DbSet<SchoolDistrict> SchoolDistricts { get; set; }
-		public DbSet<StudentStatusRecord> PendingStudentStatusRecords { get; set; }
+		public DbSet<PendingStudentStatusRecord> PendingStudentStatusRecords { get; set; }
+		public DbSet<CommittedStudentStatusRecord> CommittedStudentStatusRecords { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{

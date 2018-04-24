@@ -8,26 +8,29 @@ namespace api.Models
 {
 	public interface IPendingStudentStatusRecordRepository
 	{
-		IList<StudentStatusRecord> GetMany();
-		IList<StudentStatusRecord> GetMany(int skip, int take);
+		IList<PendingStudentStatusRecord> GetMany();
+		IList<PendingStudentStatusRecord> GetMany(int skip, int take);
+		void Truncate();
 	}
 
 	public class PendingStudentStatusRecordRepository : IPendingStudentStatusRecordRepository
 	{
-		private readonly DbSet<StudentStatusRecord> _records;
+		private readonly PacBillContext _context;
+		private readonly DbSet<PendingStudentStatusRecord> _records;
 		private readonly ILogger<PendingStudentStatusRecordRepository> _logger;
 
 		public PendingStudentStatusRecordRepository(
 			PacBillContext context,
 			ILogger<PendingStudentStatusRecordRepository> logger)
 		{
+			_context = context;
 			_records = context.PendingStudentStatusRecords;
 			_logger = logger;
 		}
 
-		public IList<StudentStatusRecord> GetMany() => GetMany(0, 0);
+		public IList<PendingStudentStatusRecord> GetMany() => GetMany(0, 0);
 
-		public IList<StudentStatusRecord> GetMany(int skip, int take)
+		public IList<PendingStudentStatusRecord> GetMany(int skip, int take)
 		{
 			var records = _records.AsQueryable();
 
@@ -38,6 +41,11 @@ namespace api.Models
 				records = records.Take(take);
 
 			return records.OrderBy(r => r.Id).ToList();
+		}
+
+		public void Truncate()
+		{
+			_context.Database.ExecuteSqlCommand("TRUNCATE TABLE " + nameof(_context.PendingStudentStatusRecords));
 		}
 	}
 }

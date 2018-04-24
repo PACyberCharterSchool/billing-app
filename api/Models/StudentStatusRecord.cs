@@ -30,4 +30,11 @@ namespace api.Models
 		public string BatchFilename { get; set; }
 		public string BatchHash { get; set; }
 	}
+
+	public class PendingStudentStatusRecord : StudentStatusRecord { }
+
+	public class CommittedStudentStatusRecord : StudentStatusRecord
+	{
+		public DateTime CommitTime { get; set; }
+	}
 }

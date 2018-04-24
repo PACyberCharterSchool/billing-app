@@ -89,7 +89,7 @@ namespace import
 						Console.WriteLine($"Batch time: {batchTime}");
 						Console.WriteLine($"Hash: {batchHash}");
 
-						var records = csvReader.GetRecords<StudentStatusRecord>();
+						var records = csvReader.GetRecords<PendingStudentStatusRecord>();
 						foreach (var record in records)
 						{
 							record.BatchTime = batchTime;
