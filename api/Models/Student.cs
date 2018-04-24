@@ -23,6 +23,8 @@ namespace api.Models
 		public DateTime? CurrentIep { get; set; }
 		public DateTime? FormerIep { get; set; }
 		public DateTime? NOREP { get; set; }
+		public DateTime Created { get; set; }
+		public DateTime LastUpdated { get; set; }
 
 		public SchoolDistrict SchoolDistrict { get; set; }
 

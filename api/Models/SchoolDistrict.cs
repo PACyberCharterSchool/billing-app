@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace api.Models
@@ -16,6 +17,8 @@ namespace api.Models
 		public decimal Rate { get; set; }
 		public decimal? AlternateRate { get; set; }
 		public string PaymentType { get; set; }
+		public DateTime Created { get; set; }
+		public DateTime LastUpdated { get; set; }
 
 		public IList<Student> Students { get; set; }
 	}
