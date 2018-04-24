@@ -38,7 +38,7 @@ namespace import
 			watcher.Created += HandleFileChange;
 			watcher.EnableRaisingEvents = true;
 
-			Console.WriteLine("Watching directory...");
+			Console.WriteLine($"Watching directory {path} for '{importGlob}'...");
 			while (true) { }
 		}
 
