@@ -23,8 +23,7 @@ namespace import
 			_closing.Set();
 		}
 
-		private static PacBillContext _context;
-		private static Parser _parser;
+		private static string _connectionString;
 
 		static void Main(string[] args)
 		{
@@ -38,11 +37,7 @@ namespace import
 			var userName = Environment.GetEnvironmentVariable("DATABASE_USERNAME");
 			var password = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
 			var port = Environment.GetEnvironmentVariable("DATABASE_PORT");
-			var connectionString = $"Server={hostName},{port};Database={databaseName};User Id={userName};Password={password}";
-
-			_context = new PacBillContext(new DbContextOptionsBuilder<PacBillContext>().
-				UseSqlServer(connectionString).Options);
-			_parser = new Parser();
+			_connectionString = $"Server={hostName},{port};Database={databaseName};User Id={userName};Password={password}";
 
 			var path = Path.Combine(Environment.CurrentDirectory, importDir);
 			var watcher = new FileSystemWatcher(path, importGlob);
@@ -55,13 +50,17 @@ namespace import
 		}
 
 		private static AutoResetEvent _processing = new AutoResetEvent(true);
+		private static PacBillContext _context;
+		private static Parser _parser = new Parser();
 
-		// TODO(Erik): detach entities after writing!
 		private static void HandleFileChange(object source, FileSystemEventArgs e)
 		{
 			try
 			{
 				_processing.WaitOne();
+
+				_context = new PacBillContext(new DbContextOptionsBuilder<PacBillContext>().
+					UseSqlServer(_connectionString).Options);
 
 				using (var tx = _context.Database.BeginTransaction())
 				{
@@ -85,7 +84,10 @@ namespace import
 					try
 					{
 						using (var streamReader = File.OpenText(e.FullPath))
-							records = _parser.Parse(streamReader, e.Name);
+						{
+							var lastWrite = File.GetLastWriteTime(e.FullPath);
+							records = _parser.Parse(lastWrite, streamReader, e.Name);
+						}
 					}
 					catch (Exception ex)
 					{
