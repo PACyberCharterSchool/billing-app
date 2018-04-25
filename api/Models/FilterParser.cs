@@ -123,6 +123,9 @@ namespace api.Models
 				if (char.IsWhiteSpace(c) || c == CLOSE)
 				{
 					Backup();
+					if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+						type = Nullable.GetUnderlyingType(type);
+
 					return Convert.ChangeType(value, type);
 				}
 
@@ -221,6 +224,7 @@ namespace api.Models
 			return exp;
 		}
 
+		// TODO(Erik): catch InvalidCastException?
 		public LambdaExpression Parse<T>(string param, string filter)
 		{
 			_param = Expression.Parameter(typeof(T), param);
