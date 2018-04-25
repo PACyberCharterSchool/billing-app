@@ -48,6 +48,12 @@ namespace api.Tests.Controllers
 				_logger);
 		}
 
+		[TearDown]
+		public void TearDown()
+		{
+			_context.Database.EnsureDeleted();
+		}
+
 		[Test]
 		public async Task GetManyNoArgsReturnsList()
 		{
