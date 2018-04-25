@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -23,6 +24,7 @@ namespace import
 		}
 
 		private static PacBillContext _context;
+		private static Parser _parser;
 
 		static void Main(string[] args)
 		{
@@ -40,6 +42,7 @@ namespace import
 
 			_context = new PacBillContext(new DbContextOptionsBuilder<PacBillContext>().
 				UseSqlServer(connectionString).Options);
+			_parser = new Parser();
 
 			var path = Path.Combine(Environment.CurrentDirectory, importDir);
 			var watcher = new FileSystemWatcher(path, importGlob);
@@ -49,19 +52,6 @@ namespace import
 			Console.WriteLine($"Watching directory {path} for '{importGlob}'...");
 			Console.CancelKeyPress += OnExit;
 			_closing.WaitOne();
-		}
-
-		private static string HashBatch(DateTime time, string filename)
-		{
-			var milli = time.Millisecond.ToString();
-			var bytes = Encoding.UTF8.GetBytes($"{milli}-{filename}");
-			var hash = SHA256.Create().ComputeHash(bytes);
-
-			var sb = new StringBuilder();
-			foreach (var b in hash)
-				sb.Append(b.ToString("x2"));
-
-			return sb.ToString().Substring(0, 10);
 		}
 
 		private static AutoResetEvent _processing = new AutoResetEvent(true);
@@ -90,40 +80,25 @@ namespace import
 						return;
 					}
 
+					IList<PendingStudentStatusRecord> records = null;
 					try
 					{
-						var count = 0;
 						using (var streamReader = File.OpenText(e.FullPath))
-						{
-							var csvReader = new CsvReader(streamReader);
-							csvReader.Configuration.RegisterClassMap<StudentStatusRecordClassMap>();
+							records = _parser.Parse(streamReader, e.Name);
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine($"Failed to read CSV: {ex.Message}.");
+						if (ex.InnerException != null)
+							Console.WriteLine($"  Inner exception: {ex.InnerException.Message}.");
 
-							var batchFilename = e.Name;
-							var batchTime = DateTime.Now;
-							var batchHash = HashBatch(batchTime, batchFilename);
-							Console.WriteLine($"Filename: {batchFilename}");
-							Console.WriteLine($"Batch time: {batchTime}");
-							Console.WriteLine($"Hash: {batchHash}");
+						return;
+					}
 
-							Console.WriteLine("Reading records...");
-							var records = csvReader.GetRecords<PendingStudentStatusRecord>();
-							foreach (var record in records)
-							{
-								record.BatchTime = batchTime;
-								record.BatchFilename = batchFilename;
-								record.BatchHash = batchHash;
-
-								_context.Add(record);
-								count++;
-
-								if (count % 1000 == 0)
-									Console.WriteLine($"Read {count} records.");
-							}
-
-							Console.WriteLine($"Reading records done ({count})!");
-						}
-
+					try
+					{
 						Console.WriteLine("Writing changes to the database...");
+						_context.AddRange(records);
 						_context.SaveChanges();
 						Console.WriteLine("Writing changes to the database done!");
 
@@ -131,7 +106,7 @@ namespace import
 					}
 					catch (Exception ex)
 					{
-						Console.WriteLine($"Failed to read CSV: {ex.Message}.");
+						Console.WriteLine($"Failed to write data to database: {ex.Message}.");
 						if (ex.InnerException != null)
 							Console.WriteLine($"  Inner exception: {ex.InnerException.Message}.");
 
