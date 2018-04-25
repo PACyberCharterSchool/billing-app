@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using CsvHelper;
@@ -14,6 +15,13 @@ namespace import
 {
 	class Program
 	{
+		private static readonly AutoResetEvent _closing = new AutoResetEvent(false);
+
+		private static void OnExit(object source, ConsoleCancelEventArgs args)
+		{
+			_closing.Set();
+		}
+
 		private static PacBillContext _context;
 
 		static void Main(string[] args)
@@ -39,7 +47,8 @@ namespace import
 			watcher.EnableRaisingEvents = true;
 
 			Console.WriteLine($"Watching directory {path} for '{importGlob}'...");
-			while (true) { }
+			Console.CancelKeyPress += OnExit;
+			_closing.WaitOne();
 		}
 
 		private static string HashBatch(DateTime time, string filename)
@@ -78,7 +87,6 @@ namespace import
 				try
 				{
 					var count = 0;
-					Console.WriteLine("Reading records...");
 					using (var streamReader = File.OpenText(e.FullPath))
 					{
 						var csvReader = new CsvReader(streamReader);
@@ -91,6 +99,7 @@ namespace import
 						Console.WriteLine($"Batch time: {batchTime}");
 						Console.WriteLine($"Hash: {batchHash}");
 
+						Console.WriteLine("Reading records...");
 						var records = csvReader.GetRecords<PendingStudentStatusRecord>();
 						foreach (var record in records)
 						{
