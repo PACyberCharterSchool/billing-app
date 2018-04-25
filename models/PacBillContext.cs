@@ -7,10 +7,11 @@ namespace models
 	{
 		public PacBillContext(DbContextOptions<PacBillContext> options) : base(options) { }
 
-		public DbSet<Student> Students { get; set; }
-		public DbSet<SchoolDistrict> SchoolDistricts { get; set; }
-		public DbSet<PendingStudentStatusRecord> PendingStudentStatusRecords { get; set; }
+		public DbSet<AuditRecord> AuditRecords { get; set; }
 		public DbSet<CommittedStudentStatusRecord> CommittedStudentStatusRecords { get; set; }
+		public DbSet<PendingStudentStatusRecord> PendingStudentStatusRecords { get; set; }
+		public DbSet<SchoolDistrict> SchoolDistricts { get; set; }
+		public DbSet<Student> Students { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{

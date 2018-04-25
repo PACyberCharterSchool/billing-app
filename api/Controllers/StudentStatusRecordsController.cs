@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 
 using models;
@@ -15,15 +15,18 @@ namespace api.Controllers
 	{
 		private readonly IPendingStudentStatusRecordRepository _pending;
 		private readonly ICommittedStudentStatusRecordRepository _committed;
+		private readonly IAuditRecordRepository _audits;
 		private readonly ILogger<StudentStatusRecordsController> _logger;
 
 		public StudentStatusRecordsController(
 			IPendingStudentStatusRecordRepository pending,
 			ICommittedStudentStatusRecordRepository committed,
+			IAuditRecordRepository audits,
 			ILogger<StudentStatusRecordsController> logger)
 		{
 			_pending = pending;
 			_committed = committed;
+			_audits = audits;
 			_logger = logger;
 		}
 
@@ -60,7 +63,7 @@ namespace api.Controllers
 		[Authorize(Policy = "PAY+")]
 		public async Task<IActionResult> Commit()
 		{
-			var pending = _pending.GetMany();
+			var pending = await Task.Run(() => _pending.GetMany());
 			if (pending == null || pending.Count == 0)
 				return Ok();
 
@@ -94,8 +97,16 @@ namespace api.Controllers
 					BatchHash = p.BatchHash,
 				});
 
-			await Task.Run(() => _committed.CreateMany(committed));
-			await Task.Run(() => _pending.Truncate());
+			// TODO(Erik): transaction!
+			_committed.CreateMany(committed);
+			_pending.Truncate();
+
+			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+			_audits.Create(new AuditRecord
+			{
+				Username = username,
+				Activity = AuditRecordActivity.COMMIT_GENIUS,
+			});
 
 			return Ok();
 		}

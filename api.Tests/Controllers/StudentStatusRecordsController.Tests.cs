@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 using Moq;
@@ -17,6 +20,7 @@ namespace api.Tests.Controllers
 	{
 		private Mock<IPendingStudentStatusRecordRepository> _pending;
 		private Mock<ICommittedStudentStatusRecordRepository> _committed;
+		private Mock<IAuditRecordRepository> _audits;
 		private ILogger<StudentStatusRecordsController> _logger;
 
 		private StudentStatusRecordsController _uut;
@@ -26,9 +30,10 @@ namespace api.Tests.Controllers
 		{
 			_pending = new Mock<IPendingStudentStatusRecordRepository>();
 			_committed = new Mock<ICommittedStudentStatusRecordRepository>();
+			_audits = new Mock<IAuditRecordRepository>();
 			_logger = new TestLogger<StudentStatusRecordsController>();
 
-			_uut = new StudentStatusRecordsController(_pending.Object, _committed.Object, _logger);
+			_uut = new StudentStatusRecordsController(_pending.Object, _committed.Object, _audits.Object, _logger);
 		}
 
 		[Test]
@@ -128,6 +133,17 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task CommitCommits()
 		{
+			var username = "bob";
+			_uut.ControllerContext = new ControllerContext
+			{
+				HttpContext = new DefaultHttpContext
+				{
+					User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]{
+							new Claim(JwtRegisteredClaimNames.Sub, username),
+					})),
+				},
+			};
+
 			var pending = new[] {
 				new PendingStudentStatusRecord{Id = 1},
 				new PendingStudentStatusRecord{Id = 2},
@@ -138,8 +154,12 @@ namespace api.Tests.Controllers
 			var result = await _uut.Commit();
 			Assert.That(result, Is.TypeOf<OkResult>());
 
-			_committed.Verify(c => c.CreateMany(It.IsAny<List<CommittedStudentStatusRecord>>()), Times.Once);
+			_committed.Verify(c => c.CreateMany(It.Is<List<CommittedStudentStatusRecord>>(
+				l => l.Count == 3)), Times.Once);
 			_pending.Verify(c => c.Truncate(), Times.Once);
+			_audits.Verify(c => c.Create(It.Is<AuditRecord>(r =>
+				r.Username == username && r.Activity == AuditRecordActivity.COMMIT_GENIUS
+			)), Times.Once);
 		}
 
 		[Test]

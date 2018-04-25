@@ -43,7 +43,6 @@ namespace import
 			var records = new List<PendingStudentStatusRecord>();
 			foreach (var record in csvReader.GetRecords<PendingStudentStatusRecord>())
 			{
-				Console.WriteLine($"record.StudentFirstName: {record.StudentFirstName}");
 				record.BatchTime = batchTime;
 				record.BatchFilename = batchFilename;
 				record.BatchHash = batchHash;

@@ -56,6 +56,7 @@ namespace import
 
 		private static AutoResetEvent _processing = new AutoResetEvent(true);
 
+		// TODO(Erik): detach entities after writing!
 		private static void HandleFileChange(object source, FileSystemEventArgs e)
 		{
 			try

@@ -12,9 +12,10 @@ using models;
 namespace models.Migrations
 {
     [DbContext(typeof(PacBillContext))]
-    partial class PacBillContextModelSnapshot : ModelSnapshot
+    [Migration("20180425173621_AuditRecords")]
+    partial class AuditRecords
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
