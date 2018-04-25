@@ -9,6 +9,7 @@ import { AuthenticationGuardService } from './services/authentication-guard.serv
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: '', redirectTo: 'main', pathMatch: 'full' }
 ];
 
 @NgModule({

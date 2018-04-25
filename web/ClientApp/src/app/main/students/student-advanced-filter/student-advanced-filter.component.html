@@ -1,0 +1,40 @@
+<div class='col-md-4'>
+  <label>School District</label>
+  <div ngbDropdown class='d-inline-block'>
+    <button class='btn btn-outline-primary' id='schoolDistrictDropdown' ngbDropdownToggle>Select</button>
+    <div ngbDropdownMenu aria-labelled-by='schoolDistrictDropdown'>
+      <button class='dropdown-item' *ngFor="let sd of schoolDistricts">{{sd.name}}</button>
+    </div>
+  </div>
+</div>
+<div class='col-md-2'>
+  <label>School Year</label>
+  <div ngbDropdown class='d-inline-block'>
+    <button class='btn btn-outline-primary' id='schoolYearDropdown' ngbDropdownToggle>Year</button>
+    <div ngbDropdownMenu aria-labelled-by='schoolYearDropdown'>
+      <button class='dropdown-item' *ngFor="let year of schoolYears">{{year}}</button>
+    </div>
+  </div>
+</div>
+<div class='col-md-2'>
+  <label>Grade</label>
+  <div ngbDropdown class='d-inline-block'>
+    <button class='btn btn-outline-primary' id='gradeDropdown' ngbDropdownToggle>Grade</button>
+    <div ngbDropdownMenu aria-labelled-by='gradeDropdown'>
+      <button class='dropdown-item' *ngFor="let grade of grades">{{grade}}</button>
+    </div>
+  </div>
+</div>
+<div class='col-md-2'>
+  <label>Date of Birth</label>
+</div>
+<div class='col-md-2'>
+  <label>IEP</label>
+  <div ngbDropdown class='d-inline-block'>
+    <button class='btn btn-outline-primary' id='iepDropdown' ngbDropdownToggle>IEP</button>
+    <div ngbDropdownMenu aria-labelled-by='iepDropdown'>
+      <button class='dropdown-item'>Yes</button>
+      <button class='dropdown-item'>No</button>
+    </div>
+  </div>
+</div>

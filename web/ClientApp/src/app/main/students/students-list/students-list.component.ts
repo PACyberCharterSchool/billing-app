@@ -4,8 +4,10 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
 
 import { Student } from '../../../models/student.model';
+import { SchoolDistrict } from '../../../models/school-district.model';
 
 import { StudentsService } from '../../../services/students.service';
+import { SchoolDistrictService } from '../../../services/school-district.service';
 
 @Component({
   selector: 'app-students-list',
@@ -15,14 +17,27 @@ import { StudentsService } from '../../../services/students.service';
 export class StudentsListComponent implements OnInit {
 
   private students: Student[];
+  private schoolDistricts: SchoolDistrict[];
+  private advancedSearchEnabled: boolean;
+  private searchText: string;
 
-  constructor(private studentsService: StudentsService, private router: Router) { }
+  constructor(
+    private studentsService: StudentsService,
+    private schoolDistrictService: SchoolDistrictService,
+    private router: Router) { this.advancedSearchEnabled = false; }
 
   ngOnInit() {
     this.studentsService.getStudents().subscribe(
       data => {
         this.students = data['students'];
         console.log('StudentsListComponent.ngOnInit():  students are ', this.students);
+      }
+    );
+
+    this.schoolDistrictService.getSchoolDistricts().subscribe(
+      data => {
+        this.schoolDistricts = data['schoolDistricts'];
+        console.log('StudentsListComponent.ngOnInit():  school districts are', this.schoolDistricts);
       }
     );
   }
@@ -43,5 +58,20 @@ export class StudentsListComponent implements OnInit {
   showStudentDetails(studentId: number) {
     console.log('StudentsListComponent.showStudentDetails():  studentId is ', studentId);
     this.router.navigate(['/students', { id: studentId, outlets: {'action': [`${studentId}`]} }]);
+  }
+
+  toggleAdvancedSearchTools() {
+    this.advancedSearchEnabled = !this.advancedSearchEnabled;
+  }
+
+  filterStudentList() {
+    if (this.searchText) {
+      this.studentsService.getFilteredStudents(this.searchText).subscribe(
+        data => {
+          this.students = data['students'];
+          console.log('StudentsListComponent.filterStudentList():  students are ', data);
+        }
+      );
+    }
   }
 }

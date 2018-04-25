@@ -10,6 +10,7 @@ import { StudentsDetailComponent } from './students-detail/students-detail.compo
 import { StudentDatepickerComponent } from './student-datepicker/student-datepicker.component';
 import { StudentDetailsInfoComponent } from './student-details-info/student-details-info.component';
 import { StudentHistoryInfoComponent } from './student-history-info/student-history-info.component';
+import { StudentAdvancedFilterComponent } from './student-advanced-filter/student-advanced-filter.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -23,6 +24,7 @@ import { IepEnrolledPipe } from '../../pipes/iep-enrolled.pipe';
     StudentDatepickerComponent,
     StudentDetailsInfoComponent,
     StudentHistoryInfoComponent,
+    StudentAdvancedFilterComponent,
     IepEnrolledPipe
   ],
   imports: [

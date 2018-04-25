@@ -28,4 +28,33 @@ export class StudentsService {
   public getStudent(id: number): Observable<Student> {
     return this.httpClient.get<Student>(this.apiStudentsUrl + `/${id}`, this.headers);
   }
+
+  public getFilteredStudents(searchText: string): Observable<Student[]> {
+    const url: string = this.buildStudentIdOrNameSearchQuery(searchText);
+    return this.httpClient.get<Student[]>(url, this.headers);
+  }
+
+  private buildStudentIdOrNameSearchQuery(searchText: string): string {
+    let url: string;
+    let searchTokens: string[];
+    let newSearchTokens: string[];
+
+    if (searchText) {
+      searchTokens = searchText.split(' ');
+      newSearchTokens = searchTokens.map(
+        (v) => {
+          if (isNaN(Number(v))) {
+            return `(FirstName eq ${v}) or (LastName eq ${v})`;
+          } else {
+            return `(PACyberId eq ${v}) or (PASecuredId eq ${v})`;
+          }
+        }
+      );
+
+      url = this.apiStudentsUrl + '?filter=' + '(' + newSearchTokens.join(' ') + ')';
+      console.log('StudentsService.buildStudentIdOrNameSearchQuery(): url is ', url);
+    }
+
+    return url;
+  }
 }
