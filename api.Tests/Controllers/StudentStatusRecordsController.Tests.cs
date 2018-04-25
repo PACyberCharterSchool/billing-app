@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,6 +20,7 @@ namespace api.Tests.Controllers
 	[TestFixture]
 	public class StudentStatusRecordsControllerTests
 	{
+		private PacBillContext _context;
 		private Mock<IPendingStudentStatusRecordRepository> _pending;
 		private Mock<ICommittedStudentStatusRecordRepository> _committed;
 		private Mock<IAuditRecordRepository> _audits;
@@ -28,12 +31,21 @@ namespace api.Tests.Controllers
 		[SetUp]
 		public void SetUp()
 		{
+			_context = new PacBillContext(new DbContextOptionsBuilder<PacBillContext>().
+				UseInMemoryDatabase("student-status-records-controller").
+				ConfigureWarnings(o => o.Ignore(InMemoryEventId.TransactionIgnoredWarning)).
+				Options);
 			_pending = new Mock<IPendingStudentStatusRecordRepository>();
 			_committed = new Mock<ICommittedStudentStatusRecordRepository>();
 			_audits = new Mock<IAuditRecordRepository>();
 			_logger = new TestLogger<StudentStatusRecordsController>();
 
-			_uut = new StudentStatusRecordsController(_pending.Object, _committed.Object, _audits.Object, _logger);
+			_uut = new StudentStatusRecordsController(
+				_context,
+				_pending.Object,
+				_committed.Object,
+				_audits.Object,
+				_logger);
 		}
 
 		[Test]

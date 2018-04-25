@@ -13,17 +13,20 @@ namespace api.Controllers
 	[Route("api/[controller]")]
 	public class StudentStatusRecordsController : Controller
 	{
+		private readonly PacBillContext _context;
 		private readonly IPendingStudentStatusRecordRepository _pending;
 		private readonly ICommittedStudentStatusRecordRepository _committed;
 		private readonly IAuditRecordRepository _audits;
 		private readonly ILogger<StudentStatusRecordsController> _logger;
 
 		public StudentStatusRecordsController(
+			PacBillContext context,
 			IPendingStudentStatusRecordRepository pending,
 			ICommittedStudentStatusRecordRepository committed,
 			IAuditRecordRepository audits,
 			ILogger<StudentStatusRecordsController> logger)
 		{
+			_context = context;
 			_pending = pending;
 			_committed = committed;
 			_audits = audits;
@@ -97,16 +100,20 @@ namespace api.Controllers
 					BatchHash = p.BatchHash,
 				});
 
-			// TODO(Erik): transaction!
-			_committed.CreateMany(committed);
-			_pending.Truncate();
-
-			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
-			_audits.Create(new AuditRecord
+			using (var tx = _context.Database.BeginTransaction())
 			{
-				Username = username,
-				Activity = AuditRecordActivity.COMMIT_GENIUS,
-			});
+				_committed.CreateMany(committed);
+				_pending.Truncate();
+
+				var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+				_audits.Create(new AuditRecord
+				{
+					Username = username,
+					Activity = AuditRecordActivity.COMMIT_GENIUS,
+				});
+
+				tx.Commit();
+			}
 
 			return Ok();
 		}
