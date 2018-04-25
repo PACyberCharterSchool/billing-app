@@ -12,6 +12,7 @@ namespace api.Tests.Models
 		public int B { get; set; }
 		public int C { get; set; }
 		public string D { get; set; }
+		public int? E { get; set; }
 	}
 
 	[TestFixture]
@@ -30,6 +31,7 @@ namespace api.Tests.Models
 		[TestCase("((a eq 1) and (b eq 2))", "x => ((x.A == 1) AndAlso (x.B == 2))")]
 		[TestCase("((a eq 1) or (b eq 2))", "x => ((x.A == 1) OrElse (x.B == 2))")]
 		[TestCase("(((a eq 1) and (b eq 2)) or (c eq 3))", "x => (((x.A == 1) AndAlso (x.B == 2)) OrElse (x.C == 3))")]
+		[TestCase("(e eq 1)", "x => (x.E == 1)")] // nullables
 		public void ParseProducesLambda(string clause, string lambda)
 		{
 			var actual = new FilterParser().Parse<TestClass>(clause);
