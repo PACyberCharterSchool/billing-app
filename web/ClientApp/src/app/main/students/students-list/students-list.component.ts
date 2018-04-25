@@ -20,16 +20,24 @@ export class StudentsListComponent implements OnInit {
   private schoolDistricts: SchoolDistrict[];
   private advancedSearchEnabled: boolean;
   private searchText: string;
+  private isDescending: boolean;
+  private property: string;
+  private direction: number;
+  private items: Student[];
 
   constructor(
     private studentsService: StudentsService,
     private schoolDistrictService: SchoolDistrictService,
-    private router: Router) { this.advancedSearchEnabled = false; }
+    private router: Router) {
+      this.advancedSearchEnabled = false;
+      this.isDescending = false;
+      this.property = 'paCyberId';
+    }
 
   ngOnInit() {
     this.studentsService.getStudents().subscribe(
       data => {
-        this.students = data['students'];
+        this.students = this.items = data['students'];
         console.log('StudentsListComponent.ngOnInit():  students are ', this.students);
       }
     );
@@ -45,14 +53,16 @@ export class StudentsListComponent implements OnInit {
   getStudents($event) {
    this.studentsService.getStudents().subscribe(
      data => {
-       this.students = data['students'];
+       this.students = this.items = data['students'];
        console.log('StudentsListComponent.getStudents():  students are ', this.students);
      }
    );
   }
 
-  onSorted($event) {
-    this.getStudents($event);
+  sort(property) {
+    this.isDescending = !this.isDescending; // change the direction
+    this.property = property;
+    this.direction = this.isDescending ? 1 : -1;
   }
 
   showStudentDetails(studentId: number) {
@@ -68,7 +78,7 @@ export class StudentsListComponent implements OnInit {
     if (this.searchText) {
       this.studentsService.getFilteredStudents(this.searchText).subscribe(
         data => {
-          this.students = data['students'];
+          this.students = this.items = data['students'];
           console.log('StudentsListComponent.filterStudentList():  students are ', data);
         }
       );

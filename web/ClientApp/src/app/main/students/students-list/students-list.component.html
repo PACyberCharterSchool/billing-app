@@ -24,23 +24,53 @@
 </div>
 <div class='row student-list-view-row'>
   <div class='col-md-12'>
-    <table app-sortable-table (sorted)="onSorted($event)">
+    <table class='table table-responsive table-striped'>
       <thead>
         <tr>
-          <th app-sortable-column='paCyberId'>PACyber Id</th>
-          <th app-sortable-column='firstName'>First Name</th>
-          <th app-sortable-column='middleInitial'>Middle Initial</th>
-          <th app-sortable-column='lastName'>Last Name</th>
-          <th app-sortable-column='isSpecialEducation'>IEP</th>
-          <th app-sortable-column='grade'>Grade</th>
-          <th app-sortable-column='schoolDistrict'>School District</th>
-          <th app-sortable-column='dateOfBirth'>DOB</th>
-          <th app-sortable-column='startDate'>Start Date</th>
-          <th app-sortable-column='endDate'>End Date</th>
+          <th (click)="sort('paCyberId')">
+            PACyber Id
+            <i class="fa" [ngClass]="{'fa-sort': column != 'paCyberId', 'fa-sort-asc': (column == 'paCyberId' && isDesc), 'fa-sort-desc': (column == 'paCyberId' && !isDesc) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('firstName')">
+            First Name
+            <i class="fa" [ngClass]="{'fa-sort': column != 'firstName', 'fa-sort-asc': (column == 'firstName' && isDesc), 'fa-sort-desc': (column == 'firstName' && !isDesc) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('middleInitial')">
+            Middle Initial
+            <i class="fa" [ngClass]="{'fa-sort': column != 'middleInitial', 'fa-sort-asc': (column == 'middleInitial' && isDesc), 'fa-sort-desc': (column == 'middleInitial' && !isDesc) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('lastName')">
+            Last Name
+            <i class="fa" [ngClass]="{'fa-sort': column != 'lastName', 'fa-sort-asc': (column == 'lastName' && isDesc), 'fa-sort-desc': (column == 'lastName' && !isDesc) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('isSpecialEducation')">
+            IEP
+            <i class="fa" [ngClass]="{'fa-sort': column != 'isSpecialEducation', 'fa-sort-asc': (column == 'isSpecialEducation' && isDesc), 'fa-sort-desc': (column == 'isSpecialEducation' && !isDesc) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('grade')">
+            Grade
+            <i class="fa" [ngClass]="{'fa-sort': column != 'grade', 'fa-sort-asc': (column == 'grade' && isDesc), 'fa-sort-desc': (column == 'grade' && !isDesc) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('schoolDistrict')">
+            School District
+            <i class="fa" [ngClass]="{'fa-sort': column != 'schoolDistrict', 'fa-sort-asc': (column == 'schoolDistrict' && isDesc), 'fa-sort-desc': (column == 'schoolDistrict' && !isDesc) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('dob')">
+            DOB
+            <i class="fa" [ngClass]="{'fa-sort': column != 'dob', 'fa-sort-asc': (column == 'dob' && isDesc), 'fa-sort-desc': (column == 'dob' && !isDesc) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('startDate')">
+            Start Date
+            <i class="fa" [ngClass]="{'fa-sort': column != 'startDate', 'fa-sort-asc': (column == 'startDate' && isDesc), 'fa-sort-desc': (column == 'startDate' && !isDesc) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('endDate')">
+            End Date
+            <i class="fa" [ngClass]="{'fa-sort': column != 'startDate', 'fa-sort-asc': (column == 'startDate' && isDesc), 'fa-sort-desc': (column == 'startDate' && !isDesc) }" aria-hidden="true"></i>
+          </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let student of students" (click)="showStudentDetails(student.id)">
+        <tr *ngFor="let student of items | orderBy: {property: property, direction: direction}" (click)="showStudentDetails(student.id)">
           <td>{{student.paCyberId}}</td>
           <td>{{student.firstName}}</td>
           <td>{{student.middleInitial}}</td>
@@ -48,7 +78,7 @@
           <td>{{student.isSpecialEducation | iepEnrolled}}</td>
           <td>{{student.grade}}</td>
           <td>{{student.schoolDistrict}}</td>
-          <td>{{student.dateOfBirth | date: 'dd/MM/yyyy'}}</td>
+          <td>{{student.dateOfBirth | date: 'MM/dd/yyyy'}}</td>
           <td></td>
           <td></td>
         </tr>

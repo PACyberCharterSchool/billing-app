@@ -15,6 +15,7 @@ import { StudentAdvancedFilterComponent } from './student-advanced-filter/studen
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { IepEnrolledPipe } from '../../pipes/iep-enrolled.pipe';
+import { OrderByPipe } from '../../pipes/orderby.pipe';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { IepEnrolledPipe } from '../../pipes/iep-enrolled.pipe';
     StudentDetailsInfoComponent,
     StudentHistoryInfoComponent,
     StudentAdvancedFilterComponent,
-    IepEnrolledPipe
+    IepEnrolledPipe,
+    OrderByPipe
   ],
   imports: [
     CommonModule,

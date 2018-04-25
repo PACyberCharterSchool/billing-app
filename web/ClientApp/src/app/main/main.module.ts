@@ -23,9 +23,6 @@ import { MatMenu } from '@angular/material';
 // ng-bootstrap
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { SortableTableDirective } from '../directives/sortable-table.directive';
-import { SortableColumnComponent } from '../main/sortable-column/sortable-column.component';
-
 @NgModule({
   declarations: [
     ContentAreaComponent,
@@ -34,9 +31,7 @@ import { SortableColumnComponent } from '../main/sortable-column/sortable-column
     LoginTitleBarComponent,
     MainComponent,
     TitleBarComponent,
-    NavMenuComponent,
-    SortableTableDirective,
-    SortableColumnComponent
+    NavMenuComponent
   ],
   exports: [],
   imports: [
