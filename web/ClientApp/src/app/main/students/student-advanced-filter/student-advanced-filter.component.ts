@@ -28,6 +28,10 @@ export class StudentAdvancedFilterComponent implements OnInit {
   ngOnInit() {
   }
 
+  dateUpdatedHandler() {
+
+  }
+
   filterStudentListBySchoolDistrict(schoolId: number) {
     this.studentsService.getStudentsFilteredBySchoolDistrict(schoolId).subscribe(
       data => {
@@ -43,6 +47,17 @@ export class StudentAdvancedFilterComponent implements OnInit {
         data => {
           this.studentsUpdated.emit(data['students']);
           console.log('StudentAdvancedFilterComponent.filterStudentListByGrade(): students are ', data);
+        }
+      );
+    }
+  }
+
+  filterStudentListByDateOfBirth(dob: Date) {
+    if (dob) {
+      this.studentsService.getStudentsFilteredByDateOfBirth(dob).subscribe(
+        data => {
+          this.studentsUpdated.emit(data['students']);
+          console.log('StudentAdvancedFilterComponent.filterStudentListByDateOfBirth(): students are ', data);
         }
       );
     }

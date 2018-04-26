@@ -1,4 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, Output, EventEmitter } from '@angular/core';
+
+import { StudentsService } from '../../../services/students.service';
 
 @Component({
   selector: 'app-student-datepicker',
@@ -6,8 +8,13 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./student-datepicker.component.scss']
 })
 export class StudentDatepickerComponent implements OnInit {
+  private studentsService: StudentsService;
 
   @Input() iconSize: string;
+
+  @Output() dateSelected: EventEmitter<any> = new EventEmitter();
+
+  model;
 
   constructor() { }
 
@@ -15,4 +22,7 @@ export class StudentDatepickerComponent implements OnInit {
     console.log('StudentDatepickerComponent.ngOnInit(): iconSize is ', this.iconSize);
   }
 
+  ngOnChange() {
+    this.dateSelected.emit();
+  }
 }

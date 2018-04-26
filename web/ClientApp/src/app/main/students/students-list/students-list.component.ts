@@ -24,6 +24,8 @@ export class StudentsListComponent implements OnInit {
   private property: string;
   private direction: number;
   private items: Student[];
+  private startDate: Date;
+  private endDate: Date;
 
   constructor(
     private studentsService: StudentsService,
@@ -46,6 +48,14 @@ export class StudentsListComponent implements OnInit {
       data => {
         this.schoolDistricts = data['schoolDistricts'];
         console.log('StudentsListComponent.ngOnInit():  school districts are', this.schoolDistricts);
+      }
+    );
+  }
+
+  dateSelectedHandler(date: Date) {
+    this.studentsService.getStudentsFilteredByStartDateAndEndDate().subscribe(
+      data => {
+        this.students = this.items = data['students'];
       }
     );
   }
