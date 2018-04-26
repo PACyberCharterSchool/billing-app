@@ -1,0 +1,12 @@
+<table class='table table-striped'>
+  <thead>
+    <tr>
+      <th *ngFor='let k of objectKeys(enrollments[0])'>{{k}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor='let enrollment of enrollments'>
+      <td *ngFor='let v of objectValues(enrollment)'>{{v}}</td>
+    </tr>
+  </tbody>
+</table>

@@ -8,8 +8,11 @@ body, html {
   overflow: hidden;
   padding: 0;
 
-  h2 {
+  h1, h2, h3, h4, h5 {
     font-family: 'Museo Slab';
+  }
+
+  h2 {
     font-size: 22px;
   }
 
@@ -64,8 +67,4 @@ body, html {
     background-color: #fe4848;
     color: #ffffff;
   }
-}
-
-@media (min-width: 768px) {
-
 }

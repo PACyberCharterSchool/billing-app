@@ -7,6 +7,7 @@ import { Observable } from 'rxjs/Observable';
 import { environment } from '../../environments/environment';
 
 import { Student } from '../models/student.model';
+import { SchoolDistrict } from '../models/school-district.model';
 
 @Injectable()
 export class StudentsService {
@@ -29,9 +30,19 @@ export class StudentsService {
     return this.httpClient.get<Student>(this.apiStudentsUrl + `/${id}`, this.headers);
   }
 
-  public getFilteredStudents(searchText: string): Observable<Student[]> {
+  public getStudentsFilteredByNameOrId(searchText: string): Observable<Student[]> {
     const url: string = this.buildStudentIdOrNameSearchQuery(searchText);
     return this.httpClient.get<Student[]>(url, this.headers);
+  }
+
+  public getStudentsFilteredBySchoolDistrict(schoolId: number): Observable<Student[]> {
+    const url: string = this.buildStudentSchoolDistrictSearchQuery(schoolId);
+    return this.httpClient.get<Student[]>(url, this.headers);
+  }
+
+  private buildStudentSchoolDistrictSearchQuery(schoolId: number): string {
+    const url: string = this.apiStudentsUrl + `?filter=((schoolDistrict eq ${schoolId}))`;
+    return url;
   }
 
   private buildStudentIdOrNameSearchQuery(searchText: string): string {

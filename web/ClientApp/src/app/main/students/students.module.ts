@@ -11,6 +11,8 @@ import { StudentDatepickerComponent } from './student-datepicker/student-datepic
 import { StudentDetailsInfoComponent } from './student-details-info/student-details-info.component';
 import { StudentHistoryInfoComponent } from './student-history-info/student-history-info.component';
 import { StudentAdvancedFilterComponent } from './student-advanced-filter/student-advanced-filter.component';
+import { StudentAddressHistoryComponent } from './student-address-history/student-address-history.component';
+import { StudentEnrollmentHistoryComponent } from './student-enrollment-history/student-enrollment-history.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -26,6 +28,8 @@ import { OrderByPipe } from '../../pipes/orderby.pipe';
     StudentDetailsInfoComponent,
     StudentHistoryInfoComponent,
     StudentAdvancedFilterComponent,
+    StudentAddressHistoryComponent,
+    StudentEnrollmentHistoryComponent,
     IepEnrolledPipe,
     OrderByPipe
   ],

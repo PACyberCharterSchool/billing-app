@@ -20,9 +20,6 @@ import { MatFormFieldModule, MatFormFieldControl, MatInputModule } from '@angula
 // import { MAT_MENU_DEFAULT_OPTIONS } from '@angular/material';
 import { MatMenu } from '@angular/material';
 
-// ng-bootstrap
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
 @NgModule({
   declarations: [
     ContentAreaComponent,
@@ -44,7 +41,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     MatInputModule,
     MatMenuModule,
     MatSidenavModule,
-    NgbModule,
     StudentsModule
   ],
   providers: []

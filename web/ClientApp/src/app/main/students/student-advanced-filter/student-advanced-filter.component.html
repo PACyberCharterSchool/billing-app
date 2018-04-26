@@ -1,23 +1,23 @@
 <div class='col-md-4'>
-  <label>School District</label>
+  <h5>School District</h5>
   <div ngbDropdown class='d-inline-block'>
-    <button class='btn btn-outline-primary' id='schoolDistrictDropdown' ngbDropdownToggle>Select</button>
-    <div ngbDropdownMenu aria-labelled-by='schoolDistrictDropdown'>
-      <button class='dropdown-item' *ngFor="let sd of schoolDistricts">{{sd.name}}</button>
+    <button ngbDropdownToggle class='btn btn-outline-primary' id='schoolDistrictDropdown'>Select</button>
+    <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='schoolDistrictDropdown'>
+      <button class='dropdown-item' *ngFor='let sd of schoolDistricts' (click)='filterStudentListBySchoolDistrict(sd.id)'>{{sd.name}}</button>
     </div>
   </div>
 </div>
 <div class='col-md-2'>
-  <label>School Year</label>
+  <h5>School Year</h5>
   <div ngbDropdown class='d-inline-block'>
     <button class='btn btn-outline-primary' id='schoolYearDropdown' ngbDropdownToggle>Year</button>
-    <div ngbDropdownMenu aria-labelled-by='schoolYearDropdown'>
+    <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='schoolYearDropdown'>
       <button class='dropdown-item' *ngFor="let year of schoolYears">{{year}}</button>
     </div>
   </div>
 </div>
-<div class='col-md-2'>
-  <label>Grade</label>
+<div class='col-md-1'>
+  <h5>Grade</h5>
   <div ngbDropdown class='d-inline-block'>
     <button class='btn btn-outline-primary' id='gradeDropdown' ngbDropdownToggle>Grade</button>
     <div ngbDropdownMenu aria-labelled-by='gradeDropdown'>
@@ -25,11 +25,12 @@
     </div>
   </div>
 </div>
-<div class='col-md-2'>
-  <label>Date of Birth</label>
+<div class='col-md-3'>
+  <h5>Date of Birth</h5>
+  <app-student-datepicker iconSize="fa-lg"></app-student-datepicker>
 </div>
 <div class='col-md-2'>
-  <label>IEP</label>
+  <h5>IEP</h5>
   <div ngbDropdown class='d-inline-block'>
     <button class='btn btn-outline-primary' id='iepDropdown' ngbDropdownToggle>IEP</button>
     <div ngbDropdownMenu aria-labelled-by='iepDropdown'>
