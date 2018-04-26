@@ -52,8 +52,16 @@ export class StudentsListComponent implements OnInit {
     );
   }
 
-  dateSelectedHandler(date: Date) {
-    this.studentsService.getStudentsFilteredByStartDateAndEndDate().subscribe(
+  dateSelectedStartDateHandler(date: Date) {
+    this.studentsService.getStudentsFilteredByStartDate(date).subscribe(
+      data => {
+        this.students = this.items = data['students'];
+      }
+    );
+  }
+
+  dateSelectedEndDateHandler(date: Date) {
+    this.studentsService.getStudentsFilteredByEndDate(date).subscribe(
       data => {
         this.students = this.items = data['students'];
       }

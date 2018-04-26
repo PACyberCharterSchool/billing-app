@@ -30,6 +30,11 @@ export class StudentsService {
     return this.httpClient.get<Student>(this.apiStudentsUrl + `/${id}`, this.headers);
   }
 
+  public getStudentsFilteredByIep(isIep: boolean): Observable<Student[]> {
+    const url: string = this.buildStudentIepSearchQuery(isIep);
+    return this.httpClient.get<Student[]>(url, this.headers);
+  }
+
   public getStudentsFilteredByNameOrId(searchText: string): Observable<Student[]> {
     const url: string = this.buildStudentIdOrNameSearchQuery(searchText);
     return this.httpClient.get<Student[]>(url, this.headers);
@@ -48,6 +53,31 @@ export class StudentsService {
   public getStudentsFilteredByDateOfBirth(dob: Date): Observable<Student[]> {
     const url: string = this.buildStudentDateOfBirthSearchQuery(dob);
     return this.httpClient.get<Student[]>(url, this.headers);
+  }
+
+  public getStudentsFilteredByStartDate(startDate: Date): Observable<Student[]> {
+    const url: string = this.buildStudentStartDateSearchQuery(startDate);
+    return this.httpClient.get<Student[]>(url, this.headers);
+  }
+
+  public getStudentsFilteredByEndDate(endDate: Date): Observable<Student[]> {
+    const url: string = this.buildStudentEndDateSearchQuery(endDate);
+    return this.httpClient.get<Student[]>(url, this.headers);
+  }
+
+  private buildStudentIepSearchQuery(isIep: boolean): string {
+    const url: string = this.apiStudentsUrl + `?filter=(isSpecialEducation eq ${isIep})`;
+    return url;
+  }
+
+  private buildStudentStartDateSearchQuery(startDate: Date): string {
+    const url: string = this.apiStudentsUrl + `?filter=(StartDate eq ${startDate})`;
+    return url;
+  }
+
+  private buildStudentEndDateSearchQuery(endDate: Date): string {
+    const url: string = this.apiStudentsUrl + `?filter=(EndDate eq ${endDate})`;
+    return url;
   }
 
   private buildStudentGradeSearchQuery(grade: number): string {

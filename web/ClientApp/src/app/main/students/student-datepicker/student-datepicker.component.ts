@@ -11,6 +11,7 @@ export class StudentDatepickerComponent implements OnInit {
   private studentsService: StudentsService;
 
   @Input() iconSize: string;
+  @Input() date: Date;
 
   @Output() dateSelected: EventEmitter<any> = new EventEmitter();
 
@@ -22,7 +23,9 @@ export class StudentDatepickerComponent implements OnInit {
     console.log('StudentDatepickerComponent.ngOnInit(): iconSize is ', this.iconSize);
   }
 
-  ngOnChange() {
+  onDateChanged() {
+    this.date = this.model;
     this.dateSelected.emit();
+    console.log('StudentDatepickerComponent.ngOnChange():  dateSelected event emitted.');
   }
 }

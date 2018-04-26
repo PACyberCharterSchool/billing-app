@@ -62,4 +62,13 @@ export class StudentAdvancedFilterComponent implements OnInit {
       );
     }
   }
+
+  filterStudentListByIep(iep: boolean) {
+    this.studentsService.getStudentsFilteredByIep(iep).subscribe(
+      data => {
+        this.studentsUpdated.emit(data['students']);
+        console.log('StudentAdvancedFilterComponent.filterStudentListByIep(): students are ', data);
+      }
+    );
+  }
 }

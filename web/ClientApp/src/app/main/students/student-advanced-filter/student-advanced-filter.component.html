@@ -34,8 +34,8 @@
   <div ngbDropdown class='d-inline-block'>
     <button class='btn btn-outline-primary' id='iepDropdown' ngbDropdownToggle>IEP</button>
     <div ngbDropdownMenu aria-labelled-by='iepDropdown'>
-      <button class='dropdown-item'>Yes</button>
-      <button class='dropdown-item'>No</button>
+      <button class='dropdown-item' (click)='filterStudentListByIep(true)'>Yes</button>
+      <button class='dropdown-item' (click)='filterStudentListByIep(false)'>No</button>
     </div>
   </div>
 </div>
