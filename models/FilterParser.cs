@@ -73,7 +73,12 @@ namespace models
 				if (char.IsWhiteSpace(c))
 				{
 					Backup();
-					return Expression.PropertyOrField(_param, ident);
+
+					Expression m = _param;
+					foreach (var id in ident.Split("."))
+						m = Expression.PropertyOrField(m, id);
+
+					return (MemberExpression)m;
 				}
 
 				ident += c;
