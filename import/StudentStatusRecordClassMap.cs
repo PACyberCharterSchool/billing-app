@@ -3,7 +3,7 @@ using System;
 using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 
-using api.Models;
+using models;
 
 namespace import
 {
@@ -22,7 +22,7 @@ namespace import
 		}
 	}
 
-	public class StudentStatusRecordClassMap : ClassMap<StudentStatusRecord>
+	public class StudentStatusRecordClassMap : ClassMap<PendingStudentStatusRecord>
 	{
 		public StudentStatusRecordClassMap()
 		{

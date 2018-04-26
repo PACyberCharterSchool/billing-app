@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Text;
 
 using dotenv.net;
@@ -15,8 +17,8 @@ using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.ReDoc;
 
 using static api.Common.UserRoles;
-using api.Models;
 using api.Services;
+using models;
 
 namespace api
 {
@@ -51,9 +53,12 @@ namespace api
 			var connectionString = $"Server={hostName},{port};Database={databaseName};User Id={userName};Password={password}";
 			_logger.LogInformation($"Startup.ConfigureServices(): connectionString is {connectionString}.");
 
-			services.AddDbContext<PacBillContext>(opt => opt.UseSqlServer(connectionString));
-			services.AddTransient<IStudentRepository, StudentRepository>();
+			services.AddDbContextPool<PacBillContext>(opt => opt.UseSqlServer(connectionString));
+			services.AddTransient<IAuditRecordRepository, AuditRecordRepository>();
+			services.AddTransient<ICommittedStudentStatusRecordRepository, CommittedStudentStatusRecordRepository>();
+			services.AddTransient<IPendingStudentStatusRecordRepository, PendingStudentStatusRecordRepository>();
 			services.AddTransient<ISchoolDistrictRepository, SchoolDistrictRepository>();
+			services.AddTransient<IStudentRepository, StudentRepository>();
 
 			services.AddTransient<IFilterParser, FilterParser>();
 			#endregion
@@ -94,6 +99,12 @@ namespace api
 						RequireExpirationTime = true,
 						ValidateLifetime = true,
 					};
+
+					var handler = o.SecurityTokenValidators.OfType<JwtSecurityTokenHandler>().SingleOrDefault();
+					if (handler != null)
+						handler.InboundClaimTypeMap = handler.InboundClaimTypeMap.
+							Where(m => m.Key != "sub").
+							ToDictionary(m => m.Key, m => m.Value);
 				});
 
 			services.AddAuthorization(o =>
