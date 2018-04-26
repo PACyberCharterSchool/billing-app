@@ -51,7 +51,8 @@ export class StudentsListComponent implements OnInit {
   }
 
   studentsUpdatedHandler(students: Student[]) {
-    this.students = students;
+    this.students = this.items = students;
+    console.log('StudentsListComponent.studentsUpdatedHandler():  students are ', this.students);
   }
 
   getStudents($event) {
@@ -78,6 +79,14 @@ export class StudentsListComponent implements OnInit {
     this.advancedSearchEnabled = !this.advancedSearchEnabled;
   }
 
+  resetStudentList() {
+    this.studentsService.getStudents().subscribe(
+      data => {
+        this.students = this.items = data['students'];
+      }
+    );
+  }
+
   filterStudentListByNameOrId() {
     if (this.searchText) {
       this.studentsService.getStudentsFilteredByNameOrId(this.searchText).subscribe(
@@ -88,5 +97,4 @@ export class StudentsListComponent implements OnInit {
       );
     }
   }
-
 }

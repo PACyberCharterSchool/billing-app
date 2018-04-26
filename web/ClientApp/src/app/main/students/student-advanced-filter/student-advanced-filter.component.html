@@ -12,7 +12,7 @@
   <div ngbDropdown class='d-inline-block'>
     <button class='btn btn-outline-primary' id='schoolYearDropdown' ngbDropdownToggle>Year</button>
     <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='schoolYearDropdown'>
-      <button class='dropdown-item' *ngFor="let year of schoolYears">{{year}}</button>
+      <button class='dropdown-item' *ngFor='let year of schoolYears'>{{year}}</button>
     </div>
   </div>
 </div>
@@ -21,7 +21,7 @@
   <div ngbDropdown class='d-inline-block'>
     <button class='btn btn-outline-primary' id='gradeDropdown' ngbDropdownToggle>Grade</button>
     <div ngbDropdownMenu aria-labelled-by='gradeDropdown'>
-      <button class='dropdown-item' *ngFor="let grade of grades">{{grade}}</button>
+      <button class='dropdown-item' *ngFor='let grade of grades' (click)='filterStudentListByGrade(grade)'>{{grade}}</button>
     </div>
   </div>
 </div>

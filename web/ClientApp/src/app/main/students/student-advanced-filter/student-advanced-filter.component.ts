@@ -37,4 +37,14 @@ export class StudentAdvancedFilterComponent implements OnInit {
     );
   }
 
+  filterStudentListByGrade(grade: number) {
+    if (grade) {
+      this.studentsService.getStudentsFilteredByGrade(grade).subscribe(
+        data => {
+          this.studentsUpdated.emit(data['students']);
+          console.log('StudentAdvancedFilterComponent.filterStudentListByGrade(): students are ', data);
+        }
+      );
+    }
+  }
 }

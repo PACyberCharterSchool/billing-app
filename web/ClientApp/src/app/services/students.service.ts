@@ -40,8 +40,18 @@ export class StudentsService {
     return this.httpClient.get<Student[]>(url, this.headers);
   }
 
+  public getStudentsFilteredByGrade(grade: number): Observable<Student[]> {
+    const url: string = this.buildStudentGradeSearchQuery(grade);
+    return this.httpClient.get<Student[]>(url, this.headers);
+  }
+
+  private buildStudentGradeSearchQuery(grade: number): string {
+    const url: string = this.apiStudentsUrl + `?filter=(Grade eq ${grade})`;
+    return url;
+  }
+
   private buildStudentSchoolDistrictSearchQuery(schoolId: number): string {
-    const url: string = this.apiStudentsUrl + `?filter=((schoolDistrict eq ${schoolId}))`;
+    const url: string = this.apiStudentsUrl + `?filter=((schoolDistrict.id eq ${schoolId}))`;
     return url;
   }
 

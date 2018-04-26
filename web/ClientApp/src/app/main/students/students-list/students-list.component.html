@@ -4,7 +4,7 @@
     <input type='text' placeholder='Search ID, student name...' [(ngModel)]='searchText' />
     <button class='btn-primary search-button' (click)='filterStudentListByNameOrId()'>SEARCH</button>
   </div>
-  <div class='col-md-3 advanced-search-tools-control-col'>
+  <div class='col-md-2 advanced-search-tools-control-col'>
     <h4>More Filters</h4>
     <button mat-icon-button class='advanced-search-tools-toggle-btn' (click)='toggleAdvancedSearchTools()'>
       <i class='fa fa-bars' *ngIf='!advancedSearchEnabled'></i>
@@ -14,6 +14,9 @@
   <div class='col-md-5'>
     <div class='col-md-6'><app-student-datepicker iconSize='fa-2x'></app-student-datepicker></div>
     <div class='col-md-6'><app-student-datepicker iconSize='fa-2x'></app-student-datepicker></div>
+  </div>
+  <div class='col-md-1'>
+    <button class='btn btn-primary reset-button' (click)='resetStudentList()'>Reset</button>
   </div>
 </div>
 <div class='row advanced-search-tools-row' *ngIf="advancedSearchEnabled">
