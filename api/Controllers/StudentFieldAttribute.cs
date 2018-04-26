@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-using api.Models;
+using models;
 
 namespace api.Controllers
 {
