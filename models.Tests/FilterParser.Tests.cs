@@ -6,6 +6,12 @@ using models;
 
 namespace models.Tests
 {
+	public class NestedClass
+	{
+		public int A { get; set; }
+		public int Z { get; set; }
+	}
+
 	public class TestClass
 	{
 		public int A { get; set; }
@@ -13,6 +19,7 @@ namespace models.Tests
 		public int C { get; set; }
 		public string D { get; set; }
 		public int? E { get; set; }
+		public NestedClass F { get; set; }
 	}
 
 	[TestFixture]
@@ -32,6 +39,8 @@ namespace models.Tests
 		[TestCase("((a eq 1) or (b eq 2))", "x => ((x.A == 1) OrElse (x.B == 2))")]
 		[TestCase("(((a eq 1) and (b eq 2)) or (c eq 3))", "x => (((x.A == 1) AndAlso (x.B == 2)) OrElse (x.C == 3))")]
 		[TestCase("(e eq 1)", "x => (x.E == 1)")] // nullables
+		[TestCase("(f.a eq 1)", "x => (x.F.A == 1)")]
+		[TestCase("(f.z eq 1)", "x => (x.F.Z == 1)")]
 		public void ParseProducesLambda(string clause, string lambda)
 		{
 			var actual = new FilterParser().Parse<TestClass>(clause);
