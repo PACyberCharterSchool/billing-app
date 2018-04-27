@@ -20,6 +20,8 @@ export class StudentAdvancedFilterComponent implements OnInit {
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
   ];
 
+  private date: Date;
+
   @Input() schoolDistricts: SchoolDistrict[];
   constructor(private studentsService: StudentsService) { }
 
@@ -28,7 +30,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
   ngOnInit() {
   }
 
-  dateUpdatedHandler() {
+  studentsUpdatedHandler() {
 
   }
 

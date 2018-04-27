@@ -1,6 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { StudentAdvancedFilterComponent } from './student-advanced-filter.component';
+import { StudentDatepickerComponent } from '../student-datepicker/student-datepicker.component';
+import { OrderByPipe } from '../../../pipes/orderby.pipe';
+import { IepEnrolledPipe } from '../../../pipes/iep-enrolled.pipe';
 
 describe('StudentAdvancedFilterComponent', () => {
   let component: StudentAdvancedFilterComponent;
@@ -8,7 +11,7 @@ describe('StudentAdvancedFilterComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ StudentAdvancedFilterComponent ]
+      declarations: [ StudentAdvancedFilterComponent, StudentDatepickerComponent, IepEnrolledPipe, OrderByPipe ]
     })
     .compileComponents();
   }));
