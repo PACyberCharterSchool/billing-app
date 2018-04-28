@@ -71,12 +71,12 @@ export class StudentsService {
   }
 
   private buildStudentStartDateSearchQuery(startDate: Date): string {
-    const url: string = this.apiStudentsUrl + `?filter=(StartDate eq ${startDate})`;
+    const url: string = this.apiStudentsUrl + `?filter=(StartDate eq ${startDate.toLocaleDateString('en-US')})`;
     return url;
   }
 
   private buildStudentEndDateSearchQuery(endDate: Date): string {
-    const url: string = this.apiStudentsUrl + `?filter=(EndDate eq ${endDate})`;
+    const url: string = this.apiStudentsUrl + `?filter=(EndDate eq ${endDate.toLocaleDateString('en-US')})`;
     return url;
   }
 
@@ -91,7 +91,7 @@ export class StudentsService {
   }
 
   private buildStudentDateOfBirthSearchQuery(dob: Date): string {
-    const url: string = this.apiStudentsUrl + `?filter=(dateOfBirth eq ${dob})`;
+    const url: string = this.apiStudentsUrl + `?filter=(dateOfBirth eq ${dob.toLocaleDateString('en-US')})`;
     return url;
   }
 

@@ -27,7 +27,7 @@
 </div>
 <div class='col-md-3'>
   <h5>Date of Birth</h5>
-  <app-student-datepicker [(date)]='date' (studentsUpdated)='studentsUpdatedHandler()' iconSize="fa-lg"></app-student-datepicker>
+  <app-student-datepicker [(date)]='date' (dateSelected)='dateSelectedDOBDateHandler($event)' iconSize="fa-lg"></app-student-datepicker>
 </div>
 <div class='col-md-2'>
   <h5>IEP</h5>

@@ -5,4 +5,7 @@ export class SchoolDistrict {
   name: string;
   aun: number;
   paymentType: string;
+  students: any;
+  created: Date;
+  lastUpdate: Date;
 }

@@ -8,6 +8,7 @@ import { AppTitleService } from '../../services/app-title.service';
 })
 export class NavMenuComponent implements OnInit {
   isExpanded = false;
+  showAdministrationSubItems = false;
   appTitle: string;
 
   constructor(private appTitleService: AppTitleService) { }
@@ -22,5 +23,9 @@ export class NavMenuComponent implements OnInit {
 
   toggle() {
     this.isExpanded = !this.isExpanded;
+  }
+
+  toggleAdministrationSubItems() {
+    this.showAdministrationSubItems = !this.showAdministrationSubItems;
   }
 }

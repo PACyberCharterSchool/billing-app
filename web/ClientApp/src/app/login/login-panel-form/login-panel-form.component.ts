@@ -6,6 +6,8 @@ import * as HttpStatus from 'http-status-codes';
 
 import { AuthenticationService } from '../../services/authentication.service';
 
+import { User } from '../../models/user.model';
+
 @Component({
   selector: 'app-login-panel-form',
   templateUrl: './login-panel-form.component.html',
@@ -49,10 +51,14 @@ export class LoginPanelFormComponent implements OnInit {
     console.log('LoginPanelFormComponent.login():  email is ', this.email);
     console.log('LoginPanelFormComponent.login():  password is ', this.password);
 
+    let user: User = new User();
+
     this.authService.authenticate(this.email, this.password).subscribe(
       data => {
         console.log('LoginPanelFormComponent.login():  authentication successful.  data is ', data);
         localStorage.setItem('jwt-token', data.token);
+        user.firstName = data.token;
+        localStorage.setItem('current-user', user.firstName);
         this.router.navigate(['main']);
       },
       error => {

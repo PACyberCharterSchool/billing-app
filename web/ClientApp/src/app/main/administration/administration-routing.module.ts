@@ -1,18 +1,19 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes, RouterOutlet } from '@angular/router';
 
 import { MainComponent } from '../main.component';
 
 import { AdministrationHomeComponent } from './administration-home/administration-home.component';
+import { AdministrationPaymentRateComponent } from './administration-payment-rate/administration-payment-rate.component';
 
 const adminRoutes: Routes = [
   {
-    path: 'students',
+    path: 'administration',
     component: MainComponent,
     children: [
       {
-        path: 'list',
-        component: AdministrationHomeComponent,
+        path: 'payment-rates',
+        component: AdministrationPaymentRateComponent,
         outlet: 'action'
       }
     ]

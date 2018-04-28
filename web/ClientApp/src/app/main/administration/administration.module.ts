@@ -4,15 +4,13 @@ import { FormsModule } from '@angular/forms';
 
 import { AdministrationRoutingModule } from './administration-routing.module';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { AdministrationPaymentRateComponent } from './administration-payment-rate/administration-payment-rate.component';
 
-import { IepEnrolledPipe } from '../../pipes/iep-enrolled.pipe';
-import { OrderByPipe } from '../../pipes/orderby.pipe';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
-    IepEnrolledPipe,
-    OrderByPipe
+    AdministrationPaymentRateComponent
   ],
   imports: [
     CommonModule,
@@ -23,4 +21,4 @@ import { OrderByPipe } from '../../pipes/orderby.pipe';
   providers: [ ]
 })
 
-export class StudentsModule { }
+export class AdministrationModule { }

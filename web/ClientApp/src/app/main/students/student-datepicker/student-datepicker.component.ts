@@ -13,7 +13,7 @@ export class StudentDatepickerComponent implements OnInit {
   @Input() iconSize: string;
   @Input() date: Date;
 
-  @Output() dateSelected: EventEmitter<any> = new EventEmitter();
+  @Output() dateSelected: EventEmitter<Date> = new EventEmitter();
 
   model;
 
@@ -24,8 +24,8 @@ export class StudentDatepickerComponent implements OnInit {
   }
 
   onDateChanged() {
-    this.date = this.model;
-    this.dateSelected.emit();
+    this.date = new Date(this.model.year, this.model.month - 1, this.model.day); // yes, that bit of math on the month value is necessary
+    this.dateSelected.emit(this.date);
     console.log('StudentDatepickerComponent.ngOnChange():  dateSelected event emitted.');
   }
 }

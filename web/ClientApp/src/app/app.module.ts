@@ -35,7 +35,6 @@ const pacbillDeclarations = [
 ];
 
 const pacbillImports = [
-  NgbModule.forRoot(),
   BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
   BrowserAnimationsModule,
   HttpClientModule,
@@ -43,7 +42,8 @@ const pacbillImports = [
   RouterModule,
   LoginModule,
   MainModule,
-  AppRoutingModule
+  AppRoutingModule,
+  NgbModule.forRoot()
 ];
 
 const pacbillProviders = [

@@ -14,6 +14,12 @@ li.link-active a:focus {
   color: #58a917;
 }
 
+li {
+  a:hover {
+    color: #4d4d4d;
+  }
+}
+
 /* Keep the nav menu independent of scrolling and on top of other items */
 .main-nav {
   top: 0;
@@ -23,7 +29,15 @@ li.link-active a:focus {
 }
 
 .navbar-inverse {
-  background-color: #F4F4F4;
+  background-color: #f4f4f4;
+}
+
+.administration-nav-sub-item {
+  padding-left: 20px;
+
+  a {
+    font-size: 0.80em;
+  }
 }
 
 @media (min-width: 768px) {

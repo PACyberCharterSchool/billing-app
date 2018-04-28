@@ -26,7 +26,18 @@ export class SchoolDistrictService {
   }
 
   public getSchoolDistrict(id: number): Observable<SchoolDistrict> {
+    console.log('SchoolDistrictService.getSchoolDistrict():  id is ', id);
     return this.httpClient.get<SchoolDistrict>(this.apiSchoolDistrictsUrl + `/${id}`, this.headers);
   }
 
+  public updateSchoolDistrict(schoolDistrict: SchoolDistrict): Observable<SchoolDistrict> {
+    console.log('SchoolDistrictService.updateSchoolDistrict():  schoolDistrict is ', schoolDistrict);
+    if (schoolDistrict) {
+      return this.httpClient.put<SchoolDistrict>(
+        this.apiSchoolDistrictsUrl + `/${schoolDistrict.id}`,
+        { 'schoolDistrict': schoolDistrict },
+        this.headers
+      );
+    }
+  }
 }

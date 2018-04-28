@@ -7,14 +7,11 @@ import { User } from '../../../models/user.model';
   styleUrls: ['./login-title-bar.component.scss']
 })
 export class LoginTitleBarComponent implements OnInit {
-  user: User = {
-    id: 1,
-    firstName: 'Fargus',
-    lastName: 'McGinty'
-  };
+  user: User = new User();
 
   constructor() { }
 
   ngOnInit() {
+    this.user.firstName = localStorage.getItem('current-user').substring(0, 28);
   }
 }

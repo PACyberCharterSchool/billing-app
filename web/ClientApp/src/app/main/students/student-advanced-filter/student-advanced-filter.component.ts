@@ -23,6 +23,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
   private date: Date;
 
   @Input() schoolDistricts: SchoolDistrict[];
+
   constructor(private studentsService: StudentsService) { }
 
   @Output() studentsUpdated: EventEmitter<Student[]> = new EventEmitter();
@@ -30,9 +31,15 @@ export class StudentAdvancedFilterComponent implements OnInit {
   ngOnInit() {
   }
 
-  studentsUpdatedHandler() {
-
+  dateSelectedDOBDateHandler(date: Date) {
+    console.log('StudentAdvancedFilter.dateSelectedDOBDateHandler(): date is ', date);
+    this.studentsService.getStudentsFilteredByDateOfBirth(date).subscribe(
+      data => {
+        this.studentsUpdated.emit(data['students']);
+      }
+    );
   }
+
 
   filterStudentListBySchoolDistrict(schoolId: number) {
     this.studentsService.getStudentsFilteredBySchoolDistrict(schoolId).subscribe(
