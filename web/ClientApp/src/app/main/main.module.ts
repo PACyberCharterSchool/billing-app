@@ -6,6 +6,7 @@ import { MainRoutingModule } from './main-routing.module';
 
 import { StudentsModule } from './students/students.module';
 import { AdministrationModule } from './administration/administration.module';
+import { ReportsInvoicesModule } from './reports-invoices/reports-invoices.module';
 
 import { MainComponent } from './main.component';
 import { ContentAreaComponent } from './content-area/content-area.component';
@@ -45,7 +46,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     MatSidenavModule,
     NgbModule,
     StudentsModule,
-    AdministrationModule
+    AdministrationModule,
+    ReportsInvoicesModule
   ],
   providers: []
 })

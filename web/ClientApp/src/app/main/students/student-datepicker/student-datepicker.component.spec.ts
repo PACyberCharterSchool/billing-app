@@ -1,8 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 
 import { StudentDatepickerComponent } from './student-datepicker.component';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbCalendar, NgbDropdownConfig, NgbDateParserFormatter, NgbDateAdapter  } from '@ng-bootstrap/ng-bootstrap';
 
 describe('StudentDatepickerComponent', () => {
   let component: StudentDatepickerComponent;
@@ -11,7 +12,13 @@ describe('StudentDatepickerComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ StudentDatepickerComponent ],
-      imports: [ NgbModule ]
+      imports: [ FormsModule, NgbModule ],
+      providers: [
+        NgbDropdownConfig,
+        NgbCalendar,
+        NgbDateParserFormatter,
+        NgbDateAdapter
+      ]
     })
     .compileComponents();
   }));

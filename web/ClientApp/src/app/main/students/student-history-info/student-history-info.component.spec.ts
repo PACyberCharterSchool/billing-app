@@ -1,10 +1,12 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { FormsModule } from '@angular/forms';
+
 import { StudentHistoryInfoComponent } from './student-history-info.component';
 import { StudentAddressHistoryComponent } from '../student-address-history/student-address-history.component';
 import { StudentEnrollmentHistoryComponent } from '../student-enrollment-history/student-enrollment-history.component';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbTabsetConfig } from '@ng-bootstrap/ng-bootstrap';
 
 describe('StudentHistoryInfoComponent', () => {
   let component: StudentHistoryInfoComponent;
@@ -17,7 +19,8 @@ describe('StudentHistoryInfoComponent', () => {
         StudentAddressHistoryComponent,
         StudentEnrollmentHistoryComponent
       ],
-      imports: [ NgbModule ]
+      imports: [ NgbModule, FormsModule ],
+      providers: [ NgbTabsetConfig ]
     })
     .compileComponents();
   }));
