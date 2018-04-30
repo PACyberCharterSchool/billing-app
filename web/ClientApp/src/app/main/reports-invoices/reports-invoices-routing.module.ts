@@ -15,6 +15,11 @@ const reportsInvoicesRoutes: Routes = [
         path: '',
         component: ReportsInvoicesComponent,
         outlet: 'action'
+      },
+      {
+        path: 'home',
+        component: ReportsInvoicesHomeComponent,
+        outlet: 'action'
       }
     ]
   }

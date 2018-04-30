@@ -1,0 +1,25 @@
+<div class='row import-student-data-title-row'>
+  <div class='col-md-9'>
+    <h3>Administration - Import Student Data</h3>
+  </div>
+  <div class='col-md-3'>
+    <button type='button' class='btn btn-primary' (click)='handleCancelClick()'>Cancel</button>
+    <button type='button' class='btn btn-primary'>Commit</button>
+  </div>
+</div>
+<div class='row import-student-data-content-row'>
+  <div class='col-md-12'>
+    <table class='table table-striped'>
+      <thead>
+        <tr>
+          <th *ngFor='let k of objectKeys(studentList[0])'>{{k | normalizeFieldName}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor='let student of studentList'>
+          <td *ngFor='let v of objectValues(student)'>{{v}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -5,6 +5,9 @@ import { MainComponent } from '../main.component';
 
 import { AdministrationHomeComponent } from './administration-home/administration-home.component';
 import { AdministrationPaymentRateComponent } from './administration-payment-rate/administration-payment-rate.component';
+import {
+  AdministrationImportStudentDataComponent
+} from './administration-import-student-data/administration-import-student-data.component';
 
 const adminRoutes: Routes = [
   {
@@ -12,8 +15,18 @@ const adminRoutes: Routes = [
     component: MainComponent,
     children: [
       {
+        path: 'home',
+        component: AdministrationHomeComponent,
+        outlet: 'action'
+      },
+      {
         path: 'payment-rates',
         component: AdministrationPaymentRateComponent,
+        outlet: 'action'
+      },
+      {
+        path: 'import-student-data',
+        component: AdministrationImportStudentDataComponent,
         outlet: 'action'
       }
     ]
