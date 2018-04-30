@@ -23,12 +23,25 @@ namespace models.Transformers
 		}
 	}
 
-	public class TransformerList : List<ITransformer>
-	{
-		public void Transform(IEnumerable<object> input)
-		{
-			foreach (var t in this)
-				input = t.Transform(input);
-		}
-	}
+	// public class TransformerChain : List<ITransformer>, ITransformer
+	// {
+	// 	public IEnumerable<object> Transform(IEnumerable<object> input)
+	// 	{
+	// 		foreach (var t in this)
+	// 			input = t.Transform(input);
+
+	// 		return input;
+	// 	}
+	// }
+
+	// public class TransformerJunction : List<ITransformer>, ITransformer
+	// {
+	// 	public IEnumerable<object> Transform(IEnumerable<object> input)
+	// 	{
+	// 		foreach (var t in this)
+	// 			t.Transform(input);
+
+	// 		return input;
+	// 	}
+	// }
 }
