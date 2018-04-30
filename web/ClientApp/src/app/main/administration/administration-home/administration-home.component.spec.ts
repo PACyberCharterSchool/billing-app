@@ -10,7 +10,8 @@ describe('AdministrationHomeComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AdministrationHomeComponent ]
+      declarations: [ AdministrationHomeComponent ],
+      imports: [ RouterTestingModule ]
     })
     .compileComponents();
   }));

@@ -17,7 +17,6 @@ import { AppTitleService } from './services/app-title.service';
 import { AuthenticationService } from './services/authentication.service';
 import { AuthenticationGuardService } from './services/authentication-guard.service';
 import { StudentsService } from './services/students.service';
-import { SortService } from './services/sort.service';
 import { SchoolDistrictService } from './services/school-district.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
