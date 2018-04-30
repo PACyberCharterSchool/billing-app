@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 
 using NUnit.Framework;
@@ -55,6 +56,28 @@ namespace models.Tests
 			Assert.IsNull(actual);
 		}
 
+
+		[Test]
+		public void GetByAunReturnsSchoolDistrictIfExists()
+		{
+			var aun = 3;
+			var district = new SchoolDistrict { Aun = aun };
+			_context.Add(district);
+			_context.SaveChanges();
+
+			var actual = _uut.GetByAun(aun);
+			Assert.That(actual, Is.EqualTo(district));
+		}
+
+		[Test]
+		public void GetByAunReturnsNullIfNotExists()
+		{
+			var aun = 3;
+
+			var actual = _uut.GetByAun(aun);
+			Assert.IsNull(actual);
+		}
+
 		[Test]
 		public void GetManyReturnsAll()
 		{
@@ -92,6 +115,7 @@ namespace models.Tests
 		[Test]
 		public void CreateOrUpdateWithNewObjectCreates()
 		{
+			var time = DateTime.Now;
 			var district = new SchoolDistrict
 			{
 				Name = "Bob",
@@ -100,18 +124,21 @@ namespace models.Tests
 				PaymentType = SchoolDistrictPaymentType.ACH,
 			};
 
-			var result = _uut.CreateOrUpdate(district);
+			var result = _uut.CreateOrUpdate(time, district);
 			Assert.That(result, Is.EqualTo(district));
 
 			var actual = _context.SchoolDistricts.First(d => d.Id == result.Id);
 			Assert.That(actual.Name, Is.EqualTo(district.Name));
 			Assert.That(actual.Rate, Is.EqualTo(district.Rate));
 			Assert.That(actual.AlternateRate, Is.EqualTo(district.AlternateRate));
+			Assert.That(actual.Created, Is.EqualTo(time));
+			Assert.That(actual.LastUpdated, Is.EqualTo(time));
 		}
 
 		[Test]
 		public void CreateOrUpdateWithSameObjectUpdates()
 		{
+			var time = DateTime.Now;
 			var id = 3;
 			var district = new SchoolDistrict
 			{
@@ -121,6 +148,7 @@ namespace models.Tests
 				Rate = 1.0m,
 				AlternateRate = null,
 				PaymentType = SchoolDistrictPaymentType.ACH,
+				LastUpdated = time.AddDays(-1),
 			};
 			_context.Add(district);
 			_context.SaveChanges();
@@ -137,6 +165,7 @@ namespace models.Tests
 			Assert.That(actual.Rate, Is.EqualTo(district.Rate));
 			Assert.That(actual.AlternateRate, Is.EqualTo(district.AlternateRate));
 			Assert.That(actual.PaymentType, Is.EqualTo(district.PaymentType));
+			Assert.That(actual.LastUpdated.Date, Is.EqualTo(time.Date));
 		}
 
 		[Test]

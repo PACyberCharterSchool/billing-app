@@ -5,7 +5,7 @@ namespace models
 	public class StudentStatusRecord
 	{
 		public int Id { get; set; }
-		public int SchoolDistrictId { get; set; }
+		public int SchoolDistrictId { get; set; } // TODO(Erik): string
 		public string SchoolDistrictName { get; set; }
 		public int StudentId { get; set; }
 		public string StudentFirstName { get; set; }

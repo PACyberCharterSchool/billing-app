@@ -7,7 +7,7 @@ namespace models
 	public class Student
 	{
 		public int Id { get; set; }
-		public int PACyberId { get; set; }
+		public int PACyberId { get; set; } // TODO(Erik): string
 		public ulong? PASecuredId { get; set; }
 		public string FirstName { get; set; }
 		public string MiddleInitial { get; set; }
@@ -22,7 +22,7 @@ namespace models
 		public bool IsSpecialEducation { get; set; }
 		public DateTime? CurrentIep { get; set; }
 		public DateTime? FormerIep { get; set; }
-		public DateTime? NOREP { get; set; }
+		public DateTime? NorepDate { get; set; }
 		public DateTime StartDate { get; set; }
 		public DateTime? EndDate { get; set; }
 		public DateTime Created { get; set; }

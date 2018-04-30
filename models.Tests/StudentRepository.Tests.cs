@@ -61,6 +61,28 @@ namespace models.Tests
 		}
 
 		[Test]
+		public void GetByPACyberIdReturnsStudentIfExists()
+		{
+			var id = 3;
+			var student = new Student
+			{
+				PACyberId = 3,
+			};
+			_context.Add(student);
+			_context.SaveChanges();
+
+			var actual = _uut.GetByPACyberId(id);
+			Assert.That(actual, Is.EqualTo(student));
+		}
+
+		[Test]
+		public void GetByPACyberIdReturnsNullIfNotExists()
+		{
+			var actual = _uut.GetByPACyberId(3);
+			Assert.IsNull(actual);
+		}
+
+		[Test]
 		public void GetManyWithDefaultValuesGetsEverythingSortedByIdAsc()
 		{
 			var students = new[] {
