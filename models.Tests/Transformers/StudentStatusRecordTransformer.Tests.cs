@@ -134,21 +134,18 @@ namespace models.Tests.Transformers
 				BatchFilename = "test.csv",
 			};
 
-		// TODO(Erik): public string SchoolDistrictName { get; set; }
-		// TODO(Erik): public DateTime StudentDateOfBirth { get; set; }
 		// TODO(Erik): [TestCase(StudentActivity. , "ActivitySchoolYear", "", "Student ", "")]
 		// TODO(Erik): [TestCase(StudentActivity. , "StudentEnrollmentDate", "", "Student ", "")]
 		// TODO(Erik): [TestCase(StudentActivity. , "StudentWithdrawalDate", "", "Student ", "")]
-		// TODO(Erik): [TestCase(StudentActivity.CURRENTIEP_CHANGE, "StudentCurrentIep", "", "Student ", "")]
-		// TODO(Erik): [TestCase(StudentActivity.FORMERIEP_CHANGE, "StudentFormerIep", "", "Student ", "")]
-		// TODO(Erik): [TestCase(StudentActivity.SPECIAL_CHANGE, "IsSpecialEducation", "", "Student ", "")]
-
 
 		[Test]
+		[TestCase(StudentActivity.DATEOFBIRTH_CHANGE, "DateOfBirth", "2000/01/01", "StudentDateOfBirth", "2000/02/02")]
 		[TestCase(StudentActivity.GRADE_CHANGE, "Grade", "11", "StudentGradeLevel", "12")]
-		[TestCase(StudentActivity.NOREP_CHANGE, "NorepDate", "1/1/18 12:00:00 AM", "StudentNorep", "2/2/18 12:00:00 AM")]
+		[TestCase(StudentActivity.NOREP_CHANGE, "NorepDate", "2018/01/01", "StudentNorep", "2018/02/02")]
 		[TestCase(StudentActivity.PASECURED_CHANGE, "PASecuredId", 123456789, "StudentPASecuredId", 234567890)]
 		[TestCase(StudentActivity.SPECIAL_ENROLL, "IsSpecialEducation", false, "StudentIsSpecialEducation", true)]
+		[TestCase(StudentActivity.CURRENTIEP_CHANGE, "CurrentIep", "2018/01/01", "StudentCurrentIep", "2018/02/02")]
+		[TestCase(StudentActivity.FORMERIEP_CHANGE, "FormerIep", "2018/01/01", "StudentFormerIep", "2018/02/02")]
 		public void TransformWithExistingStudentCreatesRecordIfChanged<T>(
 			string activity,
 			string studentProperty, T oldData,
@@ -260,30 +257,41 @@ namespace models.Tests.Transformers
 		{
 			var studentId = 3;
 			var previousAun = 4;
+			var previousName = "Old SD";
 			_students.Setup(ss => ss.GetByPACyberId(studentId)).Returns(new Student
 			{
 				PACyberId = studentId,
-				SchoolDistrict = new SchoolDistrict { Aun = previousAun },
+				SchoolDistrict = new SchoolDistrict
+				{
+					Aun = previousAun,
+					Name = previousName,
+				},
 			});
 
+			var oldDistrict = String.Join("|", previousAun, previousName);
+
 			var nextAun = 5;
+			var nextName = "New SD";
 			var enrollDate = DateTime.Now.Date;
 			var batchHash = "hash";
 			var statuses = new[] {
 				new StudentStatusRecord{
 					StudentId = studentId,
 					SchoolDistrictId = nextAun,
+					SchoolDistrictName = nextName,
 					StudentEnrollmentDate = enrollDate,
 					BatchHash = batchHash,
 				},
 			};
 
+			var newDistrict = String.Join("|", nextAun, nextName);
+
 			var actual = (_uut.Transform(statuses) as IEnumerable<StudentActivityRecord>).ToList();
 			Assert.That(actual, Has.Count.EqualTo(1));
 			Assert.That(actual[0].Activity, Is.EqualTo(StudentActivity.DISTRICT_ENROLL));
 			Assert.That(actual[0].Timestamp, Is.EqualTo(enrollDate));
-			Assert.That(actual[0].PreviousData, Is.EqualTo(previousAun.ToString()));
-			Assert.That(actual[0].NextData, Is.EqualTo(nextAun.ToString()));
+			Assert.That(actual[0].PreviousData, Is.EqualTo(oldDistrict));
+			Assert.That(actual[0].NextData, Is.EqualTo(newDistrict));
 			Assert.That(actual[0].BatchHash, Is.EqualTo(batchHash));
 		}
 

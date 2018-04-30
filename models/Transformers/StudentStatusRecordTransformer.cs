@@ -24,6 +24,8 @@ namespace models.Transformers
 			_activities = activities;
 		}
 
+		private const string DATE_FORMAT = "yyyy/MM/dd";
+
 		private static string Join(params string[] parts)
 		{
 			for (var i = 0; i < parts.Length; i++)
@@ -41,6 +43,18 @@ namespace models.Transformers
 						PACyberId = status.StudentId,
 						Activity = StudentActivity.NEW_STUDENT,
 						Timestamp = status.StudentEnrollmentDate,
+						BatchHash = status.BatchHash,
+					}
+			),
+			( // date of birth
+				(student, status) => student == null || status.StudentDateOfBirth != student.DateOfBirth,
+				(student, status) => new StudentActivityRecord
+					{
+						PACyberId = status.StudentId,
+						Activity = StudentActivity.DATEOFBIRTH_CHANGE,
+						Timestamp = status.StudentEnrollmentDate,
+						PreviousData = student?.DateOfBirth.ToString(DATE_FORMAT),
+						NextData = status.StudentDateOfBirth.ToString(DATE_FORMAT),
 						BatchHash = status.BatchHash,
 					}
 			),
@@ -62,8 +76,8 @@ namespace models.Transformers
 						PACyberId = status.StudentId,
 						Activity = StudentActivity.DISTRICT_ENROLL,
 						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student?.SchoolDistrict?.Aun.ToString(),
-						NextData = status.SchoolDistrictId.ToString(),
+						PreviousData = Join(student?.SchoolDistrict?.Aun.ToString(), student?.SchoolDistrict?.Name),
+						NextData = Join(status.SchoolDistrictId.ToString(), status.SchoolDistrictName),
 						BatchHash = status.BatchHash,
 					}
 			),
@@ -95,15 +109,42 @@ namespace models.Transformers
 						BatchHash = status.BatchHash,
 					}
 			),
+			( // current iep
+				(student, status) => student == null && status.StudentCurrentIep != null ||
+					status.StudentCurrentIep != null && status.StudentCurrentIep != student.CurrentIep,
+				(student, status) => new StudentActivityRecord
+					{
+						PACyberId = status.StudentId,
+						Activity = StudentActivity.CURRENTIEP_CHANGE,
+						Timestamp = status.StudentEnrollmentDate,
+						PreviousData = student?.CurrentIep?.ToString(DATE_FORMAT),
+						NextData = status.StudentCurrentIep?.ToString(DATE_FORMAT),
+						BatchHash = status.BatchHash,
+					}
+			),
+			( // former iep
+				(student, status) => student == null && status.StudentFormerIep != null ||
+					status.StudentFormerIep != null && status.StudentFormerIep != student.FormerIep,
+				(student, status) => new StudentActivityRecord
+					{
+						PACyberId = status.StudentId,
+						Activity = StudentActivity.FORMERIEP_CHANGE,
+						Timestamp = status.StudentEnrollmentDate,
+						PreviousData = student?.FormerIep?.ToString(DATE_FORMAT),
+						NextData = status.StudentFormerIep?.ToString(DATE_FORMAT),
+						BatchHash = status.BatchHash,
+					}
+			),
 			( // norep
-				(student, status) => student == null || status.StudentNorep != student.NorepDate,
+				(student, status) => student == null && status.StudentNorep != null || status.StudentNorep != null &&
+					status.StudentNorep != student.NorepDate,
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
 						Activity = StudentActivity.NOREP_CHANGE,
 						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student?.NorepDate?.ToString(),
-						NextData = status.StudentNorep.ToString(),
+						PreviousData = student?.NorepDate?.ToString(DATE_FORMAT),
+						NextData = status.StudentNorep?.ToString(DATE_FORMAT),
 						BatchHash = status.BatchHash,
 					}
 			),

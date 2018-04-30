@@ -6,6 +6,7 @@ namespace models
 	public static class StudentActivity
 	{
 		public const string NEW_STUDENT = "NewStudent";
+		public const string DATEOFBIRTH_CHANGE = "DateOfBirthChange";
 		public const string DISTRICT_ENROLL = "DistrictEnrollment";
 		public const string DISTRICT_WITHDRAW = "DistrictWithdraw";
 		public const string NAME_CHANGE = "NameChange";
