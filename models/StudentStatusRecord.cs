@@ -36,5 +36,34 @@ namespace models
 	public class CommittedStudentStatusRecord : StudentStatusRecord
 	{
 		public DateTime CommitTime { get; set; }
+
+		public static CommittedStudentStatusRecord FromPendingStudentStatusRecord(PendingStudentStatusRecord record) =>
+			new CommittedStudentStatusRecord
+			{
+				SchoolDistrictId = record.SchoolDistrictId,
+				SchoolDistrictName = record.SchoolDistrictName,
+				StudentId = record.StudentId,
+				StudentFirstName = record.StudentFirstName,
+				StudentMiddleInitial = record.StudentMiddleInitial,
+				StudentLastName = record.StudentLastName,
+				StudentGradeLevel = record.StudentGradeLevel,
+				StudentDateOfBirth = record.StudentDateOfBirth,
+				StudentStreet1 = record.StudentStreet1,
+				StudentStreet2 = record.StudentStreet2,
+				StudentCity = record.StudentCity,
+				StudentState = record.StudentState,
+				StudentZipCode = record.StudentZipCode,
+				ActivitySchoolYear = record.ActivitySchoolYear,
+				StudentEnrollmentDate = record.StudentEnrollmentDate,
+				StudentWithdrawalDate = record.StudentWithdrawalDate,
+				StudentIsSpecialEducation = record.StudentIsSpecialEducation,
+				StudentCurrentIep = record.StudentCurrentIep,
+				StudentFormerIep = record.StudentFormerIep,
+				StudentNorep = record.StudentNorep,
+				StudentPaSecuredId = record.StudentPaSecuredId,
+				BatchTime = record.BatchTime,
+				BatchFilename = record.BatchFilename,
+				BatchHash = record.BatchHash,
+			};
 	}
 }
