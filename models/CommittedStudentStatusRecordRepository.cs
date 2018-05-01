@@ -28,24 +28,22 @@ namespace models
 			_logger = logger;
 		}
 
-		public CommittedStudentStatusRecord Create(CommittedStudentStatusRecord record) =>
-			Create(DateTime.Now, record);
-
-		public CommittedStudentStatusRecord Create(DateTime time, CommittedStudentStatusRecord record) =>
-			CreateMany(time, new List<CommittedStudentStatusRecord> { record })[0];
-
-		public IList<CommittedStudentStatusRecord> CreateMany(IList<CommittedStudentStatusRecord> records) =>
-			CreateMany(DateTime.Now, records);
-
 		public IList<CommittedStudentStatusRecord> CreateMany(DateTime time, IList<CommittedStudentStatusRecord> records)
 		{
 			foreach (var r in records)
 				r.CommitTime = time;
 
 			_records.AddRange(records);
-			_context.SaveChanges();
-
 			return records;
 		}
+
+		public IList<CommittedStudentStatusRecord> CreateMany(IList<CommittedStudentStatusRecord> records) =>
+			CreateMany(DateTime.Now, records);
+
+		public CommittedStudentStatusRecord Create(DateTime time, CommittedStudentStatusRecord record) =>
+			CreateMany(time, new List<CommittedStudentStatusRecord> { record })[0];
+
+		public CommittedStudentStatusRecord Create(CommittedStudentStatusRecord record) =>
+			Create(DateTime.Now, record);
 	}
 }

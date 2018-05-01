@@ -47,7 +47,7 @@ namespace models.Tests
 				BatchHash = "hash",
 			};
 
-			var result = _uut.Create(record);
+			var result = _context.SaveChanges(() => _uut.Create(record));
 			Assert.That(result, Is.EqualTo(record));
 
 			var actual = _context.StudentActivityRecords.First(r => r.Id == result.Id);
@@ -62,7 +62,7 @@ namespace models.Tests
 			_context.Add(record);
 			_context.SaveChanges();
 
-			Assert.That(() => _uut.Create(record), Throws.TypeOf<ArgumentException>());
+			Assert.That(() => _context.SaveChanges(() => _uut.Create(record)), Throws.TypeOf<ArgumentException>());
 		}
 
 		[Test]
@@ -75,7 +75,7 @@ namespace models.Tests
 				new StudentActivityRecord(),
 			};
 
-			var result = _uut.CreateMany(records);
+			var result = _context.SaveChanges(() => _uut.CreateMany(records));
 			Assert.That(result, Is.EqualTo(records));
 
 			var actual = _context.StudentActivityRecords.ToList();
@@ -93,7 +93,7 @@ namespace models.Tests
 			_context.AddRange(records);
 			_context.SaveChanges();
 
-			Assert.That(() => _uut.CreateMany(records), Throws.TypeOf<ArgumentException>());
+			Assert.That(() => _context.SaveChanges(() => _uut.CreateMany(records)), Throws.TypeOf<ArgumentException>());
 		}
 	}
 }

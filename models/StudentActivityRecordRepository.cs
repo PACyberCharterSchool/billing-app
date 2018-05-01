@@ -30,7 +30,6 @@ namespace models
 		public IList<StudentActivityRecord> CreateMany(IList<StudentActivityRecord> records)
 		{
 			_records.AddRange(records);
-			_context.SaveChanges();
 			return records;
 		}
 	}

@@ -34,6 +34,7 @@ namespace models.Transformers
 			return String.Join("|", parts);
 		}
 
+		// TODO(Erik): cleanup predicates
 		private static readonly FieldTransformers _fieldTransformers = new FieldTransformers
 		{
 			( // new student
@@ -76,7 +77,9 @@ namespace models.Transformers
 						PACyberId = status.StudentId,
 						Activity = StudentActivity.DISTRICT_ENROLL,
 						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = Join(student?.SchoolDistrict?.Aun.ToString(), student?.SchoolDistrict?.Name),
+						PreviousData = student?.SchoolDistrict != null ? null : Join(
+							student?.SchoolDistrict?.Aun.ToString(),
+							student?.SchoolDistrict?.Name),
 						NextData = Join(status.SchoolDistrictId.ToString(), status.SchoolDistrictName),
 						BatchHash = status.BatchHash,
 					}

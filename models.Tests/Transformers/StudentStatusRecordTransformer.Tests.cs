@@ -134,10 +134,6 @@ namespace models.Tests.Transformers
 				BatchFilename = "test.csv",
 			};
 
-		// TODO(Erik): [TestCase(StudentActivity. , "ActivitySchoolYear", "", "Student ", "")]
-		// TODO(Erik): [TestCase(StudentActivity. , "StudentEnrollmentDate", "", "Student ", "")]
-		// TODO(Erik): [TestCase(StudentActivity. , "StudentWithdrawalDate", "", "Student ", "")]
-
 		[Test]
 		[TestCase(StudentActivity.DATEOFBIRTH_CHANGE, "DateOfBirth", "2000/01/01", "StudentDateOfBirth", "2000/02/02")]
 		[TestCase(StudentActivity.GRADE_CHANGE, "Grade", "11", "StudentGradeLevel", "12")]
@@ -268,8 +264,6 @@ namespace models.Tests.Transformers
 				},
 			});
 
-			var oldDistrict = String.Join("|", previousAun, previousName);
-
 			var nextAun = 5;
 			var nextName = "New SD";
 			var enrollDate = DateTime.Now.Date;
@@ -290,7 +284,7 @@ namespace models.Tests.Transformers
 			Assert.That(actual, Has.Count.EqualTo(1));
 			Assert.That(actual[0].Activity, Is.EqualTo(StudentActivity.DISTRICT_ENROLL));
 			Assert.That(actual[0].Timestamp, Is.EqualTo(enrollDate));
-			Assert.That(actual[0].PreviousData, Is.EqualTo(oldDistrict));
+			Assert.That(actual[0].PreviousData, Is.EqualTo(null));
 			Assert.That(actual[0].NextData, Is.EqualTo(newDistrict));
 			Assert.That(actual[0].BatchHash, Is.EqualTo(batchHash));
 		}

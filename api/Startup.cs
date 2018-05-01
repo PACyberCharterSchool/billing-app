@@ -19,6 +19,7 @@ using Swashbuckle.AspNetCore.ReDoc;
 using static api.Common.UserRoles;
 using api.Services;
 using models;
+using models.Transformers;
 
 namespace api
 {
@@ -59,8 +60,21 @@ namespace api
 			services.AddTransient<IPendingStudentStatusRecordRepository, PendingStudentStatusRecordRepository>();
 			services.AddTransient<ISchoolDistrictRepository, SchoolDistrictRepository>();
 			services.AddTransient<IStudentRepository, StudentRepository>();
+			services.AddTransient<IStudentActivityRecordRepository, StudentActivityRecordRepository>();
 
 			services.AddTransient<IFilterParser, FilterParser>();
+			#endregion
+
+			#region Transformer
+			services.AddTransient<ITransformer>(ctx =>
+			{
+				return new TransformerChain{
+					new PendingToCommittedTransformer(ctx.GetRequiredService<ICommittedStudentStatusRecordRepository>()),
+					new StudentStatusRecordTransformer(
+						ctx.GetRequiredService<IStudentRepository>(),
+						ctx.GetRequiredService<IStudentActivityRecordRepository>()),
+				};
+			});
 			#endregion
 
 			#region LDAP

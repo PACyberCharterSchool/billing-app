@@ -8,8 +8,8 @@ namespace models
 {
 	public interface IPendingStudentStatusRecordRepository
 	{
-		IList<PendingStudentStatusRecord> GetMany();
-		IList<PendingStudentStatusRecord> GetMany(int skip, int take);
+		IEnumerable<PendingStudentStatusRecord> GetMany();
+		IEnumerable<PendingStudentStatusRecord> GetMany(int skip, int take);
 		void Truncate();
 	}
 
@@ -28,9 +28,9 @@ namespace models
 			_logger = logger;
 		}
 
-		public IList<PendingStudentStatusRecord> GetMany() => GetMany(0, 0);
+		public IEnumerable<PendingStudentStatusRecord> GetMany() => GetMany(0, 0);
 
-		public IList<PendingStudentStatusRecord> GetMany(int skip, int take)
+		public IEnumerable<PendingStudentStatusRecord> GetMany(int skip, int take)
 		{
 			var records = _records.AsQueryable();
 
@@ -40,7 +40,7 @@ namespace models
 			if (take > 0)
 				records = records.Take(take);
 
-			return records.OrderBy(r => r.Id).ToList();
+			return records.OrderBy(r => r.Id);
 		}
 
 		public void Truncate()
