@@ -59,8 +59,62 @@ namespace models.Transformers
 						BatchHash = status.BatchHash,
 					}
 			),
+			( // name
+				(student, status) => student == null ||
+					(status.StudentFirstName != student.FirstName ||
+					status.StudentMiddleInitial != student.MiddleInitial ||
+					status.StudentLastName != student.LastName),
+				(student, status) => new StudentActivityRecord
+					{
+						PACyberId = status.StudentId,
+						Activity = StudentActivity.NAME_CHANGE,
+						Timestamp = status.StudentEnrollmentDate,
+						PreviousData = student == null ? null : Join(student.FirstName, student.MiddleInitial, student.LastName),
+						NextData = Join(status.StudentFirstName, status.StudentMiddleInitial, status.StudentLastName),
+						BatchHash = status.BatchHash,
+					}
+			),
+			( // grade
+				(student, status) => student == null || status.StudentGradeLevel != student.Grade,
+				(student, status) => new StudentActivityRecord
+					{
+						PACyberId = status.StudentId,
+						Activity = StudentActivity.GRADE_CHANGE,
+						Timestamp = status.StudentEnrollmentDate,
+						PreviousData = student?.Grade,
+						NextData = status.StudentGradeLevel,
+						BatchHash = status.BatchHash,
+					}
+			),
+			( // address
+				(student, status) => student == null ||
+					(status.StudentStreet1 != student.Street1 ||
+					status.StudentStreet2 != student.Street2 ||
+					status.StudentCity != student.City ||
+					status.StudentState != student.State ||
+					status.StudentZipCode != student.ZipCode),
+				(student, status) => new StudentActivityRecord
+					{
+						PACyberId = status.StudentId,
+						Activity = StudentActivity.ADDRESS_CHANGE,
+						Timestamp = status.StudentEnrollmentDate,
+						PreviousData = student == null ? null : Join(
+							student.Street1,
+							student.Street2,
+							student.City,
+							student.State,
+							student.ZipCode),
+						NextData = Join(
+							status.StudentStreet1,
+							status.StudentStreet2,
+							status.StudentCity,
+							status.StudentState,
+							status.StudentZipCode),
+						BatchHash = status.BatchHash,
+					}
+			),
 			( // district withdraw
-				(student, status) => student != null && status.StudentWithdrawalDate.HasValue,
+				(student, status) => student != null && status.StudentWithdrawalDate != null,
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
@@ -87,7 +141,7 @@ namespace models.Transformers
 			( // special education withdraw
 				(student, status) => student != null &&
 					!status.StudentIsSpecialEducation &&
-					status.StudentWithdrawalDate.HasValue &&
+					status.StudentWithdrawalDate != null &&
 					status.StudentIsSpecialEducation != student.IsSpecialEducation,
 				(student, status) => new StudentActivityRecord
 					{
@@ -100,8 +154,8 @@ namespace models.Transformers
 					}
 			),
 			( // special education enroll
-				(student, status) => student == null && status.StudentIsSpecialEducation ||
-					status.StudentIsSpecialEducation && status.StudentIsSpecialEducation != student.IsSpecialEducation,
+				(student, status) => status.StudentIsSpecialEducation && (student == null ||
+					status.StudentIsSpecialEducation != student.IsSpecialEducation),
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
@@ -113,8 +167,8 @@ namespace models.Transformers
 					}
 			),
 			( // current iep
-				(student, status) => student == null && status.StudentCurrentIep != null ||
-					status.StudentCurrentIep != null && status.StudentCurrentIep != student.CurrentIep,
+				(student, status) => status.StudentCurrentIep != null && (student == null ||
+					status.StudentCurrentIep != student.CurrentIep),
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
@@ -126,8 +180,8 @@ namespace models.Transformers
 					}
 			),
 			( // former iep
-				(student, status) => student == null && status.StudentFormerIep != null ||
-					status.StudentFormerIep != null && status.StudentFormerIep != student.FormerIep,
+				(student, status) => status.StudentFormerIep != null && (student == null ||
+					status.StudentFormerIep != student.FormerIep),
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
@@ -139,8 +193,8 @@ namespace models.Transformers
 					}
 			),
 			( // norep
-				(student, status) => student == null && status.StudentNorep != null || status.StudentNorep != null &&
-					status.StudentNorep != student.NorepDate,
+				(student, status) => status.StudentNorep != null && (student == null ||
+					status.StudentNorep != student.NorepDate),
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
@@ -160,60 +214,6 @@ namespace models.Transformers
 						Timestamp = status.StudentEnrollmentDate,
 						PreviousData = student?.PASecuredId?.ToString(),
 						NextData = status.StudentPaSecuredId.ToString(),
-						BatchHash = status.BatchHash,
-					}
-			),
-			( // name
-				(student, status) => student == null ||
-					status.StudentFirstName != student.FirstName ||
-					status.StudentMiddleInitial != student.MiddleInitial ||
-					status.StudentLastName != student.LastName,
-				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.NAME_CHANGE,
-						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student == null ? null : Join(student.FirstName, student.MiddleInitial, student.LastName),
-						NextData = Join(status.StudentFirstName, status.StudentMiddleInitial, status.StudentLastName),
-						BatchHash = status.BatchHash,
-					}
-			),
-			( // grade
-				(student, status) => student == null || status.StudentGradeLevel != student.Grade,
-				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.GRADE_CHANGE,
-						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student?.Grade,
-						NextData = status.StudentGradeLevel,
-						BatchHash = status.BatchHash,
-					}
-			),
-			( // address
-				(student, status) => student == null ||
-					status.StudentStreet1 != student.Street1 ||
-					status.StudentStreet2 != student.Street2 ||
-					status.StudentCity != student.City ||
-					status.StudentState != student.State ||
-					status.StudentZipCode != student.ZipCode,
-				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.ADDRESS_CHANGE,
-						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student == null ? null : Join(
-							student.Street1,
-							student.Street2,
-							student.City,
-							student.State,
-							student.ZipCode),
-						NextData = Join(
-							status.StudentStreet1,
-							status.StudentStreet2,
-							status.StudentCity,
-							status.StudentState,
-							status.StudentZipCode),
 						BatchHash = status.BatchHash,
 					}
 			),
