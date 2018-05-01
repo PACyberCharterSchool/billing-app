@@ -28,6 +28,8 @@ namespace models
 		[Required]
 		public string Activity { get; set; }
 
+		public int Sequence { get; set; }
+
 		public string PreviousData { get; set; }
 		public string NextData { get; set; }
 		public DateTime Timestamp { get; set; }

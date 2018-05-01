@@ -77,7 +77,7 @@ namespace models.Transformers
 						PACyberId = status.StudentId,
 						Activity = StudentActivity.DISTRICT_ENROLL,
 						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student?.SchoolDistrict != null ? null : Join(
+						PreviousData = student?.SchoolDistrict == null ? null : Join(
 							student?.SchoolDistrict?.Aun.ToString(),
 							student?.SchoolDistrict?.Name),
 						NextData = Join(status.SchoolDistrictId.ToString(), status.SchoolDistrictName),
@@ -219,18 +219,23 @@ namespace models.Transformers
 			),
 		};
 
+		private Dictionary<int, int> _sequences = new Dictionary<int, int>();
+
 		protected override IEnumerable<StudentActivityRecord> Transform(IEnumerable<StudentStatusRecord> statuses)
 		{
 			foreach (var status in statuses)
 			{
-				// TODO(Erik): sequence #?
 				var student = _students.GetByPACyberId(status.StudentId);
 
 				foreach (var transformer in _fieldTransformers)
 				{
 					if (transformer.Item1(student, status))
 					{
+						if (!_sequences.ContainsKey(status.StudentId))
+							_sequences.Add(status.StudentId, 0);
+
 						var activity = transformer.Item2(student, status);
+						activity.Sequence = ++_sequences[status.StudentId];
 						_activities.Create(activity);
 						yield return activity;
 					}
