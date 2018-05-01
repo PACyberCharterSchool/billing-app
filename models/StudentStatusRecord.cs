@@ -5,9 +5,9 @@ namespace models
 	public class StudentStatusRecord
 	{
 		public int Id { get; set; }
-		public int SchoolDistrictId { get; set; } // TODO(Erik): string
+		public int SchoolDistrictId { get; set; }
 		public string SchoolDistrictName { get; set; }
-		public int StudentId { get; set; }
+		public string StudentId { get; set; }
 		public string StudentFirstName { get; set; }
 		public string StudentMiddleInitial { get; set; }
 		public string StudentLastName { get; set; }
@@ -18,7 +18,7 @@ namespace models
 		public string StudentCity { get; set; }
 		public string StudentState { get; set; }
 		public string StudentZipCode { get; set; }
-		public string ActivitySchoolYear { get; set; }
+		public string ActivitySchoolYear { get; set; } // TODO(Erik): BatchSchoolYear?
 		public DateTime StudentEnrollmentDate { get; set; }
 		public DateTime? StudentWithdrawalDate { get; set; }
 		public bool StudentIsSpecialEducation { get; set; }

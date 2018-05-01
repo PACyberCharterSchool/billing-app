@@ -23,13 +23,12 @@ namespace models
 	public class StudentActivityRecord
 	{
 		public int Id { get; set; }
-		public int PACyberId { get; set; } // TODO(Erik): string
+		public string PACyberId { get; set; }
 
 		[Required]
 		public string Activity { get; set; }
 
 		public int Sequence { get; set; }
-
 		public string PreviousData { get; set; }
 		public string NextData { get; set; }
 		public DateTime Timestamp { get; set; }

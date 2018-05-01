@@ -39,7 +39,7 @@ namespace models.Tests
 		{
 			var record = new StudentActivityRecord
 			{
-				PACyberId = 123456789,
+				PACyberId = "123456789",
 				Activity = StudentActivity.NEW_STUDENT,
 				PreviousData = null,
 				NextData = null,

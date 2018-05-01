@@ -63,10 +63,10 @@ namespace models.Tests
 		[Test]
 		public void GetByPACyberIdReturnsStudentIfExists()
 		{
-			var id = 3;
+			var id = "3";
 			var student = new Student
 			{
-				PACyberId = 3,
+				PACyberId = id,
 			};
 			_context.Add(student);
 			_context.SaveChanges();
@@ -78,7 +78,7 @@ namespace models.Tests
 		[Test]
 		public void GetByPACyberIdReturnsNullIfNotExists()
 		{
-			var actual = _uut.GetByPACyberId(3);
+			var actual = _uut.GetByPACyberId("3");
 			Assert.IsNull(actual);
 		}
 

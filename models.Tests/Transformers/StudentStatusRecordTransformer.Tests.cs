@@ -32,7 +32,7 @@ namespace models.Tests.Transformers
 		[Test]
 		public void TransformCreatesNewStudentRecordIfNotExists()
 		{
-			var studentId = 3;
+			var studentId = "3";
 			var enrollDate = DateTime.Now.Date;
 			var batchHash = "hash";
 			var statuses = new[] {
@@ -77,7 +77,7 @@ namespace models.Tests.Transformers
 			lambda.Compile()(target);
 		}
 
-		private static Student NewStudent(int paCyberId) => new Student
+		private static Student NewStudent(string paCyberId) => new Student
 		{
 			PACyberId = paCyberId,
 			PASecuredId = null,
@@ -104,7 +104,7 @@ namespace models.Tests.Transformers
 			},
 		};
 
-		private static StudentStatusRecord NewStatusRecord(int paCyberId, DateTime enrollDate, string batchHash, Student student)
+		private static StudentStatusRecord NewStatusRecord(string paCyberId, DateTime enrollDate, string batchHash, Student student)
 			=> new StudentStatusRecord
 			{
 				StudentId = paCyberId,
@@ -147,7 +147,7 @@ namespace models.Tests.Transformers
 			string studentProperty, T oldData,
 			string recordProperty, T newData)
 		{
-			var paCyberId = 3;
+			var paCyberId = "3";
 			var student = NewStudent(paCyberId);
 			Assign(student, studentProperty, oldData);
 			_students.Setup(ss => ss.GetByPACyberId(paCyberId)).Returns(student);
@@ -176,7 +176,7 @@ namespace models.Tests.Transformers
 					string studentProperty, string oldData,
 					string recordProperty, string newData)
 		{
-			var paCyberId = 3;
+			var paCyberId = "3";
 			var student = NewStudent(paCyberId);
 			Assign(student, studentProperty, oldData);
 			_students.Setup(ss => ss.GetByPACyberId(paCyberId)).Returns(student);
@@ -214,7 +214,7 @@ namespace models.Tests.Transformers
 					string studentProperty, string oldData,
 					string recordProperty, string newData)
 		{
-			var paCyberId = 3;
+			var paCyberId = "3";
 			var student = NewStudent(paCyberId);
 			Assign(student, studentProperty, oldData);
 			_students.Setup(ss => ss.GetByPACyberId(paCyberId)).Returns(student);
@@ -251,7 +251,7 @@ namespace models.Tests.Transformers
 		[Test]
 		public void TransformCreatesDistrictEnrollRecordIfChanged()
 		{
-			var studentId = 3;
+			var studentId = "3";
 			var previousAun = 4;
 			var previousName = "Old SD";
 			_students.Setup(ss => ss.GetByPACyberId(studentId)).Returns(new Student
@@ -294,7 +294,7 @@ namespace models.Tests.Transformers
 		[Test]
 		public void TransformCreatesDistrictWithdrawRecordIfPresent()
 		{
-			var studentId = 3;
+			var studentId = "3";
 			var districtAun = 4;
 			_students.Setup(ss => ss.GetByPACyberId(studentId)).Returns(new Student
 			{
@@ -327,7 +327,7 @@ namespace models.Tests.Transformers
 		[Test]
 		public void TransformCreatesSpecialWithdrawRecordIfPresent()
 		{
-			var paCyberId = 3;
+			var paCyberId = "3";
 			var student = NewStudent(paCyberId);
 			student.IsSpecialEducation = true;
 			_students.Setup(ss => ss.GetByPACyberId(paCyberId)).Returns(student);

@@ -42,7 +42,7 @@ namespace models.Tests
 			{
 				SchoolDistrictId = 123456789,
 				SchoolDistrictName = "Some Name",
-				StudentId = 234567890,
+				StudentId = "234567890",
 				StudentFirstName = "Bob",
 				StudentMiddleInitial = "C",
 				StudentLastName = "Testy",

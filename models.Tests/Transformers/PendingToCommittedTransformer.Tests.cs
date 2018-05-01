@@ -26,7 +26,7 @@ namespace models.Tests.Transformers
 		[Test]
 		public void TransformTransforms()
 		{
-			var studentId = 3;
+			var studentId = "3";
 			var pending = new PendingStudentStatusRecord
 			{
 				StudentId = studentId,

@@ -218,7 +218,7 @@ namespace models.Transformers
 			),
 		};
 
-		private Dictionary<int, int> _sequences = new Dictionary<int, int>();
+		private Dictionary<string, int> _sequences = new Dictionary<string, int>();
 
 		protected override IEnumerable<StudentActivityRecord> Transform(IEnumerable<StudentStatusRecord> statuses)
 		{

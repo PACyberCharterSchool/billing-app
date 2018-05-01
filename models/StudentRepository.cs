@@ -9,7 +9,7 @@ namespace models
 	public interface IStudentRepository
 	{
 		Student Get(int id);
-		Student GetByPACyberId(int id);
+		Student GetByPACyberId(string id);
 
 		// CS0854: can't use optional parameters in expression trees
 		IList<Student> GetMany();
@@ -35,7 +35,7 @@ namespace models
 
 		public Student Get(int id) => _students.SingleOrDefault(s => s.Id == id);
 
-		public Student GetByPACyberId(int id) => _students.SingleOrDefault(s => s.PACyberId == id);
+		public Student GetByPACyberId(string id) => _students.SingleOrDefault(s => s.PACyberId == id);
 
 		public IList<Student> GetMany() => GetMany(null, null, 0, 0);
 

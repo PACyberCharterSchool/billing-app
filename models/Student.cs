@@ -7,7 +7,7 @@ namespace models
 	public class Student
 	{
 		public int Id { get; set; }
-		public int PACyberId { get; set; } // TODO(Erik): string
+		public string PACyberId { get; set; }
 		public ulong? PASecuredId { get; set; }
 		public string FirstName { get; set; }
 		public string MiddleInitial { get; set; }
