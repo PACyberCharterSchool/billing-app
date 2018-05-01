@@ -1,12 +1,12 @@
 <table class='table table-striped'>
   <thead>
     <tr>
-      <th *ngFor='let k of objectKeys(addresses[0])'>{{k}}</th>
+      <th *ngFor='let k of utilities.objectKeys(addresses[0])'>{{k}}</th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor='let address of addresses'>
-      <td *ngFor='let v of objectValues(address)'>{{v}}</td>
+      <td *ngFor='let v of utilities.objectValues(address)'>{{v}}</td>
     </tr>
   </tbody>
 </table>

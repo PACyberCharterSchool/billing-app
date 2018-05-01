@@ -1,25 +1,3 @@
 <div class='row student-history-type-row'>
-  <div class='col-md-12'>
-    <h5>Student History</h5>
-    <!-- <div ngbDropdown class='d-inline-block'>
-      <button ngbDropdownToggle class='btn btn-outline-primary' id='studentHistoryTypeDropdown'>Activity Type</button>
-      <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='studentHistoryTypeDropdown'>
-        <button class='dropdown-item' *ngFor='let type of studentHistoryTypes' (click)='filterStudentHistoryByType(type)'>{{type}}</button>
-      </div>
-    </div> -->
-  </div>
-</div>
-<div class='row student-history-details-row'>
-  <div class='col-md-12'>
-    <ngb-tabset>
-      <ngb-tab title='Address History'>
-        <ng-template ngbTabContent>
-          <app-student-address-history></app-student-address-history>
-        </ng-template>
-      </ngb-tab>
-      <ngb-tab title='School Enrollment History'>
-        <ng-template ngbTabContent><app-student-enrollment-history></app-student-enrollment-history></ng-template>
-      </ngb-tab>
-    </ngb-tabset>
-  </div>
+  <div class='col-md-12'><app-student-activity-history></app-student-activity-history></div>
 </div>

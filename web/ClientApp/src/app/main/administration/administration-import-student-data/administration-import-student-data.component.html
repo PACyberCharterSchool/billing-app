@@ -12,12 +12,12 @@
     <table class='table table-striped'>
       <thead>
         <tr>
-          <th *ngFor='let k of objectKeys(studentList[0])'>{{k | normalizeFieldName}}</th>
+          <th *ngFor='let k of utilities.objectKeys(studentList[0])'>{{k | normalizeFieldName}}</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor='let student of studentList'>
-          <td *ngFor='let v of objectValues(student)'>{{v}}</td>
+          <td *ngFor='let v of utilities.objectValues(student)'>{{v}}</td>
         </tr>
       </tbody>
     </table>

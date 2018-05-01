@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
+import { UtilitiesService } from '../../../services/utilities.service';
+
 @Component({
   selector: 'app-student-enrollment-history',
   templateUrl: './student-enrollment-history.component.html',
@@ -12,16 +14,8 @@ export class StudentEnrollmentHistoryComponent implements OnInit {
     { 'School District': 'Seneca Valley', 'AUN #': '9999999', 'Date Enrolled': '11/13/2013', 'Date Withdrawn': '' }
   ];
 
-  constructor() { }
+  constructor(private utilities: UtilitiesService) { }
 
   ngOnInit() {
-  }
-
-  objectKeys(obj) {
-    return Object.keys(obj);
-  }
-
-  objectValues(obj) {
-    return Object.values(obj);
   }
 }

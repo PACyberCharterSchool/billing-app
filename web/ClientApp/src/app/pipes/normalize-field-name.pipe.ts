@@ -12,6 +12,9 @@ export class NormalizeFieldNamePipe implements PipeTransform {
       case 'id':
         fieldName = 'Id';
         break;
+      case 'type':
+        fieldName = 'Type';
+        break;
       case 'city':
         fieldName = 'City';
         break;
@@ -65,6 +68,15 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         break;
       case 'lastUpdated':
         fieldName = 'Updated At';
+        break;
+      case 'date':
+        fieldName = 'Date';
+        break;
+      case 'oldValue':
+        fieldName = 'Old Value';
+        break;
+      case 'newValue':
+        fieldName = 'New Value';
         break;
       default:
         fieldName = '';

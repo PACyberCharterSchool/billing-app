@@ -18,6 +18,7 @@ import { AuthenticationService } from './services/authentication.service';
 import { AuthenticationGuardService } from './services/authentication-guard.service';
 import { StudentsService } from './services/students.service';
 import { SchoolDistrictService } from './services/school-district.service';
+import { UtilitiesService } from './services/utilities.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
@@ -51,7 +52,8 @@ const pacbillProviders = [
   AuthenticationService,
   StudentsService,
   tokenInterceptor,
-  SchoolDistrictService
+  SchoolDistrictService,
+  UtilitiesService
 ];
 
 @NgModule({

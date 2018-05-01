@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 
 import { Student } from '../../../models/student.model';
 
+import { UtilitiesService } from '../../../services/utilities.service';
+
 @Component({
   selector: 'app-student-address-history',
   templateUrl: './student-address-history.component.html',
@@ -14,17 +16,10 @@ export class StudentAddressHistoryComponent implements OnInit {
     { Street1: '920 Pentland Ave', Street2: '', City: 'Cranberry Twp', State: 'PA', 'Zip Code': '16066', 'Date': '11/5/2013' }
   ];
 
-  constructor() {
+  constructor(private utilities: UtilitiesService) {
   }
 
   ngOnInit() {
   }
 
-  objectKeys(obj) {
-    return Object.keys(obj);
-  }
-
-  objectValues(obj) {
-    return Object.values(obj);
-  }
 }

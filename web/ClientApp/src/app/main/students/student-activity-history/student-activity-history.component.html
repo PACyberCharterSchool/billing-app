@@ -1,0 +1,39 @@
+<div class='row student-activity-history-title-row'>
+  <div class='col-md-12'>
+    <div class='col-md-12'>
+      <div class='col-md-11'>
+        <h5>Student History</h5>
+        <div ngbDropdown class='d-inline-block'>
+          <button ngbDropdownToggle class='btn btn-outline-primary' id='studentHistoryTypeDropdown'>Activity Type</button>
+          <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='studentHistoryTypeDropdown'>
+            <button class='dropdown-item' *ngFor='let item of activityTypes' (click)='filterStudentHistoryByType(item)'>{{item}}</button>
+          </div>
+        </div>
+      </div>
+      <div class='col-md-1 reset-button-col'>
+        <button type='button' class='btn btn-primary' (click)='resetStudentHistoryFilter()'>Reset</button>
+      </div>
+    </div>
+    <div class='row student-activity-history-content-row'>
+      <div class='col-md-12'>
+        <div class='col-md-12'>
+          <table class='table table-striped'>
+            <thead>
+              <tr>
+                <th *ngFor='let k of utilities.objectKeys(activities[0])' (click)='sort(k)'>
+                  {{ k | normalizeFieldName }}
+                  <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+                </th>
+              </tr>
+            </thead>
+            <tbody infiniteScroll>
+              <tr *ngFor='let activity of activities | orderBy: {property: property, direction: direction}'>
+                <td *ngFor='let v of utilities.objectValues(activity)'>{{v}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

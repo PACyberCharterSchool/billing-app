@@ -34,6 +34,7 @@ export class StudentsListComponent implements OnInit {
       this.advancedSearchEnabled = false;
       this.isDescending = false;
       this.property = 'paCyberId';
+      this.direction = 1;
     }
 
   ngOnInit() {

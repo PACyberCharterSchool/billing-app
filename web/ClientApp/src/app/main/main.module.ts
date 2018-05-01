@@ -23,6 +23,7 @@ import { MatMenu } from '@angular/material';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
+
 @NgModule({
   declarations: [
     ContentAreaComponent,
@@ -31,7 +32,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     LoginTitleBarComponent,
     MainComponent,
     TitleBarComponent,
-    NavMenuComponent
+    NavMenuComponent,
   ],
   exports: [],
   imports: [

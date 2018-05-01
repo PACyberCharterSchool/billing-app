@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { SharedModule } from '../../shared/shared.module';
+
 import { AdministrationRoutingModule } from './administration-routing.module';
 
 import { AdministrationHomeComponent } from './administration-home/administration-home.component';
@@ -12,19 +14,17 @@ import {
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { NormalizeFieldNamePipe } from '../../pipes/normalize-field-name.pipe';
-
 @NgModule({
   declarations: [
     AdministrationPaymentRateComponent,
     AdministrationHomeComponent,
     AdministrationImportStudentDataComponent,
-    NormalizeFieldNamePipe
   ],
   imports: [
     CommonModule,
     FormsModule,
     AdministrationRoutingModule,
+    SharedModule,
     NgbModule
   ],
   providers: [ ]

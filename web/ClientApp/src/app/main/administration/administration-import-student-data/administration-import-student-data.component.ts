@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Student } from '../../../models/student.model';
 
 import { StudentsService } from '../../../services/students.service';
+import { UtilitiesService } from '../../../services/utilities.service';
 
 @Component({
   selector: 'app-administration-import-student-data',
@@ -15,7 +16,11 @@ export class AdministrationImportStudentDataComponent implements OnInit {
 
   studentList: Student[];
 
-  constructor(private studentsService: StudentsService, private router: Router) { }
+  constructor(
+    private studentsService: StudentsService,
+    private router: Router,
+    private utilities: UtilitiesService
+  ) { }
 
   ngOnInit() {
     this.studentsService.getStudents().subscribe(
@@ -27,18 +32,5 @@ export class AdministrationImportStudentDataComponent implements OnInit {
 
   handleCancelClick() {
     this.router.navigate(['/administration', { outlets: { 'action': ['home'] } }]);
-  }
-
-  objectKeys(obj) {
-    console.log('AdministrationImportStudentDataComponent.objectKeys(): obj is ', obj);
-    if (obj) {
-      return Object.keys(obj);
-    }
-  }
-
-  objectValues(obj) {
-    if (obj) {
-      return Object.values(obj);
-    }
   }
 }
