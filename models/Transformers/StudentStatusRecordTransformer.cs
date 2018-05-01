@@ -34,7 +34,6 @@ namespace models.Transformers
 			return String.Join("|", parts);
 		}
 
-		// TODO(Erik): cleanup predicates
 		private static readonly FieldTransformers _fieldTransformers = new FieldTransformers
 		{
 			( // new student
