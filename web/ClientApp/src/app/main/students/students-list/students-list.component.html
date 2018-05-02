@@ -5,14 +5,14 @@
     <button class='btn-primary search-button' (click)='filterStudentListByNameOrId()'>SEARCH</button>
   </div>
   <div class='col-md-2 advanced-search-tools-control-col'>
-    <h4>More Filters</h4>
+    <h5>More Filters</h5>
     <button mat-icon-button class='advanced-search-tools-toggle-btn' (click)='toggleAdvancedSearchTools()'>
       <i class='fa fa-bars' *ngIf='!advancedSearchEnabled'></i>
       <i class='fa fa-angle-down fa-bold' *ngIf='advancedSearchEnabled'></i>
     </button>
   </div>
-  <div class='col-md-5'>
-    <div class='col-md-6'><app-student-datepicker iconSize='fa-2x' [(date)]='startDate' (dateSelected)='dateSelectedStartDateHandler($event)'></app-student-datepicker></div>
+  <div class='col-md-5 base-date-search-tools-col'>
+    <div class='col-md-5'><app-student-datepicker iconSize='fa-2x' [(date)]='startDate' (dateSelected)='dateSelectedStartDateHandler($event)'></app-student-datepicker></div>
     <div class='col-md-6'><app-student-datepicker iconSize='fa-2x' [(date)]='endDate' (dateSelected)='dateSelectedEndDateHandler($event)'></app-student-datepicker></div>
   </div>
   <div class='col-md-1'>
@@ -20,16 +20,16 @@
   </div>
 </div>
 <div class='row advanced-search-tools-row' *ngIf="advancedSearchEnabled">
-  <div class='col-md-9'>
+  <div class='col-md-10'>
     <app-student-advanced-filter [schoolDistricts]='schoolDistricts' (studentsUpdated)='studentsUpdatedHandler($event)'></app-student-advanced-filter>
   </div>
-  <div class='col-md-3'></div>
+  <div class='col-md-2'></div>
 </div>
 <div class='row student-list-view-row'>
   <div class='col-md-12'>
     <table class='table table-responsive table-striped'>
       <thead>
-        <tr>
+        <tr style='width: 100%;'>
           <th (click)="sort('paCyberId')">
             PACyber Id
             <i class="fa" [ngClass]="{'fa-sort': column != 'paCyberId', 'fa-sort-asc': (column == 'paCyberId' && isDescending), 'fa-sort-desc': (column == 'paCyberId' && !isDescending) }" aria-hidden="true"></i>

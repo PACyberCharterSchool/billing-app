@@ -7,13 +7,24 @@
     height: 100%;
   }
 
+  .base-date-search-tools-col {
+    margin: 0;
+    padding: 0;
+
+    div {
+      display: inline-block;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
   .search-button {
     border-radius: 2px;
     height: 40px;
     left: -4px;
     margin-left: 0;
     position: relative;
-    top: -2px;
+    top: -1px;
     width: 85px;
   }
 
@@ -41,7 +52,7 @@
     font-size: 18px;
   }
 
-  h4 {
+  h5 {
     color: #4d4d4d;
     display: inline-block;
     text-align: left;
@@ -51,7 +62,7 @@
     height: 40px;
     margin-left: 20px;
     margin-right: 0;
-    width: 45%;
+    width: 55%;
   }
 }
 
@@ -64,9 +75,11 @@
   table {
     border-top: 1px solid #dddddd;
     color: #4d4d4d;
+    display: inline-table;
     width: 100%;
 
     thead {
+      width: 150%;
       tr {
         th {
           a {
@@ -76,11 +89,15 @@
       }
     }
 
-    tr {
-      border-top: 1px solid #dddddd;
-      border-bottom: 1px solid #dddddd;
-      td {
-        padding-left: 5px;
+    tbody {
+      tr {
+        border-top: 1px solid #dddddd;
+        border-bottom: 1px solid #dddddd;
+        width: 100%;
+
+        td {
+          padding-left: 5px;
+        }
       }
     }
   }

@@ -2,15 +2,17 @@
   <div class='col-md-12 login-response-error' [style.visibility]="loginError ? 'visible' : 'hidden'">
     Login error:  {{loginError}}
   </div>
-  <form #loginForm='ngForm' (ngSubmit)='login()'>
-    <div class='form-group'>
-      <input class='form-control' id='loginEmail' name='loginEmail' placeholder='Email or username' [(ngModel)]='email' required #loginEmail='ngModel' />
-      <div [style.visibility]="loginEmail.invalid && (loginEmail.dirty || loginEmail.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Incorrect email or username</div>
-    </div>
-    <div class='form-group'>
-      <input type='password' class='form-control' id='loginPassword' name='loginPassword' placeholder='Password' [(ngModel)]='password' required #loginPassword='ngModel' />
-      <div [style.visibility]="loginPassword.invalid && (loginPassword.dirty || loginPassword.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Incorrect password</div>
-    </div>
-    <button type='submit' class='btn btn-primary'>Sign in</button>
-  </form>
+  <div class='col-md-12'>
+    <form #loginForm='ngForm' (ngSubmit)='login()'>
+      <div class='form-group'>
+        <input class='form-control' id='loginEmail' name='loginEmail' placeholder='Email or username' [(ngModel)]='email' required #loginEmail='ngModel' />
+        <div [style.visibility]="loginEmail.invalid && (loginEmail.dirty || loginEmail.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Incorrect email or username</div>
+      </div>
+      <div class='form-group'>
+        <input type='password' class='form-control' id='loginPassword' name='loginPassword' placeholder='Password' [(ngModel)]='password' required #loginPassword='ngModel' />
+        <div [style.visibility]="loginPassword.invalid && (loginPassword.dirty || loginPassword.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Incorrect password</div>
+      </div>
+      <button type='submit' class='btn btn-primary'>Sign in</button>
+    </form>
+  </div>
 </div>

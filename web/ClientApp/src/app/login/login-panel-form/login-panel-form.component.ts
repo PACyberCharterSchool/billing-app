@@ -51,7 +51,7 @@ export class LoginPanelFormComponent implements OnInit {
     console.log('LoginPanelFormComponent.login():  email is ', this.email);
     console.log('LoginPanelFormComponent.login():  password is ', this.password);
 
-    let user: User = new User();
+    const user: User = new User();
 
     this.authService.authenticate(this.email, this.password).subscribe(
       data => {

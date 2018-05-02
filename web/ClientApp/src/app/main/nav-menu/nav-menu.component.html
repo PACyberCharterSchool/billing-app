@@ -14,27 +14,27 @@
       <ul class='nav navbar-nav'>
         <li [routerLinkActive]='["link-active"]' [routerLinkActiveOptions]='{ exact: true }'>
           <a [routerLink]='["/"]' (click)='collapse()'>
-              <span class='glyphicon glyphicon-home'></span> Home
+              <span class='fa fa-search'></span> Home
           </a>
         </li>
         <li [routerLinkActive]='["link-active"]'>
           <a [routerLink]='["/payments-refunds", { outlets: { "action": ["home"] } }]' (click)='collapse()'>
-              <span class='glyphicon glyphicon-usd'></span> Payments & Refunds
+              <span class='fa fa-usd'></span> Payments & Refunds
           </a>
         </li>
         <li [routerLinkActive]='["link-active"]'>
           <a [routerLink]='["/reports-invoices", { outlets: { "action": ["home"] } }]' (click)='collapse()'>
-              <span class='glyphicon glyphicon-duplicate'></span> Reports & Invoices
+              <span class='fa fa-copy'></span> Reports & Invoices
           </a>
         </li>
         <li [routerLinkActive]='["link-active"]'>
           <a [routerLink]='["/students", { outlets: { "action": ["list"] } }]' (click)='collapse()'>
-              <span class='glyphicon glyphicon-user'></span> Students
+              <span class='fa fa-user'></span> Students
           </a>
         </li>
         <li [routerLinkActive]='["link-active"]'>
           <a [routerLink]='["/administration", { outlets: { "action": ["home"] } }]' (click)='collapse()'>
-            <span class='glyphicon glyphicon-cog'></span> Administration
+            <span class='fa fa-cog'></span> Administration
           </a>
         </li>
       </ul>
