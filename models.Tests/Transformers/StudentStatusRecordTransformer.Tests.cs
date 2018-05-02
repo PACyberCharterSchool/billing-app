@@ -48,7 +48,7 @@ namespace models.Tests.Transformers
 			var count = 7;
 			var actual = (_uut.Transform(statuses) as IEnumerable<StudentActivityRecord>).ToList();
 			Assert.That(actual, Has.Count.EqualTo(count)); // TODO(Erik): all the change records
-			Assert.That(actual[0].Activity, Is.EqualTo(StudentActivity.NEW_STUDENT));
+			Assert.That(actual[0].Activity, Is.EqualTo(StudentActivity.NewStudent));
 			Assert.That(actual[0].PACyberId, Is.EqualTo(studentId));
 			Assert.That(actual[0].Timestamp, Is.EqualTo(enrollDate));
 			Assert.That(actual[0].BatchHash, Is.EqualTo(batchHash));
@@ -135,18 +135,21 @@ namespace models.Tests.Transformers
 			};
 
 		[Test]
-		[TestCase(StudentActivity.DATEOFBIRTH_CHANGE, "DateOfBirth", "2000/01/01", "StudentDateOfBirth", "2000/02/02")]
-		[TestCase(StudentActivity.GRADE_CHANGE, "Grade", "11", "StudentGradeLevel", "12")]
-		[TestCase(StudentActivity.NOREP_CHANGE, "NorepDate", "2018/01/01", "StudentNorep", "2018/02/02")]
-		[TestCase(StudentActivity.PASECURED_CHANGE, "PASecuredId", 123456789, "StudentPASecuredId", 234567890)]
-		[TestCase(StudentActivity.SPECIAL_ENROLL, "IsSpecialEducation", false, "StudentIsSpecialEducation", true)]
-		[TestCase(StudentActivity.CURRENTIEP_CHANGE, "CurrentIep", "2018/01/01", "StudentCurrentIep", "2018/02/02")]
-		[TestCase(StudentActivity.FORMERIEP_CHANGE, "FormerIep", "2018/01/01", "StudentFormerIep", "2018/02/02")]
+		[TestCase("DateOfBirthChange", "DateOfBirth", "2000/01/01", "StudentDateOfBirth", "2000/02/02")]
+		[TestCase("GradeChange", "Grade", "11", "StudentGradeLevel", "12")]
+		[TestCase("NorepChange", "NorepDate", "2018/01/01", "StudentNorep", "2018/02/02")]
+		[TestCase("PASecuredChange", "PASecuredId", 123456789, "StudentPASecuredId", 234567890)]
+		[TestCase("SpecialEducationEnrollment", "IsSpecialEducation", false, "StudentIsSpecialEducation", true)]
+		[TestCase("CurrentIepChange", "CurrentIep", "2018/01/01", "StudentCurrentIep", "2018/02/02")]
+		[TestCase("FormerIepChange", "FormerIep", "2018/01/01", "StudentFormerIep", "2018/02/02")]
 		public void TransformWithExistingStudentCreatesRecordIfChanged<T>(
-			string activity,
+			string activityString,
 			string studentProperty, T oldData,
 			string recordProperty, T newData)
 		{
+			var activity = StudentActivity.FromString(activityString);
+			Console.WriteLine($"activity: {activity}");
+
 			var paCyberId = "3";
 			var student = NewStudent(paCyberId);
 			Assign(student, studentProperty, oldData);
@@ -168,14 +171,16 @@ namespace models.Tests.Transformers
 		}
 
 		[Test]
-		[TestCase(StudentActivity.NAME_CHANGE, "FirstName", "Bob", "StudentFirstName", "Charlie")]
-		[TestCase(StudentActivity.NAME_CHANGE, "MiddleInitial", "A", "StudentMiddleInitial", "B")]
-		[TestCase(StudentActivity.NAME_CHANGE, "LastName", "Ytset", "StudentLastName", "Testy")]
+		[TestCase("NameChange", "FirstName", "Bob", "StudentFirstName", "Charlie")]
+		[TestCase("NameChange", "MiddleInitial", "A", "StudentMiddleInitial", "B")]
+		[TestCase("NameChange", "LastName", "Ytset", "StudentLastName", "Testy")]
 		public void TransformWithExistingStudentCreatesNameChangeRecordIfChanged(
-					string activity,
+					string activityString,
 					string studentProperty, string oldData,
 					string recordProperty, string newData)
 		{
+			var activity = StudentActivity.FromString(activityString);
+
 			var paCyberId = "3";
 			var student = NewStudent(paCyberId);
 			Assign(student, studentProperty, oldData);
@@ -204,16 +209,18 @@ namespace models.Tests.Transformers
 		}
 
 		[Test]
-		[TestCase(StudentActivity.ADDRESS_CHANGE, "Street1", "Here", "StudentStreet1", "There")]
-		[TestCase(StudentActivity.ADDRESS_CHANGE, "Street2", "Here", "StudentStreet2", "There")]
-		[TestCase(StudentActivity.ADDRESS_CHANGE, "City", "East Side", "StudentCity", "West Side")]
-		[TestCase(StudentActivity.ADDRESS_CHANGE, "State", "PA", "StudentState", "Not PA")]
-		[TestCase(StudentActivity.ADDRESS_CHANGE, "ZipCode", "12345", "StudentZipCode", "67890")]
+		[TestCase("AddressChange", "Street1", "Here", "StudentStreet1", "There")]
+		[TestCase("AddressChange", "Street2", "Here", "StudentStreet2", "There")]
+		[TestCase("AddressChange", "City", "East Side", "StudentCity", "West Side")]
+		[TestCase("AddressChange", "State", "PA", "StudentState", "Not PA")]
+		[TestCase("AddressChange", "ZipCode", "12345", "StudentZipCode", "67890")]
 		public void TransformWithExistingStudentCreatesAddressChangeRecordIfChanged(
-					string activity,
+					string activityString,
 					string studentProperty, string oldData,
 					string recordProperty, string newData)
 		{
+			var activity = StudentActivity.FromString(activityString);
+
 			var paCyberId = "3";
 			var student = NewStudent(paCyberId);
 			Assign(student, studentProperty, oldData);
@@ -284,7 +291,7 @@ namespace models.Tests.Transformers
 
 			var actual = (_uut.Transform(statuses) as IEnumerable<StudentActivityRecord>).ToList();
 			Assert.That(actual, Has.Count.EqualTo(1));
-			Assert.That(actual[0].Activity, Is.EqualTo(StudentActivity.DISTRICT_ENROLL));
+			Assert.That(actual[0].Activity, Is.EqualTo(StudentActivity.DistrictEnrollment));
 			Assert.That(actual[0].Timestamp, Is.EqualTo(enrollDate));
 			Assert.That(actual[0].PreviousData, Is.EqualTo(oldDistrict));
 			Assert.That(actual[0].NextData, Is.EqualTo(newDistrict));
@@ -317,7 +324,7 @@ namespace models.Tests.Transformers
 
 			var actual = (_uut.Transform(statuses) as IEnumerable<StudentActivityRecord>).ToList();
 			Assert.That(actual, Has.Count.EqualTo(1));
-			Assert.That(actual[0].Activity, Is.EqualTo(StudentActivity.DISTRICT_WITHDRAW));
+			Assert.That(actual[0].Activity, Is.EqualTo(StudentActivity.DistrictWithdrawal));
 			Assert.That(actual[0].Timestamp, Is.EqualTo(withdrawDate));
 			Assert.That(actual[0].PreviousData, Is.EqualTo(districtAun.ToString()));
 			Assert.That(actual[0].NextData, Is.EqualTo(null));
@@ -341,7 +348,7 @@ namespace models.Tests.Transformers
 			var actual = (_uut.Transform(statuses) as IEnumerable<StudentActivityRecord>).ToList();
 			Assert.That(actual, Has.Count.EqualTo(2)); // district withdrawal is first
 			Assert.That(actual[1].PACyberId, Is.EqualTo(paCyberId));
-			Assert.That(actual[1].Activity, Is.EqualTo(StudentActivity.SPECIAL_WITHDRAW));
+			Assert.That(actual[1].Activity, Is.EqualTo(StudentActivity.SpecialEducationWithdrawal));
 			Assert.That(actual[1].Timestamp, Is.EqualTo(enrollDate));
 			Assert.That(actual[1].PreviousData, Is.EqualTo(true.ToString()));
 			Assert.That(actual[1].NextData, Is.EqualTo(false.ToString()));

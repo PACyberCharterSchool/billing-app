@@ -17,6 +17,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.ReDoc;
 
 using static api.Common.UserRoles;
+using api.Controllers;
 using api.Services;
 using models;
 using models.Transformers;
@@ -150,7 +151,8 @@ namespace api
 				o.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>{
 						{"Bearer", null},
 				});
-				o.DescribeAllEnumsAsStrings();
+				o.SchemaFilter<EnumerableSchemaFilter>();
+				o.OperationFilter<EnumerableOperationFilter>();
 			});
 			#endregion
 

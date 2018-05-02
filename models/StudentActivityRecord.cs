@@ -1,23 +1,27 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
+using Newtonsoft.Json;
+
 namespace models
 {
-	public static class StudentActivity
+	public class StudentActivity : Enumerable<StudentActivity>
 	{
-		public const string NEW_STUDENT = "NewStudent";
-		public const string DATEOFBIRTH_CHANGE = "DateOfBirthChange";
-		public const string DISTRICT_ENROLL = "DistrictEnrollment";
-		public const string DISTRICT_WITHDRAW = "DistrictWithdraw";
-		public const string NAME_CHANGE = "NameChange";
-		public const string GRADE_CHANGE = "GradeChange";
-		public const string ADDRESS_CHANGE = "AddressChange";
-		public const string SPECIAL_ENROLL = "SpecialEducationEnroll";
-		public const string SPECIAL_WITHDRAW = "SpecialEducationWithdraw";
-		public const string CURRENTIEP_CHANGE = "CurrentIepChange";
-		public const string FORMERIEP_CHANGE = "FormerIepChange";
-		public const string NOREP_CHANGE = "NorepChange";
-		public const string PASECURED_CHANGE = "PASecuredChange";
+		private StudentActivity(string value) : base(value) { }
+
+		public static readonly StudentActivity NewStudent = new StudentActivity("NewStudent");
+		public static readonly StudentActivity DateOfBirthChange = new StudentActivity("DateOfBirthChange");
+		public static readonly StudentActivity DistrictEnrollment = new StudentActivity("DistrictEnrollment");
+		public static readonly StudentActivity DistrictWithdrawal = new StudentActivity("DistrictWithdraw");
+		public static readonly StudentActivity NameChange = new StudentActivity("NameChange");
+		public static readonly StudentActivity GradeChange = new StudentActivity("GradeChange");
+		public static readonly StudentActivity AddressChange = new StudentActivity("AddressChange");
+		public static readonly StudentActivity SpecialEducationEnrollment = new StudentActivity("SpecialEducationEnrollment");
+		public static readonly StudentActivity SpecialEducationWithdrawal = new StudentActivity("SpecialEducationWithdraw");
+		public static readonly StudentActivity CurrentIepChange = new StudentActivity("CurrentIepChange");
+		public static readonly StudentActivity FormerIepChange = new StudentActivity("FormerIepChange");
+		public static readonly StudentActivity NorepChange = new StudentActivity("NorepChange");
+		public static readonly StudentActivity PASecuredChange = new StudentActivity("PASecuredChange");
 	}
 
 	public class StudentActivityRecord
@@ -26,7 +30,8 @@ namespace models
 		public string PACyberId { get; set; }
 
 		[Required]
-		public string Activity { get; set; }
+		[JsonConverter(typeof(StudentActivityJsonConverter))]
+		public StudentActivity Activity { get; set; }
 
 		public int Sequence { get; set; }
 		public string PreviousData { get; set; }

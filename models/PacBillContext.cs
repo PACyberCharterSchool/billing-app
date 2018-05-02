@@ -31,6 +31,13 @@ namespace models
 			builder.Entity<Student>().
 				HasIndex(s => s.PACyberId).
 				IsUnique();
+
+			builder.Entity<StudentActivityRecord>().
+				Property(s => s.Activity).
+				HasConversion(
+					a => a.Value,
+					a => StudentActivity.FromString(a)
+				);
 		}
 	}
 }

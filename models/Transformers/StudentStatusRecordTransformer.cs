@@ -41,7 +41,7 @@ namespace models.Transformers
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
-						Activity = StudentActivity.NEW_STUDENT,
+						Activity = StudentActivity.NewStudent,
 						Timestamp = status.StudentEnrollmentDate,
 						BatchHash = status.BatchHash,
 					}
@@ -51,7 +51,7 @@ namespace models.Transformers
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
-						Activity = StudentActivity.DATEOFBIRTH_CHANGE,
+						Activity = StudentActivity.DateOfBirthChange,
 						Timestamp = status.StudentEnrollmentDate,
 						PreviousData = student?.DateOfBirth.ToString(DATE_FORMAT),
 						NextData = status.StudentDateOfBirth.ToString(DATE_FORMAT),
@@ -66,7 +66,7 @@ namespace models.Transformers
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
-						Activity = StudentActivity.NAME_CHANGE,
+						Activity = StudentActivity.NameChange,
 						Timestamp = status.StudentEnrollmentDate,
 						PreviousData = student == null ? null : Join(student.FirstName, student.MiddleInitial, student.LastName),
 						NextData = Join(status.StudentFirstName, status.StudentMiddleInitial, status.StudentLastName),
@@ -78,7 +78,7 @@ namespace models.Transformers
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
-						Activity = StudentActivity.GRADE_CHANGE,
+						Activity = StudentActivity.GradeChange,
 						Timestamp = status.StudentEnrollmentDate,
 						PreviousData = student?.Grade,
 						NextData = status.StudentGradeLevel,
@@ -95,7 +95,7 @@ namespace models.Transformers
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
-						Activity = StudentActivity.ADDRESS_CHANGE,
+						Activity = StudentActivity.AddressChange,
 						Timestamp = status.StudentEnrollmentDate,
 						PreviousData = student == null ? null : Join(
 							student.Street1,
@@ -117,7 +117,7 @@ namespace models.Transformers
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
-						Activity = StudentActivity.DISTRICT_WITHDRAW,
+						Activity = StudentActivity.DistrictWithdrawal,
 						Timestamp = status.StudentWithdrawalDate.Value,
 						PreviousData = status.SchoolDistrictId.ToString(),
 						BatchHash = status.BatchHash,
@@ -128,7 +128,7 @@ namespace models.Transformers
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
-						Activity = StudentActivity.DISTRICT_ENROLL,
+						Activity = StudentActivity.DistrictEnrollment,
 						Timestamp = status.StudentEnrollmentDate,
 						PreviousData = student?.SchoolDistrict == null ? null : Join(
 							student?.SchoolDistrict?.Aun.ToString(),
@@ -145,7 +145,7 @@ namespace models.Transformers
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
-						Activity = StudentActivity.SPECIAL_WITHDRAW,
+						Activity = StudentActivity.SpecialEducationWithdrawal,
 						Timestamp = status.StudentWithdrawalDate.Value,
 						PreviousData = student?.IsSpecialEducation.ToString(),
 						NextData = status.StudentIsSpecialEducation.ToString(),
@@ -158,7 +158,7 @@ namespace models.Transformers
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
-						Activity = StudentActivity.SPECIAL_ENROLL,
+						Activity = StudentActivity.SpecialEducationEnrollment,
 						Timestamp = status.StudentEnrollmentDate,
 						PreviousData = student?.IsSpecialEducation.ToString(),
 						NextData = status.StudentIsSpecialEducation.ToString(),
@@ -171,7 +171,7 @@ namespace models.Transformers
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
-						Activity = StudentActivity.CURRENTIEP_CHANGE,
+						Activity = StudentActivity.CurrentIepChange,
 						Timestamp = status.StudentEnrollmentDate,
 						PreviousData = student?.CurrentIep?.ToString(DATE_FORMAT),
 						NextData = status.StudentCurrentIep?.ToString(DATE_FORMAT),
@@ -184,7 +184,7 @@ namespace models.Transformers
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
-						Activity = StudentActivity.FORMERIEP_CHANGE,
+						Activity = StudentActivity.FormerIepChange,
 						Timestamp = status.StudentEnrollmentDate,
 						PreviousData = student?.FormerIep?.ToString(DATE_FORMAT),
 						NextData = status.StudentFormerIep?.ToString(DATE_FORMAT),
@@ -197,7 +197,7 @@ namespace models.Transformers
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
-						Activity = StudentActivity.NOREP_CHANGE,
+						Activity = StudentActivity.NorepChange,
 						Timestamp = status.StudentEnrollmentDate,
 						PreviousData = student?.NorepDate?.ToString(DATE_FORMAT),
 						NextData = status.StudentNorep?.ToString(DATE_FORMAT),
@@ -209,7 +209,7 @@ namespace models.Transformers
 				(student, status) => new StudentActivityRecord
 					{
 						PACyberId = status.StudentId,
-						Activity = StudentActivity.PASECURED_CHANGE,
+						Activity = StudentActivity.PASecuredChange,
 						Timestamp = status.StudentEnrollmentDate,
 						PreviousData = student?.PASecuredId?.ToString(),
 						NextData = status.StudentPaSecuredId.ToString(),

@@ -35,12 +35,139 @@ namespace models.Tests
 		}
 
 		[Test]
+		public void GetManyReturnsAllWhenNoArgs()
+		{
+			var records = new[] {
+				new StudentActivityRecord{
+					PACyberId = "1",
+					Activity = StudentActivity.NewStudent,
+				},
+				new StudentActivityRecord{
+					PACyberId = "2",
+					Activity = StudentActivity.NameChange,
+				},
+			};
+			_context.AddRange(records);
+			_context.SaveChanges();
+
+			var result = _uut.GetMany();
+			Assert.That(result, Has.Count.EqualTo(2));
+			Assert.That(result, Is.EqualTo(records));
+		}
+
+		[Test]
+		public void GetManyReturnsAllWhenIdAndActivityEmpty()
+		{
+			var records = new[] {
+				new StudentActivityRecord{
+					PACyberId = "1",
+					Activity = StudentActivity.NewStudent,
+				},
+				new StudentActivityRecord{
+					PACyberId = "2",
+					Activity = StudentActivity.NameChange,
+				},
+			};
+			_context.AddRange(records);
+			_context.SaveChanges();
+
+			var result = _uut.GetMany(id: " ", activity: " ");
+			Assert.That(result, Has.Count.EqualTo(2));
+			Assert.That(result, Is.EqualTo(records));
+		}
+
+		[Test]
+		public void GetManyReturnsFilteredResultsById()
+		{
+			var records = new[] {
+				new StudentActivityRecord{
+					PACyberId = "1",
+					Activity = StudentActivity.NewStudent,
+				},
+				new StudentActivityRecord{
+					PACyberId = "2",
+					Activity = StudentActivity.NameChange,
+				},
+			};
+			_context.AddRange(records);
+			_context.SaveChanges();
+
+			var result = _uut.GetMany(id: "2");
+			Assert.That(result, Has.Count.EqualTo(1));
+			Assert.That(result[0], Is.EqualTo(records[1]));
+		}
+
+		[Test]
+		public void GetManyReturnsFilteredResultsByActivity()
+		{
+			var records = new[] {
+				new StudentActivityRecord{
+					PACyberId = "1",
+					Activity = StudentActivity.NewStudent,
+				},
+				new StudentActivityRecord{
+					PACyberId = "2",
+					Activity = StudentActivity.NameChange,
+				},
+			};
+			_context.AddRange(records);
+			_context.SaveChanges();
+
+			var result = _uut.GetMany(activity: StudentActivity.NewStudent.Value);
+			Assert.That(result, Has.Count.EqualTo(1));
+			Assert.That(result[0], Is.EqualTo(records[0]));
+		}
+
+		[Test]
+		public void GetManyWithSkipSkips()
+		{
+			var records = new[] {
+				new StudentActivityRecord{
+					PACyberId = "1",
+					Activity = StudentActivity.NewStudent,
+				},
+				new StudentActivityRecord{
+					PACyberId = "2",
+					Activity = StudentActivity.NameChange,
+				},
+			};
+			_context.AddRange(records);
+			_context.SaveChanges();
+
+			var result = _uut.GetMany(skip: 1, take: 0);
+			Assert.That(result, Has.Count.EqualTo(1));
+			Assert.That(result[0], Is.EqualTo(records[1]));
+		}
+
+		[Test]
+		public void GetManyWithTakeTakes()
+		{
+
+			var records = new[] {
+				new StudentActivityRecord{
+					PACyberId = "1",
+					Activity = StudentActivity.NewStudent,
+				},
+				new StudentActivityRecord{
+					PACyberId = "2",
+					Activity = StudentActivity.NameChange,
+				},
+			};
+			_context.AddRange(records);
+			_context.SaveChanges();
+
+			var result = _uut.GetMany(skip: 0, take: 1);
+			Assert.That(result, Has.Count.EqualTo(1));
+			Assert.That(result[0], Is.EqualTo(records[0]));
+		}
+
+		[Test]
 		public void CreateWithNewCreates()
 		{
 			var record = new StudentActivityRecord
 			{
 				PACyberId = "123456789",
-				Activity = StudentActivity.NEW_STUDENT,
+				Activity = StudentActivity.NewStudent,
 				PreviousData = null,
 				NextData = null,
 				Timestamp = DateTime.Now.Date,
