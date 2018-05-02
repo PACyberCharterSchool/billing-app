@@ -153,6 +153,7 @@ namespace api
 				});
 				o.SchemaFilter<EnumerableSchemaFilter>();
 				o.OperationFilter<EnumerableOperationFilter>();
+				o.OperationFilter<StudentFieldOperationFilter>();
 			});
 			#endregion
 
