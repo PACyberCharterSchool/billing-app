@@ -26,7 +26,11 @@ namespace models
 
 			builder.Entity<SchoolDistrict>().
 				Property(e => e.PaymentType).
-				HasDefaultValue(SchoolDistrictPaymentType.ACH);
+				HasDefaultValue(SchoolDistrictPaymentType.Ach).
+				HasConversion(
+					v => v.Value,
+					v => SchoolDistrictPaymentType.FromString(v)
+				);
 
 			builder.Entity<Student>().
 				HasIndex(s => s.PACyberId).
@@ -35,8 +39,8 @@ namespace models
 			builder.Entity<StudentActivityRecord>().
 				Property(s => s.Activity).
 				HasConversion(
-					a => a.Value,
-					a => StudentActivity.FromString(a)
+					v => v.Value,
+					v => StudentActivity.FromString(v)
 				);
 		}
 	}

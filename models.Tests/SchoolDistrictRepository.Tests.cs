@@ -121,7 +121,7 @@ namespace models.Tests
 				Name = "Bob",
 				Rate = 1.0m,
 				AlternateRate = null,
-				PaymentType = SchoolDistrictPaymentType.ACH,
+				PaymentType = SchoolDistrictPaymentType.Ach,
 			};
 
 			var result = _uut.CreateOrUpdate(time, district);
@@ -147,7 +147,7 @@ namespace models.Tests
 				Name = "Bob",
 				Rate = 1.0m,
 				AlternateRate = null,
-				PaymentType = SchoolDistrictPaymentType.ACH,
+				PaymentType = SchoolDistrictPaymentType.Ach,
 				LastUpdated = time.AddDays(-1),
 			};
 			_context.Add(district);
@@ -157,7 +157,7 @@ namespace models.Tests
 			district.Name = "Charlie";
 			district.Rate = 2.0m;
 			district.AlternateRate = 3.0m;
-			district.PaymentType = SchoolDistrictPaymentType.CHECK;
+			district.PaymentType = SchoolDistrictPaymentType.Check;
 			_uut.CreateOrUpdate(district);
 
 			var actual = _context.SchoolDistricts.First(d => d.Id == id);
@@ -179,7 +179,7 @@ namespace models.Tests
 				Name = "Bob",
 				Rate = 1.0m,
 				AlternateRate = null,
-				PaymentType = SchoolDistrictPaymentType.ACH,
+				PaymentType = SchoolDistrictPaymentType.Ach,
 			};
 			_context.Add(district);
 			_context.SaveChanges();
@@ -191,7 +191,7 @@ namespace models.Tests
 				Name = "Charlie",
 				Rate = 2.0m,
 				AlternateRate = 3.0m,
-				PaymentType = SchoolDistrictPaymentType.CHECK,
+				PaymentType = SchoolDistrictPaymentType.Check,
 			};
 			_uut.CreateOrUpdate(updated);
 
