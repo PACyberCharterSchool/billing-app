@@ -20,6 +20,9 @@ namespace api.Controllers
 					continue;
 
 				var prop = type.GetProperty(param.Name);
+				if (prop == null)
+					continue;
+
 				var att = prop.GetCustomAttributes(typeof(EnumerableValidationAttribute), true).FirstOrDefault();
 				if (att == null)
 					continue;
