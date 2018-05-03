@@ -1,12 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 import { UtilitiesService } from '../../../services/utilities.service';
 
-const ACTIVITY_TYPES = [
-  'Address Change',
-  'Enrollment',
-  'Withdrawal'
-];
+import { Student } from '../../../models/student.model';
 
 @Component({
   selector: 'app-student-history-info',
@@ -14,8 +10,6 @@ const ACTIVITY_TYPES = [
   styleUrls: ['./student-history-info.component.scss']
 })
 export class StudentHistoryInfoComponent implements OnInit {
-  private activityTypes = ACTIVITY_TYPES;
-
   constructor(private utilities: UtilitiesService) { }
 
   ngOnInit() {

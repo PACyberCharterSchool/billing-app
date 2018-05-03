@@ -8,6 +8,7 @@ import { environment } from '../../environments/environment';
 
 import { Student } from '../models/student.model';
 import { SchoolDistrict } from '../models/school-district.model';
+import { StudentActivityRecord } from '../models/student-activity-record.model';
 
 @Injectable()
 export class StudentsService {
@@ -63,6 +64,11 @@ export class StudentsService {
   public getStudentsFilteredByEndDate(endDate: Date): Observable<Student[]> {
     const url: string = this.buildStudentEndDateSearchQuery(endDate);
     return this.httpClient.get<Student[]>(url, this.headers);
+  }
+
+  public getStudentActivityRecordsByStudentId(id: number) {
+    const url: string = `http://localhost:5000/api/StudentActivityRecords/${id}`;
+    return this.httpClient.get<StudentActivityRecord[]>(url, this.headers);
   }
 
   private buildStudentIepSearchQuery(isIep: boolean): string {

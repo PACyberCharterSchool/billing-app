@@ -15,8 +15,6 @@ import { StudentDetailsInfoComponent } from './student-details-info/student-deta
 import { StudentHistoryInfoComponent } from './student-history-info/student-history-info.component';
 import { StudentActivityHistoryComponent } from './student-activity-history/student-activity-history.component';
 import { StudentAdvancedFilterComponent } from './student-advanced-filter/student-advanced-filter.component';
-import { StudentAddressHistoryComponent } from './student-address-history/student-address-history.component';
-import { StudentEnrollmentHistoryComponent } from './student-enrollment-history/student-enrollment-history.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -32,8 +30,6 @@ import { IepEnrolledPipe } from '../../pipes/iep-enrolled.pipe';
     StudentHistoryInfoComponent,
     StudentActivityHistoryComponent,
     StudentAdvancedFilterComponent,
-    StudentAddressHistoryComponent,
-    StudentEnrollmentHistoryComponent,
     IepEnrolledPipe
   ],
   imports: [

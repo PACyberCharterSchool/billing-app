@@ -8,6 +8,7 @@ import { SchoolDistrict } from '../../../models/school-district.model';
 
 import { StudentsService } from '../../../services/students.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
+import { CurrentStudentService } from '../../../services/current-student.service';
 
 @Component({
   selector: 'app-students-list',
@@ -26,10 +27,12 @@ export class StudentsListComponent implements OnInit {
   private items: Student[];
   private startDate: Date;
   private endDate: Date;
+  private selectedStudent: Student;
 
   constructor(
     private studentsService: StudentsService,
     private schoolDistrictService: SchoolDistrictService,
+    private currentStudentService: CurrentStudentService,
     private router: Router) {
       this.advancedSearchEnabled = false;
       this.isDescending = false;
@@ -51,6 +54,8 @@ export class StudentsListComponent implements OnInit {
         console.log('StudentsListComponent.ngOnInit():  school districts are', this.schoolDistricts);
       }
     );
+
+    this.currentStudentService.currentStudent.subscribe((student) => this.selectedStudent = student);
   }
 
   dateSelectedStartDateHandler(date: Date) {
@@ -75,12 +80,12 @@ export class StudentsListComponent implements OnInit {
   }
 
   getStudents($event) {
-   this.studentsService.getStudents().subscribe(
-     data => {
-       this.students = this.items = data['students'];
-       console.log('StudentsListComponent.getStudents():  students are ', this.students);
-     }
-   );
+    this.studentsService.getStudents().subscribe(
+      data => {
+        this.students = this.items = data['students'];
+        console.log('StudentsListComponent.getStudents():  students are ', this.students);
+      }
+    );
   }
 
   sort(property) {
@@ -91,6 +96,8 @@ export class StudentsListComponent implements OnInit {
 
   showStudentDetails(studentId: number) {
     console.log('StudentsListComponent.showStudentDetails():  studentId is ', studentId);
+    const s: Student = this.students.find((student) => student.id === studentId);
+    this.currentStudentService.changeStudent(s);
     this.router.navigate(['/students', { id: studentId, outlets: {'action': [`${studentId}`]} }]);
   }
 

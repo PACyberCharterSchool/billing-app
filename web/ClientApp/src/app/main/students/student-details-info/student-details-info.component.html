@@ -1,17 +1,17 @@
 <div class='row'>
   <div class='col-md-12'>
     <div class='col-md-12 student-bio-info'>
-      <h2>{{studentInfo?.firstName}} {{studentInfo?.middleInitial}} {{studentInfo?.lastName}}</h2>
-      <h4>{{studentInfo?.dateOfBirth | date: 'MM/dd/yyyy'}} &#8226; {{studentInfo?.street1}} {{studentInfo?.street2}} {{studentInfo?.city}}, {{studentInfo?.state}} {{studentInfo?.zipCode}}</h4>
+      <h2>{{student?.firstName}} {{student?.middleInitial}} {{student?.lastName}}</h2>
+      <h4>{{student?.dateOfBirth | date: 'MM/dd/yyyy'}} &#8226; {{student?.street1}} {{student?.street2}} {{student?.city}}, {{student?.state}} {{student?.zipCode}}</h4>
     </div>
     <div class='col-md-12 student-school-info'>
       <table>
         <tbody>
           <tr>
             <td><strong>Grade:</strong></td>
-            <td>{{studentInfo?.grade}}</td>
+            <td>{{student?.grade}}</td>
             <td><strong>PA Cyber ID:</strong></td>
-            <td>{{studentInfo?.paCyberId}}</td>
+            <td>{{student?.paCyberId}}</td>
             <td><strong>First Date:</strong></td>
             <td></td>
           </tr>
@@ -19,7 +19,7 @@
             <td><strong>School</strong>:</td>
             <td></td>
             <td><strong>PA Secure ID:</strong></td>
-            <td>{{studentInfo?.paSecuredId}}</td>
+            <td>{{student?.paSecuredId}}</td>
             <td><strong>Last Date:</strong></td>
             <td></td>
           </tr>

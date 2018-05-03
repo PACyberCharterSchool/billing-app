@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { StudentsService } from '../../../services/students.service';
+import { CurrentStudentService } from '../../../services/current-student.service';
 
 import { Student } from '../../../models/student.model';
 
@@ -15,7 +16,10 @@ export class StudentsDetailComponent implements OnInit, OnDestroy {
   private student: Student;
   private subscription: any;
 
-  constructor(private studentsService: StudentsService, private route: ActivatedRoute) { }
+  constructor(
+    private studentsService: StudentsService,
+    private currentStudentService: CurrentStudentService,
+    private route: ActivatedRoute) { }
 
   ngOnInit() {
     this.subscription = this.route.params.subscribe(
@@ -29,6 +33,8 @@ export class StudentsDetailComponent implements OnInit, OnDestroy {
        );
       }
     );
+
+    this.currentStudentService.currentStudent.subscribe((s) => this.student = s);
   }
 
   ngOnDestroy() {

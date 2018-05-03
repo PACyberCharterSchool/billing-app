@@ -19,6 +19,7 @@ import { AuthenticationGuardService } from './services/authentication-guard.serv
 import { StudentsService } from './services/students.service';
 import { SchoolDistrictService } from './services/school-district.service';
 import { UtilitiesService } from './services/utilities.service';
+import { CurrentStudentService } from './services/current-student.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
@@ -50,9 +51,10 @@ const pacbillProviders = [
   AppTitleService,
   AuthenticationGuardService,
   AuthenticationService,
+  CurrentStudentService,
+  SchoolDistrictService,
   StudentsService,
   tokenInterceptor,
-  SchoolDistrictService,
   UtilitiesService
 ];
 

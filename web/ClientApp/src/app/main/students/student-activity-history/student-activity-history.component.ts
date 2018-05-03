@@ -1,6 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 import { UtilitiesService } from '../../../services/utilities.service';
+import { StudentsService } from '../../../services/students.service';
+import { CurrentStudentService } from '../../../services/current-student.service';
+
+import { Student } from '../../../models/student.model';
+import { StudentActivityRecord } from '../../../models/student-activity-record.model';
 
 const ACTIVITY_TYPES = [
   'Address Change',
@@ -54,17 +59,29 @@ const activityList = [
 })
 export class StudentActivityHistoryComponent implements OnInit {
   private activityTypes = ACTIVITY_TYPES;
-  private activities = activityList;
+  private activities;
   private property: string;
   private direction: number;
   private isDescending: boolean;
+  private student: Student;
 
-  constructor(private utilities: UtilitiesService) {
+  constructor(
+    private utilities: UtilitiesService,
+    private studentsService: StudentsService,
+    private currentStudentService: CurrentStudentService) {
     this.property = 'date';
     this.direction = 1;
+    this.activities = [];
   }
 
   ngOnInit() {
+    this.currentStudentService.currentStudent.subscribe((s) => this.student = s);
+    this.studentsService.getStudentActivityRecordsByStudentId(this.student.id).subscribe(
+      data => {
+        console.log(`StudentActivityHistoryComponent.ngOnInit(): data is ${data['studentActivityRecords']}.`);
+        this.activities = data['studentActivityRecords'];
+      }
+    );
   }
 
   filterStudentHistoryByType(type: string) {
