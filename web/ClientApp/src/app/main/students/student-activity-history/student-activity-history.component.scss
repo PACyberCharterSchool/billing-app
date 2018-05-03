@@ -1,18 +1,41 @@
 .student-activity-history-title-row {
-  div {
-    div {
-      div {
-        h5 {
-          color: #58a917;
-        }
-      }
+  width: 100%;
 
-      div.reset-button-col {
-        display: flex;
-        flex-direction: column;
-        height: 100px;
-        justify-content: center;
-      }
+  div {
+    h5 {
+      color: #58a917;
+    }
+
+    div.col-md-2 {
+      display: inline-block;
+    }
+
+    div.reset-button-col {
+      display: inline-block;
+      padding-left: 12%;
+    }
+  }
+}
+
+.student-activity-history-content-row {
+  width: 100%;
+  height: 340px;
+  overflow: hidden;
+
+  table {
+    margin-left: 15px;
+
+    // thead {
+    //   tr {
+    //     display: block;
+    //   }
+    // }
+
+    tbody {
+      // display: block;
+      overflow: auto;
+      height: 340px;
+      width: 100%;
     }
   }
 }
