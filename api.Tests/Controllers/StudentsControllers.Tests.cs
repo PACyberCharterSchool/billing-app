@@ -88,7 +88,7 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task GetManyReturnsEmptyListWhenNull()
 		{
-			_students.Setup(s => s.GetMany(null, null, 0, 0)).Returns((List<Student>)null);
+			_students.Setup(s => s.GetMany(null, null, 0, 0, null)).Returns((List<Student>)null);
 
 			var result = await _uut.GetMany(new StudentsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<ObjectResult>());

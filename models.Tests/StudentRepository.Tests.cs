@@ -111,7 +111,7 @@ namespace models.Tests
 			_context.AddRange(students);
 			_context.SaveChanges();
 
-			var actual = _uut.GetMany("FirstName", null);
+			var actual = _uut.GetMany(sort: "FirstName");
 			Assert.That(actual, Has.Count.EqualTo(3));
 			Assert.That(actual[0].Id, Is.EqualTo(3));
 			Assert.That(actual[1].Id, Is.EqualTo(2));
@@ -129,7 +129,7 @@ namespace models.Tests
 			_context.AddRange(students);
 			_context.SaveChanges();
 
-			var actual = _uut.GetMany(null, SortDirection.Descending);
+			var actual = _uut.GetMany(dir: SortDirection.Descending);
 			Assert.That(actual, Has.Count.EqualTo(3));
 			Assert.That(actual[0].Id, Is.EqualTo(3));
 			Assert.That(actual[1].Id, Is.EqualTo(2));
@@ -147,7 +147,7 @@ namespace models.Tests
 			_context.AddRange(students);
 			_context.SaveChanges();
 
-			var actual = _uut.GetMany(1, 0);
+			var actual = _uut.GetMany(skip: 1);
 			Assert.That(actual, Has.Count.EqualTo(2));
 			Assert.That(actual[0].Id, Is.EqualTo(2));
 			Assert.That(actual[1].Id, Is.EqualTo(3));
@@ -164,7 +164,7 @@ namespace models.Tests
 			_context.AddRange(students);
 			_context.SaveChanges();
 
-			var actual = _uut.GetMany(0, 1);
+			var actual = _uut.GetMany(take: 1);
 			Assert.That(actual, Has.Count.EqualTo(1));
 			Assert.That(actual[0].Id, Is.EqualTo(1));
 		}
@@ -187,7 +187,7 @@ namespace models.Tests
 			var exp = Expression.Lambda<Func<Student, bool>>(method, param);
 			_parser.Setup(p => p.Parse<Student>("x", filter)).Returns(exp);
 
-			var actual = _uut.GetMany(filter);
+			var actual = _uut.GetMany(filter: filter);
 			Assert.That(actual, Has.Count.EqualTo(1));
 			Assert.That(actual[0].FirstName, Is.EqualTo(students[1].FirstName));
 		}
