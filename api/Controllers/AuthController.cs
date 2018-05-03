@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using api.Services;
+using models;
 
 namespace api.Controllers
 {
@@ -49,6 +50,8 @@ namespace api.Controllers
 
 		[HttpPost("login")]
 		[ProducesResponseType(typeof(TokenResponse), 200)]
+		[ProducesResponseType(typeof(ErrorsResponse), 400)]
+		[ProducesResponseType(typeof(ErrorResponse), 500)]
 		public async Task<IActionResult> Login([FromBody]LoginArgs args)
 		{
 			if (!ModelState.IsValid)

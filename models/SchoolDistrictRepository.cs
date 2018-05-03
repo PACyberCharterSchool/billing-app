@@ -9,7 +9,9 @@ namespace models
 	public interface ISchoolDistrictRepository
 	{
 		SchoolDistrict CreateOrUpdate(SchoolDistrict district);
+		SchoolDistrict CreateOrUpdate(DateTime time, SchoolDistrict district);
 		SchoolDistrict Get(int id);
+		SchoolDistrict GetByAun(int aun);
 		IList<SchoolDistrict> GetMany();
 	}
 
@@ -28,13 +30,20 @@ namespace models
 
 		public SchoolDistrict Get(int id) => _schoolDistricts.SingleOrDefault(d => d.Id == id);
 
+		public SchoolDistrict GetByAun(int aun) => _schoolDistricts.SingleOrDefault(d => d.Aun == aun);
+
 		public IList<SchoolDistrict> GetMany() => _schoolDistricts.OrderBy(d => d.Id).ToList();
 
-		public SchoolDistrict CreateOrUpdate(SchoolDistrict update)
+		public SchoolDistrict CreateOrUpdate(SchoolDistrict update) => CreateOrUpdate(DateTime.Now, update);
+
+		public SchoolDistrict CreateOrUpdate(DateTime time, SchoolDistrict update)
 		{
 			var district = _schoolDistricts.FirstOrDefault(d => d.Id == update.Id);
 			if (district == null)
 			{
+				update.Created = time;
+				update.LastUpdated = time;
+
 				_schoolDistricts.Add(update);
 				_context.SaveChanges();
 				return update;
@@ -55,6 +64,7 @@ namespace models
 			if (district.PaymentType != update.PaymentType)
 				district.PaymentType = update.PaymentType;
 
+			district.LastUpdated = time;
 			_schoolDistricts.Update(district);
 			_context.SaveChanges();
 

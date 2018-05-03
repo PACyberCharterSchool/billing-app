@@ -50,7 +50,7 @@ namespace api.Tests.Controllers
 		public async Task GetManyAllArgsReturnsList()
 		{
 			var sort = "FirstName";
-			var dir = "asc";
+			var dir = SortDirection.Ascending;
 			var skip = 10;
 			var take = 100;
 			var students = new List<Student>{
@@ -61,7 +61,7 @@ namespace api.Tests.Controllers
 			var result = await _uut.GetMany(new StudentsController.GetManyArgs
 			{
 				Sort = sort,
-				Dir = dir,
+				Dir = dir.Value,
 				Skip = skip,
 				Take = take,
 			});
@@ -88,7 +88,7 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task GetManyReturnsEmptyListWhenNull()
 		{
-			_students.Setup(s => s.GetMany(null, null, 0, 0)).Returns((List<Student>)null);
+			_students.Setup(s => s.GetMany(null, null, 0, 0, null)).Returns((List<Student>)null);
 
 			var result = await _uut.GetMany(new StudentsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<ObjectResult>());

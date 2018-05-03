@@ -1,12 +1,16 @@
 using System;
 using System.Collections.Generic;
 
+using Newtonsoft.Json;
+
 namespace models
 {
-	public static class SchoolDistrictPaymentType
+	public class SchoolDistrictPaymentType : Enumerable<SchoolDistrictPaymentType>
 	{
-		public const string ACH = "ACH";
-		public const string CHECK = "Check";
+		private SchoolDistrictPaymentType(string value) : base(value) { }
+
+		public static readonly SchoolDistrictPaymentType Ach = new SchoolDistrictPaymentType("ACH");
+		public static readonly SchoolDistrictPaymentType Check = new SchoolDistrictPaymentType("Check");
 	}
 
 	public class SchoolDistrict
@@ -16,7 +20,10 @@ namespace models
 		public string Name { get; set; }
 		public decimal Rate { get; set; }
 		public decimal? AlternateRate { get; set; }
-		public string PaymentType { get; set; }
+
+		[JsonConverter(typeof(SchoolDistrictPaymentTypeJsonConverter))]
+		public SchoolDistrictPaymentType PaymentType { get; set; }
+
 		public DateTime Created { get; set; }
 		public DateTime LastUpdated { get; set; }
 

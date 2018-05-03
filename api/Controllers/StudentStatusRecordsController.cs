@@ -4,9 +4,11 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Threading.Tasks;
 
 using models;
+using models.Transformers;
 
 namespace api.Controllers
 {
@@ -15,21 +17,21 @@ namespace api.Controllers
 	{
 		private readonly PacBillContext _context;
 		private readonly IPendingStudentStatusRecordRepository _pending;
-		private readonly ICommittedStudentStatusRecordRepository _committed;
 		private readonly IAuditRecordRepository _audits;
+		private readonly ITransformer _transformer;
 		private readonly ILogger<StudentStatusRecordsController> _logger;
 
 		public StudentStatusRecordsController(
 			PacBillContext context,
 			IPendingStudentStatusRecordRepository pending,
-			ICommittedStudentStatusRecordRepository committed,
 			IAuditRecordRepository audits,
+			ITransformer transformer,
 			ILogger<StudentStatusRecordsController> logger)
 		{
 			_context = context;
 			_pending = pending;
-			_committed = committed;
 			_audits = audits;
+			_transformer = transformer;
 			_logger = logger;
 		}
 
@@ -55,11 +57,11 @@ namespace api.Controllers
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
-			var records = await Task.Run(() => _pending.GetMany(args.Skip, args.Take));
+			var records = await Task.Run(() => _pending.GetMany(skip: args.Skip, take: args.Take));
 			if (records == null)
 				records = new List<PendingStudentStatusRecord>();
 
-			return new ObjectResult(new PendingStudentStatusRecordsResponse { StudentStatusRecords = records });
+			return new ObjectResult(new PendingStudentStatusRecordsResponse { StudentStatusRecords = records.ToList() });
 		}
 
 		[HttpPost("pending/commit")]
@@ -67,42 +69,13 @@ namespace api.Controllers
 		public async Task<IActionResult> Commit()
 		{
 			var pending = await Task.Run(() => _pending.GetMany());
-			if (pending == null || pending.Count == 0)
+			if (pending == null)
 				return Ok();
-
-			var committed = new List<CommittedStudentStatusRecord>();
-			foreach (var p in pending)
-				committed.Add(new CommittedStudentStatusRecord
-				{
-					SchoolDistrictId = p.SchoolDistrictId,
-					SchoolDistrictName = p.SchoolDistrictName,
-					StudentId = p.StudentId,
-					StudentFirstName = p.StudentFirstName,
-					StudentMiddleInitial = p.StudentMiddleInitial,
-					StudentLastName = p.StudentLastName,
-					StudentGradeLevel = p.StudentGradeLevel,
-					StudentDateOfBirth = p.StudentDateOfBirth,
-					StudentStreet1 = p.StudentStreet1,
-					StudentStreet2 = p.StudentStreet2,
-					StudentCity = p.StudentCity,
-					StudentState = p.StudentState,
-					StudentZipCode = p.StudentZipCode,
-					ActivitySchoolYear = p.ActivitySchoolYear,
-					StudentEnrollmentDate = p.StudentEnrollmentDate,
-					StudentWithdrawalDate = p.StudentWithdrawalDate,
-					StudentIsSpecialEducation = p.StudentIsSpecialEducation,
-					StudentCurrentIep = p.StudentCurrentIep,
-					StudentFormerIep = p.StudentFormerIep,
-					StudentNorep = p.StudentNorep,
-					StudentPaSecuredId = p.StudentPaSecuredId,
-					BatchTime = p.BatchTime,
-					BatchFilename = p.BatchFilename,
-					BatchHash = p.BatchHash,
-				});
 
 			using (var tx = _context.Database.BeginTransaction())
 			{
-				_committed.CreateMany(committed);
+				_transformer.Transform(pending).ToList();
+
 				_pending.Truncate();
 
 				var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
@@ -112,6 +85,7 @@ namespace api.Controllers
 					Activity = AuditRecordActivity.COMMIT_GENIUS,
 				});
 
+				_context.SaveChanges();
 				tx.Commit();
 			}
 

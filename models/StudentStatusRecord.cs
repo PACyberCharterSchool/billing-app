@@ -7,7 +7,7 @@ namespace models
 		public int Id { get; set; }
 		public int SchoolDistrictId { get; set; }
 		public string SchoolDistrictName { get; set; }
-		public int StudentId { get; set; }
+		public string StudentId { get; set; }
 		public string StudentFirstName { get; set; }
 		public string StudentMiddleInitial { get; set; }
 		public string StudentLastName { get; set; }
@@ -18,7 +18,7 @@ namespace models
 		public string StudentCity { get; set; }
 		public string StudentState { get; set; }
 		public string StudentZipCode { get; set; }
-		public string ActivitySchoolYear { get; set; }
+		public string ActivitySchoolYear { get; set; } // TODO(Erik): BatchSchoolYear?
 		public DateTime StudentEnrollmentDate { get; set; }
 		public DateTime? StudentWithdrawalDate { get; set; }
 		public bool StudentIsSpecialEducation { get; set; }
@@ -36,5 +36,34 @@ namespace models
 	public class CommittedStudentStatusRecord : StudentStatusRecord
 	{
 		public DateTime CommitTime { get; set; }
+
+		public static CommittedStudentStatusRecord FromPendingStudentStatusRecord(PendingStudentStatusRecord record) =>
+			new CommittedStudentStatusRecord
+			{
+				SchoolDistrictId = record.SchoolDistrictId,
+				SchoolDistrictName = record.SchoolDistrictName,
+				StudentId = record.StudentId,
+				StudentFirstName = record.StudentFirstName,
+				StudentMiddleInitial = record.StudentMiddleInitial,
+				StudentLastName = record.StudentLastName,
+				StudentGradeLevel = record.StudentGradeLevel,
+				StudentDateOfBirth = record.StudentDateOfBirth,
+				StudentStreet1 = record.StudentStreet1,
+				StudentStreet2 = record.StudentStreet2,
+				StudentCity = record.StudentCity,
+				StudentState = record.StudentState,
+				StudentZipCode = record.StudentZipCode,
+				ActivitySchoolYear = record.ActivitySchoolYear,
+				StudentEnrollmentDate = record.StudentEnrollmentDate,
+				StudentWithdrawalDate = record.StudentWithdrawalDate,
+				StudentIsSpecialEducation = record.StudentIsSpecialEducation,
+				StudentCurrentIep = record.StudentCurrentIep,
+				StudentFormerIep = record.StudentFormerIep,
+				StudentNorep = record.StudentNorep,
+				StudentPaSecuredId = record.StudentPaSecuredId,
+				BatchTime = record.BatchTime,
+				BatchFilename = record.BatchFilename,
+				BatchHash = record.BatchHash,
+			};
 	}
 }

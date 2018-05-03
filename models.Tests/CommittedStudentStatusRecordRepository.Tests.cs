@@ -42,7 +42,7 @@ namespace models.Tests
 			{
 				SchoolDistrictId = 123456789,
 				SchoolDistrictName = "Some Name",
-				StudentId = 234567890,
+				StudentId = "234567890",
 				StudentFirstName = "Bob",
 				StudentMiddleInitial = "C",
 				StudentLastName = "Testy",
@@ -66,7 +66,7 @@ namespace models.Tests
 				BatchHash = "hash",
 			};
 
-			var result = _uut.Create(time, record);
+			var result = _context.SaveChanges(() => _uut.Create(time, record));
 			Assert.That(result, Is.EqualTo(record));
 
 			var actual = _context.CommittedStudentStatusRecords.First(r => r.Id == result.Id);
@@ -82,7 +82,7 @@ namespace models.Tests
 			_context.CommittedStudentStatusRecords.Add(record);
 			_context.SaveChanges();
 
-			Assert.That(() => _uut.Create(record), Throws.TypeOf<ArgumentException>());
+			Assert.That(() => _context.SaveChanges(() => _uut.Create(record)), Throws.TypeOf<ArgumentException>());
 		}
 
 		[Test]
@@ -95,7 +95,7 @@ namespace models.Tests
 				new CommittedStudentStatusRecord(),
 			};
 
-			var result = _uut.CreateMany(time, records);
+			var result = _context.SaveChanges(() => _uut.CreateMany(time, records));
 			Assert.That(result, Is.EqualTo(records));
 
 			var actual = _context.CommittedStudentStatusRecords.ToList();
@@ -115,7 +115,7 @@ namespace models.Tests
 			_context.CommittedStudentStatusRecords.AddRange(records);
 			_context.SaveChanges();
 
-			Assert.That(() => _uut.CreateMany(records), Throws.TypeOf<ArgumentException>());
+			Assert.That(() => _context.SaveChanges(() => _uut.CreateMany(records)), Throws.TypeOf<ArgumentException>());
 		}
 	}
 }

@@ -12,9 +12,10 @@ using models;
 namespace models.Migrations
 {
     [DbContext(typeof(PacBillContext))]
-    partial class PacBillContextModelSnapshot : ModelSnapshot
+    [Migration("20180501161416_ActivitySequences")]
+    partial class ActivitySequences
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,7 +73,7 @@ namespace models.Migrations
 
                     b.Property<string>("StudentGradeLevel");
 
-                    b.Property<string>("StudentId");
+                    b.Property<int>("StudentId");
 
                     b.Property<bool>("StudentIsSpecialEducation");
 
@@ -130,7 +131,7 @@ namespace models.Migrations
 
                     b.Property<string>("StudentGradeLevel");
 
-                    b.Property<string>("StudentId");
+                    b.Property<int>("StudentId");
 
                     b.Property<bool>("StudentIsSpecialEducation");
 
@@ -219,7 +220,7 @@ namespace models.Migrations
 
                     b.Property<DateTime?>("NorepDate");
 
-                    b.Property<string>("PACyberId");
+                    b.Property<int>("PACyberId");
 
                     b.Property<ulong?>("PASecuredId");
 
@@ -238,8 +239,7 @@ namespace models.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("PACyberId")
-                        .IsUnique()
-                        .HasFilter("[PACyberId] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("SchoolDistrictId");
 
@@ -258,7 +258,7 @@ namespace models.Migrations
 
                     b.Property<string>("NextData");
 
-                    b.Property<string>("PACyberId");
+                    b.Property<int>("PACyberId");
 
                     b.Property<string>("PreviousData");
 

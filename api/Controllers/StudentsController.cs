@@ -37,7 +37,7 @@ namespace api.Controllers
 			[StudentField]
 			public string Sort { get; set; }
 
-			[RegularExpression("^(?:a|de)sc$")]
+			[EnumerableValidation(typeof(SortDirection))]
 			public string Dir { get; set; }
 
 			[Range(0, int.MaxValue)]
@@ -62,7 +62,7 @@ namespace api.Controllers
 			{
 				students = await Task.Run(() => _students.GetMany(
 					sort: args.Sort,
-					dir: args.Dir,
+					dir: string.IsNullOrWhiteSpace(args.Dir) ? null : SortDirection.FromString(args.Dir),
 					skip: args.Skip,
 					take: args.Take,
 					filter: args.Filter
