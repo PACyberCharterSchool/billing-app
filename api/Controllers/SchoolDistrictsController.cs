@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -71,7 +72,7 @@ namespace api.Controllers
 			[MinLength(1)]
 			public string Name { get; set; }
 
-			[Required]
+			[BindRequired]
 			[Range(0, double.PositiveInfinity)]
 			public decimal Rate { get; set; }
 
@@ -79,12 +80,13 @@ namespace api.Controllers
 			public decimal? AlternateRate { get; set; }
 
 			[Required]
-			[RegularExpression("^ACH|Check$")]
-			public string PaymentType { get; set; }
+			[JsonConverter(typeof(SchoolDistrictPaymentTypeJsonConverter))]
+			public SchoolDistrictPaymentType PaymentType { get; set; }
 		}
 
 		[HttpPut("{id}")]
 		[Authorize(Policy = "PAY+")]
+		[ProducesResponseType(200)]
 		[ProducesResponseType(typeof(ErrorsResponse), 400)]
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> Update(int id, [FromBody]SchoolDistrictUpdate update)

@@ -39,8 +39,6 @@ namespace models
 				record.Timestamp = time;
 
 			_records.AddRange(records);
-			_context.SaveChanges();
-
 			return records;
 		}
 	}

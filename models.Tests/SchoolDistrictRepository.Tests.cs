@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
 
 using NUnit.Framework;
@@ -55,6 +56,28 @@ namespace models.Tests
 			Assert.IsNull(actual);
 		}
 
+
+		[Test]
+		public void GetByAunReturnsSchoolDistrictIfExists()
+		{
+			var aun = 3;
+			var district = new SchoolDistrict { Aun = aun };
+			_context.Add(district);
+			_context.SaveChanges();
+
+			var actual = _uut.GetByAun(aun);
+			Assert.That(actual, Is.EqualTo(district));
+		}
+
+		[Test]
+		public void GetByAunReturnsNullIfNotExists()
+		{
+			var aun = 3;
+
+			var actual = _uut.GetByAun(aun);
+			Assert.IsNull(actual);
+		}
+
 		[Test]
 		public void GetManyReturnsAll()
 		{
@@ -92,26 +115,30 @@ namespace models.Tests
 		[Test]
 		public void CreateOrUpdateWithNewObjectCreates()
 		{
+			var time = DateTime.Now;
 			var district = new SchoolDistrict
 			{
 				Name = "Bob",
 				Rate = 1.0m,
 				AlternateRate = null,
-				PaymentType = SchoolDistrictPaymentType.ACH,
+				PaymentType = SchoolDistrictPaymentType.Ach,
 			};
 
-			var result = _uut.CreateOrUpdate(district);
+			var result = _uut.CreateOrUpdate(time, district);
 			Assert.That(result, Is.EqualTo(district));
 
 			var actual = _context.SchoolDistricts.First(d => d.Id == result.Id);
 			Assert.That(actual.Name, Is.EqualTo(district.Name));
 			Assert.That(actual.Rate, Is.EqualTo(district.Rate));
 			Assert.That(actual.AlternateRate, Is.EqualTo(district.AlternateRate));
+			Assert.That(actual.Created, Is.EqualTo(time));
+			Assert.That(actual.LastUpdated, Is.EqualTo(time));
 		}
 
 		[Test]
 		public void CreateOrUpdateWithSameObjectUpdates()
 		{
+			var time = DateTime.Now;
 			var id = 3;
 			var district = new SchoolDistrict
 			{
@@ -120,7 +147,8 @@ namespace models.Tests
 				Name = "Bob",
 				Rate = 1.0m,
 				AlternateRate = null,
-				PaymentType = SchoolDistrictPaymentType.ACH,
+				PaymentType = SchoolDistrictPaymentType.Ach,
+				LastUpdated = time.AddDays(-1),
 			};
 			_context.Add(district);
 			_context.SaveChanges();
@@ -129,7 +157,7 @@ namespace models.Tests
 			district.Name = "Charlie";
 			district.Rate = 2.0m;
 			district.AlternateRate = 3.0m;
-			district.PaymentType = SchoolDistrictPaymentType.CHECK;
+			district.PaymentType = SchoolDistrictPaymentType.Check;
 			_uut.CreateOrUpdate(district);
 
 			var actual = _context.SchoolDistricts.First(d => d.Id == id);
@@ -137,6 +165,7 @@ namespace models.Tests
 			Assert.That(actual.Rate, Is.EqualTo(district.Rate));
 			Assert.That(actual.AlternateRate, Is.EqualTo(district.AlternateRate));
 			Assert.That(actual.PaymentType, Is.EqualTo(district.PaymentType));
+			Assert.That(actual.LastUpdated.Date, Is.EqualTo(time.Date));
 		}
 
 		[Test]
@@ -150,7 +179,7 @@ namespace models.Tests
 				Name = "Bob",
 				Rate = 1.0m,
 				AlternateRate = null,
-				PaymentType = SchoolDistrictPaymentType.ACH,
+				PaymentType = SchoolDistrictPaymentType.Ach,
 			};
 			_context.Add(district);
 			_context.SaveChanges();
@@ -162,7 +191,7 @@ namespace models.Tests
 				Name = "Charlie",
 				Rate = 2.0m,
 				AlternateRate = 3.0m,
-				PaymentType = SchoolDistrictPaymentType.CHECK,
+				PaymentType = SchoolDistrictPaymentType.Check,
 			};
 			_uut.CreateOrUpdate(updated);
 

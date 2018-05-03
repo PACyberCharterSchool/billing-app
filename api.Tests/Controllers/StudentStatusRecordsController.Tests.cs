@@ -14,6 +14,7 @@ using NUnit.Framework;
 using api.Controllers;
 using api.Tests.Util;
 using models;
+using models.Transformers;
 
 namespace api.Tests.Controllers
 {
@@ -22,8 +23,8 @@ namespace api.Tests.Controllers
 	{
 		private PacBillContext _context;
 		private Mock<IPendingStudentStatusRecordRepository> _pending;
-		private Mock<ICommittedStudentStatusRecordRepository> _committed;
 		private Mock<IAuditRecordRepository> _audits;
+		private Mock<ITransformer> _transformer;
 		private ILogger<StudentStatusRecordsController> _logger;
 
 		private StudentStatusRecordsController _uut;
@@ -36,15 +37,15 @@ namespace api.Tests.Controllers
 				ConfigureWarnings(o => o.Ignore(InMemoryEventId.TransactionIgnoredWarning)).
 				Options);
 			_pending = new Mock<IPendingStudentStatusRecordRepository>();
-			_committed = new Mock<ICommittedStudentStatusRecordRepository>();
 			_audits = new Mock<IAuditRecordRepository>();
+			_transformer = new Mock<ITransformer>();
 			_logger = new TestLogger<StudentStatusRecordsController>();
 
 			_uut = new StudentStatusRecordsController(
 				_context,
 				_pending.Object,
-				_committed.Object,
 				_audits.Object,
+				_transformer.Object,
 				_logger);
 		}
 
@@ -172,21 +173,11 @@ namespace api.Tests.Controllers
 			var result = await _uut.Commit();
 			Assert.That(result, Is.TypeOf<OkResult>());
 
-			_committed.Verify(c => c.CreateMany(It.Is<List<CommittedStudentStatusRecord>>(
-				l => l.Count == 3)), Times.Once);
+			_transformer.Verify(t => t.Transform(It.IsAny<IEnumerable<PendingStudentStatusRecord>>()), Times.Once);
 			_pending.Verify(c => c.Truncate(), Times.Once);
 			_audits.Verify(c => c.Create(It.Is<AuditRecord>(r =>
 				r.Username == username && r.Activity == AuditRecordActivity.COMMIT_GENIUS
 			)), Times.Once);
-		}
-
-		[Test]
-		public async Task CommitOkWhenNoPending()
-		{
-			_pending.Setup(p => p.GetMany()).Returns(new List<PendingStudentStatusRecord>());
-
-			var result = await _uut.Commit();
-			Assert.That(result, Is.TypeOf<OkResult>());
 		}
 
 		[Test]
