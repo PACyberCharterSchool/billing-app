@@ -129,7 +129,7 @@ namespace models.Tests
 			_context.AddRange(students);
 			_context.SaveChanges();
 
-			var actual = _uut.GetMany(null, "desc");
+			var actual = _uut.GetMany(null, SortDirection.Descending);
 			Assert.That(actual, Has.Count.EqualTo(3));
 			Assert.That(actual[0].Id, Is.EqualTo(3));
 			Assert.That(actual[1].Id, Is.EqualTo(2));
