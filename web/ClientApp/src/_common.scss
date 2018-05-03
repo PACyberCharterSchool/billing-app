@@ -8,8 +8,11 @@ body, html {
   overflow: hidden;
   padding: 0;
 
-  h2 {
+  h1, h2, h3, h4, h5 {
     font-family: 'Museo Slab';
+  }
+
+  h2 {
     font-size: 22px;
   }
 
@@ -54,6 +57,11 @@ body, html {
     font-family: 'Museo Slab';
     font-size: 14px;
     font-weight: bold;
+  }
+
+  .btn-outline-primary, .btn-outline-primary:hover {
+    border-color: #58a719;
+    color: #58a719;
   }
 
   .btn-secondary {

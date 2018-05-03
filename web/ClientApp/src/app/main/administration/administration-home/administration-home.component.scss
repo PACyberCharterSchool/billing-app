@@ -1,0 +1,50 @@
+.administration-home-title-row {
+  height: 25%;
+
+  h3 {
+    color: #58a719;
+  }
+}
+
+.administration-home-content-row {
+  height: 75%;
+
+  div.col-md-3 {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    button {
+      background-color: #ffffff;
+      border: 1px solid #dddddd;
+      border-radius: 5px;
+      height: 170px;
+      margin: 0 auto;
+      width: 190px;
+
+      label {
+        color: #4d4d4d;
+      }
+    }
+
+    button#import-student-data-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -410px -200px;
+        height: 140px;
+        width: 160px;
+      }
+    }
+
+    button#school-district-rates-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -655px -215px;
+        height: 140px;
+        width: 160px;
+      }
+    }
+  }
+}

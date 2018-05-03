@@ -1,0 +1,22 @@
+.import-student-data-title-row {
+  div {
+    height: 100%;
+    h3 {
+      color: #58a917;
+    }
+  }
+
+  div.col-md-3 {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.import-student-data-content-row {
+  div {
+    table {
+      overflow-x: scroll;
+      overflow-y: scroll;
+    }
+  }
+}

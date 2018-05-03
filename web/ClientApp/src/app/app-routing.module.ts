@@ -2,25 +2,22 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 
-import { HomeComponent } from './components/home/home.component';
-import { LoginComponent } from './components/login/login.component';
-import { PaymentsRefundsComponent } from './components/payments-refunds/payments-refunds.component';
+import { MainComponent } from './main/main.component';
+import { LoginComponent } from './login/login/login.component';
 
 import { AuthenticationGuardService } from './services/authentication-guard.service';
 
 const routes: Routes = [
-  // { path: '', component: HomeComponent, pathMatch: 'full' },
-  // { path: 'counter', component: CounterComponent },
-  // { path: 'fetch-data', component: FetchDataComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'payments-refunds', component: PaymentsRefundsComponent, canActivate: [ AuthenticationGuardService ] },
-  { path: '', component: HomeComponent, canActivate: [ AuthenticationGuardService ] }
+  { path: '', redirectTo: 'main', pathMatch: 'full' }
 ];
 
 @NgModule({
   imports: [
     RouterModule.forRoot(routes)
   ],
-  exports: [ RouterModule ]
+  exports: [
+    RouterModule
+  ]
 })
 export class AppRoutingModule { }

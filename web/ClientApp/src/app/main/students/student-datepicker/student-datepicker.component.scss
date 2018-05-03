@@ -1,0 +1,22 @@
+.form-group {
+  width: 100%;
+
+  .input-group-append {
+    display: inline-block;
+  }
+
+  input {
+    display: inline-block;
+    width: 75%;
+  }
+}
+
+button {
+  height: 35px;
+  width: 45px;
+
+  i {
+    position: relative;
+    top: -5px;
+  }
+}

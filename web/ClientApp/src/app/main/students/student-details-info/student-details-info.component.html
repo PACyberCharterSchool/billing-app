@@ -1,0 +1,70 @@
+<div class='row'>
+  <div class='col-md-12 student-bio-info'>
+    <h2>{{studentInfo?.firstName}} {{studentInfo?.middleInitial}} {{studentInfo?.lastName}}</h2>
+    <h4>{{studentInfo?.dateOfBirth | date: 'MM/dd/yyyy'}} &#8226; {{studentInfo?.street1}} {{studentInfo?.street2}} {{studentInfo?.city}}, {{studentInfo?.state}} {{studentInfo?.zipCode}}</h4>
+  </div>
+  <div class='col-md-12 student-school-info'>
+    <table>
+      <tbody>
+        <tr>
+          <td><strong>Grade:</strong></td>
+          <td>{{studentInfo?.grade}}</td>
+          <td><strong>PA Cyber ID:</strong></td>
+          <td>{{studentInfo?.paCyberId}}</td>
+          <td><strong>First Date:</strong></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><strong>School</strong>:</td>
+          <td></td>
+          <td><strong>PA Secure ID:</strong></td>
+          <td>{{studentInfo?.paSecuredId}}</td>
+          <td><strong>Last Date:</strong></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><strong>School Year:</strong></td>
+          <td></td>
+          <td><strong>Student Index:</strong></td>
+          <td></td>
+          <td><strong>Education Code:</strong></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td><strong>Student ID:</strong></td>
+          <td></td>
+          <td><strong>Current IEP Date:</strong></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td><strong>Former IEP Date:</strong></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td><strong>NOREP Date:</strong></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td><strong>Enrolled Record Index:</strong></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class='col-md-12'>
+  </div>
+</div>

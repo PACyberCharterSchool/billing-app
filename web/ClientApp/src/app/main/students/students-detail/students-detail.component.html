@@ -1,0 +1,25 @@
+<div class='row student-meta-info-row'>
+  <div class='col-md-9'>
+    <h4>Students | Search Results | <span>{{student?.firstName}} {{student?.middleInitial}} {{student?.lastName}}</span></h4>
+  </div>
+  <div class='col-md-3'>
+    <h4><strong>Last Updated: </strong>{{student?.lastUpdated | date:'MM/dd/yyyy'}}</h4>
+  </div>
+</div>
+<div class='row student-info-row'>
+  <div class='col-md-12'>
+    <app-student-details-info [studentInfo]='student'></app-student-details-info>
+  </div>
+</div>
+<div class='row student-history-info-row'>
+  <div class='col-md-12'>
+    <app-student-history-info></app-student-history-info>
+  </div>
+</div>
+<div class='row'>
+  <div class='col-md-12'>
+    <a [routerLink]='["/students", { outlets: { "action": ["list"] } }]' class='btn btn-primary'>
+        <span class='glyphicon glyphicon-user'></span> Back to Students
+    </a>
+  </div>
+</div>

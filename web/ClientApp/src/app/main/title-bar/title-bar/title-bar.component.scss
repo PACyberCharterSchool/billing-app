@@ -1,0 +1,17 @@
+.title-bar-row {
+  background-color: #ffffff;
+  border-bottom: 1px solid #eaeaea;
+  height: 75px;
+  padding-left: 20px;
+  padding-top: 10px;
+
+  div {
+    height: 100%;
+  }
+
+  .logo {
+    height: 100%;
+    background: url('../../../../assets/images/PA_Cyber_Logo_55PX.png');
+    background-repeat: no-repeat;
+  }
+}

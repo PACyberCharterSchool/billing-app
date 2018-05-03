@@ -1,0 +1,83 @@
+li .glyphicon {
+  margin-right: 10px;
+}
+
+/* Highlighting rules for nav menu items */
+li.link-active {
+  border-left: 5px solid #58a917;
+  border-radius: 1px;
+}
+
+li.link-active a,
+li.link-active a:hover,
+li.link-active a:focus {
+  color: #58a917;
+}
+
+li {
+  a:hover {
+    color: #4d4d4d;
+  }
+}
+
+/* Keep the nav menu independent of scrolling and on top of other items */
+.main-nav {
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.navbar-inverse {
+  background-color: #f4f4f4;
+}
+
+.administration-nav-sub-item {
+  padding-left: 20px;
+
+  a {
+    font-size: 0.80em;
+  }
+}
+
+@media (min-width: 768px) {
+  /* On small screens, convert the nav menu to a vertical sidebar */
+  .main-nav {
+    height: 100%;
+  }
+  .navbar {
+    border-radius: 0px;
+    border-width: 0px;
+    height: 100%;
+  }
+  .navbar-header {
+    float: none;
+  }
+  .navbar-inverse {
+    background-color: #F4F4F4;
+  }
+  .navbar-collapse {
+    border-top: 1px solid #666;
+    padding: 0px;
+  }
+  .navbar ul {
+    float: none;
+  }
+  .navbar li {
+    float: none;
+    font-size: 15px;
+    margin: 0 6px 0 6px;
+    border-bottom: 1px solid #dddddd;
+  }
+  .navbar li a {
+    padding: 10px 16px;
+    border-radius: 4px;
+  }
+  .navbar a {
+    /* If a menu item's text is too long, truncate it */
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

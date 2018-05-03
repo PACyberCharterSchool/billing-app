@@ -1,0 +1,22 @@
+.student-history-type-row {
+  div {
+    h5 {
+      color: #58a917;
+      display: inline-block;
+    }
+  }
+}
+
+.student-history-details-row {
+  div {
+    ngb-tabset {
+      ul {
+        li {
+          a {
+            color: #58a719;
+          }
+        }
+      }
+    }
+  }
+}
