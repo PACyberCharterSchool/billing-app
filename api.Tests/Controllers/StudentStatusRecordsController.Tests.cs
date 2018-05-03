@@ -168,7 +168,7 @@ namespace api.Tests.Controllers
 				new PendingStudentStatusRecord{Id = 2},
 				new PendingStudentStatusRecord{Id = 3},
 			};
-			_pending.Setup(p => p.GetMany()).Returns(pending);
+			_pending.Setup(p => p.GetMany(0, 0)).Returns(pending);
 
 			var result = await _uut.Commit();
 			Assert.That(result, Is.TypeOf<OkResult>());
@@ -183,7 +183,7 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task CommitOkWhenPendingNull()
 		{
-			_pending.Setup(p => p.GetMany()).Returns((List<PendingStudentStatusRecord>)null);
+			_pending.Setup(p => p.GetMany(0, 0)).Returns((List<PendingStudentStatusRecord>)null);
 
 			var result = await _uut.Commit();
 			Assert.That(result, Is.TypeOf<OkResult>());

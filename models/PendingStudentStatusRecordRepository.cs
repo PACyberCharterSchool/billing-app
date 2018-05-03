@@ -8,8 +8,7 @@ namespace models
 {
 	public interface IPendingStudentStatusRecordRepository
 	{
-		IEnumerable<PendingStudentStatusRecord> GetMany();
-		IEnumerable<PendingStudentStatusRecord> GetMany(int skip, int take);
+		IEnumerable<PendingStudentStatusRecord> GetMany(int skip = 0, int take = 0);
 		void Truncate();
 	}
 
@@ -28,9 +27,7 @@ namespace models
 			_logger = logger;
 		}
 
-		public IEnumerable<PendingStudentStatusRecord> GetMany() => GetMany(0, 0);
-
-		public IEnumerable<PendingStudentStatusRecord> GetMany(int skip, int take)
+		public IEnumerable<PendingStudentStatusRecord> GetMany(int skip = 0, int take = 0)
 		{
 			var records = _records.AsQueryable();
 
