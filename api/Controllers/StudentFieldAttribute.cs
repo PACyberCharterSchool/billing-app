@@ -10,7 +10,6 @@ namespace api.Controllers
 		{
 			var field = (string)value;
 
-			// TODO(Erik): case-insensitive
 			if (!string.IsNullOrWhiteSpace(field) && !Student.IsValidField(field))
 				return new ValidationResult($"The field {validationContext.MemberName} contains an invalid Student property.");
 
