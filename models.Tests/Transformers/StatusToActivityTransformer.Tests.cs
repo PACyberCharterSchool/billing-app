@@ -13,12 +13,12 @@ using models.Transformers;
 namespace models.Tests.Transformers
 {
 	[TestFixture]
-	public class StudentStatusRecordTransformerTests
+	public class StatusToActivityTransformerTests
 	{
 		private Mock<IStudentRepository> _students;
 		private Mock<IStudentActivityRecordRepository> _activities;
 
-		private StudentStatusRecordTransformer _uut;
+		private StatusToActivityTransformer _uut;
 
 		[SetUp]
 		public void SetUp()
@@ -26,7 +26,7 @@ namespace models.Tests.Transformers
 			_students = new Mock<IStudentRepository>();
 			_activities = new Mock<IStudentActivityRecordRepository>();
 
-			_uut = new StudentStatusRecordTransformer(_students.Object, _activities.Object);
+			_uut = new StatusToActivityTransformer(_students.Object, _activities.Object);
 		}
 
 		[Test]

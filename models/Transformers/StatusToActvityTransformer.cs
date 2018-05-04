@@ -10,13 +10,13 @@ using FieldTransformers = System.Collections.Generic.List<
 
 namespace models.Transformers
 {
-	public class StudentStatusRecordTransformer :
+	public class StatusToActivityTransformer :
 		Transformer<StudentStatusRecord, StudentActivityRecord>
 	{
 		private readonly IStudentRepository _students;
 		private readonly IStudentActivityRecordRepository _activities;
 
-		public StudentStatusRecordTransformer(
+		public StatusToActivityTransformer(
 			IStudentRepository students,
 			IStudentActivityRecordRepository activities)
 		{
