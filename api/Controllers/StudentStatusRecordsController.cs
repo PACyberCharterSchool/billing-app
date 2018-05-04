@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using models;
@@ -64,32 +65,51 @@ namespace api.Controllers
 			return new ObjectResult(new PendingStudentStatusRecordsResponse { StudentStatusRecords = records.ToList() });
 		}
 
+		private static readonly object _lock = new object();
+
 		[HttpPost("pending/commit")]
 		[Authorize(Policy = "PAY+")]
-		public async Task<IActionResult> Commit()
+		[ProducesResponseType(200)]
+		[ProducesResponseType(423)]
+		public IActionResult Commit()
 		{
-			var pending = await Task.Run(() => _pending.GetMany());
-			if (pending == null)
-				return Ok();
-
-			using (var tx = _context.Database.BeginTransaction())
+			bool acquired = false;
+			try
 			{
-				_transformer.Transform(pending).ToList();
+				// Monitor and async don't play well together, apparently.
+				Monitor.TryEnter(_lock, ref acquired);
+				if (!acquired)
+					return StatusCode(423);
 
-				_pending.Truncate();
+				// var pending = await Task.Run(() => _pending.GetMany());
+				var pending = _pending.GetMany();
+				if (pending == null)
+					return Ok();
 
-				var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
-				_audits.Create(new AuditRecord
+				using (var tx = _context.Database.BeginTransaction())
 				{
-					Username = username,
-					Activity = AuditRecordActivity.COMMIT_GENIUS,
-				});
+					_transformer.Transform(pending).ToList();
 
-				_context.SaveChanges();
-				tx.Commit();
+					_pending.Truncate();
+
+					var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+					_audits.Create(new AuditRecord
+					{
+						Username = username,
+						Activity = AuditRecordActivity.COMMIT_GENIUS,
+					});
+
+					_context.SaveChanges();
+					tx.Commit();
+				}
+
+				return Ok();
 			}
-
-			return Ok();
+			finally
+			{
+				if (acquired)
+					Monitor.Exit(_lock);
+			}
 		}
 	}
 }

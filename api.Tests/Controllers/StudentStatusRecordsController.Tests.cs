@@ -150,7 +150,7 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async Task CommitCommits()
+		public void CommitCommits()
 		{
 			var username = "bob";
 			_uut.ControllerContext = new ControllerContext
@@ -170,7 +170,7 @@ namespace api.Tests.Controllers
 			};
 			_pending.Setup(p => p.GetMany(0, 0)).Returns(pending);
 
-			var result = await _uut.Commit();
+			var result = _uut.Commit();
 			Assert.That(result, Is.TypeOf<OkResult>());
 
 			_transformer.Verify(t => t.Transform(It.IsAny<IEnumerable<PendingStudentStatusRecord>>()), Times.Once);
@@ -181,11 +181,11 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async Task CommitOkWhenPendingNull()
+		public void CommitOkWhenPendingNull()
 		{
 			_pending.Setup(p => p.GetMany(0, 0)).Returns((List<PendingStudentStatusRecord>)null);
 
-			var result = await _uut.Commit();
+			var result = _uut.Commit();
 			Assert.That(result, Is.TypeOf<OkResult>());
 		}
 	}

@@ -90,7 +90,7 @@ namespace models.Transformers
 
 		protected override IEnumerable<Student> Transform(IEnumerable<StudentActivityRecord> records)
 		{
-			// TODO(Erik): mutex to prevent clobbering?
+			// TODO(Erik): instance variable, not static
 			_districtCache = new Dictionary<int, SchoolDistrict>();
 			var studentCache = new Dictionary<string, Student>();
 
