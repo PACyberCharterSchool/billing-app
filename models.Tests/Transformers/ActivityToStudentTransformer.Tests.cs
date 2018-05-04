@@ -126,9 +126,12 @@ namespace models.Tests.Transformers
 			_students.Setup(ss => ss.GetByPACyberId(paCyberId)).Returns(student);
 
 			var districtAun = 123456789;
-			_districts.Setup(ds => ds.GetByAun(districtAun)).Returns((SchoolDistrict)null);
-
 			var districtName = "Some SD";
+			_districts.Setup(ds => ds.GetByAun(districtAun)).Returns((SchoolDistrict)null);
+			_districts.Setup(ds => ds.CreateOrUpdate(
+				It.Is<SchoolDistrict>(d => d.Aun == districtAun && d.Name == districtName))).
+				Returns(new SchoolDistrict { Aun = districtAun });
+
 			var records = new[] {
 				new StudentActivityRecord{
 					PACyberId = paCyberId,
@@ -140,10 +143,6 @@ namespace models.Tests.Transformers
 			var result = _uut.Transform(records).Select(s => (Student)s).ToList();
 			Assert.That(result, Has.Count.EqualTo(1));
 			Assert.That(result[0].SchoolDistrict.Aun, Is.EqualTo(districtAun));
-
-			_districts.Verify(ds => ds.CreateOrUpdate(It.Is<SchoolDistrict>(
-				d => d.Aun == districtAun &&
-				d.Name == districtName)), Times.Once);
 		}
 
 		[Test]
@@ -154,9 +153,12 @@ namespace models.Tests.Transformers
 			_students.Setup(ss => ss.GetByPACyberId(paCyberId)).Returns(student);
 
 			var districtAun = 123456789;
-			_districts.Setup(ds => ds.GetByAun(districtAun)).Returns((SchoolDistrict)null);
-
 			var districtName = "Some SD";
+			_districts.Setup(ds => ds.GetByAun(districtAun)).Returns((SchoolDistrict)null);
+			_districts.Setup(ds => ds.CreateOrUpdate(
+				It.Is<SchoolDistrict>(d => d.Aun == districtAun && d.Name == districtName))).
+				Returns(new SchoolDistrict { Aun = districtAun });
+
 			var records = new[] {
 				new StudentActivityRecord{
 					PACyberId = paCyberId,
@@ -168,10 +170,6 @@ namespace models.Tests.Transformers
 			var result = _uut.Transform(records).Select(s => (Student)s).ToList();
 			Assert.That(result, Has.Count.EqualTo(1));
 			Assert.That(result[0].SchoolDistrict.Aun, Is.EqualTo(districtAun));
-
-			_districts.Verify(ds => ds.CreateOrUpdate(It.Is<SchoolDistrict>(
-				d => d.Aun == districtAun &&
-				d.Name == districtName)), Times.Once);
 		}
 	}
 }

@@ -119,7 +119,7 @@ namespace models.Transformers
 						PACyberId = status.StudentId,
 						Activity = StudentActivity.DistrictWithdrawal,
 						Timestamp = status.StudentWithdrawalDate.Value,
-						PreviousData = status.SchoolDistrictId.ToString(),
+						PreviousData = Join(status.SchoolDistrictId.ToString(), status.SchoolDistrictName),
 						BatchHash = status.BatchHash,
 					}
 			),

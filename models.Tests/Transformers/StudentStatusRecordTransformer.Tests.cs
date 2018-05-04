@@ -326,7 +326,7 @@ namespace models.Tests.Transformers
 			Assert.That(actual, Has.Count.EqualTo(1));
 			Assert.That(actual[0].Activity, Is.EqualTo(StudentActivity.DistrictWithdrawal));
 			Assert.That(actual[0].Timestamp, Is.EqualTo(withdrawDate));
-			Assert.That(actual[0].PreviousData, Is.EqualTo(districtAun.ToString()));
+			Assert.That(actual[0].PreviousData, Is.EqualTo(districtAun.ToString() + "|"));
 			Assert.That(actual[0].NextData, Is.EqualTo(null));
 			Assert.That(actual[0].BatchHash, Is.EqualTo(batchHash));
 		}

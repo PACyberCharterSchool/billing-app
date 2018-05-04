@@ -113,7 +113,7 @@ namespace models.Transformers
 				update(student, record, districtCache);
 
 				if (student.SchoolDistrict != null)
-					_districts.CreateOrUpdate(student.SchoolDistrict);
+					student.SchoolDistrict = _districts.CreateOrUpdate(student.SchoolDistrict);
 
 				_students.CreateOrUpdate(student);
 				yield return student;

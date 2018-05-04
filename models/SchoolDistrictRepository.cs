@@ -39,13 +39,14 @@ namespace models
 		private IList<string> _excludedFields = new List<string>
 		{
 			nameof(SchoolDistrict.Id),
+			nameof(SchoolDistrict.Aun),
 			nameof(SchoolDistrict.Created),
 			nameof(SchoolDistrict.LastUpdated),
 		};
 
 		public SchoolDistrict CreateOrUpdate(DateTime time, SchoolDistrict update)
 		{
-			var district = _schoolDistricts.FirstOrDefault(d => d.Id == update.Id);
+			var district = _schoolDistricts.FirstOrDefault(d => d.Aun == update.Aun);
 			if (district == null)
 			{
 				update.Created = time;

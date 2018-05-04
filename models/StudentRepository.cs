@@ -35,13 +35,14 @@ namespace models
 		private static readonly IList<string> _excludedFields = new List<string>
 		{
 			nameof(Student.Id),
+			nameof(Student.PACyberId),
 			nameof(Student.Created),
 			nameof(Student.LastUpdated),
 		};
 
 		public Student CreateOrUpdate(DateTime time, Student update)
 		{
-			var student = _students.FirstOrDefault(d => d.Id == update.Id);
+			var student = _students.FirstOrDefault(d => d.PACyberId == update.PACyberId);
 			if (student == null)
 			{
 				update.Created = time;
