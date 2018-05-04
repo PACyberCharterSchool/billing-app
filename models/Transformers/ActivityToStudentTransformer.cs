@@ -3,6 +3,18 @@ using System.Collections.Generic;
 
 using models;
 
+using FieldUpdaters = System.Collections.Generic.Dictionary<
+	models.StudentActivity,
+	System.Action<
+		models.Student,
+		models.StudentActivityRecord,
+		System.Collections.Generic.Dictionary<
+			int,
+			models.SchoolDistrict
+		>
+	>
+>;
+
 namespace models.Transformers
 {
 	public class ActivityToStudentTransformer : Transformer<StudentActivityRecord, Student>
@@ -16,19 +28,17 @@ namespace models.Transformers
 			_districts = districts;
 		}
 
-		private static Dictionary<int, SchoolDistrict> _districtCache = null;
-
-		private static void UpdateSchoolDistrict(Student student, string district)
+		private static void UpdateSchoolDistrict(Student student, string district, Dictionary<int, SchoolDistrict> cache)
 		{
 			var parts = district.Split("|");
 			var aun = int.Parse(parts[0]);
 
 			if (student.SchoolDistrict == null)
 			{
-				if (!_districtCache.ContainsKey(aun))
-					_districtCache.Add(aun, new SchoolDistrict { Aun = aun });
+				if (!cache.ContainsKey(aun))
+					cache.Add(aun, new SchoolDistrict { Aun = aun });
 
-				student.SchoolDistrict = _districtCache[aun];
+				student.SchoolDistrict = cache[aun];
 			}
 
 			student.SchoolDistrict.Name = parts[1];
@@ -64,35 +74,33 @@ namespace models.Transformers
 			student.PASecuredId = n;
 		}
 
-		private static Dictionary<StudentActivity, Action<Student, StudentActivityRecord>> _fieldUpdaters =
-			new Dictionary<StudentActivity, Action<Student, StudentActivityRecord>>
-			{
-				{StudentActivity.NewStudent, (s, r) => s.PACyberId = r.PACyberId },
-				{StudentActivity.DateOfBirthChange, (s, r) => s.DateOfBirth = DateTime.Parse(r.NextData)},
-				{StudentActivity.DistrictEnrollment, (s, r) => {
-					s.StartDate = r.Timestamp;
-					UpdateSchoolDistrict(s, r.NextData);
-				}},
-				{StudentActivity.DistrictWithdrawal, (s, r) => {
-					s.EndDate = r.Timestamp;
-					UpdateSchoolDistrict(s, r.PreviousData);
-				}},
-				{StudentActivity.NameChange, (s, r) => UpdateStudentName(s, r.NextData)},
-				{StudentActivity.GradeChange, (s, r) => s.Grade = r.NextData},
-				{StudentActivity.AddressChange, (s, r) => UpdateStudentAddress(s, r.NextData)},
-				{StudentActivity.SpecialEducationEnrollment, (s, r) => s.IsSpecialEducation = bool.Parse(r.NextData)},
-				{StudentActivity.SpecialEducationWithdrawal, (s, r) => s.IsSpecialEducation = bool.Parse(r.NextData)},
-				{StudentActivity.CurrentIepChange, (s, r) => s.CurrentIep = DateTime.Parse(r.NextData)},
-				{StudentActivity.FormerIepChange, (s, r) => s.FormerIep = DateTime.Parse(r.NextData)},
-				{StudentActivity.NorepChange, (s, r) => s.NorepDate = DateTime.Parse(r.NextData)},
-				{StudentActivity.PASecuredChange, (s, r) => UpdateStudentPASecuredId(s, r.NextData)},
-			};
+		private static readonly FieldUpdaters _fieldUpdaters = new FieldUpdaters
+		{
+			{StudentActivity.NewStudent, (s, r, _) => s.PACyberId = r.PACyberId },
+			{StudentActivity.DateOfBirthChange, (s, r, _) => s.DateOfBirth = DateTime.Parse(r.NextData)},
+			{StudentActivity.DistrictEnrollment, (s, r, dc) => {
+				s.StartDate = r.Timestamp;
+				UpdateSchoolDistrict(s, r.NextData, dc);
+			}},
+			{StudentActivity.DistrictWithdrawal, (s, r, dc) => {
+				s.EndDate = r.Timestamp;
+				UpdateSchoolDistrict(s, r.PreviousData, dc);
+			}},
+			{StudentActivity.NameChange, (s, r, _) => UpdateStudentName(s, r.NextData)},
+			{StudentActivity.GradeChange, (s, r, _) => s.Grade = r.NextData},
+			{StudentActivity.AddressChange, (s, r, _) => UpdateStudentAddress(s, r.NextData)},
+			{StudentActivity.SpecialEducationEnrollment, (s, r, _) => s.IsSpecialEducation = bool.Parse(r.NextData)},
+			{StudentActivity.SpecialEducationWithdrawal, (s, r, _) => s.IsSpecialEducation = bool.Parse(r.NextData)},
+			{StudentActivity.CurrentIepChange, (s, r, _) => s.CurrentIep = DateTime.Parse(r.NextData)},
+			{StudentActivity.FormerIepChange, (s, r, _) => s.FormerIep = DateTime.Parse(r.NextData)},
+			{StudentActivity.NorepChange, (s, r, _) => s.NorepDate = DateTime.Parse(r.NextData)},
+			{StudentActivity.PASecuredChange, (s, r, _) => UpdateStudentPASecuredId(s, r.NextData)},
+		};
 
 		protected override IEnumerable<Student> Transform(IEnumerable<StudentActivityRecord> records)
 		{
-			// TODO(Erik): instance variable, not static
-			_districtCache = new Dictionary<int, SchoolDistrict>();
 			var studentCache = new Dictionary<string, Student>();
+			var districtCache = new Dictionary<int, SchoolDistrict>();
 
 			foreach (var record in records)
 			{
@@ -102,7 +110,7 @@ namespace models.Transformers
 				var student = studentCache[record.PACyberId];
 
 				var update = _fieldUpdaters[record.Activity];
-				update(student, record);
+				update(student, record, districtCache);
 
 				if (student.SchoolDistrict != null)
 					_districts.CreateOrUpdate(student.SchoolDistrict);
