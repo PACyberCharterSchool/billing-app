@@ -8,6 +8,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Swashbuckle.AspNetCore.SwaggerGen;
+
 using models;
 using models.Transformers;
 
@@ -70,7 +72,7 @@ namespace api.Controllers
 		[HttpPost("pending/commit")]
 		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(200)]
-		[ProducesResponseType(423)]
+		[SwaggerResponse(statusCode: 423, description: "Locked")]
 		public IActionResult Commit()
 		{
 			bool acquired = false;
