@@ -72,7 +72,7 @@ namespace api.Controllers
 		[HttpPost("pending/commit")]
 		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(200)]
-		[SwaggerResponse(statusCode: 423, description: "Locked")]
+		[SwaggerResponse(statusCode: 423, description: "Locked")] // Swashbuckle sees this as "Client Error".
 		public IActionResult Commit()
 		{
 			bool acquired = false;
@@ -83,7 +83,6 @@ namespace api.Controllers
 				if (!acquired)
 					return StatusCode(423);
 
-				// var pending = await Task.Run(() => _pending.GetMany());
 				var pending = _pending.GetMany();
 				if (pending == null)
 					return Ok();
