@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using static models.Common.PropertyMerger;
+
 namespace models
 {
 	public interface ISchoolDistrictRepository
@@ -34,7 +36,12 @@ namespace models
 
 		public IList<SchoolDistrict> GetMany() => _schoolDistricts.OrderBy(d => d.Id).ToList();
 
-		public SchoolDistrict CreateOrUpdate(SchoolDistrict update) => CreateOrUpdate(DateTime.Now, update);
+		private IList<string> _excludedFields = new List<string>
+		{
+			nameof(SchoolDistrict.Id),
+			nameof(SchoolDistrict.Created),
+			nameof(SchoolDistrict.LastUpdated),
+		};
 
 		public SchoolDistrict CreateOrUpdate(DateTime time, SchoolDistrict update)
 		{
@@ -45,30 +52,16 @@ namespace models
 				update.LastUpdated = time;
 
 				_schoolDistricts.Add(update);
-				_context.SaveChanges();
 				return update;
 			}
 
-			if (district.Aun != update.Aun)
-				district.Aun = update.Aun;
-
-			if (district.Name != update.Name)
-				district.Name = update.Name;
-
-			if (district.Rate != update.Rate)
-				district.Rate = update.Rate;
-
-			if (district.AlternateRate != update.AlternateRate)
-				district.AlternateRate = update.AlternateRate;
-
-			if (district.PaymentType != update.PaymentType)
-				district.PaymentType = update.PaymentType;
-
+			MergeProperties(district, update, _excludedFields);
 			district.LastUpdated = time;
 			_schoolDistricts.Update(district);
-			_context.SaveChanges();
 
 			return district;
 		}
+
+		public SchoolDistrict CreateOrUpdate(SchoolDistrict update) => CreateOrUpdate(DateTime.Now, update);
 	}
 }

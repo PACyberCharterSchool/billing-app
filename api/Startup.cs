@@ -74,6 +74,9 @@ namespace api
 					new StudentStatusRecordTransformer(
 						ctx.GetRequiredService<IStudentRepository>(),
 						ctx.GetRequiredService<IStudentActivityRecordRepository>()),
+					new ActivityToStudentTransformer(
+						ctx.GetRequiredService<IStudentRepository>(),
+						ctx.GetRequiredService<ISchoolDistrictRepository>()),
 				};
 			});
 			#endregion

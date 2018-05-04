@@ -4,10 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using static models.Common.PropertyMerger;
+
 namespace models
 {
 	public interface IStudentRepository
 	{
+		Student CreateOrUpdate(DateTime time, Student update);
+		Student CreateOrUpdate(Student update);
+
 		Student Get(int id);
 		Student GetByPACyberId(string id);
 
@@ -20,12 +25,40 @@ namespace models
 		private readonly IFilterParser _parser;
 		private readonly ILogger<StudentRepository> _logger;
 
-		public StudentRepository(PacBillContext ctx, IFilterParser parser, ILogger<StudentRepository> logger)
+		public StudentRepository(PacBillContext context, IFilterParser parser, ILogger<StudentRepository> logger)
 		{
-			_students = ctx.Students;
+			_students = context.Students;
 			_parser = parser;
 			_logger = logger;
 		}
+
+		private static readonly IList<string> _excludedFields = new List<string>
+		{
+			nameof(Student.Id),
+			nameof(Student.Created),
+			nameof(Student.LastUpdated),
+		};
+
+		public Student CreateOrUpdate(DateTime time, Student update)
+		{
+			var student = _students.FirstOrDefault(d => d.Id == update.Id);
+			if (student == null)
+			{
+				update.Created = time;
+				update.LastUpdated = time;
+
+				_students.Add(update);
+				return update;
+			}
+
+			MergeProperties(student, update, _excludedFields);
+			student.LastUpdated = time;
+			_students.Update(student);
+
+			return student;
+		}
+
+		public Student CreateOrUpdate(Student student) => CreateOrUpdate(DateTime.Now, student);
 
 		public Student Get(int id) => _students.SingleOrDefault(s => s.Id == id);
 

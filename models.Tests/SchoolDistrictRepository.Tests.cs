@@ -124,7 +124,7 @@ namespace models.Tests
 				PaymentType = SchoolDistrictPaymentType.Ach,
 			};
 
-			var result = _uut.CreateOrUpdate(time, district);
+			var result = _context.SaveChanges(() => _uut.CreateOrUpdate(time, district));
 			Assert.That(result, Is.EqualTo(district));
 
 			var actual = _context.SchoolDistricts.First(d => d.Id == result.Id);
@@ -158,7 +158,7 @@ namespace models.Tests
 			district.Rate = 2.0m;
 			district.AlternateRate = 3.0m;
 			district.PaymentType = SchoolDistrictPaymentType.Check;
-			_uut.CreateOrUpdate(district);
+			_context.SaveChanges(() => _uut.CreateOrUpdate(district));
 
 			var actual = _context.SchoolDistricts.First(d => d.Id == id);
 			Assert.That(actual.Name, Is.EqualTo(district.Name));
@@ -193,7 +193,7 @@ namespace models.Tests
 				AlternateRate = 3.0m,
 				PaymentType = SchoolDistrictPaymentType.Check,
 			};
-			_uut.CreateOrUpdate(updated);
+			_context.SaveChanges(() => _uut.CreateOrUpdate(updated));
 
 			var actual = _context.SchoolDistricts.First(d => d.Id == id);
 			Assert.That(actual.Aun, Is.EqualTo(updated.Aun));
