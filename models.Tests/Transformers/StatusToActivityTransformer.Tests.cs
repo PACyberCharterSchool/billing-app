@@ -29,54 +29,6 @@ namespace models.Tests.Transformers
 			_uut = new StatusToActivityTransformer(_students.Object, _activities.Object);
 		}
 
-		[Test]
-		public void TransformCreatesNewStudentRecordIfNotExists()
-		{
-			var studentId = "3";
-			var enrollDate = DateTime.Now.Date;
-			var batchHash = "hash";
-			var statuses = new[] {
-				new StudentStatusRecord{
-					StudentId = studentId,
-					StudentEnrollmentDate = enrollDate,
-					BatchHash = batchHash,
-				},
-			};
-
-			_students.Setup(s => s.GetByPACyberId(studentId)).Returns((Student)null);
-
-			var count = 7;
-			var actual = (_uut.Transform(statuses) as IEnumerable<StudentActivityRecord>).ToList();
-			Assert.That(actual, Has.Count.EqualTo(count)); // TODO(Erik): all the change records
-			Assert.That(actual[0].Activity, Is.EqualTo(StudentActivity.NewStudent));
-			Assert.That(actual[0].PACyberId, Is.EqualTo(studentId));
-			Assert.That(actual[0].Timestamp, Is.EqualTo(enrollDate));
-			Assert.That(actual[0].BatchHash, Is.EqualTo(batchHash));
-
-			_activities.Verify(
-				a => a.Create(It.Is<StudentActivityRecord>(r => r.PACyberId == studentId)),
-				Times.Exactly(count));
-		}
-
-		private static void Assign<T>(T target, string propName, object value)
-		{
-			var param = Expression.Parameter(typeof(T), "x");
-			var prop = Expression.PropertyOrField(param, propName);
-			var type = prop.Type;
-			if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-				type = Nullable.GetUnderlyingType(type);
-
-			var lambda = Expression.Lambda<Action<T>>(
-				body: Expression.Assign(
-					left: prop,
-					right: Expression.Convert(Expression.Constant(Convert.ChangeType(value, type)), prop.Type)
-				),
-				parameters: param
-			);
-			Console.WriteLine($"lambda: {lambda}");
-			lambda.Compile()(target);
-		}
-
 		private static Student NewStudent(string paCyberId) => new Student
 		{
 			PACyberId = paCyberId,
@@ -85,7 +37,7 @@ namespace models.Tests.Transformers
 			MiddleInitial = "M",
 			LastName = "Last",
 			Grade = "0",
-			DateOfBirth = DateTime.MinValue,
+			DateOfBirth = DateTime.Now.AddYears(-18),
 			Street1 = "Street1",
 			Street2 = "Street2",
 			City = "City",
@@ -95,7 +47,7 @@ namespace models.Tests.Transformers
 			CurrentIep = null,
 			FormerIep = null,
 			NorepDate = null,
-			StartDate = DateTime.MinValue,
+			StartDate = DateTime.Now.AddMonths(-6),
 			EndDate = null,
 			SchoolDistrict = new SchoolDistrict
 			{
@@ -104,10 +56,10 @@ namespace models.Tests.Transformers
 			},
 		};
 
-		private static StudentStatusRecord NewStatusRecord(string paCyberId, DateTime enrollDate, string batchHash, Student student)
+		private static StudentStatusRecord NewStatusRecord(DateTime enrollDate, string batchHash, Student student)
 			=> new StudentStatusRecord
 			{
-				StudentId = paCyberId,
+				StudentId = student.PACyberId,
 				StudentEnrollmentDate = enrollDate,
 				BatchHash = batchHash,
 
@@ -135,6 +87,86 @@ namespace models.Tests.Transformers
 			};
 
 		[Test]
+		public void TransformCreatesNewStudentRecordsIfNotExists()
+		{
+			var paCyberId = "3";
+			var enrollDate = DateTime.Now.Date;
+			var batchHash = "hash";
+			var statuses = new[] {
+				NewStatusRecord(enrollDate, batchHash, NewStudent(paCyberId)),
+		};
+
+			_students.Setup(s => s.GetByPACyberId(paCyberId)).Returns((Student)null);
+
+			var activities = new[] {
+				StudentActivity.NewStudent,
+				StudentActivity.DateOfBirthChange,
+				StudentActivity.NameChange,
+				StudentActivity.GradeChange,
+				StudentActivity.AddressChange,
+				StudentActivity.DistrictEnrollment,
+			};
+
+			var actual = _uut.Transform(statuses).Select(s => (StudentActivityRecord)s).ToList();
+			Assert.That(actual, Has.Count.EqualTo(activities.Length));
+
+			for (int i = 0; i < activities.Length; i++)
+			{
+				var record = actual[i];
+				Console.WriteLine($"activity: {record.Activity}");
+				var expected = activities[i];
+				Assert.That(record.Activity, Is.EqualTo(expected));
+				Assert.That(record.PACyberId, Is.EqualTo(paCyberId));
+				Assert.That(record.Timestamp, Is.EqualTo(enrollDate));
+				Assert.That(record.BatchHash, Is.EqualTo(batchHash));
+
+				var sequence = i + 1;
+				Assert.That(actual[i].Sequence, Is.EqualTo(sequence));
+			}
+
+			_activities.Verify(
+				a => a.Create(It.Is<StudentActivityRecord>(r => r.PACyberId == paCyberId)),
+						Times.Exactly(activities.Length));
+		}
+
+		[Test]
+		public void TransformDoesNotCreateDuplicatesIfNotExists()
+		{
+			var paCyberId = "3";
+			var enrollDate = DateTime.Now.Date;
+			var batchHash = "hash";
+			var statuses = new[] {
+				NewStatusRecord(enrollDate, batchHash, NewStudent(paCyberId)),
+				NewStatusRecord(enrollDate, batchHash, NewStudent(paCyberId)),
+			};
+
+			_students.Setup(s => s.GetByPACyberId(paCyberId)).Returns((Student)null);
+
+			var count = 6;
+			var actual = _uut.Transform(statuses).Select(s => (StudentActivityRecord)s).ToList();
+			Assert.That(actual, Has.Count.EqualTo(count));
+		}
+
+		private static void Assign<T>(T target, string propName, object value)
+		{
+			var param = Expression.Parameter(typeof(T), "x");
+			var prop = Expression.PropertyOrField(param, propName);
+			var type = prop.Type;
+			if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+				type = Nullable.GetUnderlyingType(type);
+
+			var lambda = Expression.Lambda<Action<T>>(
+				body: Expression.Assign(
+					left: prop,
+					right: Expression.Convert(Expression.Constant(Convert.ChangeType(value, type)), prop.Type)
+				),
+				parameters: param
+			);
+			Console.WriteLine($"lambda: {lambda}");
+			lambda.Compile()(target);
+		}
+
+		[Test]
 		[TestCase("DateOfBirthChange", "DateOfBirth", "2000/01/01", "StudentDateOfBirth", "2000/02/02")]
 		[TestCase("GradeChange", "Grade", "11", "StudentGradeLevel", "12")]
 		[TestCase("NorepChange", "NorepDate", "2018/01/01", "StudentNorep", "2018/02/02")]
@@ -157,10 +189,10 @@ namespace models.Tests.Transformers
 
 			var enrollDate = DateTime.Now.Date;
 			var batchHash = "hash";
-			var statuses = new[] { NewStatusRecord(paCyberId, enrollDate, batchHash, student) };
+			var statuses = new[] { NewStatusRecord(enrollDate, batchHash, student) };
 			Assign(statuses[0], recordProperty, newData);
 
-			var actual = (_uut.Transform(statuses) as IEnumerable<StudentActivityRecord>).ToList();
+			var actual = _uut.Transform(statuses).Select(s => (StudentActivityRecord)s).ToList();
 			Assert.That(actual, Has.Count.EqualTo(1));
 			Assert.That(actual[0].PACyberId, Is.EqualTo(paCyberId));
 			Assert.That(actual[0].Activity, Is.EqualTo(activity));
@@ -168,6 +200,23 @@ namespace models.Tests.Transformers
 			Assert.That(actual[0].PreviousData, Is.EqualTo(oldData.ToString()));
 			Assert.That(actual[0].NextData, Is.EqualTo(newData.ToString()));
 			Assert.That(actual[0].BatchHash, Is.EqualTo(batchHash));
+		}
+
+		[Test]
+		public void TransformReturnsNullForDefaultDateTimePreviousData()
+		{
+			var paCyberId = "3";
+			_students.Setup(ss => ss.GetByPACyberId(paCyberId)).Returns((Student)null);
+
+			var enrollDate = DateTime.Now.Date;
+			var batchHash = "hash";
+			var statuses = new[] { NewStatusRecord(enrollDate, batchHash, NewStudent(paCyberId)) };
+			statuses[0].StudentDateOfBirth = DateTime.Parse("2000/01/01");
+
+			var actual = _uut.Transform(statuses).Select(s => (StudentActivityRecord)s).ToList();
+			Assert.That(actual, Has.Count.EqualTo(6));
+			Assert.That(actual[1].Activity, Is.EqualTo(StudentActivity.DateOfBirthChange));
+			Assert.That(actual[1].PreviousData, Is.Null);
 		}
 
 		[Test]
@@ -190,7 +239,7 @@ namespace models.Tests.Transformers
 
 			var enrollDate = DateTime.Now.Date;
 			var batchHash = "hash";
-			var statuses = new[] { NewStatusRecord(paCyberId, enrollDate, batchHash, student) };
+			var statuses = new[] { NewStatusRecord(enrollDate, batchHash, student) };
 			Assign(statuses[0], recordProperty, newData);
 
 			var newName = String.Join("|",
@@ -235,7 +284,7 @@ namespace models.Tests.Transformers
 
 			var enrollDate = DateTime.Now.Date;
 			var batchHash = "hash";
-			var statuses = new[] { NewStatusRecord(paCyberId, enrollDate, batchHash, student) };
+			var statuses = new[] { NewStatusRecord(enrollDate, batchHash, student) };
 			Assign(statuses[0], recordProperty, newData);
 
 			var newAddress = String.Join("|",
@@ -341,7 +390,7 @@ namespace models.Tests.Transformers
 
 			var enrollDate = DateTime.Now.Date;
 			var batchHash = "hash";
-			var statuses = new[] { NewStatusRecord(paCyberId, enrollDate, batchHash, student) };
+			var statuses = new[] { NewStatusRecord(enrollDate, batchHash, student) };
 			statuses[0].StudentIsSpecialEducation = false;
 			statuses[0].StudentWithdrawalDate = DateTime.Now.Date;
 

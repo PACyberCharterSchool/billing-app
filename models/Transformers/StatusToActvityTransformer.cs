@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using FieldTransformers = System.Collections.Generic.List<
 	System.ValueTuple<
 		System.Func<models.Student, models.StudentStatusRecord, bool>,
-		System.Func<models.Student, models.StudentStatusRecord, models.StudentActivityRecord>
+		System.Func<models.Student, models.StudentStatusRecord, models.StudentActivityRecord>,
+		System.Action<models.Student, models.StudentStatusRecord>
 	>
 >;
 
@@ -28,6 +30,9 @@ namespace models.Transformers
 
 		private static string Join(params string[] parts)
 		{
+			if (parts.All(s => s == null))
+				return null;
+
 			for (var i = 0; i < parts.Length; i++)
 				parts[i] = parts[i] == null ? "" : parts[i];
 
@@ -36,207 +41,247 @@ namespace models.Transformers
 
 		private static readonly FieldTransformers _fieldTransformers = new FieldTransformers
 		{
-			( // new student
-				(student, status) => student == null,
-				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.NewStudent,
-						Timestamp = status.StudentEnrollmentDate,
-						BatchHash = status.BatchHash,
-					}
-			),
 			( // date of birth
-				(student, status) => student == null || status.StudentDateOfBirth != student.DateOfBirth,
+				(student, status) => status.StudentDateOfBirth.Date != student.DateOfBirth.Date,
 				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.DateOfBirthChange,
-						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student?.DateOfBirth.ToString(DATE_FORMAT),
-						NextData = status.StudentDateOfBirth.ToString(DATE_FORMAT),
-						BatchHash = status.BatchHash,
-					}
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.DateOfBirthChange,
+					Timestamp = status.StudentEnrollmentDate,
+					PreviousData = student.DateOfBirth == default(DateTime) ? null : student.DateOfBirth.ToString(DATE_FORMAT),
+					NextData = status.StudentDateOfBirth.ToString(DATE_FORMAT),
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => student.DateOfBirth = status.StudentDateOfBirth
 			),
 			( // name
-				(student, status) => student == null ||
-					(status.StudentFirstName != student.FirstName ||
+				(student, status) => status.StudentFirstName != student.FirstName ||
 					status.StudentMiddleInitial != student.MiddleInitial ||
-					status.StudentLastName != student.LastName),
+					status.StudentLastName != student.LastName,
 				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.NameChange,
-						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student == null ? null : Join(student.FirstName, student.MiddleInitial, student.LastName),
-						NextData = Join(status.StudentFirstName, status.StudentMiddleInitial, status.StudentLastName),
-						BatchHash = status.BatchHash,
-					}
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.NameChange,
+					Timestamp = status.StudentEnrollmentDate,
+					PreviousData = Join(student.FirstName, student.MiddleInitial, student.LastName),
+					NextData = Join(status.StudentFirstName, status.StudentMiddleInitial, status.StudentLastName),
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => {
+					student.FirstName = status.StudentFirstName;
+					student.MiddleInitial = status.StudentMiddleInitial;
+					student.LastName = status.StudentLastName;
+				}
 			),
 			( // grade
-				(student, status) => student == null || status.StudentGradeLevel != student.Grade,
+				(student, status) => status.StudentGradeLevel != student.Grade,
 				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.GradeChange,
-						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student?.Grade,
-						NextData = status.StudentGradeLevel,
-						BatchHash = status.BatchHash,
-					}
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.GradeChange,
+					Timestamp = status.StudentEnrollmentDate,
+					PreviousData = student.Grade,
+					NextData = status.StudentGradeLevel,
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => student.Grade = status.StudentGradeLevel
 			),
 			( // address
-				(student, status) => student == null ||
-					(status.StudentStreet1 != student.Street1 ||
+				(student, status) => status.StudentStreet1 != student.Street1 ||
 					status.StudentStreet2 != student.Street2 ||
 					status.StudentCity != student.City ||
 					status.StudentState != student.State ||
-					status.StudentZipCode != student.ZipCode),
+					status.StudentZipCode != student.ZipCode,
 				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.AddressChange,
-						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student == null ? null : Join(
-							student.Street1,
-							student.Street2,
-							student.City,
-							student.State,
-							student.ZipCode),
-						NextData = Join(
-							status.StudentStreet1,
-							status.StudentStreet2,
-							status.StudentCity,
-							status.StudentState,
-							status.StudentZipCode),
-						BatchHash = status.BatchHash,
-					}
-			),
-			( // district withdraw
-				(student, status) => student != null && status.StudentWithdrawalDate != null,
-				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.DistrictWithdrawal,
-						Timestamp = status.StudentWithdrawalDate.Value,
-						PreviousData = Join(status.SchoolDistrictId.ToString(), status.SchoolDistrictName),
-						BatchHash = status.BatchHash,
-					}
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.AddressChange,
+					Timestamp = status.StudentEnrollmentDate,
+					PreviousData = student == null ? null : Join(
+						student.Street1,
+						student.Street2,
+						student.City,
+						student.State,
+						student.ZipCode),
+					NextData = Join(
+						status.StudentStreet1,
+						status.StudentStreet2,
+						status.StudentCity,
+						status.StudentState,
+						status.StudentZipCode),
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => {
+					student.Street1 = status.StudentStreet1;
+					student.Street2 = status.StudentStreet2;
+					student.City = status.StudentCity;
+					student.State = status.StudentState;
+					student.ZipCode = status.StudentZipCode;
+				}
 			),
 			( // district enroll
-				(student, status) => student == null || status.SchoolDistrictId != student.SchoolDistrict?.Aun,
+				(student, status) => status.SchoolDistrictId != student.SchoolDistrict?.Aun,
 				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.DistrictEnrollment,
-						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student?.SchoolDistrict == null ? null : Join(
-							student?.SchoolDistrict?.Aun.ToString(),
-							student?.SchoolDistrict?.Name),
-						NextData = Join(status.SchoolDistrictId.ToString(), status.SchoolDistrictName),
-						BatchHash = status.BatchHash,
-					}
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.DistrictEnrollment,
+					Timestamp = status.StudentEnrollmentDate,
+					PreviousData = student.SchoolDistrict == null ? null : Join(
+						student.SchoolDistrict?.Aun.ToString(),
+						student.SchoolDistrict?.Name),
+					NextData = Join(status.SchoolDistrictId.ToString(), status.SchoolDistrictName),
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => {
+					student.SchoolDistrict = student.SchoolDistrict ?? new SchoolDistrict();
+					student.SchoolDistrict.Aun = status.SchoolDistrictId;
+					student.SchoolDistrict.Name = status.SchoolDistrictName;
+					student.StartDate = status.StudentEnrollmentDate;
+					student.EndDate = null;
+				}
 			),
-			( // special education withdraw
-				(student, status) => student != null &&
-					!status.StudentIsSpecialEducation &&
-					status.StudentWithdrawalDate != null &&
-					status.StudentIsSpecialEducation != student.IsSpecialEducation,
+			( // district withdraw
+				(student, status) => status.StudentWithdrawalDate != null &&
+					status.StudentWithdrawalDate != student.EndDate,
 				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.SpecialEducationWithdrawal,
-						Timestamp = status.StudentWithdrawalDate.Value,
-						PreviousData = student?.IsSpecialEducation.ToString(),
-						NextData = status.StudentIsSpecialEducation.ToString(),
-						BatchHash = status.BatchHash,
-					}
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.DistrictWithdrawal,
+					Timestamp = status.StudentWithdrawalDate.Value,
+					PreviousData = Join(status.SchoolDistrictId.ToString(), status.SchoolDistrictName),
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => student.EndDate = status.StudentWithdrawalDate
 			),
 			( // special education enroll
-				(student, status) => status.StudentIsSpecialEducation && (student == null ||
-					status.StudentIsSpecialEducation != student.IsSpecialEducation),
+				(student, status) => status.StudentIsSpecialEducation == true &&
+					student.IsSpecialEducation == false,
 				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.SpecialEducationEnrollment,
-						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student?.IsSpecialEducation.ToString(),
-						NextData = status.StudentIsSpecialEducation.ToString(),
-						BatchHash = status.BatchHash,
-					}
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.SpecialEducationEnrollment,
+					Timestamp = status.StudentEnrollmentDate,
+					PreviousData = student.IsSpecialEducation.ToString(), // TODO(Erik): null
+					NextData = status.StudentIsSpecialEducation.ToString(), // TODO(Erik): null
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => student.IsSpecialEducation = true
+			),
+			( // special education withdraw
+				(student, status) => status.StudentIsSpecialEducation == false &&
+					status.StudentWithdrawalDate != null &&
+					student.IsSpecialEducation == true,
+				(student, status) => new StudentActivityRecord
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.SpecialEducationWithdrawal,
+					Timestamp = status.StudentWithdrawalDate.Value,
+					PreviousData = student.IsSpecialEducation.ToString(), // TODO(Erik): null
+					NextData = status.StudentIsSpecialEducation.ToString(), // TODO(Erik): null
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => student.IsSpecialEducation = false
 			),
 			( // current iep
-				(student, status) => status.StudentCurrentIep != null && (student == null ||
-					status.StudentCurrentIep != student.CurrentIep),
+				(student, status) => status.StudentCurrentIep != null &&
+					status.StudentCurrentIep != student.CurrentIep,
 				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.CurrentIepChange,
-						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student?.CurrentIep?.ToString(DATE_FORMAT),
-						NextData = status.StudentCurrentIep?.ToString(DATE_FORMAT),
-						BatchHash = status.BatchHash,
-					}
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.CurrentIepChange,
+					Timestamp = status.StudentEnrollmentDate,
+					PreviousData = student.CurrentIep?.ToString(DATE_FORMAT),
+					NextData = status.StudentCurrentIep?.ToString(DATE_FORMAT),
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => student.CurrentIep = status.StudentCurrentIep
 			),
 			( // former iep
-				(student, status) => status.StudentFormerIep != null && (student == null ||
-					status.StudentFormerIep != student.FormerIep),
+				(student, status) => status.StudentFormerIep != null &&
+					status.StudentFormerIep != student.FormerIep,
 				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.FormerIepChange,
-						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student?.FormerIep?.ToString(DATE_FORMAT),
-						NextData = status.StudentFormerIep?.ToString(DATE_FORMAT),
-						BatchHash = status.BatchHash,
-					}
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.FormerIepChange,
+					Timestamp = status.StudentEnrollmentDate,
+					PreviousData = student.FormerIep?.ToString(DATE_FORMAT),
+					NextData = status.StudentFormerIep?.ToString(DATE_FORMAT),
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => student.FormerIep = status.StudentFormerIep
 			),
 			( // norep
-				(student, status) => status.StudentNorep != null && (student == null ||
-					status.StudentNorep != student.NorepDate),
+				(student, status) => status.StudentNorep != null &&
+					status.StudentNorep != student.NorepDate,
 				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.NorepChange,
-						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student?.NorepDate?.ToString(DATE_FORMAT),
-						NextData = status.StudentNorep?.ToString(DATE_FORMAT),
-						BatchHash = status.BatchHash,
-					}
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.NorepChange,
+					Timestamp = status.StudentEnrollmentDate,
+					PreviousData = student.NorepDate?.ToString(DATE_FORMAT),
+					NextData = status.StudentNorep?.ToString(DATE_FORMAT),
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => student.NorepDate = status.StudentNorep
 			),
 			( // PA secured
-				(student, status) => student == null || status.StudentPaSecuredId != student.PASecuredId,
+				(student, status) => status.StudentPaSecuredId != student.PASecuredId,
 				(student, status) => new StudentActivityRecord
-					{
-						PACyberId = status.StudentId,
-						Activity = StudentActivity.PASecuredChange,
-						Timestamp = status.StudentEnrollmentDate,
-						PreviousData = student?.PASecuredId?.ToString(),
-						NextData = status.StudentPaSecuredId.ToString(),
-						BatchHash = status.BatchHash,
-					}
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.PASecuredChange,
+					Timestamp = status.StudentEnrollmentDate,
+					PreviousData = student.PASecuredId?.ToString(),
+					NextData = status.StudentPaSecuredId.ToString(),
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => student.PASecuredId = status.StudentPaSecuredId
 			),
 		};
 
-		private Dictionary<string, int> _sequences = new Dictionary<string, int>();
-
 		protected override IEnumerable<StudentActivityRecord> Transform(IEnumerable<StudentStatusRecord> statuses)
 		{
+			var sequences = new Dictionary<string, int>();
+			var studentCache = new Dictionary<string, Student>();
+
 			foreach (var status in statuses)
 			{
-				var student = _students.GetByPACyberId(status.StudentId);
+				if (!sequences.ContainsKey(status.StudentId))
+					sequences.Add(status.StudentId, 0);
 
-				foreach (var transformer in _fieldTransformers)
+				if (!studentCache.ContainsKey(status.StudentId))
 				{
-					if (transformer.Item1(student, status))
+					var s = _students.GetByPACyberId(status.StudentId);
+					if (s == null)
 					{
-						if (!_sequences.ContainsKey(status.StudentId))
-							_sequences.Add(status.StudentId, 0);
+						s = new Student { PACyberId = status.StudentId };
+						var activity = new StudentActivityRecord
+						{
+							PACyberId = status.StudentId,
+							Activity = StudentActivity.NewStudent,
+							Timestamp = status.StudentEnrollmentDate,
+							BatchHash = status.BatchHash,
+							Sequence = ++sequences[status.StudentId],
+						};
 
-						var activity = transformer.Item2(student, status);
-						activity.Sequence = ++_sequences[status.StudentId];
 						_activities.Create(activity);
 						yield return activity;
+					}
+
+					studentCache.Add(status.StudentId, s);
+				}
+
+				var student = studentCache[status.StudentId];
+				foreach (var transformer in _fieldTransformers)
+				{
+					if (transformer.Item1(student, status)) // predicate
+					{
+						var activity = transformer.Item2(student, status); // create activity record
+						activity.Sequence = ++sequences[status.StudentId];
+						_activities.Create(activity);
+						yield return activity;
+
+						transformer.Item3(student, status); // update student
 					}
 				}
 			}
