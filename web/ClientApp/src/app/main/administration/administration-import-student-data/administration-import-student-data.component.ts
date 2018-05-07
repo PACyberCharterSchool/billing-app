@@ -42,13 +42,18 @@ export class AdministrationImportStudentDataComponent implements OnInit {
   }
 
   handleDataImportCommitClick() {
+    this.ssrImportService.postStudentData().subscribe(
+      response => {
+        console.log(`AdministrationImportStudentDataComponent.handleDataImportCommitClick():  response is ${response}.`);
+      }
+    );
   }
 
   getPending($event) {
     this.ssrImportService.getPending(this.skip).subscribe(
       data => {
         this.updateScrollingSkip();
-        this.studentStatusRecords.concat(data['studentStatusRecords']);
+        this.studentStatusRecords = this.studentStatusRecords.concat(data['studentStatusRecords']);
         console.log('AdministrationImportStudentDataComponent.ngOnInit():  sample status record ', this.studentStatusRecords[0]);
       }
     );

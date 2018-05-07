@@ -20,7 +20,12 @@ export class StudentStatusRecordsImportService {
   }
 
   public getPending(skip: number): Observable<PendingStudentStatusRecord[]> {
-    const url = this.apiSSRUrl + `?skip=${skip}&take=${this.globals.take}`;
-    return this.httpClient.get<PendingStudentStatusRecord[]>(this.apiSSRUrl + '/pending?skip=0&take=100', this.headers);
+    const url = this.apiSSRUrl + `/pending?skip=${skip}&take=${this.globals.take}`;
+    return this.httpClient.get<PendingStudentStatusRecord[]>(url, this.headers);
+  }
+
+  public postStudentData(): Observable<any> {
+    const url = this.apiSSRUrl + `/pending/commit`;
+    return this.httpClient.post<any>(url, this.headers);
   }
 }

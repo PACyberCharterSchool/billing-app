@@ -88,8 +88,8 @@ export class StudentsListComponent implements OnInit {
   getStudents($event) {
     this.studentsService.getStudents(this.skip).subscribe(
       data => {
-        this.students.concat(data['students']);
-        this.items.concat(data['students']);
+        this.students = this.students.concat(data['students']);
+        this.items = this.items.concat(data['students']);
         console.log('StudentsListComponent.getStudents():  students are ', this.students);
       }
     );
