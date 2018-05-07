@@ -57,7 +57,7 @@ namespace api.Controllers
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
-			var records = await Task.Run(() => _pending.GetMany(args.Skip, args.Take));
+			var records = await Task.Run(() => _pending.GetMany(skip: args.Skip, take: args.Take));
 			if (records == null)
 				records = new List<PendingStudentStatusRecord>();
 

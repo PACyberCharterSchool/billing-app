@@ -11,10 +11,12 @@ namespace api.Controllers
 {
 	public class EnumerableValidationAttribute : ValidationAttribute
 	{
+		Type _type;
 		public readonly IList<string> Values;
 
 		public EnumerableValidationAttribute(Type type)
 		{
+			_type = type;
 			var t = type.GetGenericSubclass(typeof(Enumerable<>));
 			if (t == null)
 				throw new ArgumentException($"{t} does not inherit from {typeof(Enumerable<>)}.");
@@ -30,7 +32,7 @@ namespace api.Controllers
 				return ValidationResult.Success;
 
 			if (!Values.Contains(s))
-				return new ValidationResult($"{s} is not a valid {ctx.DisplayName} value.");
+				return new ValidationResult($"{s} is not a valid {_type.Name} value.");
 
 			return ValidationResult.Success;
 		}

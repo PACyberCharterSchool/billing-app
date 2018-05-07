@@ -11,13 +11,7 @@ namespace models
 		Student Get(int id);
 		Student GetByPACyberId(string id);
 
-		// CS0854: can't use optional parameters in expression trees
-		IList<Student> GetMany();
-		IList<Student> GetMany(string sort, string dir);
-		IList<Student> GetMany(int skip, int take);
-		IList<Student> GetMany(string sort, string dir, int skip, int take);
-		IList<Student> GetMany(string filter);
-		IList<Student> GetMany(string sort, string dir, int skip, int take, string filter);
+		IList<Student> GetMany(string sort = "Id", SortDirection dir = null, int skip = 0, int take = 0, string filter = null);
 	}
 
 	public class StudentRepository : IStudentRepository
@@ -37,19 +31,12 @@ namespace models
 
 		public Student GetByPACyberId(string id) => _students.SingleOrDefault(s => s.PACyberId == id);
 
-		public IList<Student> GetMany() => GetMany(null, null, 0, 0);
-
-		public IList<Student> GetMany(string sort, string dir) => GetMany(sort, dir, 0, 0);
-
-		public IList<Student> GetMany(int skip, int take) => GetMany(null, null, skip, take);
-
-		public IList<Student> GetMany(string sort, string dir, int skip, int take) =>
-			GetMany(sort, dir, skip, take, null);
-
-		public IList<Student> GetMany(string filter) =>
-			GetMany(null, null, 0, 0, filter);
-
-		public IList<Student> GetMany(string sort, string dir, int skip, int take, string filter)
+		public IList<Student> GetMany(
+			string sort = "Id",
+			SortDirection dir = null,
+			int skip = 0,
+			int take = 0,
+			string filter = null)
 		{
 			var students = _students.AsQueryable();
 			if (!string.IsNullOrWhiteSpace(filter))
@@ -58,9 +45,7 @@ namespace models
 			if (string.IsNullOrWhiteSpace(sort))
 				sort = "Id";
 
-			if (string.IsNullOrWhiteSpace(dir))
-				dir = "asc";
-
+			dir = dir ?? SortDirection.Ascending;
 			students = students.SortBy(sort, dir);
 
 			if (skip > 0)

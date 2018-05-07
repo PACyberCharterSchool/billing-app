@@ -60,7 +60,7 @@ namespace models.Tests
 			_context.PendingStudentStatusRecords.AddRange(records);
 			_context.SaveChanges();
 
-			var actual = _uut.GetMany(1, 0).ToList();
+			var actual = _uut.GetMany(skip: 1).ToList();
 			Assert.That(actual, Has.Count.EqualTo(2));
 			Assert.That(actual[0], Is.EqualTo(records[1]));
 			Assert.That(actual[1], Is.EqualTo(records[2]));
@@ -77,7 +77,7 @@ namespace models.Tests
 			_context.PendingStudentStatusRecords.AddRange(records);
 			_context.SaveChanges();
 
-			var actual = _uut.GetMany(0, 1).ToList();
+			var actual = _uut.GetMany(take: 1).ToList();
 			Assert.That(actual, Has.Count.EqualTo(1));
 			Assert.That(actual[0], Is.EqualTo(records[0]));
 		}
