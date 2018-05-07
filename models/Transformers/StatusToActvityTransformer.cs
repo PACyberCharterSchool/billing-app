@@ -161,8 +161,6 @@ namespace models.Transformers
 					PACyberId = status.StudentId,
 					Activity = StudentActivity.SpecialEducationEnrollment,
 					Timestamp = status.StudentEnrollmentDate,
-					PreviousData = student.IsSpecialEducation.ToString(), // TODO(Erik): null
-					NextData = status.StudentIsSpecialEducation.ToString(), // TODO(Erik): null
 					BatchHash = status.BatchHash,
 				},
 				(student, status) => student.IsSpecialEducation = true
@@ -176,8 +174,6 @@ namespace models.Transformers
 					PACyberId = status.StudentId,
 					Activity = StudentActivity.SpecialEducationWithdrawal,
 					Timestamp = status.StudentWithdrawalDate.Value,
-					PreviousData = student.IsSpecialEducation.ToString(), // TODO(Erik): null
-					NextData = status.StudentIsSpecialEducation.ToString(), // TODO(Erik): null
 					BatchHash = status.BatchHash,
 				},
 				(student, status) => student.IsSpecialEducation = false
