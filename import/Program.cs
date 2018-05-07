@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -101,7 +102,7 @@ namespace import
 					try
 					{
 						Console.WriteLine("Writing changes to the database...");
-						_context.AddRange(records);
+						_context.AddRange(records.Reverse()); // HACK(Erik): match order in CSV
 						_context.SaveChanges();
 						Console.WriteLine("Writing changes to the database done!");
 
