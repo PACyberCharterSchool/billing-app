@@ -71,9 +71,12 @@ namespace api
 			{
 				return new TransformerChain{
 					new PendingToCommittedTransformer(ctx.GetRequiredService<ICommittedStudentStatusRecordRepository>()),
-					new StudentStatusRecordTransformer(
+					new StatusToActivityTransformer(
 						ctx.GetRequiredService<IStudentRepository>(),
 						ctx.GetRequiredService<IStudentActivityRecordRepository>()),
+					new ActivityToStudentTransformer(
+						ctx.GetRequiredService<IStudentRepository>(),
+						ctx.GetRequiredService<ISchoolDistrictRepository>()),
 				};
 			});
 			#endregion

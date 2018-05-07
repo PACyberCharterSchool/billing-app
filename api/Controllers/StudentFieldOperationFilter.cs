@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 
 using Swashbuckle.AspNetCore.Swagger;
@@ -17,20 +16,15 @@ namespace api.Controllers
 
 			foreach (var param in context.ApiDescription.ParameterDescriptions)
 			{
-				Console.WriteLine($"param: {param.Name}");
-				Console.WriteLine($"\ttype: {param.Type}");
 				var type = param.ParameterDescriptor.ParameterType;
-				Console.WriteLine($"\tparameterType: {type}");
 				if (type.Name == param.Type.Name)
 					continue;
 
 				var prop = type.GetProperty(param.Name);
-				Console.WriteLine($"\tprop: {prop.Name}");
 				if (prop == null)
 					continue;
 
 				var att = prop.GetCustomAttributes(typeof(StudentFieldAttribute), true).FirstOrDefault();
-				Console.WriteLine($"\tatt: {att}");
 				if (att == null)
 					continue;
 

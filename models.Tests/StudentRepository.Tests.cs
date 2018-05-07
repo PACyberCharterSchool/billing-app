@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 
 using Moq;
@@ -36,6 +37,91 @@ namespace models.Tests
 		{
 			// in-memory database sticks around
 			_context.Database.EnsureDeleted();
+		}
+
+		private Student NewStudent(DateTime time) => new Student
+		{
+			Id = 1,
+			PACyberId = "3",
+			PASecuredId = 123456789,
+			FirstName = "Bob",
+			MiddleInitial = "C",
+			LastName = "Testy",
+			Grade = "12",
+			DateOfBirth = time.AddYears(-18),
+			Street1 = "Here Street",
+			Street2 = "Apt 1",
+			City = "Some City",
+			State = "PA",
+			ZipCode = "12345",
+			IsSpecialEducation = false,
+			CurrentIep = time.AddMonths(-1),
+			FormerIep = time.AddMonths(-2),
+			NorepDate = time.AddMonths(-3),
+			StartDate = time.AddMonths(-4),
+			EndDate = null,
+			Created = DateTime.MinValue,
+			LastUpdated = DateTime.MinValue,
+			SchoolDistrict = new SchoolDistrict
+			{
+				Aun = 123456789,
+				Name = "Some SD",
+			},
+		};
+
+		[Test]
+		public void CreateOrUpdateWithNewObjectCreates()
+		{
+			var time = DateTime.Now;
+			var student = NewStudent(time);
+
+			var result = _context.SaveChanges(() => _uut.CreateOrUpdate(time, student));
+			Assert.That(result, Is.EqualTo(student));
+
+			var actual = _context.Students.First(s => s.Id == result.Id);
+			Assert.That(actual, Is.EqualTo(student));
+			Assert.That(actual.Created, Is.EqualTo(time));
+			Assert.That(actual.LastUpdated, Is.EqualTo(time));
+		}
+
+		[Test]
+		public void CreateOrUpdateWithSameObjectUpdates()
+		{
+			var time = DateTime.Now;
+			var id = 3;
+			var student = NewStudent(time);
+			student.Id = 3;
+			_context.Add(student);
+			_context.SaveChanges();
+
+			student.FirstName = "Updated";
+			_context.SaveChanges(() => _uut.CreateOrUpdate(student));
+
+			var actual = _context.Students.First(s => s.Id == id);
+			Assert.That(actual.FirstName, Is.EqualTo(student.FirstName));
+			Assert.That(actual.Created, Is.EqualTo(DateTime.MinValue));
+			Assert.That(actual.LastUpdated.ToString(), Is.EqualTo(time.ToString()));
+		}
+
+		[Test]
+		public void CreateOrUpdateWithDifferentObjectUpdates()
+		{
+			var time = DateTime.Now;
+			var id = 3;
+			var student = NewStudent(time);
+			student.Id = id;
+			_context.Add(student);
+			_context.SaveChanges();
+
+			var updated = NewStudent(time);
+			updated.Id = id;
+			updated.FirstName = "Updated";
+			_context.SaveChanges(() => _uut.CreateOrUpdate(updated));
+
+			var actual = _context.Students.First(s => s.Id == id);
+			Assert.That(actual.FirstName, Is.EqualTo(student.FirstName));
+			Assert.That(actual.Created, Is.EqualTo(DateTime.MinValue));
+			Assert.That(actual.LastUpdated.ToString(), Is.EqualTo(time.ToString()));
 		}
 
 		[Test]

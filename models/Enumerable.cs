@@ -42,5 +42,10 @@ namespace models
 
 			return _values;
 		}
+
+		public override string ToString()
+		{
+			return Value;
+		}
 	}
 }

@@ -30,6 +30,7 @@ namespace models
 		public IEnumerable<PendingStudentStatusRecord> GetMany(int skip = 0, int take = 0)
 		{
 			var records = _records.AsQueryable();
+			records = records.OrderBy(r => r.Id);
 
 			if (skip > 0)
 				records = records.Skip(skip);
@@ -37,7 +38,7 @@ namespace models
 			if (take > 0)
 				records = records.Take(take);
 
-			return records.OrderBy(r => r.Id);
+			return records;
 		}
 
 		public void Truncate()

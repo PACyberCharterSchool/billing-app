@@ -12,12 +12,12 @@ namespace models
 		public static readonly StudentActivity NewStudent = new StudentActivity("NewStudent");
 		public static readonly StudentActivity DateOfBirthChange = new StudentActivity("DateOfBirthChange");
 		public static readonly StudentActivity DistrictEnrollment = new StudentActivity("DistrictEnrollment");
-		public static readonly StudentActivity DistrictWithdrawal = new StudentActivity("DistrictWithdraw");
+		public static readonly StudentActivity DistrictWithdrawal = new StudentActivity("DistrictWithdrawal");
 		public static readonly StudentActivity NameChange = new StudentActivity("NameChange");
 		public static readonly StudentActivity GradeChange = new StudentActivity("GradeChange");
 		public static readonly StudentActivity AddressChange = new StudentActivity("AddressChange");
 		public static readonly StudentActivity SpecialEducationEnrollment = new StudentActivity("SpecialEducationEnrollment");
-		public static readonly StudentActivity SpecialEducationWithdrawal = new StudentActivity("SpecialEducationWithdraw");
+		public static readonly StudentActivity SpecialEducationWithdrawal = new StudentActivity("SpecialEducationWithdrawal");
 		public static readonly StudentActivity CurrentIepChange = new StudentActivity("CurrentIepChange");
 		public static readonly StudentActivity FormerIepChange = new StudentActivity("FormerIepChange");
 		public static readonly StudentActivity NorepChange = new StudentActivity("NorepChange");
