@@ -3,9 +3,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Student } from '../../../models/student.model';
+import { PendingStudentStatusRecord } from '../../../models/pending-student-status-record.model';
 
-import { StudentsService } from '../../../services/students.service';
 import { UtilitiesService } from '../../../services/utilities.service';
+import { StudentStatusRecordsImportService } from '../../../services/student-status-records-import.service';
 
 @Component({
   selector: 'app-administration-import-student-data',
@@ -14,23 +15,27 @@ import { UtilitiesService } from '../../../services/utilities.service';
 })
 export class AdministrationImportStudentDataComponent implements OnInit {
 
-  studentList: Student[];
+  studentStatusRecords: PendingStudentStatusRecord[] = [];
 
   constructor(
-    private studentsService: StudentsService,
+    private utilitiesService: UtilitiesService,
+    private ssrImportService: StudentStatusRecordsImportService,
     private router: Router,
-    private utilities: UtilitiesService
   ) { }
 
   ngOnInit() {
-    this.studentsService.getStudents().subscribe(
+    this.ssrImportService.getPending().subscribe(
       data => {
-        this.studentList = data['students'];
+        this.studentStatusRecords = data['studentStatusRecords'];
+        console.log('AdministrationImportStudentDataComponent.ngOnInit():  sample status record ', this.studentStatusRecords[0]);
       }
     );
   }
 
   handleCancelClick() {
     this.router.navigate(['/administration', { outlets: { 'action': ['home'] } }]);
+  }
+
+  handleDataImportCommitClick() {
   }
 }

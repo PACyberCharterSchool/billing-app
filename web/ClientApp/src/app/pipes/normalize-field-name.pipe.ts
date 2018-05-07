@@ -12,6 +12,48 @@ export class NormalizeFieldNamePipe implements PipeTransform {
       case 'id':
         fieldName = 'Id';
         break;
+      case 'activitySchoolYear':
+        fieldName = 'School Year';
+        break;
+      case 'studentFirstName':
+        fieldName = 'First Name';
+        break;
+      case 'studentLastName':
+        fieldName = 'Last Name';
+        break;
+      case 'studentGradeLevel':
+        fieldName = 'Grade';
+        break;
+      case 'schoolDistrictId':
+        fieldName = 'AUN #';
+        break;
+      case 'studentCity':
+        fieldName = 'City';
+        break;
+      case 'studentStreet1':
+        fieldName = 'Street 1';
+        break;
+      case 'studentStreet2':
+        fieldName = 'Street 2';
+        break;
+      case 'studentState':
+        fieldName = 'State';
+        break;
+      case 'schoolDistrictName':
+        fieldName = 'School District Name';
+        break;
+      case 'activity':
+        fieldName = 'Activity';
+        break;
+      case 'previousData':
+        fieldName = 'Old Field';
+        break;
+      case 'nextData':
+        fieldName = 'New Field';
+        break;
+      case 'timestamp':
+        fieldName = 'Date Modified';
+        break;
       case 'type':
         fieldName = 'Type';
         break;
@@ -79,7 +121,7 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         fieldName = 'New Value';
         break;
       default:
-        fieldName = '';
+        fieldName = 'Column';
         break;
     }
 

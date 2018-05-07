@@ -20,10 +20,14 @@ import { StudentsService } from './services/students.service';
 import { SchoolDistrictService } from './services/school-district.service';
 import { UtilitiesService } from './services/utilities.service';
 import { CurrentStudentService } from './services/current-student.service';
+import { StudentStatusRecordsImportService } from './services/student-status-records-import.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+
+import { Globals } from './globals';
 
 const tokenInterceptor = {
   provide: HTTP_INTERCEPTORS,
@@ -44,7 +48,8 @@ const pacbillImports = [
   LoginModule,
   MainModule,
   AppRoutingModule,
-  NgbModule.forRoot()
+  NgbModule.forRoot(),
+  InfiniteScrollModule
 ];
 
 const pacbillProviders = [
@@ -54,8 +59,10 @@ const pacbillProviders = [
   CurrentStudentService,
   SchoolDistrictService,
   StudentsService,
+  StudentStatusRecordsImportService,
   tokenInterceptor,
-  UtilitiesService
+  UtilitiesService,
+  Globals
 ];
 
 @NgModule({

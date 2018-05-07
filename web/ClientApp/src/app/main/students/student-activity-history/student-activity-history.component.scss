@@ -1,4 +1,5 @@
 .student-activity-history-title-row {
+  height: 20%;
   width: 100%;
 
   div {
@@ -19,17 +20,15 @@
 
 .student-activity-history-content-row {
   width: 100%;
-  height: 340px;
+  height: 80%;
   overflow: hidden;
 
   table {
     margin-left: 15px;
 
-    // thead {
-    //   tr {
-    //     display: block;
-    //   }
-    // }
+    thead {
+      height: 60px;
+    }
 
     tbody {
       // display: block;

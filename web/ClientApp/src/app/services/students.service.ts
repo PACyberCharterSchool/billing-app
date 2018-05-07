@@ -10,6 +10,8 @@ import { Student } from '../models/student.model';
 import { SchoolDistrict } from '../models/school-district.model';
 import { StudentActivityRecord } from '../models/student-activity-record.model';
 
+import { Globals } from '../globals';
+
 @Injectable()
 export class StudentsService {
   private apiStudentsUrl: string;
@@ -19,11 +21,12 @@ export class StudentsService {
     })
   };
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private globals: Globals, private httpClient: HttpClient) {
     this.apiStudentsUrl = 'http://localhost:5000/api/students';
   }
 
-  public getStudents(): Observable<Student[]> {
+  public getStudents(skip: number): Observable<Student[]> {
+    const url = this.apiStudentsUrl + `?skip=${skip}&take=${this.globals.take}`;
     return this.httpClient.get<Student[]>(this.apiStudentsUrl, this.headers);
   }
 

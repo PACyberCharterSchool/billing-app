@@ -3,6 +3,8 @@
 
   div {
     height: 100%;
+    overflow: hidden;
+    padding-left: 0;
 
     span {
       display: inline-flex;

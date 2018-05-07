@@ -27,9 +27,9 @@
 </div>
 <div class='row student-list-view-row'>
   <div class='col-md-12'>
-    <table class='table table-responsive table-striped'>
+    <table class='table table-fixed table-striped'>
       <thead>
-        <tr style='width: 100%;'>
+        <tr>
           <th (click)="sort('paCyberId')">
             PACyber Id
             <i class="fa" [ngClass]="{'fa-sort': column != 'paCyberId', 'fa-sort-asc': (column == 'paCyberId' && isDescending), 'fa-sort-desc': (column == 'paCyberId' && !isDescending) }" aria-hidden="true"></i>
@@ -72,7 +72,7 @@
           </th>
         </tr>
       </thead>
-      <tbody>
+      <tbody infiniteScroll (scrolled)='onScroll($event)'>
         <tr *ngFor="let student of items | orderBy: {property: property, direction: direction}" (click)="showStudentDetails(student.id)">
           <td>{{student.paCyberId}}</td>
           <td>{{student.firstName}}</td>

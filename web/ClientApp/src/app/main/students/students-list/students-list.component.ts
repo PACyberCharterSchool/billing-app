@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 
 import { Observable } from 'rxjs/Observable';
 
+import { Globals } from '../../../globals';
+
 import { Student } from '../../../models/student.model';
 import { SchoolDistrict } from '../../../models/school-district.model';
 
@@ -28,8 +30,10 @@ export class StudentsListComponent implements OnInit {
   private startDate: Date;
   private endDate: Date;
   private selectedStudent: Student;
+  private skip: number;
 
   constructor(
+    private globals: Globals,
     private studentsService: StudentsService,
     private schoolDistrictService: SchoolDistrictService,
     private currentStudentService: CurrentStudentService,
@@ -38,11 +42,13 @@ export class StudentsListComponent implements OnInit {
       this.isDescending = false;
       this.property = 'paCyberId';
       this.direction = 1;
+      this.skip = 0;
     }
 
   ngOnInit() {
-    this.studentsService.getStudents().subscribe(
+    this.studentsService.getStudents(this.skip).subscribe(
       data => {
+        this.updateScrollingSkip();
         this.students = this.items = data['students'];
         console.log('StudentsListComponent.ngOnInit():  students are ', this.students);
       }
@@ -80,7 +86,7 @@ export class StudentsListComponent implements OnInit {
   }
 
   getStudents($event) {
-    this.studentsService.getStudents().subscribe(
+    this.studentsService.getStudents(this.skip).subscribe(
       data => {
         this.students = this.items = data['students'];
         console.log('StudentsListComponent.getStudents():  students are ', this.students);
@@ -106,7 +112,7 @@ export class StudentsListComponent implements OnInit {
   }
 
   resetStudentList() {
-    this.studentsService.getStudents().subscribe(
+    this.studentsService.getStudents(this.skip).subscribe(
       data => {
         this.students = this.items = data['students'];
       }
@@ -122,5 +128,13 @@ export class StudentsListComponent implements OnInit {
         }
       );
     }
+  }
+
+  onScroll($event) {
+    this.getStudents($event);
+  }
+
+  private updateScrollingSkip() {
+    this.skip += this.globals.take;
   }
 }

@@ -72,33 +72,7 @@
 .student-list-view-row {
   margin-top: 5px;
 
-  table {
-    border-top: 1px solid #dddddd;
-    color: #4d4d4d;
-    display: inline-table;
-    width: 100%;
-
-    thead {
-      width: 150%;
-      tr {
-        th {
-          a {
-            color: #4d4d4d;
-          }
-        }
-      }
-    }
-
-    tbody {
-      tr {
-        border-top: 1px solid #dddddd;
-        border-bottom: 1px solid #dddddd;
-        width: 100%;
-
-        td {
-          padding-left: 5px;
-        }
-      }
-    }
+  thead {
+    height: 60px;
   }
 }
