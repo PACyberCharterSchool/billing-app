@@ -28,7 +28,7 @@ namespace import
 		{
 			Map(m => m.SchoolDistrictId).Name("schooldistrict");
 			Map(m => m.SchoolDistrictName).Name("school_name");
-			Map(m => m.StudentId).Name("student_id");
+			Map(m => m.StudentId).Name("StudentIndex"); // case in file
 			Map(m => m.StudentFirstName).Name("first_name");
 			Map(m => m.StudentMiddleInitial).Name("middle_initial");
 			Map(m => m.StudentLastName).Name("last_name");

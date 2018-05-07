@@ -53,13 +53,13 @@ namespace import.Tests
 
 			var sb = new StringBuilder();
 			sb.Append($"{HEADER}\n");
-			sb.Append("1,"); // StudentIndex
+			sb.Append($"{record.StudentId},"); // StudentIndex
 			sb.Append("2,"); // EnrollmentRecordIndex
 			sb.Append("3,"); // StudentAddressIndex
 			sb.Append("4,"); // DistrictListIndex
 			sb.Append($"{record.SchoolDistrictName},"); // school name
 			sb.Append($"{record.SchoolDistrictId},"); // schooldistrict
-			sb.Append($"{record.StudentId},"); // student_id
+			sb.Append("1,"); // student_id
 			sb.Append($"{record.StudentLastName},"); // last_name
 			sb.Append($"{record.StudentFirstName},"); // first_name
 			sb.Append($"{record.StudentMiddleInitial},"); // middle_initial
