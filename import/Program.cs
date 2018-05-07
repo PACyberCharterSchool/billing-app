@@ -102,8 +102,16 @@ namespace import
 					try
 					{
 						Console.WriteLine("Writing changes to the database...");
-						_context.AddRange(records.Reverse()); // HACK(Erik): match order in CSV
-						_context.SaveChanges();
+						_context.AddRange(records);
+						try
+						{
+							_context.Database.ExecuteSqlCommand($"SET IDENTITY_INSERT " + nameof(_context.PendingStudentStatusRecords) + " ON");
+							_context.SaveChanges();
+						}
+						finally
+						{
+							_context.Database.ExecuteSqlCommand($"SET IDENTITY_INSERT " + nameof(_context.PendingStudentStatusRecords) + " OFF");
+						}
 						Console.WriteLine("Writing changes to the database done!");
 
 						tx.Commit();
