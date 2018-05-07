@@ -5,6 +5,8 @@ import { Observable } from 'rxjs/Observable';
 
 import { PendingStudentStatusRecord } from '../models/pending-student-status-record.model';
 
+import { Globals } from '../globals';
+
 @Injectable()
 export class StudentStatusRecordsImportService {
   private apiSSRUrl = 'http://localhost:5000/api/StudentStatusRecords';
@@ -14,10 +16,11 @@ export class StudentStatusRecordsImportService {
     })
   };
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private globals: Globals, private httpClient: HttpClient) {
   }
 
-  public getPending(): Observable<PendingStudentStatusRecord[]> {
+  public getPending(skip: number): Observable<PendingStudentStatusRecord[]> {
+    const url = this.apiSSRUrl + `?skip=${skip}&take=${this.globals.take}`;
     return this.httpClient.get<PendingStudentStatusRecord[]>(this.apiSSRUrl + '/pending?skip=0&take=100', this.headers);
   }
 }

@@ -25,7 +25,6 @@ import { StudentStatusRecordsImportService } from './services/student-status-rec
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 import { Globals } from './globals';
 
@@ -49,7 +48,6 @@ const pacbillImports = [
   MainModule,
   AppRoutingModule,
   NgbModule.forRoot(),
-  InfiniteScrollModule
 ];
 
 const pacbillProviders = [

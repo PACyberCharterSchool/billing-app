@@ -19,7 +19,7 @@
           <th *ngFor='let k of utilitiesService.objectKeys(studentStatusRecords[0])'>{{k | normalizeFieldName}}</th>
         </tr>
       </thead>
-      <tbody style='overflow: scroll;'>
+      <tbody infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]="false">
         <tr *ngFor='let ssr of studentStatusRecords'>
           <td *ngFor='let v of utilitiesService.objectValues(ssr)'>{{v}}</td>
         </tr>
