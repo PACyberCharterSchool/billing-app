@@ -22,7 +22,7 @@ export class StudentActivityHistoryComponent implements OnInit {
   private student: Student;
 
   constructor(
-    private utilities: UtilitiesService,
+    private utilitiesService: UtilitiesService,
     private studentsService: StudentsService,
     private currentStudentService: CurrentStudentService) {
     this.property = 'date';
@@ -43,24 +43,31 @@ export class StudentActivityHistoryComponent implements OnInit {
 
   initActivityTypes() {
     const atypes = this.allActivities.map((a) => a.activity);
-    this.activityTypes = this.utilities.uniqueItemsInArray(atypes);
+    this.activityTypes = this.utilitiesService.uniqueItemsInArray(atypes);
     console.log(`StudentActivityHistoryComponent.initActivityTypes():  activityTypes are ${this.activityTypes}.`);
   }
 
   listDisplayableFields() {
-    const fields = this.utilities.objectKeys(this.allActivities[0]);
+    const fields = this.utilitiesService.objectKeys(this.allActivities[0]);
+    let rejected = ['batchHash', 'sequence', 'paCyberId'];
+
     if (fields) {
-      return fields.filter((i) => i !== 'batchHash' && i !== 'sequence');
+      return fields.filter((i) => !rejected.includes(i));
     }
   }
 
   listDisplayableValues(activity) {
-    const values = this.utilities.objectKeys(activity).map((i) => { if (i !== 'batchHash' && i !== 'sequence') { return activity[i]; } });
-    return values;
+    let vkeys = this.listDisplayableFields();
+
+    let selected = this.utilitiesService.pick(activity, vkeys);
+    console.log('StudentActivityHistoryComponent.listDisplayableValues(): vkeys is ', vkeys);
+    console.log('StudentActivityHistoryComponent.listDisplayableValues(): selected is ', selected);
+    
+    return this.utilitiesService.objectValues(selected);
   }
 
   filterStudentHistoryByType(type: string) {
-    this.activities = this.allActivities.filter((e) => e['type'] === type);
+    this.activities = this.allActivities.filter((e) => e['activity'] === type);
   }
 
   resetStudentHistoryFilter() {

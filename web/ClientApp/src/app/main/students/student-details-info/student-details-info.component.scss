@@ -5,11 +5,15 @@
 }
 
 .student-school-info {
+  height: 260px;
+
   table {
     background-color: #dddddd;
     width: 100%;
 
     tbody {
+      overflow: visible;
+
       tr {
         margin-top: 0;
         margin-bottom: 0;

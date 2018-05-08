@@ -12,7 +12,7 @@
   </div>
 </div>
 <div class='row import-student-data-content-row'>
-  <div class='col-md-12'>
+  <div class='col-md-12' *ngIf='studentStatusRecords.length'>
     <table class='table table-striped table-fixed'>
       <thead>
         <tr>
@@ -25,5 +25,8 @@
         </tr>
       </tbody>
     </table>
+  </div>
+  <div class='col-md-12' *ngIf='!studentStatusRecords.length'>
+    <h3>PACBill is updated with the latest Genius data.</h3>
   </div>
 </div>

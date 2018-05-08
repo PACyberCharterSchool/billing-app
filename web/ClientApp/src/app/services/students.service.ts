@@ -27,7 +27,7 @@ export class StudentsService {
 
   public getStudents(skip: number): Observable<Student[]> {
     const url = this.apiStudentsUrl + `?skip=${skip}&take=${this.globals.take}`;
-    return this.httpClient.get<Student[]>(this.apiStudentsUrl, this.headers);
+    return this.httpClient.get<Student[]>(url, this.headers);
   }
 
   public getStudent(id: number): Observable<Student> {

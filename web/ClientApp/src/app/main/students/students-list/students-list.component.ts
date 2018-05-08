@@ -26,7 +26,6 @@ export class StudentsListComponent implements OnInit {
   private isDescending: boolean;
   private property: string;
   private direction: number;
-  private items: Student[];
   private startDate: Date;
   private endDate: Date;
   private selectedStudent: Student;
@@ -49,7 +48,7 @@ export class StudentsListComponent implements OnInit {
     this.studentsService.getStudents(this.skip).subscribe(
       data => {
         this.updateScrollingSkip();
-        this.students = this.items = data['students'];
+        this.students = data['students'];
         console.log('StudentsListComponent.ngOnInit():  students are ', this.students);
       }
     );
@@ -67,7 +66,7 @@ export class StudentsListComponent implements OnInit {
   dateSelectedStartDateHandler(date: Date) {
     this.studentsService.getStudentsFilteredByStartDate(date).subscribe(
       data => {
-        this.students = this.items = data['students'];
+        this.students = data['students'];
       }
     );
   }
@@ -75,13 +74,13 @@ export class StudentsListComponent implements OnInit {
   dateSelectedEndDateHandler(date: Date) {
     this.studentsService.getStudentsFilteredByEndDate(date).subscribe(
       data => {
-        this.students = this.items = data['students'];
+        this.students = data['students'];
       }
     );
   }
 
   studentsUpdatedHandler(students: Student[]) {
-    this.students = this.items = students;
+    this.students = students;
     console.log('StudentsListComponent.studentsUpdatedHandler():  students are ', this.students);
   }
 
@@ -89,7 +88,6 @@ export class StudentsListComponent implements OnInit {
     this.studentsService.getStudents(this.skip).subscribe(
       data => {
         this.students = this.students.concat(data['students']);
-        this.items = this.items.concat(data['students']);
         console.log('StudentsListComponent.getStudents():  students are ', this.students);
       }
     );
@@ -115,7 +113,7 @@ export class StudentsListComponent implements OnInit {
   resetStudentList() {
     this.studentsService.getStudents(this.skip).subscribe(
       data => {
-        this.students = this.items = data['students'];
+        this.students = data['students'];
       }
     );
   }
@@ -124,7 +122,7 @@ export class StudentsListComponent implements OnInit {
     if (this.searchText) {
       this.studentsService.getStudentsFilteredByNameOrId(this.searchText).subscribe(
         data => {
-          this.students = this.items = data['students'];
+          this.students = data['students'];
           console.log('StudentsListComponent.filterStudentList():  students are ', data);
         }
       );

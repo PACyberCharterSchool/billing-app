@@ -72,8 +72,8 @@
           </th>
         </tr>
       </thead>
-      <tbody infiniteScroll (scrolled)='onScroll($event)'>
-        <tr *ngFor="let student of items | orderBy: {property: property, direction: direction}" (click)="showStudentDetails(student.id)">
+      <tbody infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]='false'>
+        <tr *ngFor="let student of students | orderBy: {property: property, direction: direction}" (click)="showStudentDetails(student.id)">
           <td>{{student.paCyberId}}</td>
           <td>{{student.firstName}}</td>
           <td>{{student.middleInitial}}</td>
