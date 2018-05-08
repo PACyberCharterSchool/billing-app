@@ -22,7 +22,7 @@ export class StudentsService {
   };
 
   constructor(private globals: Globals, private httpClient: HttpClient) {
-    this.apiStudentsUrl = 'http://localhost:5000/api/students';
+    this.apiStudentsUrl = environment.baseAPIUrl + '/students';
   }
 
   public getStudents(skip: number): Observable<Student[]> {
@@ -70,7 +70,7 @@ export class StudentsService {
   }
 
   public getStudentActivityRecordsByStudentId(id: number) {
-    const url: string = `http://localhost:5000/api/StudentActivityRecords/${id}`;
+    const url: string = environment.baseAPIUrl + `/StudentActivityRecords/${id}`;
     return this.httpClient.get<StudentActivityRecord[]>(url, this.headers);
   }
 
@@ -122,7 +122,6 @@ export class StudentsService {
       );
 
       url = this.apiStudentsUrl + '?filter=' + '(' + newSearchTokens.join(' ') + ')';
-      console.log('StudentsService.buildStudentIdOrNameSearchQuery(): url is ', url);
     }
 
     return url;

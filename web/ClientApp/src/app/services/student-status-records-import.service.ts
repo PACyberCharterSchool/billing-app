@@ -7,9 +7,11 @@ import { PendingStudentStatusRecord } from '../models/pending-student-status-rec
 
 import { Globals } from '../globals';
 
+import { environment } from '../../environments/environment';
+
 @Injectable()
 export class StudentStatusRecordsImportService {
-  private apiSSRUrl = 'http://localhost:5000/api/StudentStatusRecords';
+  private apiSSRUrl;
   private headers = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json'
@@ -17,6 +19,7 @@ export class StudentStatusRecordsImportService {
   };
 
   constructor(private globals: Globals, private httpClient: HttpClient) {
+    this.apiSSRUrl = environment.baseAPIUrl + '/StudentStatusRecords';
   }
 
   public getPending(skip: number): Observable<PendingStudentStatusRecord[]> {

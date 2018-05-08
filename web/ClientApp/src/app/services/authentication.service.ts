@@ -13,14 +13,12 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 export class AuthenticationService {
   private apiLoginUrl = '';
   constructor(private http: HttpClient) {
-    this.apiLoginUrl = '/api/auth/login';
+    this.apiLoginUrl = environment.baseAPIUrl + '/auth/login';
   }
 
   public isAuthenticated(): boolean {
     const token = localStorage.getItem('jwt-token');
     const jwtHelper = new JwtHelperService();
-
-    console.log('AuthenticationService.isAuthenticated():  token is ', token);
 
     // returns true or false based upon whether the JWT is empty or expired...
     return ((token !== null) || !jwtHelper.isTokenExpired(token));
@@ -34,7 +32,6 @@ export class AuthenticationService {
     };
 
     const credentials = { username: email, password: password };
-    console.log('AuthenticationService.authenticate():  apiLoginUrl is ', this.apiLoginUrl);
     return this.http.post(this.apiLoginUrl, JSON.stringify(credentials), headers);
   }
 
