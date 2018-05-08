@@ -36,6 +36,7 @@ namespace models
 	public class CommittedStudentStatusRecord : StudentStatusRecord
 	{
 		public DateTime CommitTime { get; set; }
+		public int BatchRow { get; set; }
 
 		public static CommittedStudentStatusRecord FromPendingStudentStatusRecord(PendingStudentStatusRecord record) =>
 			new CommittedStudentStatusRecord
@@ -64,6 +65,7 @@ namespace models
 				BatchTime = record.BatchTime,
 				BatchFilename = record.BatchFilename,
 				BatchHash = record.BatchHash,
+				BatchRow = record.Id,
 			};
 	}
 }

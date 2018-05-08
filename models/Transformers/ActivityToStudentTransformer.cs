@@ -80,6 +80,7 @@ namespace models.Transformers
 			{StudentActivity.DateOfBirthChange, (s, r, _) => s.DateOfBirth = DateTime.Parse(r.NextData)},
 			{StudentActivity.DistrictEnrollment, (s, r, dc) => {
 				s.StartDate = r.Timestamp;
+				s.EndDate = null;
 				UpdateSchoolDistrict(s, r.NextData, dc);
 			}},
 			{StudentActivity.DistrictWithdrawal, (s, r, dc) => {

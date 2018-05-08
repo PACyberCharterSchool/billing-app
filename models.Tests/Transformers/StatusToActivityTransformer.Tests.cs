@@ -394,13 +394,13 @@ namespace models.Tests.Transformers
 			statuses[0].StudentWithdrawalDate = DateTime.Now.Date;
 
 			var actual = (_uut.Transform(statuses) as IEnumerable<StudentActivityRecord>).ToList();
-			Assert.That(actual, Has.Count.EqualTo(2)); // district withdrawal is first
-			Assert.That(actual[1].PACyberId, Is.EqualTo(paCyberId));
-			Assert.That(actual[1].Activity, Is.EqualTo(StudentActivity.SpecialEducationWithdrawal));
-			Assert.That(actual[1].Timestamp, Is.EqualTo(enrollDate));
-			Assert.That(actual[1].PreviousData, Is.EqualTo(null));
-			Assert.That(actual[1].NextData, Is.EqualTo(null));
-			Assert.That(actual[1].BatchHash, Is.EqualTo(batchHash));
+			Assert.That(actual, Has.Count.EqualTo(2)); // district withdrawal is second
+			Assert.That(actual[0].PACyberId, Is.EqualTo(paCyberId));
+			Assert.That(actual[0].Activity, Is.EqualTo(StudentActivity.SpecialEducationWithdrawal));
+			Assert.That(actual[0].Timestamp, Is.EqualTo(enrollDate));
+			Assert.That(actual[0].PreviousData, Is.EqualTo(null));
+			Assert.That(actual[0].NextData, Is.EqualTo(null));
+			Assert.That(actual[0].BatchHash, Is.EqualTo(batchHash));
 		}
 
 		[Test]
