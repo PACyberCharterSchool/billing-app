@@ -80,6 +80,7 @@ namespace models.Transformers
 			{StudentActivity.DateOfBirthChange, (s, r, _) => s.DateOfBirth = DateTime.Parse(r.NextData)},
 			{StudentActivity.DistrictEnrollment, (s, r, dc) => {
 				s.StartDate = r.Timestamp;
+				s.EndDate = null;
 				UpdateSchoolDistrict(s, r.NextData, dc);
 			}},
 			{StudentActivity.DistrictWithdrawal, (s, r, dc) => {
@@ -89,8 +90,8 @@ namespace models.Transformers
 			{StudentActivity.NameChange, (s, r, _) => UpdateStudentName(s, r.NextData)},
 			{StudentActivity.GradeChange, (s, r, _) => s.Grade = r.NextData},
 			{StudentActivity.AddressChange, (s, r, _) => UpdateStudentAddress(s, r.NextData)},
-			{StudentActivity.SpecialEducationEnrollment, (s, r, _) => s.IsSpecialEducation = bool.Parse(r.NextData)},
-			{StudentActivity.SpecialEducationWithdrawal, (s, r, _) => s.IsSpecialEducation = bool.Parse(r.NextData)},
+			{StudentActivity.SpecialEducationEnrollment, (s, r, _) => s.IsSpecialEducation = true},
+			{StudentActivity.SpecialEducationWithdrawal, (s, r, _) => s.IsSpecialEducation = false},
 			{StudentActivity.CurrentIepChange, (s, r, _) => s.CurrentIep = DateTime.Parse(r.NextData)},
 			{StudentActivity.FormerIepChange, (s, r, _) => s.FormerIep = DateTime.Parse(r.NextData)},
 			{StudentActivity.NorepChange, (s, r, _) => s.NorepDate = DateTime.Parse(r.NextData)},

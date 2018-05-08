@@ -171,7 +171,6 @@ namespace models.Tests.Transformers
 		[TestCase("GradeChange", "Grade", "11", "StudentGradeLevel", "12")]
 		[TestCase("NorepChange", "NorepDate", "2018/01/01", "StudentNorep", "2018/02/02")]
 		[TestCase("PASecuredChange", "PASecuredId", 123456789, "StudentPASecuredId", 234567890)]
-		[TestCase("SpecialEducationEnrollment", "IsSpecialEducation", false, "StudentIsSpecialEducation", true)]
 		[TestCase("CurrentIepChange", "CurrentIep", "2018/01/01", "StudentCurrentIep", "2018/02/02")]
 		[TestCase("FormerIepChange", "FormerIep", "2018/01/01", "StudentFormerIep", "2018/02/02")]
 		public void TransformWithExistingStudentCreatesRecordIfChanged<T>(
@@ -395,13 +394,36 @@ namespace models.Tests.Transformers
 			statuses[0].StudentWithdrawalDate = DateTime.Now.Date;
 
 			var actual = (_uut.Transform(statuses) as IEnumerable<StudentActivityRecord>).ToList();
-			Assert.That(actual, Has.Count.EqualTo(2)); // district withdrawal is first
-			Assert.That(actual[1].PACyberId, Is.EqualTo(paCyberId));
-			Assert.That(actual[1].Activity, Is.EqualTo(StudentActivity.SpecialEducationWithdrawal));
-			Assert.That(actual[1].Timestamp, Is.EqualTo(enrollDate));
-			Assert.That(actual[1].PreviousData, Is.EqualTo(true.ToString()));
-			Assert.That(actual[1].NextData, Is.EqualTo(false.ToString()));
-			Assert.That(actual[1].BatchHash, Is.EqualTo(batchHash));
+			Assert.That(actual, Has.Count.EqualTo(2)); // district withdrawal is second
+			Assert.That(actual[0].PACyberId, Is.EqualTo(paCyberId));
+			Assert.That(actual[0].Activity, Is.EqualTo(StudentActivity.SpecialEducationWithdrawal));
+			Assert.That(actual[0].Timestamp, Is.EqualTo(enrollDate));
+			Assert.That(actual[0].PreviousData, Is.EqualTo(null));
+			Assert.That(actual[0].NextData, Is.EqualTo(null));
+			Assert.That(actual[0].BatchHash, Is.EqualTo(batchHash));
+		}
+
+		[Test]
+		public void TransformCreatestSpecialEnrollmentRecordIfPresent()
+		{
+			var paCyberId = "3";
+			var student = NewStudent(paCyberId);
+			student.IsSpecialEducation = false;
+			_students.Setup(ss => ss.GetByPACyberId(paCyberId)).Returns(student);
+
+			var enrollDate = DateTime.Now.Date;
+			var batchHash = "hash";
+			var statuses = new[] { NewStatusRecord(enrollDate, batchHash, student) };
+			statuses[0].StudentIsSpecialEducation = true;
+
+			var actual = _uut.Transform(statuses).Select(s => (StudentActivityRecord)s).ToList();
+			Assert.That(actual, Has.Count.EqualTo(1));
+			Assert.That(actual[0].PACyberId, Is.EqualTo(paCyberId));
+			Assert.That(actual[0].Activity, Is.EqualTo(StudentActivity.SpecialEducationEnrollment));
+			Assert.That(actual[0].Timestamp, Is.EqualTo(enrollDate));
+			Assert.That(actual[0].PreviousData, Is.EqualTo(null));
+			Assert.That(actual[0].NextData, Is.EqualTo(null));
+			Assert.That(actual[0].BatchHash, Is.EqualTo(batchHash));
 		}
 	}
 }

@@ -84,6 +84,7 @@ namespace import.Tests
 			var filename = "test.csv";
 			var actual = _uut.Parse(new StringReader(csv), filename).ToList();
 			Assert.That(actual, Has.Count.EqualTo(1));
+			Assert.That(actual[0].Id, Is.EqualTo(2)); // sets raw row
 			Assert.That(actual[0].SchoolDistrictId, Is.EqualTo(record.SchoolDistrictId));
 			Assert.That(actual[0].SchoolDistrictName, Is.EqualTo(record.SchoolDistrictName));
 			Assert.That(actual[0].StudentId, Is.EqualTo(record.StudentId));

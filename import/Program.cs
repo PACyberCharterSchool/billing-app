@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -102,7 +103,15 @@ namespace import
 					{
 						Console.WriteLine("Writing changes to the database...");
 						_context.AddRange(records);
-						_context.SaveChanges();
+						try
+						{
+							_context.Database.ExecuteSqlCommand($"SET IDENTITY_INSERT " + nameof(_context.PendingStudentStatusRecords) + " ON");
+							_context.SaveChanges();
+						}
+						finally
+						{
+							_context.Database.ExecuteSqlCommand($"SET IDENTITY_INSERT " + nameof(_context.PendingStudentStatusRecords) + " OFF");
+						}
 						Console.WriteLine("Writing changes to the database done!");
 
 						tx.Commit();

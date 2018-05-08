@@ -119,6 +119,19 @@ namespace models.Transformers
 					student.ZipCode = status.StudentZipCode;
 				}
 			),
+			( // PA secured
+				(student, status) => status.StudentPaSecuredId != student.PASecuredId,
+				(student, status) => new StudentActivityRecord
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.PASecuredChange,
+					Timestamp = status.StudentEnrollmentDate,
+					PreviousData = student.PASecuredId?.ToString(),
+					NextData = status.StudentPaSecuredId.ToString(),
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => student.PASecuredId = status.StudentPaSecuredId
+			),
 			( // district enroll
 				(student, status) => status.SchoolDistrictId != student.SchoolDistrict?.Aun,
 				(student, status) => new StudentActivityRecord
@@ -140,19 +153,6 @@ namespace models.Transformers
 					student.EndDate = null;
 				}
 			),
-			( // district withdraw
-				(student, status) => status.StudentWithdrawalDate != null &&
-					status.StudentWithdrawalDate != student.EndDate,
-				(student, status) => new StudentActivityRecord
-				{
-					PACyberId = status.StudentId,
-					Activity = StudentActivity.DistrictWithdrawal,
-					Timestamp = status.StudentWithdrawalDate.Value,
-					PreviousData = Join(status.SchoolDistrictId.ToString(), status.SchoolDistrictName),
-					BatchHash = status.BatchHash,
-				},
-				(student, status) => student.EndDate = status.StudentWithdrawalDate
-			),
 			( // special education enroll
 				(student, status) => status.StudentIsSpecialEducation == true &&
 					student.IsSpecialEducation == false,
@@ -161,26 +161,9 @@ namespace models.Transformers
 					PACyberId = status.StudentId,
 					Activity = StudentActivity.SpecialEducationEnrollment,
 					Timestamp = status.StudentEnrollmentDate,
-					PreviousData = student.IsSpecialEducation.ToString(), // TODO(Erik): null
-					NextData = status.StudentIsSpecialEducation.ToString(), // TODO(Erik): null
 					BatchHash = status.BatchHash,
 				},
 				(student, status) => student.IsSpecialEducation = true
-			),
-			( // special education withdraw
-				(student, status) => status.StudentIsSpecialEducation == false &&
-					status.StudentWithdrawalDate != null &&
-					student.IsSpecialEducation == true,
-				(student, status) => new StudentActivityRecord
-				{
-					PACyberId = status.StudentId,
-					Activity = StudentActivity.SpecialEducationWithdrawal,
-					Timestamp = status.StudentWithdrawalDate.Value,
-					PreviousData = student.IsSpecialEducation.ToString(), // TODO(Erik): null
-					NextData = status.StudentIsSpecialEducation.ToString(), // TODO(Erik): null
-					BatchHash = status.BatchHash,
-				},
-				(student, status) => student.IsSpecialEducation = false
 			),
 			( // current iep
 				(student, status) => status.StudentCurrentIep != null &&
@@ -224,18 +207,34 @@ namespace models.Transformers
 				},
 				(student, status) => student.NorepDate = status.StudentNorep
 			),
-			( // PA secured
-				(student, status) => status.StudentPaSecuredId != student.PASecuredId,
+			( // special education withdraw
+				(student, status) => status.StudentIsSpecialEducation == false &&
+					status.StudentWithdrawalDate != null &&
+					student.IsSpecialEducation == true,
 				(student, status) => new StudentActivityRecord
 				{
 					PACyberId = status.StudentId,
-					Activity = StudentActivity.PASecuredChange,
-					Timestamp = status.StudentEnrollmentDate,
-					PreviousData = student.PASecuredId?.ToString(),
-					NextData = status.StudentPaSecuredId.ToString(),
+					Activity = StudentActivity.SpecialEducationWithdrawal,
+					Timestamp = status.StudentWithdrawalDate.Value,
 					BatchHash = status.BatchHash,
 				},
-				(student, status) => student.PASecuredId = status.StudentPaSecuredId
+				(student, status) => student.IsSpecialEducation = false
+			),
+			( // district withdraw
+				(student, status) => status.StudentWithdrawalDate != null &&
+					status.StudentWithdrawalDate != student.EndDate,
+				(student, status) => new StudentActivityRecord
+				{
+					PACyberId = status.StudentId,
+					Activity = StudentActivity.DistrictWithdrawal,
+					Timestamp = status.StudentWithdrawalDate.Value,
+					PreviousData = Join(status.SchoolDistrictId.ToString(), status.SchoolDistrictName),
+					BatchHash = status.BatchHash,
+				},
+				(student, status) => {
+					student.SchoolDistrict = null;
+					student.EndDate = status.StudentWithdrawalDate;
+				}
 			),
 		};
 

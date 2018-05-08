@@ -72,6 +72,7 @@ namespace models
 			int take = 0,
 			string filter = null)
 		{
+			// TODO(Erik): include SchoolDistrict?
 			var students = _students.AsQueryable();
 			if (!string.IsNullOrWhiteSpace(filter))
 				students = students.Filter(_parser, filter);

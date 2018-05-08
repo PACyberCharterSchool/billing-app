@@ -107,6 +107,7 @@ namespace models.Tests
 		public void CreateOrUpdateWithDifferentObjectUpdates()
 		{
 			var time = DateTime.Now;
+
 			var id = 3;
 			var student = NewStudent(time);
 			student.Id = id;
@@ -116,7 +117,7 @@ namespace models.Tests
 			var updated = NewStudent(time);
 			updated.Id = id;
 			updated.FirstName = "Updated";
-			_context.SaveChanges(() => _uut.CreateOrUpdate(updated));
+			_context.SaveChanges(() => _uut.CreateOrUpdate(time, updated));
 
 			var actual = _context.Students.First(s => s.Id == id);
 			Assert.That(actual.FirstName, Is.EqualTo(student.FirstName));
