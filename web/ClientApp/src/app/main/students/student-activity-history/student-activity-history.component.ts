@@ -35,8 +35,10 @@ export class StudentActivityHistoryComponent implements OnInit {
     this.studentsService.getStudentActivityRecordsByStudentId(this.student.paCyberId).subscribe(
       data => {
         this.activities = this.allActivities = data['studentActivityRecords'];
-        console.log('StudentActivityHistoryComponent.ngOnInit(): data is ', data['studentActivityRecords']);
         this.initActivityTypes();
+      },
+      error => {
+        console.log('getStudentActivityRecordsByStudentId(): ', error);
       }
     );
   }
@@ -44,7 +46,6 @@ export class StudentActivityHistoryComponent implements OnInit {
   initActivityTypes() {
     const atypes = this.allActivities.map((a) => a.activity);
     this.activityTypes = this.utilitiesService.uniqueItemsInArray(atypes);
-    console.log(`StudentActivityHistoryComponent.initActivityTypes():  activityTypes are ${this.activityTypes}.`);
   }
 
   listDisplayableFields() {
@@ -60,14 +61,17 @@ export class StudentActivityHistoryComponent implements OnInit {
     let vkeys = this.listDisplayableFields();
 
     let selected = this.utilitiesService.pick(activity, vkeys);
-    console.log('StudentActivityHistoryComponent.listDisplayableValues(): vkeys is ', vkeys);
-    console.log('StudentActivityHistoryComponent.listDisplayableValues(): selected is ', selected);
     
     return this.utilitiesService.objectValues(selected);
   }
 
   filterStudentHistoryByType(type: string) {
-    this.activities = this.allActivities.filter((e) => e['activity'] === type);
+    this.activities = this.allActivities.filter(
+      (a) => {
+        const atype = a['activity'];
+        return atype.StudentActivity === type;
+      }
+    );
   }
 
   resetStudentHistoryFilter() {

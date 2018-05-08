@@ -29,7 +29,10 @@ export class StudentsDetailComponent implements OnInit, OnDestroy {
           data => {
             console.log('StudentsDetailComponent.ngOnInit(): data is ', data);
             this.student = data['student'];
-         }
+          },
+          error => {
+            console.log('getStudent(): error is ', error);
+          }
        );
       }
     );

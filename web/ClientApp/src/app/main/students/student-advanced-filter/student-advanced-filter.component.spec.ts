@@ -12,6 +12,8 @@ import { StudentsService } from '../../../services/students.service';
 
 import { NgbModule, NgbCalendar, NgbDropdownConfig, NgbDateParserFormatter, NgbDateAdapter  } from '@ng-bootstrap/ng-bootstrap';
 
+import { Globals } from '../../../globals';
+
 describe('StudentAdvancedFilterComponent', () => {
   let component: StudentAdvancedFilterComponent;
   let fixture: ComponentFixture<StudentAdvancedFilterComponent>;
@@ -27,7 +29,8 @@ describe('StudentAdvancedFilterComponent', () => {
         NgbDropdownConfig,
         NgbCalendar,
         NgbDateParserFormatter,
-        NgbDateAdapter
+        NgbDateAdapter,
+        Globals
       ]
     })
     .compileComponents();

@@ -4,13 +4,16 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 import { StudentDetailsInfoComponent } from './student-details-info.component';
 
+import { CurrentStudentService } from '../../../services/current-student.service';
+
 describe('StudentDetailsInfoComponent', () => {
   let component: StudentDetailsInfoComponent;
   let fixture: ComponentFixture<StudentDetailsInfoComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ StudentDetailsInfoComponent ]
+      declarations: [ StudentDetailsInfoComponent ],
+      providers: [ CurrentStudentService ]
     })
     .compileComponents();
   }));

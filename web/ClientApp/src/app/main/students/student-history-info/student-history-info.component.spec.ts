@@ -1,12 +1,22 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { HttpClient, HttpHandler } from '@angular/common/http';
+
 import { FormsModule } from '@angular/forms';
 
 import { StudentHistoryInfoComponent } from './student-history-info.component';
-import { StudentAddressHistoryComponent } from '../student-address-history/student-address-history.component';
-import { StudentEnrollmentHistoryComponent } from '../student-enrollment-history/student-enrollment-history.component';
+import { StudentActivityHistoryComponent } from '../student-activity-history/student-activity-history.component';
 
-import { NgbModule, NgbTabsetConfig } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbTabsetConfig, NgbDropdownConfig } from '@ng-bootstrap/ng-bootstrap';
+
+import { OrderByPipe } from '../../../pipes/orderby.pipe';
+import { NormalizeFieldNamePipe } from '../../../pipes/normalize-field-name.pipe';
+
+import { UtilitiesService } from '../../../services/utilities.service';
+import { StudentsService } from '../../../services/students.service';
+import { CurrentStudentService } from '../../../services/current-student.service';
+
+import { Globals } from '../../../globals';
 
 describe('StudentHistoryInfoComponent', () => {
   let component: StudentHistoryInfoComponent;
@@ -16,11 +26,21 @@ describe('StudentHistoryInfoComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         StudentHistoryInfoComponent,
-        StudentAddressHistoryComponent,
-        StudentEnrollmentHistoryComponent
+        StudentActivityHistoryComponent,
+        OrderByPipe,
+        NormalizeFieldNamePipe
       ],
       imports: [ NgbModule, FormsModule ],
-      providers: [ NgbTabsetConfig ]
+      providers: [
+        NgbDropdownConfig,
+        NgbTabsetConfig,
+        HttpClient,
+        HttpHandler,
+        Globals,
+        StudentsService,
+        UtilitiesService,
+        CurrentStudentService
+      ]
     })
     .compileComponents();
   }));
