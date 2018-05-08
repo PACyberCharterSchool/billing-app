@@ -50,7 +50,7 @@ export class StudentActivityHistoryComponent implements OnInit {
 
   listDisplayableFields() {
     const fields = this.utilitiesService.objectKeys(this.allActivities[0]);
-    let rejected = ['batchHash', 'sequence', 'paCyberId'];
+    const rejected = ['batchHash', 'sequence', 'paCyberId'];
 
     if (fields) {
       return fields.filter((i) => !rejected.includes(i));
@@ -58,10 +58,9 @@ export class StudentActivityHistoryComponent implements OnInit {
   }
 
   listDisplayableValues(activity) {
-    let vkeys = this.listDisplayableFields();
+    const vkeys = this.listDisplayableFields();
+    const selected = this.utilitiesService.pick(activity, vkeys);
 
-    let selected = this.utilitiesService.pick(activity, vkeys);
-    
     return this.utilitiesService.objectValues(selected);
   }
 

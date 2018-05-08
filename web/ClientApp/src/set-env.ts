@@ -11,14 +11,16 @@ require('dotenv').config();
 const environment = argv.environment;
 const isProd = environment === 'prod';
 
-const targetPath = `./src/environments/environment.${environment}.ts`;
+const targetPath = environment === 'dev' ? `./src/environments/environment.ts` : `.src/environments/environment.${environment}.ts`;
+
 const envConfigFile = `
 export const environment = {
   production: ${isProd},
   apiHostName: "${process.env.API_HOST}",
   apiHostPort: "${process.env.API_PORT}"
 };
-`
+`;
+
 writeFile(targetPath, envConfigFile, function (err) {
   if (err) {
     console.log(err);
