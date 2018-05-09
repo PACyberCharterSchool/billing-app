@@ -1,3 +1,21 @@
-<p>
-  payments-refunds-home works!
-</p>
+<div class='row payments-refunds-home-title-row'>
+  <div class='col-md-12'><h3>Payments & Refunds</h3></div>
+</div>
+<div class='row payments-refunds-home-content-row'>
+  <div class='col-md-12'>
+    <div class='row'>
+      <div class='col-md-3'>
+        <button id='payments-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
+          <img src='../../../../assets/images/sprite_2X.png' alt='Payments' />
+          <label>Payments</label>
+        </button>
+      </div>
+      <div class='col-md-3'>
+        <button id='refunds-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
+          <img src='../../../../assets/images/sprite_2X.png' alt='Refunds' />
+          <label>Refunds</label>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
