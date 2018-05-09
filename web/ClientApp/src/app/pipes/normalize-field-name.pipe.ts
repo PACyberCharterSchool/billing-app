@@ -120,6 +120,15 @@ export class NormalizeFieldNamePipe implements PipeTransform {
       case 'newValue':
         fieldName = 'New Value';
         break;
+      case 'paymentAmt':
+        fieldName = 'Amount';
+        break;
+      case 'paymentDate':
+        fieldName = 'Date';
+        break;
+      case 'academicYear':
+        fieldName = 'Academic Year';
+        break;
       default:
         fieldName = 'Column';
         break;

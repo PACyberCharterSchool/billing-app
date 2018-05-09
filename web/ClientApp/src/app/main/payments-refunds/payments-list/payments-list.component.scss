@@ -1,7 +1,10 @@
 .payments-list-row {
+  height: 100%;
+
   div { // col-md-12
     .create-payment-col {
       display: inline-block;
+      height: 60px;
 
       div {
         display: inline-block;
@@ -12,6 +15,17 @@
           color: #58a917;
           display: inline-block;
         }
+
+        input {
+          height: 40px;
+          margin-left: 20px;
+          margin-right: 0;
+          width: 55%;
+        }
+
+        button {
+          height: 40px;
+        }
       }
     }
 
@@ -20,6 +34,16 @@
       padding: 0;
       margin: 0;
 
+    }
+  }
+
+  .payment-list-col {
+    height: calc(100% - 60px);
+
+    table {
+      thead {
+        height: 59px;
+      }
     }
   }
 }

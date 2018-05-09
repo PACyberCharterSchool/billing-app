@@ -13,15 +13,18 @@
      </div>
     </div>
   </div>
-  <div class='col-md-12'>
+  <div class='col-md-12 payment-list-col'>
     <table class='table table-fixed table-striped'>
       <thead>
         <tr>
-          <th *ngFor='let k of utilitiesService.objectKeys(payments[0])'></th>
+          <th *ngFor='let k of utilitiesService.objectKeys(payments[0])' (click)='sort(k)'>
+            {{k | normalizeFieldName}}
+            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+          </th>
         </tr>
       </thead>
-      <tbody>
-        <tr *ngFor='let payment of payments'>
+      <tbody infiniteScroll>
+        <tr *ngFor='let payment of payments | orderBy: {property: property, direction: direction}'>
           <td *ngFor='let v of utilitiesService.objectValues(payment)'>{{v}}</td>
         </tr>
       </tbody>

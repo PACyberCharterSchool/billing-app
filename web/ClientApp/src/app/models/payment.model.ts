@@ -1,6 +1,6 @@
 export class Payment {
   schoolDistrictName: string;
-  schoolDistrictAUN: string;
+  schoolDistrictId: string;
   paymentAmt: number;
   paymentDate: Date;
   type: string;
