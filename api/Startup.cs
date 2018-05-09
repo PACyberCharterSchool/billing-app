@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 
 using dotenv.net;
+using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.ReDoc;
 
@@ -55,7 +56,11 @@ namespace api
 			var connectionString = $"Server={hostName},{port};Database={databaseName};User Id={userName};Password={password}";
 			_logger.LogInformation($"Startup.ConfigureServices(): connectionString is {connectionString}.");
 
-			services.AddDbContextPool<PacBillContext>(opt => opt.UseSqlServer(connectionString));
+			services.AddDbContextPool<PacBillContext>(opt =>
+			{
+				opt.UseSqlServer(connectionString);
+				opt.UseLazyLoadingProxies();
+			});
 			services.AddTransient<IAuditRecordRepository, AuditRecordRepository>();
 			services.AddTransient<ICommittedStudentStatusRecordRepository, CommittedStudentStatusRecordRepository>();
 			services.AddTransient<IPendingStudentStatusRecordRepository, PendingStudentStatusRecordRepository>();
@@ -160,7 +165,8 @@ namespace api
 			});
 			#endregion
 
-			services.AddMvc();
+			services.AddMvc().
+				AddJsonOptions(o => o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 		}
 
 		public void Configure(IApplicationBuilder app, PacBillContext context)
