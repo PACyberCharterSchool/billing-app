@@ -122,7 +122,6 @@ namespace api.Common
 			var param = Expression.Parameter(typeof(T), "x");
 			var init = Project(typeof(T), param, includes, excludes);
 			var lambda = Expression.Lambda(init, param);
-			Console.WriteLine($"lambda: {lambda}");
 
 			return lambda.Compile().DynamicInvoke(obj);
 		}
