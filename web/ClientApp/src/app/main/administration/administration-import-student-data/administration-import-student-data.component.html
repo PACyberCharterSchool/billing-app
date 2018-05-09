@@ -12,7 +12,7 @@
   </div>
 </div>
 <div class='row import-student-data-content-row'>
-  <ngx-spinner size='large' loadingText='Committing data to PACBill database.  Please wait...'></ngx-spinner>
+  <ngx-spinner size='large' loadingText='Committing data to PACBill database.  Please wait...' type='ball-climbing-dot'></ngx-spinner>
 
   <div class='col-md-12' *ngIf='studentStatusRecords.length'>
     <table class='table table-striped table-fixed'>
@@ -30,6 +30,6 @@
   </div>
 
   <div class='col-md-12' *ngIf='studentStatusRecords.length === 0'>
-    <h4>The PACBill database is updated with the latest data.</h4>
+    <h4>PACBill data was last updated on {{lastUpdatedDate}}</h4>
   </div>
 </div>

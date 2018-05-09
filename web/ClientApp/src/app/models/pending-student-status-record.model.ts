@@ -21,7 +21,7 @@ export class PendingStudentStatusRecord {
   studentFormerIep?: Date;
   studentNorep?: Date;
   studentPaSecuredId?: number;
-  BatchTime: Date;
-  BatchFilename: string;
-  BatchHash: string;
+  batchTime: string;
+  batchFilename: string;
+  batchHash: string;
 }

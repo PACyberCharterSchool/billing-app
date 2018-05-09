@@ -21,6 +21,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
 
   studentStatusRecords: PendingStudentStatusRecord[] = [];
   private skip;
+  lastUpdatedDate: string;
 
   constructor(
     private globals: Globals,
@@ -38,6 +39,11 @@ export class AdministrationImportStudentDataComponent implements OnInit {
         this.updateScrollingSkip();
         this.studentStatusRecords = data['studentStatusRecords'];
         console.log('AdministrationImportStudentDataComponent.ngOnInit():  sample status record ', this.studentStatusRecords[0]);
+        if (this.studentStatusRecords.length > 0) {
+          this.lastUpdatedDate = this.studentStatusRecords[0].batchTime;
+        } else {
+          this.lastUpdatedDate = '?';
+        }
       }
     );
     this.spinnerService.hide();
@@ -52,6 +58,8 @@ export class AdministrationImportStudentDataComponent implements OnInit {
     this.ssrImportService.postStudentData().subscribe(
       response => {
         this.spinnerService.hide();
+        this.lastUpdatedDate = this.studentStatusRecords[0].batchTime;
+        this.studentStatusRecords = [];
       },
       error => {
         this.spinnerService.hide();
