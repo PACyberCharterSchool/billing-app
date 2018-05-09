@@ -21,9 +21,6 @@ export class NormalizeFieldNamePipe implements PipeTransform {
       case 'studentLastName':
         fieldName = 'Last Name';
         break;
-      case 'studentGradeLevel':
-        fieldName = 'Grade';
-        break;
       case 'schoolDistrictId':
         fieldName = 'AUN #';
         break;
@@ -70,15 +67,18 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         fieldName = 'State';
         break;
       case 'grade':
+      case 'studentGradeLevel':
         fieldName = 'Grade';
         break;
       case 'zipCode':
+      case 'studentZipCode':
         fieldName = 'Zip Code';
         break;
       case 'paCyberId':
         fieldName = 'PA Cyber Id';
         break;
       case 'paSecuredId':
+      case 'studentPaSecuredId':
         fieldName = 'PA Secure Id';
         break;
       case 'firstName':
@@ -88,12 +88,15 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         fieldName = 'Last Name';
         break;
       case 'middleInitial':
+      case 'studentMiddleInitial':
         fieldName = 'Middle Initial';
         break;
       case 'currentIep':
+      case 'studentCurrentIep':
         fieldName = 'Current IEP Date';
         break;
       case 'formerIep':
+      case 'studentFormerIep':
         fieldName = 'Former IEP Date';
         break;
       case 'startDate':
@@ -103,6 +106,7 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         fieldName = 'End Date';
         break;
       case 'dateOfBirth':
+      case 'studentDateOfBirth':
         fieldName = 'Date of Birth';
         break;
       case 'created':
@@ -128,6 +132,21 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         break;
       case 'academicYear':
         fieldName = 'Academic Year';
+        break;
+      case 'studentId':
+        fieldName = 'Student Id';
+        break;
+      case 'studentEnrollmentDate':
+        fieldName = 'Enrollment Date';
+        break;
+      case 'studentWithdrawalDate':
+        fieldName = 'Withdrawal Date';
+        break;
+      case 'studentIsSpecialEducation':
+        fieldName = 'Special Ed.?';
+        break;
+      case 'studentNorep':
+        fieldName = 'NOREP';
         break;
       default:
         fieldName = 'Column';

@@ -19,7 +19,7 @@ export class StudentStatusRecordsImportService {
   };
 
   constructor(private globals: Globals, private httpClient: HttpClient) {
-    this.apiSSRUrl = 'http://' + environment.apiHostName + ':' + environment.apiHostPort + '/api/StudentStatusRecords';
+    this.apiSSRUrl = 'api/StudentStatusRecords';
   }
 
   public getPending(skip: number): Observable<PendingStudentStatusRecord[]> {
