@@ -100,7 +100,8 @@ namespace api.Tests.Controllers
 			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
-			var actual = value.GetType().GetProperty("Students").GetValue(value, new object[] { 0 });
+			var actuals = value.GetType().GetProperty("Students").GetValue(value);
+			var actual = ((IList)actuals)[0];
 			AssertStudent(students[0], actual);
 		}
 
