@@ -28,7 +28,7 @@ namespace models
 		public DateTime Created { get; set; }
 		public DateTime LastUpdated { get; set; }
 
-		public SchoolDistrict SchoolDistrict { get; set; }
+		public virtual SchoolDistrict SchoolDistrict { get; set; }
 
 		private static readonly IEnumerable<string> _fields = typeof(Student).GetProperties().Select(p => p.Name);
 		public static bool IsValidField(string field)
