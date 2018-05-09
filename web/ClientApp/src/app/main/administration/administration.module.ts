@@ -13,6 +13,7 @@ import {
 } from './administration-import-student-data/administration-import-student-data.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     FormsModule,
     AdministrationRoutingModule,
     SharedModule,
-    NgbModule
+    NgbModule,
+    NgxSpinnerModule
   ],
   providers: [ ]
 })

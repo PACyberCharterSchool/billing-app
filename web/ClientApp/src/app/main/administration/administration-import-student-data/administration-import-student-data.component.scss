@@ -18,7 +18,26 @@
     overflow: hidden;
   }
 
-  thead {
-    height: 93px;
+  table {
+
+    thead {
+      height: 128px;
+
+      tr {
+        th {
+          width: 3.5%;
+        }
+      }
+    }
+
+    tbody {
+      height: calc(100% - 128px);
+
+      tr {
+        td {
+          width: 3.5%;
+        }
+      }
+    }
   }
 }

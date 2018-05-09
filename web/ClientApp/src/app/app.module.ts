@@ -47,7 +47,7 @@ const pacbillImports = [
   LoginModule,
   MainModule,
   AppRoutingModule,
-  NgbModule.forRoot(),
+  NgbModule.forRoot()
 ];
 
 const pacbillProviders = [

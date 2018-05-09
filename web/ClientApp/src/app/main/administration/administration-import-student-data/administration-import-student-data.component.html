@@ -3,30 +3,33 @@
     <h3>Administration - Import Student Data</h3>
   </div>
   <div class='col-md-3 offset-md-3'>
-    <div class='col-md-2 offset-md-4'>
+    <div class='col-md-2 offset-md-4' *ngIf='studentStatusRecords.length !== 0'>
       <button type='button' class='btn' (click)='handleCancelClick()'>CANCEL</button>
     </div>
-    <div class='col-md-2 offset-md-1'>
+    <div class='col-md-2 offset-md-1' *ngIf='studentStatusRecords.length !== 0'>
       <button type='button' class='btn btn-primary' (click)='handleDataImportCommitClick()'>COMMIT</button>
     </div>
   </div>
 </div>
 <div class='row import-student-data-content-row'>
+  <ngx-spinner size='large' loadingText='Committing data to PACBill database.  Please wait...'></ngx-spinner>
+
   <div class='col-md-12' *ngIf='studentStatusRecords.length'>
     <table class='table table-striped table-fixed'>
       <thead>
         <tr>
-          <th *ngFor='let k of utilitiesService.objectKeys(studentStatusRecords[0])'>{{k | normalizeFieldName}}</th>
+          <th *ngFor='let k of listDisplayableFields()'>{{k | normalizeFieldName}}</th>
         </tr>
       </thead>
       <tbody infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]="false">
         <tr *ngFor='let ssr of studentStatusRecords'>
-          <td *ngFor='let v of utilitiesService.objectValues(ssr)'>{{v}}</td>
+          <td *ngFor='let v of listDisplayableValues(ssr)'>{{v}}</td>
         </tr>
       </tbody>
     </table>
   </div>
-  <div class='col-md-12' *ngIf='!studentStatusRecords.length'>
-    <h3>PACBill is updated with the latest Genius data.</h3>
+
+  <div class='col-md-12' *ngIf='studentStatusRecords.length === 0'>
+    <h4>The PACBill database is updated with the latest data.</h4>
   </div>
 </div>

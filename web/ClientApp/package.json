@@ -38,6 +38,7 @@
     "jshint": "^2.9.5",
     "ngx-infinite-scroll": "^0.8.4",
     "ngx-popover": "0.0.16",
+    "ngx-spinner": "^2.0.1",
     "rxjs": "^5.5.6",
     "webpack": "^3.11.0",
     "yargs": "^11.0.0",
