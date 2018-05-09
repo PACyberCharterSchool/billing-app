@@ -4,8 +4,10 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 
+using static api.Common.Projection;
 using models;
 
 namespace api.Controllers
@@ -20,16 +22,6 @@ namespace api.Controllers
 		{
 			_students = students;
 			_logger = logger;
-		}
-
-		public struct StudentsResponse
-		{
-			public IList<Student> Students { get; }
-
-			public StudentsResponse(IList<Student> students)
-			{
-				Students = students;
-			}
 		}
 
 		public class GetManyArgs
@@ -47,6 +39,11 @@ namespace api.Controllers
 			public int Take { get; set; }
 
 			public string Filter { get; set; }
+		}
+
+		public struct StudentsResponse
+		{
+			public IList<Student> Students { get; }
 		}
 
 		[HttpGet]
@@ -76,17 +73,17 @@ namespace api.Controllers
 			if (students == null)
 				students = new List<Student>();
 
-			return new ObjectResult(new StudentsResponse(students));
+			return new ObjectResult(new
+			{
+				Students = students.Select(s => Project(s, excludes: new[]{
+					nameof(Student.SchoolDistrict) +"."+ nameof(SchoolDistrict.Students),
+				})).ToList(),
+			});
 		}
 
 		public struct StudentResponse
 		{
 			public Student Student { get; }
-
-			public StudentResponse(Student student)
-			{
-				Student = student;
-			}
 		}
 
 		[HttpGet("{id}")]
@@ -98,7 +95,12 @@ namespace api.Controllers
 			if (student == null)
 				return NotFound();
 
-			return new ObjectResult(new StudentResponse(student));
+			return new ObjectResult(new
+			{
+				Student = Project(student, excludes: new[] {
+					nameof(Student.SchoolDistrict) + "." + nameof(SchoolDistrict.Students)
+				}),
+			});
 		}
 	}
 }
