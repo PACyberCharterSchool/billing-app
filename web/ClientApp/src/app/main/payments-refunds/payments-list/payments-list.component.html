@@ -1,16 +1,30 @@
 <div class='row payments-list-row'>
   <div class='col-md-12'>
-    <div class='col-md-6 create-payment-col'>
+    <div class='col-md-7 create-payment-col'>
       <div class='col-md-4'><h3>Payments</h3></div>
       <div class='col-md-2 offset-md-6'>
         <button type='button' class='btn btn-primary' (click)='createPayment()'>ADD NEW</button>
       </div>
     </div>
-    <div class='col-md-6 search-payment-col'>
-      <div class='col-md-5 offset-md-7'>
+    <div class='col-md-4 offset-md-8 search-payment-col'>
+      <div class='col-md-7 offset-md-5'>
         <input type='text' [(ngModel)]='searchText' />
         <button type='button' class='btn btn-primary' (click)='searchSchoolDistricts()'>SEARCH</button>
      </div>
     </div>
+  </div>
+  <div class='col-md-12'>
+    <table class='table table-fixed table-striped'>
+      <thead>
+        <tr>
+          <th *ngFor='let k of utilitiesService.objectKeys(payments[0])'></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor='let payment of payments'>
+          <td *ngFor='let v of utilitiesService.objectValues(payment)'>{{v}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
