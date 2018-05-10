@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -29,6 +30,20 @@ namespace api.Tests.Controllers
 			_uut = new SchoolDistrictsController(_schoolDistricts.Object, _logger);
 		}
 
+		public void AssertSchoolDistrict(SchoolDistrict district, object actual)
+		{
+			foreach (var p in typeof(SchoolDistrict).GetProperties())
+			{
+				if (p.Name == nameof(SchoolDistrict.Students))
+					continue;
+
+				Assert.That(actual.GetType().GetField(p.Name).GetValue(actual),
+					Is.EqualTo(p.GetValue(district)));
+			}
+
+			Assert.That(actual.GetType().GetField("Students"), Is.Null);
+		}
+
 		[Test]
 		public async Task GetByIdReturnsSchoolDistrict()
 		{
@@ -40,10 +55,8 @@ namespace api.Tests.Controllers
 			Assert.That(result, Is.TypeOf<ObjectResult>());
 
 			var value = ((ObjectResult)result).Value;
-			Assert.That(value, Is.TypeOf<SchoolDistrictsController.SchoolDistrictResponse>());
-
-			var actual = ((SchoolDistrictsController.SchoolDistrictResponse)value).SchoolDistrict;
-			Assert.That(actual, Is.EqualTo(district));
+			var actual = value.GetType().GetProperty("SchoolDistrict").GetValue(value);
+			AssertSchoolDistrict(district, actual);
 		}
 
 		[Test]
@@ -70,10 +83,9 @@ namespace api.Tests.Controllers
 			Assert.That(result, Is.TypeOf<ObjectResult>());
 
 			var value = ((ObjectResult)result).Value;
-			Assert.That(value, Is.TypeOf<SchoolDistrictsController.SchoolDistrictsResponse>());
-
-			var actual = ((SchoolDistrictsController.SchoolDistrictsResponse)value).SchoolDistricts;
-			Assert.That(actual, Is.EqualTo(districts));
+			var actuals = value.GetType().GetProperty("SchoolDistricts").GetValue(value);
+			for (var i = 0; i < districts.Length; i++)
+				AssertSchoolDistrict(districts[i], ((IList)actuals)[i]);
 		}
 
 		[Test]
@@ -85,10 +97,8 @@ namespace api.Tests.Controllers
 			Assert.That(result, Is.TypeOf<ObjectResult>());
 
 			var value = ((ObjectResult)result).Value;
-			Assert.That(value, Is.TypeOf<SchoolDistrictsController.SchoolDistrictsResponse>());
-
-			var actual = ((SchoolDistrictsController.SchoolDistrictsResponse)value).SchoolDistricts;
-			Assert.That(actual, Is.Empty);
+			var actuals = value.GetType().GetProperty("SchoolDistricts").GetValue(value);
+			Assert.That(actuals.GetType().GetProperty("Count").GetValue(actuals), Is.EqualTo(0));
 		}
 
 		[Test]
@@ -100,10 +110,8 @@ namespace api.Tests.Controllers
 			Assert.That(result, Is.TypeOf<ObjectResult>());
 
 			var value = ((ObjectResult)result).Value;
-			Assert.That(value, Is.TypeOf<SchoolDistrictsController.SchoolDistrictsResponse>());
-
-			var actual = ((SchoolDistrictsController.SchoolDistrictsResponse)value).SchoolDistricts;
-			Assert.That(actual, Is.Empty);
+			var actuals = value.GetType().GetProperty("SchoolDistricts").GetValue(value);
+			Assert.That(actuals.GetType().GetProperty("Count").GetValue(actuals), Is.EqualTo(0));
 		}
 
 		[Test]
