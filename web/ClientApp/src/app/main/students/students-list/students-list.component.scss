@@ -2,10 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-
-  .advanced-search-tools-control-col {
-    height: 100%;
-  }
+  height: 7%;
 
   .base-date-search-tools-col {
     margin: 0;
@@ -35,7 +32,6 @@
   }
 
   .advanced-search-tools-control-col {
-    height: 100%;
     margin: 0;
     padding-left: 0;
   }
@@ -70,6 +66,18 @@
 }
 
 .student-list-view-row {
-  height: 100%;
+  height: 93%;
   margin-top: 5px;
+
+  div {
+    table {
+      thead {
+        height: 15%;
+      }
+
+      tbody {
+        height: calc(100% - 15%);
+      }
+    }
+  }
 }

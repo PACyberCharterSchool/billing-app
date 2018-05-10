@@ -68,7 +68,7 @@ export class StudentActivityHistoryComponent implements OnInit {
     this.activities = this.allActivities.filter(
       (a) => {
         const atype = a['activity'];
-        return atype.StudentActivity === type;
+        return atype === type;
       }
     );
   }

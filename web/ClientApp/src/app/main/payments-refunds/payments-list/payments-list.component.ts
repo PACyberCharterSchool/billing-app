@@ -6,46 +6,30 @@ import { Payment } from '../../../models/payment.model';
 
 import { NormalizeFieldNamePipe } from '../../../pipes/normalize-field-name.pipe';
 
+import { PaymentUpsertFormComponent } from '../payment-upsert-form/payment-upsert-form.component';
+
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
 @Component({
   selector: 'app-payments-list',
   templateUrl: './payments-list.component.html',
   styleUrls: ['./payments-list.component.scss']
 })
 export class PaymentsListComponent implements OnInit {
-
+  private searchText: string;
   private direction: number;
   private property: string;
   private isDescending: boolean;
-  private payments: Payment[] = [
-    {
-      schoolDistrictName: 'Seneca Valley SD',
-      schoolDistrictId: '123456',
-      paymentAmt: 4300.00,
-      type: '#14534',
-      paymentDate: new Date('04/01/2018'),
-      academicYear: 2018
-    },
-    {
-      schoolDistrictName: 'Mars SD',
-      schoolDistrictId: '654321',
-      paymentAmt: 1800.00,
-      type: '#99999',
-      paymentDate: new Date('07/22/2018'),
-      academicYear: 2019
-    },
-    {
-      schoolDistrictName: 'Indiana SD',
-      schoolDistrictId: '789023',
-      paymentAmt: 40000.00,
-      type: '#99999',
-      paymentDate: new Date('07/22/2018'),
-      academicYear: 2019
-    }
-  ];
+  private allPayments: Payment[];
+  private payments: Payment[];
 
-  constructor(private utilitiesService: UtilitiesService) {
+  constructor(
+    private utilitiesService: UtilitiesService,
+    private ngbModalService: NgbModal
+  ) {
     this.property = 'schoolDistrictName';
     this.direction = 1;
+    this.payments = this.allPayments;
   }
 
   ngOnInit() {
@@ -55,5 +39,37 @@ export class PaymentsListComponent implements OnInit {
     this.isDescending = !this.isDescending; // change the direction
     this.property = property;
     this.direction = this.isDescending ? 1 : -1;
+  }
+
+  filterPaymentRecords() {
+    this.payments = this.allPayments.filter(
+      (i) => {
+        const re = new RegExp(this.searchText, 'gi');
+        if (+i.schoolDistrictId.search(re) !== -1 || i.schoolDistrictName.search(re) !== -1 || i.schoolDistrictId.search(re) !== -1) {
+          return true;
+        }
+        return false;
+      }
+    );
+    console.log('PaymentsListComponent.filterPaymentRecords():  payments is ', this.payments);
+  }
+
+  resetPaymentRecords() {
+    this.payments = this.allPayments;
+  }
+
+  createPayment(content) {
+    this.ngbModalService.open(PaymentUpsertFormComponent, { centered: true }).result.then(
+      (result) => {
+        console.log('PaymentsListComponent.createPayment():  result is ', result);
+      },
+      (reason) => {
+        console.log('PaymentsListComponent.createPayment():  reason is ', reason);
+      }
+    );
+  }
+
+  editPayment(p: Payment) {
+
   }
 }

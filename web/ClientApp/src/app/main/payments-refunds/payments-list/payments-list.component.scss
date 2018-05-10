@@ -1,4 +1,6 @@
 .payments-list-row {
+  display: flex;
+  align-items: center;
   height: 100%;
 
   div { // col-md-12
@@ -30,10 +32,27 @@
     }
 
     .search-payment-col {
-      display: inline-block;
+      align-items: center;
+      display: inline-flex;
+      height: 60px;
+      justify-content: center;
       padding: 0;
       margin: 0;
 
+      div {
+        height: 100%;
+        display: flex;
+        align-items:center;
+
+        input {
+          height: 55%;
+          width: 65%;
+        }
+
+        button {
+          height: 55%;
+        }
+      }
     }
   }
 

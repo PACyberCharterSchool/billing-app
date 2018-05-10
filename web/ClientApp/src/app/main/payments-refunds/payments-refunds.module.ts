@@ -10,6 +10,7 @@ import { PaymentsRefundsHomeComponent } from './payments-refunds-home/payments-r
 import { PaymentsComponent } from './payments/payments.component';
 import { RefundsComponent } from './refunds/refunds.component';
 import { PaymentsListComponent } from './payments-list/payments-list.component';
+import { PaymentUpsertFormComponent } from './payment-upsert-form/payment-upsert-form.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -18,7 +19,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     PaymentsRefundsHomeComponent,
     PaymentsComponent,
     RefundsComponent,
-    PaymentsListComponent
+    PaymentsListComponent,
+    PaymentUpsertFormComponent
   ],
   imports: [
     CommonModule,
@@ -27,7 +29,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     SharedModule,
     NgbModule
   ],
-  providers: [ ]
+  providers: [ ],
+  entryComponents: [ PaymentUpsertFormComponent ]
 })
 
 export class PaymentsRefundsModule { }

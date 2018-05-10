@@ -1,0 +1,37 @@
+<div class='col-md-12'>
+  <div class='modal-header'>
+    <h4 class="modal-title">Create Payment</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class='modal-body'>
+    <div class='col-md-12 payment-not-upserted-error' [style.visibility]="upsertError ? 'visible' : 'hidden'">
+      Payment error:  {{upsertError}}
+    </div>
+    <div class='col-md-12'>
+      <form #paymentUpsertForm='ngForm' (ngSubmit)='upsertPayment()'>
+        <div class='form-group'>
+          <label>School District Name</label>
+          <div ngbDropdown class='d-inline-block'>
+            <button ngbDropdownToggle class='btn btn-outline-primary' id='schoolDistrictDropdown'>Select</button>
+            <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='schoolDistrictDropdown'>
+              <button class='dropdown-item' *ngFor='let sd of schoolDistricts' (click)='setSelectedSchoolDistrict(sd)'>{{sd.name}}</button>
+            </div>
+          </div>
+          <span>{{selectedSchoolDistrict?.aun}}</span>
+        </div>
+        <div class='form-group'>
+          <input type='password' class='form-control' id='paymentAmount' name='paymentAmount' [(ngModel)]='amount' required #paymentAmount='ngModel' />
+          <div [style.visibility]="paymentAmount.invalid && (paymentAmount.dirty || paymentAmount.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid payment amount</div>
+        </div>
+        <div class='form-group'>
+          <button type='submit' class='btn btn-primary' (click)="upsertPayment()">{{operation}}</button>
+          <button type='submit' class='btn btn-outline' (click)="activeModal.close('Close click')">CANCEL</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class='modal-footer'>
+  </div>
+</div>

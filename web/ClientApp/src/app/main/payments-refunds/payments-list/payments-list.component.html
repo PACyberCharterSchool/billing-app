@@ -1,15 +1,16 @@
 <div class='row payments-list-row'>
   <div class='col-md-12'>
-    <div class='col-md-7 create-payment-col'>
+    <div class='col-md-6 create-payment-col'>
       <div class='col-md-4'><h3>Payments</h3></div>
       <div class='col-md-2 offset-md-6'>
-        <button type='button' class='btn btn-primary' (click)='createPayment()'>ADD NEW</button>
+        <button type='button' class='btn btn-primary' (click)='createPayment(payment)'>ADD NEW</button>
       </div>
     </div>
-    <div class='col-md-4 offset-md-8 search-payment-col'>
+    <div class='col-md-5 offset-md-7 search-payment-col'>
       <div class='col-md-7 offset-md-5'>
         <input type='text' [(ngModel)]='searchText' />
-        <button type='button' class='btn btn-primary' (click)='searchSchoolDistricts()'>SEARCH</button>
+        <button type='button' class='btn btn-primary' (click)='filterPaymentRecords()'>SEARCH</button>
+        <button type='button' class='btn btn-outline-primary' (click)='resetPaymentRecords()'>RESET</button>
      </div>
     </div>
   </div>
@@ -24,7 +25,7 @@
         </tr>
       </thead>
       <tbody infiniteScroll>
-        <tr *ngFor='let payment of payments | orderBy: {property: property, direction: direction}'>
+        <tr *ngFor='let payment of payments | orderBy: {property: property, direction: direction}' (click)='editPayment(payment)'>
           <td *ngFor='let v of utilitiesService.objectValues(payment)'>{{v}}</td>
         </tr>
       </tbody>

@@ -17,7 +17,8 @@ const envConfigFile = `
 export const environment = {
   production: ${isProd},
   apiHostName: "${process.env.API_HOST}",
-  apiHostPort: "${process.env.API_PORT}"
+  apiHostPort: "${process.env.API_PORT}",
+  apiBaseUrl: "http://${process.env.API_HOST}:${process.env.API_PORT}/api"
 };
 `;
 

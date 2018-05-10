@@ -21,6 +21,7 @@ import { SchoolDistrictService } from './services/school-district.service';
 import { UtilitiesService } from './services/utilities.service';
 import { CurrentStudentService } from './services/current-student.service';
 import { StudentStatusRecordsImportService } from './services/student-status-records-import.service';
+import { PaymentsService } from './services/payments.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
@@ -55,12 +56,13 @@ const pacbillProviders = [
   AuthenticationGuardService,
   AuthenticationService,
   CurrentStudentService,
+  Globals,
+  PaymentsService,
   SchoolDistrictService,
   StudentsService,
   StudentStatusRecordsImportService,
   tokenInterceptor,
   UtilitiesService,
-  Globals
 ];
 
 @NgModule({
