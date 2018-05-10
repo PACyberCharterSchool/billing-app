@@ -9,6 +9,7 @@ namespace models
 
 		public DbSet<AuditRecord> AuditRecords { get; set; }
 		public DbSet<CommittedStudentStatusRecord> CommittedStudentStatusRecords { get; set; }
+		public DbSet<Payment> Payments { get; set; }
 		public DbSet<PendingStudentStatusRecord> PendingStudentStatusRecords { get; set; }
 		public DbSet<SchoolDistrict> SchoolDistricts { get; set; }
 		public DbSet<Student> Students { get; set; }
@@ -16,6 +17,15 @@ namespace models
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
+			builder.Entity<Payment>().
+				HasIndex(e => new { e.PaymentId, e.Split }).
+				IsUnique();
+
+			builder.Entity<Payment>().
+				Property(e => e.Type).
+				HasDefaultValue(PaymentType.Check).
+				HasConversion(new EnumerableConverter<PaymentType>());
+
 			builder.Entity<SchoolDistrict>().
 				HasIndex(e => e.Aun).
 				IsUnique();
@@ -27,10 +37,7 @@ namespace models
 			builder.Entity<SchoolDistrict>().
 				Property(e => e.PaymentType).
 				HasDefaultValue(SchoolDistrictPaymentType.Ach).
-				HasConversion(
-					v => v.Value,
-					v => SchoolDistrictPaymentType.FromString(v)
-				);
+				HasConversion(new EnumerableConverter<SchoolDistrictPaymentType>());
 
 			builder.Entity<Student>().
 				HasIndex(s => s.PACyberId).
@@ -38,10 +45,7 @@ namespace models
 
 			builder.Entity<StudentActivityRecord>().
 				Property(s => s.Activity).
-				HasConversion(
-					v => v.Value,
-					v => StudentActivity.FromString(v)
-				);
+				HasConversion(new EnumerableConverter<StudentActivity>());
 		}
 	}
 }
