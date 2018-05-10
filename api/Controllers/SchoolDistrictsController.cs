@@ -7,8 +7,10 @@ using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 
+using static api.Common.Projection;
 using models;
 
 namespace api.Controllers
@@ -42,7 +44,12 @@ namespace api.Controllers
 			if (district == null)
 				return NotFound();
 
-			return new ObjectResult(new SchoolDistrictResponse { SchoolDistrict = district });
+			return new ObjectResult(new
+			{
+				SchoolDistrict = Project(district, excludes: new[] {
+					nameof(SchoolDistrict.Students),
+				}),
+			});
 		}
 
 		public struct SchoolDistrictsResponse
@@ -59,7 +66,12 @@ namespace api.Controllers
 			if (districts == null)
 				districts = new List<SchoolDistrict>();
 
-			return new ObjectResult(new SchoolDistrictsResponse { SchoolDistricts = districts });
+			return new ObjectResult(new
+			{
+				SchoolDistricts = districts.Select(d => Project(d, excludes: new[] {
+					nameof(SchoolDistrict.Students),
+				})).ToList(),
+			});
 		}
 
 		public class SchoolDistrictUpdate
