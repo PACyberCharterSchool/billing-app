@@ -14,6 +14,8 @@ namespace models
 			Value = value;
 		}
 
+		protected Enumerable() { }
+
 		public static T FromString(string value)
 		{
 			return GetAll().First(t => t.Value.ToLower() == value.ToLower());

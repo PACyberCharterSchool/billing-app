@@ -5,6 +5,7 @@ namespace models
 	public class PaymentType : Enumerable<PaymentType>
 	{
 		private PaymentType(string value) : base(value) { }
+		private PaymentType() : base() { }
 
 		public static readonly PaymentType Check = new PaymentType("Check");
 		public static readonly PaymentType UniPay = new PaymentType("UniPay");

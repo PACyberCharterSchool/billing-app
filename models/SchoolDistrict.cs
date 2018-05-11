@@ -8,6 +8,7 @@ namespace models
 	public class SchoolDistrictPaymentType : Enumerable<SchoolDistrictPaymentType>
 	{
 		private SchoolDistrictPaymentType(string value) : base(value) { }
+		private SchoolDistrictPaymentType() : base() { }
 
 		public static readonly SchoolDistrictPaymentType Ach = new SchoolDistrictPaymentType("ACH");
 		public static readonly SchoolDistrictPaymentType Check = new SchoolDistrictPaymentType("Check");
