@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace models
 {
-	public class SchoolDistrictPaymentType : Enumerable<SchoolDistrictPaymentType>
+	public class SchoolDistrictPaymentType : Enumeration<SchoolDistrictPaymentType>
 	{
 		private SchoolDistrictPaymentType(string value) : base(value) { }
 		private SchoolDistrictPaymentType() : base() { }

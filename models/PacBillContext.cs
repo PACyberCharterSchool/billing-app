@@ -24,7 +24,7 @@ namespace models
 			builder.Entity<Payment>().
 				Property(e => e.Type).
 				HasDefaultValue(PaymentType.Check).
-				HasConversion(new EnumerableConverter<PaymentType>());
+				HasConversion(new EnumerationConverter<PaymentType>());
 
 			builder.Entity<SchoolDistrict>().
 				HasIndex(e => e.Aun).
@@ -37,7 +37,7 @@ namespace models
 			builder.Entity<SchoolDistrict>().
 				Property(e => e.PaymentType).
 				HasDefaultValue(SchoolDistrictPaymentType.Ach).
-				HasConversion(new EnumerableConverter<SchoolDistrictPaymentType>());
+				HasConversion(new EnumerationConverter<SchoolDistrictPaymentType>());
 
 			builder.Entity<Student>().
 				HasIndex(s => s.PACyberId).
@@ -45,7 +45,7 @@ namespace models
 
 			builder.Entity<StudentActivityRecord>().
 				Property(s => s.Activity).
-				HasConversion(new EnumerableConverter<StudentActivity>());
+				HasConversion(new EnumerationConverter<StudentActivity>());
 		}
 	}
 }

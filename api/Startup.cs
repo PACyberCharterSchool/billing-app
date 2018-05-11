@@ -159,8 +159,8 @@ namespace api
 				o.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>{
 						{"Bearer", null},
 				});
-				o.SchemaFilter<EnumerableSchemaFilter>();
-				o.OperationFilter<EnumerableOperationFilter>();
+				o.SchemaFilter<EnumerationSchemaFilter>();
+				o.OperationFilter<EnumerationOperationFilter>();
 				o.OperationFilter<StudentFieldOperationFilter>();
 			});
 			#endregion

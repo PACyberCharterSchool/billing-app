@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,17 +9,17 @@ using models;
 
 namespace api.Controllers
 {
-	public class EnumerableValidationAttribute : ValidationAttribute
+	public class EnumerationValidationAttribute : ValidationAttribute
 	{
 		Type _type;
 		public readonly IList<string> Values;
 
-		public EnumerableValidationAttribute(Type type)
+		public EnumerationValidationAttribute(Type type)
 		{
 			_type = type;
-			var t = type.GetGenericSubclass(typeof(Enumerable<>));
+			var t = type.GetGenericSubclass(typeof(Enumeration<>));
 			if (t == null)
-				throw new ArgumentException($"{t} does not inherit from {typeof(Enumerable<>)}.");
+				throw new ArgumentException($"{t} does not inherit from {typeof(Enumeration<>)}.");
 
 			Values = t.GetMethod("Values", BindingFlags.Public | BindingFlags.Static).
 				Invoke(null, null) as IList<string>;

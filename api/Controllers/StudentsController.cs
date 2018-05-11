@@ -29,7 +29,7 @@ namespace api.Controllers
 			[StudentField]
 			public string Sort { get; set; }
 
-			[EnumerableValidation(typeof(SortDirection))]
+			[EnumerationValidation(typeof(SortDirection))]
 			public string Dir { get; set; }
 
 			[Range(0, int.MaxValue)]

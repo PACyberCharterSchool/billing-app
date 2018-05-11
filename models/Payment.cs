@@ -2,7 +2,7 @@ using System;
 
 namespace models
 {
-	public class PaymentType : Enumerable<PaymentType>
+	public class PaymentType : Enumeration<PaymentType>
 	{
 		private PaymentType(string value) : base(value) { }
 		private PaymentType() : base() { }
