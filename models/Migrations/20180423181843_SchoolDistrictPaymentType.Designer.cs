@@ -14,7 +14,7 @@ namespace models.Migrations
 {
 	[DbContext(typeof(PacBillContext))]
 	[Migration("20180423181843_SchoolDistrictPaymentType")]
-	partial class SchoolDistrictPaymentType
+	partial class SchoolDistrictPaymentTypeMigration
 	{
 		protected override void BuildTargetModel(ModelBuilder modelBuilder)
 		{

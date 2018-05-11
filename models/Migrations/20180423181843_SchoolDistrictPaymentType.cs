@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace models.Migrations
 {
-	public partial class SchoolDistrictPaymentType : Migration
+	public partial class SchoolDistrictPaymentTypeMigration : Migration
 	{
 		protected override void Up(MigrationBuilder migrationBuilder)
 		{
