@@ -41,7 +41,7 @@
     background-color: transparent;
   }
 
-  h3 {
+  h3, h4 {
     color: #58a719;
     display: inline-block;
     font-family: 'Museo Slab';
@@ -58,7 +58,7 @@
     height: 40px;
     margin-left: 20px;
     margin-right: 0;
-    width: 55%;
+    width: 50%;
   }
 }
 
@@ -72,11 +72,11 @@
   div {
     table {
       thead {
-        height: 15%;
+        height: 62px;
       }
 
       tbody {
-        height: calc(100% - 15%);
+        height: calc(100% - 62px);
       }
     }
   }

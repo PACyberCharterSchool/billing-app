@@ -1,6 +1,6 @@
 <div class='row base-search-tools-row'>
   <div class='col-md-4' style='padding-right: 0;'>
-    <h3>Students</h3>
+    <h4>Students</h4>
     <input type='text' placeholder='Search ID, student name...' [(ngModel)]='searchText' />
     <button class='btn-primary search-button' (click)='filterStudentListByNameOrId()'>SEARCH</button>
   </div>
@@ -55,7 +55,7 @@
             <i class="fa" [ngClass]="{'fa-sort': column != 'grade', 'fa-sort-asc': (column == 'grade' && isDescending), 'fa-sort-desc': (column == 'grade' && !isDescending) }" aria-hidden="true"></i>
           </th>
           <th (click)="sort('schoolDistrict')">
-            School District
+            School Dist
             <i class="fa" [ngClass]="{'fa-sort': column != 'schoolDistrict', 'fa-sort-asc': (column == 'schoolDistrict' && isDescending), 'fa-sort-desc': (column == 'schoolDistrict' && !isDescending) }" aria-hidden="true"></i>
           </th>
           <th (click)="sort('dob')">

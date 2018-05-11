@@ -20,12 +20,10 @@ export class StudentDatepickerComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    console.log('StudentDatepickerComponent.ngOnInit(): iconSize is ', this.iconSize);
   }
 
   onDateChanged() {
     this.date = new Date(this.model.year, this.model.month - 1, this.model.day); // yes, that bit of math on the month value is necessary
     this.dateSelected.emit(this.date);
-    console.log('StudentDatepickerComponent.ngOnChange():  dateSelected event emitted.');
   }
 }

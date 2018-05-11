@@ -18,7 +18,7 @@ export class SchoolDistrictService {
   };
 
   constructor(private httpClient: HttpClient) {
-    this.apiSchoolDistrictsUrl = 'api/schoolDistricts';
+    this.apiSchoolDistrictsUrl = '/api/schoolDistricts';
   }
 
   public getSchoolDistricts(): Observable<SchoolDistrict[]> {
