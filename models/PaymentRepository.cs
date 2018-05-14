@@ -35,30 +35,37 @@ namespace models
 			nameof(Payment.LastUpdated),
 		};
 
-		public IList<Payment> CreateOrUpdateMany(DateTime time, IList<Payment> updates)
+		public IList<Payment> CreateOrUpdateMany(DateTime time, IList<Payment> us)
 		{
-			// TODO(Erik): group by PaymentId
-			// TODO(Erik): add splits
-			// TODO(Erik): remove splits
 			var updated = new List<Payment>();
 
-			foreach (var update in updates)
+			var map = us.GroupBy(u => u.PaymentId).ToDictionary(u => u.Key, u => u.ToList());
+			foreach (var kv in map)
 			{
-				var payment = _payments.FirstOrDefault(p => p.PaymentId == update.PaymentId && p.Split == update.Split);
-				if (payment == null)
+				var id = kv.Key;
+				var updates = kv.Value;
+				var payments = GetMany(id).ToList();
+				if (payments.Count > updates.Count)
+					_payments.RemoveRange(payments.Skip(updates.Count));
+
+				foreach (var update in updates)
 				{
-					update.Created = time;
-					update.LastUpdated = time;
+					var payment = payments.SingleOrDefault(p => p.Split == update.Split);
+					if (payment == null)
+					{
+						update.Created = time;
+						update.LastUpdated = time;
 
-					_payments.Add(update);
-					updated.Add(update);
-					continue;
+						_payments.Add(update);
+						updated.Add(update);
+						continue;
+					}
+
+					MergeProperties(payment, update, _excludedFields);
+					payment.LastUpdated = time;
+					_payments.Update(payment);
+					updated.Add(payment);
 				}
-
-				MergeProperties(payment, update, _excludedFields);
-				payment.LastUpdated = time;
-				_payments.Update(payment);
-				updated.Add(payment);
 			}
 
 			return updated;

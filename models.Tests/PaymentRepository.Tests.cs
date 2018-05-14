@@ -80,7 +80,7 @@ namespace models.Tests
 			payments[1].Amount = amount;
 
 			var time = DateTime.Now;
-			var result = _context.SaveChanges(() => _uut.CreateOrUpdateMany(payments));
+			var result = _context.SaveChanges(() => _uut.CreateOrUpdateMany(time, payments));
 			Assert.That(result, Has.Count.EqualTo(payments.Length));
 
 			var actual = _context.Payments.Where(p => p.PaymentId == paymentId).ToList();
@@ -110,13 +110,76 @@ namespace models.Tests
 			};
 
 			var time = DateTime.Now;
-			var result = _context.SaveChanges(() => _uut.CreateOrUpdateMany(updates));
+			var result = _context.SaveChanges(() => _uut.CreateOrUpdateMany(time, updates));
 			Assert.That(result, Has.Count.EqualTo(payments.Length));
 
 			var actual = _context.Payments.Where(p => p.PaymentId == paymentId).ToList();
 			Assert.That(actual, Has.Count.EqualTo(payments.Length));
 			for (var i = 0; i < actual.Count(); i++)
 				Assert.That(actual[i].Amount, Is.EqualTo(amount));
+		}
+
+		[Test]
+		public void CreateOrUpdateSplitsExisting()
+		{
+			var paymentId = "1234";
+			var time = DateTime.Now;
+			var payments = new[] {
+				new Payment { PaymentId = paymentId, Split = 1, Amount = 10m, Created = time.AddDays(-1) },
+			};
+			using (var ctx = NewContext())
+			{
+				ctx.AddRange(payments);
+				ctx.SaveChanges();
+			}
+
+			var updates = new[] {
+				new Payment { PaymentId = paymentId, Split = 1, Amount = 7.5m },
+				new Payment { PaymentId = paymentId, Split = 2, Amount = 2.5m },
+			};
+
+			var result = _context.SaveChanges(() => _uut.CreateOrUpdateMany(time, updates));
+			Assert.That(result, Has.Count.EqualTo(updates.Length));
+
+			var actual = _context.Payments.Where(p => p.PaymentId == paymentId).ToList();
+			Assert.That(actual, Has.Count.EqualTo(updates.Length));
+			for (var i = 0; i < actual.Count; i++)
+				Assert.That(actual[i].Amount, Is.EqualTo(updates[i].Amount));
+
+			Assert.That(actual[0].Created, Is.EqualTo(payments[0].Created));
+			Assert.That(actual[0].LastUpdated, Is.EqualTo(time));
+			Assert.That(actual[1].Created, Is.EqualTo(time));
+			Assert.That(actual[1].LastUpdated, Is.EqualTo(time));
+		}
+
+		[Test]
+		public void CreateOrUpdateMergesExisting()
+		{
+			var paymentId = "1234";
+			var time = DateTime.Now;
+			var payments = new[] {
+				new Payment { PaymentId = paymentId, Split = 1, Amount = 7.5m, Created = time.AddDays(-1) },
+				new Payment { PaymentId = paymentId, Split = 2, Amount = 2.5m, Created = time.AddDays(-1) },
+			};
+			using (var ctx = NewContext())
+			{
+				ctx.AddRange(payments);
+				ctx.SaveChanges();
+			}
+
+			var updates = new[] {
+				new Payment { PaymentId = paymentId, Split = 1, Amount = 10m },
+			};
+
+			var result = _context.SaveChanges(() => _uut.CreateOrUpdateMany(time, updates));
+			Assert.That(result, Has.Count.EqualTo(updates.Length));
+
+			var actual = _context.Payments.Where(p => p.PaymentId == paymentId).ToList();
+			Assert.That(actual, Has.Count.EqualTo(1));
+
+			Assert.That(actual[0].Amount, Is.EqualTo(updates[0].Amount));
+			Assert.That(actual[0].Created, Is.EqualTo(payments[0].Created));
+			Assert.That(actual[0].LastUpdated, Is.EqualTo(time));
 		}
 
 		[Test]
