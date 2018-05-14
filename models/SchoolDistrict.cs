@@ -21,8 +21,6 @@ namespace models
 		public string Name { get; set; }
 		public decimal Rate { get; set; }
 		public decimal? AlternateRate { get; set; }
-
-		[JsonConverter(typeof(SchoolDistrictPaymentTypeJsonConverter))]
 		public SchoolDistrictPaymentType PaymentType { get; set; }
 
 		public DateTime Created { get; set; }

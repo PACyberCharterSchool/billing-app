@@ -8,6 +8,7 @@ using Moq;
 using NUnit.Framework;
 
 using api.Controllers;
+using api.Dtos;
 using api.Tests.Util;
 using models;
 
@@ -30,18 +31,16 @@ namespace api.Tests.Controllers
 			_uut = new SchoolDistrictsController(_schoolDistricts.Object, _logger);
 		}
 
-		public void AssertSchoolDistrict(SchoolDistrict district, object actual)
+		public void AssertSchoolDistrict(SchoolDistrictDto actual, SchoolDistrict district)
 		{
-			foreach (var p in typeof(SchoolDistrict).GetProperties())
-			{
-				if (p.Name == nameof(SchoolDistrict.Students))
-					continue;
-
-				Assert.That(actual.GetType().GetField(p.Name).GetValue(actual),
-					Is.EqualTo(p.GetValue(district)));
-			}
-
-			Assert.That(actual.GetType().GetField("Students"), Is.Null);
+			Assert.That(actual.Id, Is.EqualTo(district.Id));
+			Assert.That(actual.Aun, Is.EqualTo(district.Aun));
+			Assert.That(actual.Name, Is.EqualTo(district.Name));
+			Assert.That(actual.Rate, Is.EqualTo(district.Rate));
+			Assert.That(actual.AlternateRate, Is.EqualTo(district.AlternateRate));
+			Assert.That(actual.PaymentType, Is.EqualTo(district.PaymentType));
+			Assert.That(actual.Created, Is.EqualTo(district.Created));
+			Assert.That(actual.LastUpdated, Is.EqualTo(district.LastUpdated));
 		}
 
 		[Test]
@@ -53,10 +52,12 @@ namespace api.Tests.Controllers
 
 			var result = await _uut.GetById(id);
 			Assert.That(result, Is.TypeOf<ObjectResult>());
-
 			var value = ((ObjectResult)result).Value;
-			var actual = value.GetType().GetProperty("SchoolDistrict").GetValue(value);
-			AssertSchoolDistrict(district, actual);
+
+			Assert.That(value, Is.TypeOf<SchoolDistrictsController.SchoolDistrictResponse>());
+			var actual = ((SchoolDistrictsController.SchoolDistrictResponse)value).SchoolDistrict;
+
+			AssertSchoolDistrict(actual, district);
 		}
 
 		[Test]
@@ -81,11 +82,14 @@ namespace api.Tests.Controllers
 
 			var result = await _uut.GetMany();
 			Assert.That(result, Is.TypeOf<ObjectResult>());
-
 			var value = ((ObjectResult)result).Value;
-			var actuals = value.GetType().GetProperty("SchoolDistricts").GetValue(value);
-			for (var i = 0; i < districts.Length; i++)
-				AssertSchoolDistrict(districts[i], ((IList)actuals)[i]);
+
+			Assert.That(value, Is.TypeOf<SchoolDistrictsController.SchoolDistrictsResponse>());
+			var actuals = ((SchoolDistrictsController.SchoolDistrictsResponse)value).SchoolDistricts;
+
+			Assert.That(actuals, Has.Count.EqualTo(districts.Length));
+			for (var i = 0; i < actuals.Count; i++)
+				AssertSchoolDistrict(actuals[i], districts[i]);
 		}
 
 		[Test]
@@ -95,10 +99,12 @@ namespace api.Tests.Controllers
 
 			var result = await _uut.GetMany();
 			Assert.That(result, Is.TypeOf<ObjectResult>());
-
 			var value = ((ObjectResult)result).Value;
-			var actuals = value.GetType().GetProperty("SchoolDistricts").GetValue(value);
-			Assert.That(actuals.GetType().GetProperty("Count").GetValue(actuals), Is.EqualTo(0));
+
+			Assert.That(value, Is.TypeOf<SchoolDistrictsController.SchoolDistrictsResponse>());
+			var actuals = ((SchoolDistrictsController.SchoolDistrictsResponse)value).SchoolDistricts;
+
+			Assert.That(actuals, Has.Count.EqualTo(0));
 		}
 
 		[Test]
@@ -108,10 +114,12 @@ namespace api.Tests.Controllers
 
 			var result = await _uut.GetMany();
 			Assert.That(result, Is.TypeOf<ObjectResult>());
-
 			var value = ((ObjectResult)result).Value;
-			var actuals = value.GetType().GetProperty("SchoolDistricts").GetValue(value);
-			Assert.That(actuals.GetType().GetProperty("Count").GetValue(actuals), Is.EqualTo(0));
+
+			Assert.That(value, Is.TypeOf<SchoolDistrictsController.SchoolDistrictsResponse>());
+			var actuals = ((SchoolDistrictsController.SchoolDistrictsResponse)value).SchoolDistricts;
+
+			Assert.That(actuals, Has.Count.EqualTo(0));
 		}
 
 		[Test]
