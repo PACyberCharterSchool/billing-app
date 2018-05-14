@@ -9,6 +9,7 @@ using models;
 
 namespace api.Controllers
 {
+	// For use with query params, because a JsonConverter will not work.
 	public class EnumerationValidationAttribute : ValidationAttribute
 	{
 		Type _type;
