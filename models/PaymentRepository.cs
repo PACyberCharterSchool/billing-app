@@ -35,6 +35,7 @@ namespace models
 			nameof(Payment.LastUpdated),
 		};
 
+		// TODO(Erik): separate create/update
 		public IList<Payment> CreateOrUpdateMany(DateTime time, IList<Payment> us)
 		{
 			var updated = new List<Payment>();
@@ -53,6 +54,7 @@ namespace models
 					var payment = payments.SingleOrDefault(p => p.Split == update.Split);
 					if (payment == null)
 					{
+						// TODO(Erik): create paymentId
 						update.Created = time;
 						update.LastUpdated = time;
 
