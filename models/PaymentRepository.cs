@@ -52,6 +52,7 @@ namespace models
 				create.Created = time;
 			}
 
+			// TODO(Erik): wrap DbUpdateException in custom exception
 			_payments.AddRange(creates);
 			return creates;
 		}
@@ -80,10 +81,12 @@ namespace models
 				var updates = kv.Value;
 				var payments = GetMany(id).ToList();
 				if (payments == null || payments.Count == 0)
-					throw new ArgumentException($"Could not find payments with ID {id}.");
+					throw new ArgumentException($"Could not find payments with ID {id}."); // TODO(Erik): custom exception
 
 				if (payments.Count > updates.Count)
+				{
 					_payments.RemoveRange(payments.Skip(updates.Count));
+				}
 
 				foreach (var update in updates)
 				{

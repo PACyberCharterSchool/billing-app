@@ -40,7 +40,7 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task CreateCreates()
 		{
-			var create = new PaymentsController.CreatePayment
+			var create = new PaymentsController.CreateUpdatePayment
 			{
 				Date = DateTime.Now,
 				ExternalId = "bob",
@@ -48,12 +48,12 @@ namespace api.Tests.Controllers
 				SchoolDistrictAun = 123456789,
 				Splits = new[]
 				{
-					new PaymentsController.CreatePayment.Split
+					new PaymentsController.CreateUpdatePayment.Split
 					{
 						Amount = 10m,
 						SchoolYear = "2017-2018",
 					},
-					new PaymentsController.CreatePayment.Split
+					new PaymentsController.CreateUpdatePayment.Split
 					{
 						Amount = 20m,
 						SchoolYear = "2018-2019",
@@ -98,21 +98,7 @@ namespace api.Tests.Controllers
 			var msg = "err";
 			_uut.ModelState.AddModelError(key, msg);
 
-			var create = new PaymentsController.CreatePayment
-			{
-				Date = DateTime.Now,
-				ExternalId = "bob",
-				Type = PaymentType.Check,
-				SchoolDistrictAun = 123456789,
-				Splits = new[]
-				{
-					new PaymentsController.CreatePayment.Split
-					{
-						Amount = 10m,
-						SchoolYear = "2017-2018",
-					},
-				}
-			};
+			var create = new PaymentsController.CreateUpdatePayment();
 			var result = await _uut.Create(create);
 			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
 			var value = ((BadRequestObjectResult)result).Value;
@@ -127,7 +113,7 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task CreateReturnsConflict()
 		{
-			var create = new PaymentsController.CreatePayment
+			var create = new PaymentsController.CreateUpdatePayment
 			{
 				Date = DateTime.Now,
 				ExternalId = "bob",
@@ -135,7 +121,7 @@ namespace api.Tests.Controllers
 				SchoolDistrictAun = 123456789,
 				Splits = new[]
 				{
-					new PaymentsController.CreatePayment.Split
+					new PaymentsController.CreateUpdatePayment.Split
 					{
 						Amount = 10m,
 						SchoolYear = "2017-2018",
@@ -219,6 +205,108 @@ namespace api.Tests.Controllers
 			var actuals = ((PaymentsController.PaymentsResponse)value).Payments;
 
 			Assert.That(actuals, Is.Empty);
+		}
+
+		[Test]
+		public async Task UpdateUpdates()
+		{
+			var update = new PaymentsController.CreateUpdatePayment
+			{
+				Date = DateTime.Now,
+				ExternalId = "bob",
+				Type = PaymentType.Check,
+				SchoolDistrictAun = 123456789,
+				Splits = new[]
+				{
+					new PaymentsController.CreateUpdatePayment.Split
+					{
+						Amount = 10m,
+						SchoolYear = "2017-2018",
+					},
+					new PaymentsController.CreateUpdatePayment.Split
+					{
+						Amount = 20m,
+						SchoolYear = "2018-2019",
+					},
+				}
+			};
+			_payments.Setup(ps => ps.UpdateMany(It.IsAny<IList<Payment>>())).Returns<IList<Payment>>(l => l);
+
+			_districts.Setup(ds => ds.GetByAun(update.SchoolDistrictAun)).
+				Returns(new SchoolDistrict { Aun = update.SchoolDistrictAun });
+
+			var paymentId = "1234";
+			var result = await _uut.Update(paymentId, update);
+			Assert.That(result, Is.TypeOf<OkResult>());
+
+			_payments.Verify(ps => ps.UpdateMany(It.Is<IList<Payment>>(l =>
+				l.Count == 2 &&
+					l[0].PaymentId == paymentId &&
+					l[0].Date == update.Date &&
+					l[0].ExternalId == update.ExternalId &&
+					l[0].Type == update.Type &&
+					l[0].SchoolDistrict.Aun == update.SchoolDistrictAun &&
+					l[0].Split == 1 &&
+					l[0].Amount == update.Splits[0].Amount &&
+					l[0].SchoolYear == update.Splits[0].SchoolYear &&
+
+					l[1].PaymentId == paymentId &&
+					l[1].Date == update.Date &&
+					l[1].ExternalId == update.ExternalId &&
+					l[1].Type == update.Type &&
+					l[1].SchoolDistrict.Aun == update.SchoolDistrictAun &&
+					l[1].Split == 2 &&
+					l[1].Amount == update.Splits[1].Amount &&
+					l[1].SchoolYear == update.Splits[1].SchoolYear
+			)), Times.Once);
+		}
+
+		[Test]
+		public async Task UpdateReturnsBadRequest()
+		{
+			var key = "err";
+			var msg = "msg";
+			_uut.ModelState.AddModelError(key, msg);
+
+			var update = new PaymentsController.CreateUpdatePayment();
+			var result = await _uut.Update("1234", update);
+			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+			var value = ((BadRequestObjectResult)result).Value;
+
+			Assert.That(value, Is.TypeOf<ErrorsResponse>());
+			var actuals = ((ErrorsResponse)value).Errors;
+
+			Assert.That(actuals, Has.Count.EqualTo(1));
+			Assert.That(actuals[0], Is.EqualTo(msg));
+		}
+
+		[Test]
+		public async Task UpdateReturnsNotFound()
+		{
+			var update = new PaymentsController.CreateUpdatePayment
+			{
+				Date = DateTime.Now,
+				ExternalId = "bob",
+				Type = PaymentType.Check,
+				SchoolDistrictAun = 123456789,
+				Splits = new[]
+				{
+					new PaymentsController.CreateUpdatePayment.Split
+					{
+						Amount = 10m,
+						SchoolYear = "2017-2018",
+					},
+					new PaymentsController.CreateUpdatePayment.Split
+					{
+						Amount = 20m,
+						SchoolYear = "2018-2019",
+					},
+				}
+			};
+			_payments.Setup(ps => ps.UpdateMany(It.IsAny<IList<Payment>>())).Throws(new ArgumentException());
+
+			var result = await _uut.Update("1234", update);
+			Assert.That(result, Is.TypeOf<NotFoundResult>());
 		}
 	}
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -35,7 +36,7 @@ namespace api.Controllers
 			_logger = logger;
 		}
 
-		public struct CreatePayment
+		public struct CreateUpdatePayment
 		{
 			[Required]
 			public DateTime Date { get; set; }
@@ -48,7 +49,7 @@ namespace api.Controllers
 			[JsonConverter(typeof(PaymentTypeJsonConverter))]
 			public PaymentType Type { get; set; }
 
-			[Required]
+			[BindRequired]
 			[Range(100000000, 999999999)]
 			public int SchoolDistrictAun { get; set; }
 
@@ -75,9 +76,9 @@ namespace api.Controllers
 		[HttpPost]
 		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(PaymentsResponse), 201)]
-		[ProducesResponseType(400)]
+		[ProducesResponseType(typeof(ErrorsResponse), 400)]
 		[ProducesResponseType(409)]
-		public async Task<IActionResult> Create([FromBody]CreatePayment create)
+		public async Task<IActionResult> Create([FromBody]CreateUpdatePayment create)
 		{
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
@@ -127,6 +128,46 @@ namespace api.Controllers
 			{
 				Payments = payments.Select(p => new PaymentDto(p)).ToList(),
 			});
+		}
+
+		[HttpPut("{id}")]
+		[Authorize(Policy = "PAY+")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(typeof(ErrorsResponse), 400)]
+		[ProducesResponseType(404)]
+		public async Task<IActionResult> Update(string id, [FromBody]CreateUpdatePayment update)
+		{
+			if (!ModelState.IsValid)
+				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
+
+			var payments = new List<Payment>();
+			for (var i = 0; i < update.Splits.Count; i++)
+			{
+				var split = update.Splits[i];
+
+				payments.Add(new Payment
+				{
+					PaymentId = id,
+					Date = update.Date,
+					ExternalId = update.ExternalId,
+					Type = update.Type,
+					SchoolDistrict = _districts.GetByAun(update.SchoolDistrictAun),
+					Split = i + 1,
+					Amount = split.Amount,
+					SchoolYear = split.SchoolYear,
+				});
+			}
+
+			try
+			{
+				await Task.Run(() => _context.SaveChanges(() => _payments.UpdateMany(payments)));
+			}
+			catch (ArgumentException)
+			{
+				return NotFound();
+			}
+
+			return Ok();
 		}
 	}
 }
