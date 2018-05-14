@@ -34,8 +34,10 @@ export class PaymentUpsertFormComponent implements OnInit {
     '2017-2018'
   ];
 
+  public model: any;
+
   @Input() op: string;
-  @Input() schoolDistricts: SchoolDistrict;
+  @Input() schoolDistricts: SchoolDistrict[];
   @Input() paymentRecord: Payment;
 
   constructor(
@@ -67,6 +69,7 @@ export class PaymentUpsertFormComponent implements OnInit {
   }
 
   fillPaymentRecord() {
+    this.schoolDistrictName = this.selectedSchoolDistrict.name;
     Object.assign(this.paymentRecord, {
       type: this.paymentTypeId,
       schoolDistrictName: this.selectedSchoolDistrict.name,
@@ -108,27 +111,26 @@ export class PaymentUpsertFormComponent implements OnInit {
     this.selectedAcademicYear = year;
   }
 
-  // onDateChanged() {
-  //   this.date = new Date(this.model.year, this.model.month - 1, this.model.day); // yes, that bit of math on the month value is necessary
-  //   this.dateSelected.emit(this.date);
-  // }
+  onDateChanged() {
+    this.date = new Date(this.model.year, this.model.month - 1, this.model.day); // yes, that bit of math on the month value is necessary
+  }
 
   search = (text$: Observable<string>) => {
-    return text$.pipe(
+    const results = text$.pipe(
       debounceTime(200),
       distinctUntilChanged(),
       map((term) => {
-        term.length < 2 ? [] : this.schoolDistricts.filter(
+        return term.length < 2 ? [] : this.schoolDistricts.filter(
           (sd) => {
-            // new RegExp(term, 'gi').test(sd.name);
             if (sd.name.toLowerCase().indexOf(term.toLowerCase()) > -1) {
               return true;
             } else {
               return false;
             }
-          }
-        ).slice(0, 10);
+          }).map((sd) => sd.name);
       })
     );
+
+    return results;
   }
 }

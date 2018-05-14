@@ -13,7 +13,8 @@
         display: flex;
 
         div.col-md-6 {
-          display: inline-block;
+          display: flex;
+          align-items: center;
           padding-left: 0;
           padding-right: 0;
 

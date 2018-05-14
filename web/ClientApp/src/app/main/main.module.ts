@@ -24,7 +24,6 @@ import { MatMenu } from '@angular/material';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-
 @NgModule({
   declarations: [
     ContentAreaComponent,
