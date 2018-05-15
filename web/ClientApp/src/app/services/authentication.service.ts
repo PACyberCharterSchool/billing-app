@@ -21,7 +21,7 @@ export class AuthenticationService {
     const jwtHelper = new JwtHelperService();
 
     // returns true or false based upon whether the JWT is empty or expired...
-    return ((token !== null) || !jwtHelper.isTokenExpired(token));
+    return ((token !== null) && !jwtHelper.isTokenExpired(token));
   }
 
   public authenticate(email: string, password: string): Observable<any> {

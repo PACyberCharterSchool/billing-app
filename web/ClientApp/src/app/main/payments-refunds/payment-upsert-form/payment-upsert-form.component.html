@@ -11,10 +11,10 @@
     </div>
     <div class='col-md-12'>
       <form #paymentUpsertForm='ngForm' (ngSubmit)='upsertPayment()'>
-        <div class='form-group'>
+        <div class='form-group' *ngIf='op === "create"'>
           <div class='col-md-6'></div>
           <div class='col-md-6'>
-            <button type='button' class='btn btn-outline-primary' (click)='isSplit = !isSplit' [attr.aria-expanded]="isSplit" aria-controls="collapseSplit">SPLIT</button>
+            <button type='button' class='btn btn-outline-primary' (click)='isSplit = !isSplit' [attr.aria-expanded]="!isSplit" aria-controls="collapseSplit collapseSplitAmt">SPLIT</button>
           </div>
         </div>
         <div class='form-group col-md-12'>
@@ -23,7 +23,7 @@
           </div>
           <div class='col-md-6'>
             <label for='typeahead-school-district'></label>
-            <input id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='schoolDistrictName' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' style='width: 240px;' />
+            <input id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='schoolDistrictName' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' />
           </div>
         </div>
         <div class='form-group'>
@@ -39,8 +39,22 @@
             <label>Payment Amount</label>
           </div>
           <div class='col-md-6'>
-            <input type='text' class='form-control' id='paymentAmount' name='paymentAmount' [(ngModel)]='amount' required #paymentAmount='ngModel' />
+            <input type='number' class='form-control' id='paymentAmount' name='paymentAmount' [(ngModel)]='amount' required #paymentAmount='ngModel' />
+          </div>
+        </div>
+        <div class='form-group'>
+          <div class='col-md-6 offset-md-6'>
             <div [style.visibility]="paymentAmount.invalid && (paymentAmount.dirty || paymentAmount.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid payment amount</div>
+          </div>
+        </div>
+        <div class='form-group'>
+          <div id='collapseSplitAmt' [ngbCollapse]='!isSplit'>
+            <div class='col-md-6'>
+              <label>Split Amount</label>
+            </div>
+            <div class='col-md-6' id='split-payment-amt-input'>
+              <input type='number' class='form-control' id='splitAmount' name='splitAmount' [(ngModel)]='splitAmt' #splitAmount='ngModel' />
+            </div>
           </div>
         </div>
         <div class='form-group'>
@@ -65,15 +79,14 @@
           </div>
           <div class='col-md-6'>
             <input type='text' class='form-control' id='paymentType' name='paymentType' [(ngModel)]='paymentTypeId' required #paymentType='ngModel' />
-            <div [style.visibility]="paymentType.invalid && (paymentType.dirty || paymentType.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid payment type</div>
           </div>
         </div>
         <div class='form-group'>
           <div class='col-md-6'>
             <label>Academic Year</label>
           </div>
-            <div class='col-md-6'>
-              <div ngbDropdown class='d-inline-block'>
+          <div class='col-md-6'>
+            <div ngbDropdown class='d-inline-block'>
               <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown'>Select</button>
               <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown'>
                 <button type='button' class='dropdown-item' *ngFor='let y of schoolYears' (click)='setSelectedAcademicYear(y)'>{{y}}</button>
@@ -81,7 +94,7 @@
             </div>
           </div>
         </div>
-        <div id='collapseSplit' [ngbCollapse]='isSplit'>
+        <div id='collapseSplit' [ngbCollapse]='!isSplit'>
           <hr>
           <div class='form-group'>
             <div class='col-md-6'>

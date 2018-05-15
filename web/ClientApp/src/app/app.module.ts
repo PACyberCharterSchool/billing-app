@@ -23,6 +23,7 @@ import { CurrentStudentService } from './services/current-student.service';
 import { StudentStatusRecordsImportService } from './services/student-status-records-import.service';
 import { PaymentsService } from './services/payments.service';
 import { RefundsService } from './services/refunds.service';
+import { AcademicYearsService } from './services/academic-years.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
@@ -53,6 +54,7 @@ const pacbillImports = [
 ];
 
 const pacbillProviders = [
+  AcademicYearsService,
   AppTitleService,
   AuthenticationGuardService,
   AuthenticationService,
@@ -64,7 +66,7 @@ const pacbillProviders = [
   StudentsService,
   StudentStatusRecordsImportService,
   tokenInterceptor,
-  UtilitiesService,
+  UtilitiesService
 ];
 
 @NgModule({

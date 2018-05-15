@@ -6,20 +6,25 @@ import { MainComponent } from '../main.component';
 import { ReportsInvoicesHomeComponent } from './reports-invoices-home/reports-invoices-home.component';
 import { ReportsInvoicesComponent } from './reports-invoices.component';
 
+import { AuthenticationGuardService } from '../../services/authentication-guard.service';
+
 const reportsInvoicesRoutes: Routes = [
   {
     path: 'reports-invoices',
     component: MainComponent,
+    canActivate: [ AuthenticationGuardService ],
     children: [
       {
         path: '',
         component: ReportsInvoicesComponent,
-        outlet: 'action'
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
       },
       {
         path: 'home',
         component: ReportsInvoicesHomeComponent,
-        outlet: 'action'
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
       }
     ]
   }

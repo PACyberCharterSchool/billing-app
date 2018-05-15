@@ -6,6 +6,8 @@ import { StudentsListComponent } from './students-list/students-list.component';
 import { StudentsDetailComponent } from './students-detail/students-detail.component';
 import { MainComponent } from '../main.component';
 
+import { AuthenticationGuardService } from '../../services/authentication-guard.service';
+
 const studentsRoutes: Routes = [
   {
     path: 'students',
@@ -14,12 +16,14 @@ const studentsRoutes: Routes = [
       {
         path: 'list',
         component: StudentsListComponent,
-        outlet: 'action'
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
       },
       {
         path: ':id',
         component: StudentsDetailComponent,
-        outlet: 'action'
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
       }
     ]
   }

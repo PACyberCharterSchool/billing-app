@@ -8,30 +8,37 @@ import { PaymentsComponent } from './payments/payments.component';
 import { RefundsComponent } from './refunds/refunds.component';
 import { PaymentsListComponent } from './payments-list/payments-list.component';
 
+import { AuthenticationGuardService } from '../../services/authentication-guard.service';
+
 const paymentsRefundsRoutes: Routes = [
   {
     path: 'payments-refunds',
     component: MainComponent,
+    canActivate: [ AuthenticationGuardService ],
     children: [
       {
         path: 'home',
         component: PaymentsRefundsHomeComponent,
-        outlet: 'action'
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
       },
       {
         path: 'payments',
         component: PaymentsComponent,
-        outlet: 'action'
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
       },
       {
         path: 'refunds',
         component: RefundsComponent,
-        outlet: 'action'
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
       },
       {
         path: 'list',
         component: PaymentsListComponent,
-        outlet: 'action'
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
       }
     ]
   }

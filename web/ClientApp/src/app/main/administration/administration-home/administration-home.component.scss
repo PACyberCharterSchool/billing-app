@@ -20,6 +20,8 @@
       border-radius: 5px;
       height: 170px;
       margin: 0 auto;
+      margin-bottom: 40px;
+      padding: 0;
       width: 190px;
 
       label {
@@ -38,6 +40,26 @@
     }
 
     button#school-district-rates-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -655px -215px;
+        height: 140px;
+        width: 160px;
+      }
+    }
+
+    button#school-calendar-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -655px -215px;
+        height: 140px;
+        width: 160px;
+      }
+    }
+
+    button#audits-btn {
       img {
         display: block;
         object-fit: none;

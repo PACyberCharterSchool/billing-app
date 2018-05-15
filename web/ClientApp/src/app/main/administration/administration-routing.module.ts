@@ -9,25 +9,31 @@ import {
   AdministrationImportStudentDataComponent
 } from './administration-import-student-data/administration-import-student-data.component';
 
+import { AuthenticationGuardService } from '../../services/authentication-guard.service';
+
 const adminRoutes: Routes = [
   {
     path: 'administration',
     component: MainComponent,
+    canActivate: [ AuthenticationGuardService ],
     children: [
       {
         path: 'home',
         component: AdministrationHomeComponent,
-        outlet: 'action'
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
       },
       {
         path: 'payment-rates',
         component: AdministrationPaymentRateComponent,
-        outlet: 'action'
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
       },
       {
         path: 'import-student-data',
         component: AdministrationImportStudentDataComponent,
-        outlet: 'action'
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
       }
     ]
   }

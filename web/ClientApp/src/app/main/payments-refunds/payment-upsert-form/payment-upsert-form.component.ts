@@ -7,6 +7,7 @@ import { SchoolDistrict } from '../../../models/school-district.model';
 
 import { PaymentsService } from '../../../services/payments.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
+import { AcademicYearsService } from '../../../services/academic-years.service';
 
 import { Payment } from '../../../models/payment.model';
 
@@ -19,20 +20,14 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class PaymentUpsertFormComponent implements OnInit {
   private amount: number;
+  private splitAmt: number;
   private selectedSchoolDistrict: SchoolDistrict;
   private schoolDistrictName: string;
   private selectedAcademicYear: string;
   private date: Date;
   private academicYear: string;
   private paymentTypeId: string;
-  private schoolYears: string[] = [
-    '2012-2013',
-    '2013-2014',
-    '2014-2015',
-    '2016-2016',
-    '2016-2017',
-    '2017-2018'
-  ];
+  private schoolYears: string[];
   private isSplit: boolean;
 
   public model: any;
@@ -44,13 +39,16 @@ export class PaymentUpsertFormComponent implements OnInit {
   constructor(
     private activeModal: NgbActiveModal,
     private paymentsService: PaymentsService,
-    private schoolDistrictService: SchoolDistrictService
+    private schoolDistrictService: SchoolDistrictService,
+    private academicYearsService: AcademicYearsService
   ) {
   }
 
   ngOnInit() {
     console.log('op is ', this.op);
     console.log('schoolDistricts are ', this.schoolDistricts);
+
+    this.schoolYears = this.academicYearsService.getAcademicYears();
 
     if (this.op === 'update') {
       this.schoolDistrictService.getSchoolDistrict(this.paymentRecord.schoolDistrictId).subscribe(
