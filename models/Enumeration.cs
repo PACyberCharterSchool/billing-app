@@ -5,14 +5,16 @@ using System.Collections.Generic;
 
 namespace models
 {
-	public class Enumerable<T> where T : Enumerable<T>
+	public class Enumeration<T> where T : Enumeration<T>
 	{
 		public string Value { get; private set; }
 
-		protected Enumerable(string value)
+		protected Enumeration(string value)
 		{
 			Value = value;
 		}
+
+		protected Enumeration() { }
 
 		public static T FromString(string value)
 		{

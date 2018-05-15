@@ -3,29 +3,29 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using models;
 
 namespace models.Migrations
 {
     [DbContext(typeof(PacBillContext))]
-    [Migration("20180501170416_StringPACyberId")]
-    partial class StringPACyberId
+    [Migration("20180511203324_Rebuild")]
+    partial class Rebuild
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.0-preview1-28290")
+                .HasAnnotation("ProductVersion", "2.1.0-rc1-32029")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("models.AuditRecord", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Activity")
                         .IsRequired();
@@ -43,13 +43,16 @@ namespace models.Migrations
             modelBuilder.Entity("models.CommittedStudentStatusRecord", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ActivitySchoolYear");
 
                     b.Property<string>("BatchFilename");
 
                     b.Property<string>("BatchHash");
+
+                    b.Property<int>("BatchRow");
 
                     b.Property<DateTime>("BatchTime");
 
@@ -83,7 +86,8 @@ namespace models.Migrations
 
                     b.Property<DateTime?>("StudentNorep");
 
-                    b.Property<ulong?>("StudentPaSecuredId");
+                    b.Property<decimal?>("StudentPaSecuredId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
 
                     b.Property<string>("StudentState");
 
@@ -100,10 +104,50 @@ namespace models.Migrations
                     b.ToTable("CommittedStudentStatusRecords");
                 });
 
+            modelBuilder.Entity("models.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal>("Amount");
+
+                    b.Property<DateTime>("Created");
+
+                    b.Property<DateTime>("Date");
+
+                    b.Property<string>("ExternalId");
+
+                    b.Property<DateTime>("LastUpdated");
+
+                    b.Property<string>("PaymentId");
+
+                    b.Property<int?>("SchoolDistrictId");
+
+                    b.Property<string>("SchoolYear");
+
+                    b.Property<int>("Split");
+
+                    b.Property<string>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue("Check");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SchoolDistrictId");
+
+                    b.HasIndex("PaymentId", "Split")
+                        .IsUnique()
+                        .HasFilter("[PaymentId] IS NOT NULL");
+
+                    b.ToTable("Payments");
+                });
+
             modelBuilder.Entity("models.PendingStudentStatusRecord", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("ActivitySchoolYear");
 
@@ -141,7 +185,8 @@ namespace models.Migrations
 
                     b.Property<DateTime?>("StudentNorep");
 
-                    b.Property<ulong?>("StudentPaSecuredId");
+                    b.Property<decimal?>("StudentPaSecuredId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
 
                     b.Property<string>("StudentState");
 
@@ -161,7 +206,8 @@ namespace models.Migrations
             modelBuilder.Entity("models.SchoolDistrict", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal?>("AlternateRate");
 
@@ -192,7 +238,8 @@ namespace models.Migrations
             modelBuilder.Entity("models.Student", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("City");
 
@@ -222,7 +269,8 @@ namespace models.Migrations
 
                     b.Property<string>("PACyberId");
 
-                    b.Property<ulong?>("PASecuredId");
+                    b.Property<decimal?>("PASecuredId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
 
                     b.Property<int?>("SchoolDistrictId");
 
@@ -250,7 +298,8 @@ namespace models.Migrations
             modelBuilder.Entity("models.StudentActivityRecord", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Activity")
                         .IsRequired();
@@ -270,6 +319,13 @@ namespace models.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("StudentActivityRecords");
+                });
+
+            modelBuilder.Entity("models.Payment", b =>
+                {
+                    b.HasOne("models.SchoolDistrict", "SchoolDistrict")
+                        .WithMany()
+                        .HasForeignKey("SchoolDistrictId");
                 });
 
             modelBuilder.Entity("models.Student", b =>

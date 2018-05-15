@@ -23,7 +23,7 @@ namespace api.Controllers
 
 		public class GetManyArgs
 		{
-			[EnumerableValidation(typeof(StudentActivity))]
+			[EnumerationValidation(typeof(StudentActivity))]
 			public string Activity { get; set; }
 
 			[Range(0, int.MaxValue)]

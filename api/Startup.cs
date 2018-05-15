@@ -63,6 +63,7 @@ namespace api
 			});
 			services.AddTransient<IAuditRecordRepository, AuditRecordRepository>();
 			services.AddTransient<ICommittedStudentStatusRecordRepository, CommittedStudentStatusRecordRepository>();
+			services.AddTransient<IPaymentRepository, PaymentRepository>();
 			services.AddTransient<IPendingStudentStatusRecordRepository, PendingStudentStatusRecordRepository>();
 			services.AddTransient<ISchoolDistrictRepository, SchoolDistrictRepository>();
 			services.AddTransient<IStudentRepository, StudentRepository>();
@@ -159,8 +160,8 @@ namespace api
 				o.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>{
 						{"Bearer", null},
 				});
-				o.SchemaFilter<EnumerableSchemaFilter>();
-				o.OperationFilter<EnumerableOperationFilter>();
+				o.SchemaFilter<EnumerationSchemaFilter>();
+				o.OperationFilter<EnumerationOperationFilter>();
 				o.OperationFilter<StudentFieldOperationFilter>();
 			});
 			#endregion

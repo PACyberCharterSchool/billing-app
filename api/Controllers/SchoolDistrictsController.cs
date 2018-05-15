@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-using static api.Common.Projection;
+using api.Dtos;
 using models;
 
 namespace api.Controllers
@@ -31,7 +31,7 @@ namespace api.Controllers
 
 		public struct SchoolDistrictResponse
 		{
-			public SchoolDistrict SchoolDistrict { get; set; }
+			public SchoolDistrictDto SchoolDistrict { get; set; }
 		}
 
 		[HttpGet("{id}")]
@@ -44,17 +44,12 @@ namespace api.Controllers
 			if (district == null)
 				return NotFound();
 
-			return new ObjectResult(new
-			{
-				SchoolDistrict = Project(district, excludes: new[] {
-					nameof(SchoolDistrict.Students),
-				}),
-			});
+			return new ObjectResult(new SchoolDistrictResponse { SchoolDistrict = new SchoolDistrictDto(district) });
 		}
 
 		public struct SchoolDistrictsResponse
 		{
-			public IList<SchoolDistrict> SchoolDistricts { get; set; }
+			public IList<SchoolDistrictDto> SchoolDistricts { get; set; }
 		}
 
 		[HttpGet]
@@ -66,11 +61,9 @@ namespace api.Controllers
 			if (districts == null)
 				districts = new List<SchoolDistrict>();
 
-			return new ObjectResult(new
+			return new ObjectResult(new SchoolDistrictsResponse
 			{
-				SchoolDistricts = districts.Select(d => Project(d, excludes: new[] {
-					nameof(SchoolDistrict.Students),
-				})).ToList(),
+				SchoolDistricts = districts.Select(d => new SchoolDistrictDto(d)).ToList(),
 			});
 		}
 

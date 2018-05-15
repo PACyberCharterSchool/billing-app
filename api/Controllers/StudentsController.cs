@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-using static api.Common.Projection;
+using api.Dtos;
 using models;
 
 namespace api.Controllers
@@ -29,7 +29,7 @@ namespace api.Controllers
 			[StudentField]
 			public string Sort { get; set; }
 
-			[EnumerableValidation(typeof(SortDirection))]
+			[EnumerationValidation(typeof(SortDirection))]
 			public string Dir { get; set; }
 
 			[Range(0, int.MaxValue)]
@@ -43,7 +43,7 @@ namespace api.Controllers
 
 		public struct StudentsResponse
 		{
-			public IList<Student> Students { get; }
+			public IList<StudentDto> Students { get; set; }
 		}
 
 		[HttpGet]
@@ -73,17 +73,15 @@ namespace api.Controllers
 			if (students == null)
 				students = new List<Student>();
 
-			return new ObjectResult(new
+			return new ObjectResult(new StudentsResponse
 			{
-				Students = students.Select(s => Project(s, excludes: new[]{
-					nameof(Student.SchoolDistrict) +"."+ nameof(SchoolDistrict.Students),
-				})).ToList(),
+				Students = students.Select(s => new StudentDto(s)).ToList(),
 			});
 		}
 
 		public struct StudentResponse
 		{
-			public Student Student { get; }
+			public StudentDto Student { get; set; }
 		}
 
 		[HttpGet("{id}")]
@@ -95,12 +93,7 @@ namespace api.Controllers
 			if (student == null)
 				return NotFound();
 
-			return new ObjectResult(new
-			{
-				Student = Project(student, excludes: new[] {
-					nameof(Student.SchoolDistrict) + "." + nameof(SchoolDistrict.Students)
-				}),
-			});
+			return new ObjectResult(new StudentResponse { Student = new StudentDto(student) });
 		}
 	}
 }

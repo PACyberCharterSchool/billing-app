@@ -3,286 +3,336 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Storage.Converters;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using models;
 
 namespace models.Migrations
 {
-	[DbContext(typeof(PacBillContext))]
-	partial class PacBillContextModelSnapshot : ModelSnapshot
-	{
-		protected override void BuildModel(ModelBuilder modelBuilder)
-		{
+    [DbContext(typeof(PacBillContext))]
+    partial class PacBillContextModelSnapshot : ModelSnapshot
+    {
+        protected override void BuildModel(ModelBuilder modelBuilder)
+        {
 #pragma warning disable 612, 618
-			modelBuilder
-					.HasAnnotation("ProductVersion", "2.1.0-preview1-28290")
-					.HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+            modelBuilder
+                .HasAnnotation("ProductVersion", "2.1.0-rc1-32029")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-			modelBuilder.Entity("models.AuditRecord", b =>
-					{
-						b.Property<int>("Id")
-											.ValueGeneratedOnAdd();
+            modelBuilder.Entity("models.AuditRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-						b.Property<string>("Activity")
-											.IsRequired();
+                    b.Property<string>("Activity")
+                        .IsRequired();
 
-						b.Property<DateTime>("Timestamp");
+                    b.Property<DateTime>("Timestamp");
 
-						b.Property<string>("Username")
-											.IsRequired();
+                    b.Property<string>("Username")
+                        .IsRequired();
 
-						b.HasKey("Id");
+                    b.HasKey("Id");
 
-						b.ToTable("AuditRecords");
-					});
+                    b.ToTable("AuditRecords");
+                });
 
-			modelBuilder.Entity("models.CommittedStudentStatusRecord", b =>
-					{
-						b.Property<int>("Id")
-											.ValueGeneratedOnAdd();
+            modelBuilder.Entity("models.CommittedStudentStatusRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-						b.Property<string>("ActivitySchoolYear");
+                    b.Property<string>("ActivitySchoolYear");
 
-						b.Property<string>("BatchFilename");
+                    b.Property<string>("BatchFilename");
 
-						b.Property<string>("BatchHash");
+                    b.Property<string>("BatchHash");
 
-						b.Property<int>("BatchRow");
+                    b.Property<int>("BatchRow");
 
-						b.Property<DateTime>("BatchTime");
+                    b.Property<DateTime>("BatchTime");
 
-						b.Property<DateTime>("CommitTime");
+                    b.Property<DateTime>("CommitTime");
 
-						b.Property<int>("SchoolDistrictId");
+                    b.Property<int>("SchoolDistrictId");
 
-						b.Property<string>("SchoolDistrictName");
+                    b.Property<string>("SchoolDistrictName");
 
-						b.Property<string>("StudentCity");
+                    b.Property<string>("StudentCity");
 
-						b.Property<DateTime?>("StudentCurrentIep");
+                    b.Property<DateTime?>("StudentCurrentIep");
 
-						b.Property<DateTime>("StudentDateOfBirth");
+                    b.Property<DateTime>("StudentDateOfBirth");
 
-						b.Property<DateTime>("StudentEnrollmentDate");
+                    b.Property<DateTime>("StudentEnrollmentDate");
 
-						b.Property<string>("StudentFirstName");
+                    b.Property<string>("StudentFirstName");
 
-						b.Property<DateTime?>("StudentFormerIep");
+                    b.Property<DateTime?>("StudentFormerIep");
 
-						b.Property<string>("StudentGradeLevel");
+                    b.Property<string>("StudentGradeLevel");
 
-						b.Property<string>("StudentId");
+                    b.Property<string>("StudentId");
 
-						b.Property<bool>("StudentIsSpecialEducation");
+                    b.Property<bool>("StudentIsSpecialEducation");
 
-						b.Property<string>("StudentLastName");
+                    b.Property<string>("StudentLastName");
 
-						b.Property<string>("StudentMiddleInitial");
+                    b.Property<string>("StudentMiddleInitial");
 
-						b.Property<DateTime?>("StudentNorep");
+                    b.Property<DateTime?>("StudentNorep");
 
-						b.Property<ulong?>("StudentPaSecuredId");
+                    b.Property<decimal?>("StudentPaSecuredId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
 
-						b.Property<string>("StudentState");
+                    b.Property<string>("StudentState");
 
-						b.Property<string>("StudentStreet1");
+                    b.Property<string>("StudentStreet1");
 
-						b.Property<string>("StudentStreet2");
+                    b.Property<string>("StudentStreet2");
 
-						b.Property<DateTime?>("StudentWithdrawalDate");
+                    b.Property<DateTime?>("StudentWithdrawalDate");
 
-						b.Property<string>("StudentZipCode");
+                    b.Property<string>("StudentZipCode");
 
-						b.HasKey("Id");
+                    b.HasKey("Id");
 
-						b.ToTable("CommittedStudentStatusRecords");
-					});
+                    b.ToTable("CommittedStudentStatusRecords");
+                });
 
-			modelBuilder.Entity("models.PendingStudentStatusRecord", b =>
-					{
-						b.Property<int>("Id")
-											.ValueGeneratedOnAdd();
+            modelBuilder.Entity("models.Payment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-						b.Property<string>("ActivitySchoolYear");
+                    b.Property<decimal>("Amount");
 
-						b.Property<string>("BatchFilename");
+                    b.Property<DateTime>("Created");
 
-						b.Property<string>("BatchHash");
+                    b.Property<DateTime>("Date");
 
-						b.Property<DateTime>("BatchTime");
+                    b.Property<string>("ExternalId");
 
-						b.Property<int>("SchoolDistrictId");
+                    b.Property<DateTime>("LastUpdated");
 
-						b.Property<string>("SchoolDistrictName");
+                    b.Property<string>("PaymentId");
 
-						b.Property<string>("StudentCity");
+                    b.Property<int?>("SchoolDistrictId");
 
-						b.Property<DateTime?>("StudentCurrentIep");
+                    b.Property<string>("SchoolYear");
 
-						b.Property<DateTime>("StudentDateOfBirth");
+                    b.Property<int>("Split");
 
-						b.Property<DateTime>("StudentEnrollmentDate");
+                    b.Property<string>("Type")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue("Check");
 
-						b.Property<string>("StudentFirstName");
+                    b.HasKey("Id");
 
-						b.Property<DateTime?>("StudentFormerIep");
+                    b.HasIndex("SchoolDistrictId");
 
-						b.Property<string>("StudentGradeLevel");
+                    b.HasIndex("PaymentId", "Split")
+                        .IsUnique()
+                        .HasFilter("[PaymentId] IS NOT NULL");
 
-						b.Property<string>("StudentId");
+                    b.ToTable("Payments");
+                });
 
-						b.Property<bool>("StudentIsSpecialEducation");
+            modelBuilder.Entity("models.PendingStudentStatusRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-						b.Property<string>("StudentLastName");
+                    b.Property<string>("ActivitySchoolYear");
 
-						b.Property<string>("StudentMiddleInitial");
+                    b.Property<string>("BatchFilename");
 
-						b.Property<DateTime?>("StudentNorep");
+                    b.Property<string>("BatchHash");
 
-						b.Property<ulong?>("StudentPaSecuredId");
+                    b.Property<DateTime>("BatchTime");
 
-						b.Property<string>("StudentState");
+                    b.Property<int>("SchoolDistrictId");
 
-						b.Property<string>("StudentStreet1");
+                    b.Property<string>("SchoolDistrictName");
 
-						b.Property<string>("StudentStreet2");
+                    b.Property<string>("StudentCity");
 
-						b.Property<DateTime?>("StudentWithdrawalDate");
+                    b.Property<DateTime?>("StudentCurrentIep");
 
-						b.Property<string>("StudentZipCode");
+                    b.Property<DateTime>("StudentDateOfBirth");
 
-						b.HasKey("Id");
+                    b.Property<DateTime>("StudentEnrollmentDate");
 
-						b.ToTable("PendingStudentStatusRecords");
-					});
+                    b.Property<string>("StudentFirstName");
 
-			modelBuilder.Entity("models.SchoolDistrict", b =>
-					{
-						b.Property<int>("Id")
-											.ValueGeneratedOnAdd();
+                    b.Property<DateTime?>("StudentFormerIep");
 
-						b.Property<decimal?>("AlternateRate");
+                    b.Property<string>("StudentGradeLevel");
 
-						b.Property<int>("Aun");
+                    b.Property<string>("StudentId");
 
-						b.Property<DateTime>("Created");
+                    b.Property<bool>("StudentIsSpecialEducation");
 
-						b.Property<DateTime>("LastUpdated");
+                    b.Property<string>("StudentLastName");
 
-						b.Property<string>("Name");
+                    b.Property<string>("StudentMiddleInitial");
 
-						b.Property<SchoolDistrictPaymentType>("PaymentType")
-											.ValueGeneratedOnAdd()
-											.HasDefaultValue("ACH")
-											.HasConversion(new ValueConverter<SchoolDistrictPaymentType, string>(v => default(string), v => default(SchoolDistrictPaymentType)));
+                    b.Property<DateTime?>("StudentNorep");
 
-						b.Property<decimal>("Rate")
-											.ValueGeneratedOnAdd()
-											.HasDefaultValue(0m);
+                    b.Property<decimal?>("StudentPaSecuredId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
 
-						b.HasKey("Id");
+                    b.Property<string>("StudentState");
 
-						b.HasIndex("Aun")
-											.IsUnique();
+                    b.Property<string>("StudentStreet1");
 
-						b.ToTable("SchoolDistricts");
-					});
+                    b.Property<string>("StudentStreet2");
 
-			modelBuilder.Entity("models.Student", b =>
-					{
-						b.Property<int>("Id")
-											.ValueGeneratedOnAdd();
+                    b.Property<DateTime?>("StudentWithdrawalDate");
 
-						b.Property<string>("City");
+                    b.Property<string>("StudentZipCode");
 
-						b.Property<DateTime>("Created");
+                    b.HasKey("Id");
 
-						b.Property<DateTime?>("CurrentIep");
+                    b.ToTable("PendingStudentStatusRecords");
+                });
 
-						b.Property<DateTime>("DateOfBirth");
+            modelBuilder.Entity("models.SchoolDistrict", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-						b.Property<DateTime?>("EndDate");
+                    b.Property<decimal?>("AlternateRate");
 
-						b.Property<string>("FirstName");
+                    b.Property<int>("Aun");
 
-						b.Property<DateTime?>("FormerIep");
+                    b.Property<DateTime>("Created");
 
-						b.Property<string>("Grade");
+                    b.Property<DateTime>("LastUpdated");
 
-						b.Property<bool>("IsSpecialEducation");
+                    b.Property<string>("Name");
 
-						b.Property<string>("LastName");
+                    b.Property<string>("PaymentType")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue("ACH");
 
-						b.Property<DateTime>("LastUpdated");
+                    b.Property<decimal>("Rate")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue(0m);
 
-						b.Property<string>("MiddleInitial");
+                    b.HasKey("Id");
 
-						b.Property<DateTime?>("NorepDate");
+                    b.HasIndex("Aun")
+                        .IsUnique();
 
-						b.Property<string>("PACyberId");
+                    b.ToTable("SchoolDistricts");
+                });
 
-						b.Property<ulong?>("PASecuredId");
+            modelBuilder.Entity("models.Student", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-						b.Property<int?>("SchoolDistrictId");
+                    b.Property<string>("City");
 
-						b.Property<DateTime>("StartDate");
+                    b.Property<DateTime>("Created");
 
-						b.Property<string>("State");
+                    b.Property<DateTime?>("CurrentIep");
 
-						b.Property<string>("Street1");
+                    b.Property<DateTime>("DateOfBirth");
 
-						b.Property<string>("Street2");
+                    b.Property<DateTime?>("EndDate");
 
-						b.Property<string>("ZipCode");
+                    b.Property<string>("FirstName");
 
-						b.HasKey("Id");
+                    b.Property<DateTime?>("FormerIep");
 
-						b.HasIndex("PACyberId")
-											.IsUnique()
-											.HasFilter("[PACyberId] IS NOT NULL");
+                    b.Property<string>("Grade");
 
-						b.HasIndex("SchoolDistrictId");
+                    b.Property<bool>("IsSpecialEducation");
 
-						b.ToTable("Students");
-					});
+                    b.Property<string>("LastName");
 
-			modelBuilder.Entity("models.StudentActivityRecord", b =>
-					{
-						b.Property<int>("Id")
-											.ValueGeneratedOnAdd();
+                    b.Property<DateTime>("LastUpdated");
 
-						b.Property<StudentActivity>("Activity")
-											.IsRequired()
-											.HasConversion(new ValueConverter<StudentActivity, string>(v => default(string), v => default(StudentActivity)));
+                    b.Property<string>("MiddleInitial");
 
-						b.Property<string>("BatchHash");
+                    b.Property<DateTime?>("NorepDate");
 
-						b.Property<string>("NextData");
+                    b.Property<string>("PACyberId");
 
-						b.Property<string>("PACyberId");
+                    b.Property<decimal?>("PASecuredId")
+                        .HasConversion(new ValueConverter<decimal, decimal>(v => default(decimal), v => default(decimal), new ConverterMappingHints(precision: 20, scale: 0)));
 
-						b.Property<string>("PreviousData");
+                    b.Property<int?>("SchoolDistrictId");
 
-						b.Property<int>("Sequence");
+                    b.Property<DateTime>("StartDate");
 
-						b.Property<DateTime>("Timestamp");
+                    b.Property<string>("State");
 
-						b.HasKey("Id");
+                    b.Property<string>("Street1");
 
-						b.ToTable("StudentActivityRecords");
-					});
+                    b.Property<string>("Street2");
 
-			modelBuilder.Entity("models.Student", b =>
-					{
-						b.HasOne("models.SchoolDistrict", "SchoolDistrict")
-											.WithMany("Students")
-											.HasForeignKey("SchoolDistrictId");
-					});
+                    b.Property<string>("ZipCode");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PACyberId")
+                        .IsUnique()
+                        .HasFilter("[PACyberId] IS NOT NULL");
+
+                    b.HasIndex("SchoolDistrictId");
+
+                    b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("models.StudentActivityRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Activity")
+                        .IsRequired();
+
+                    b.Property<string>("BatchHash");
+
+                    b.Property<string>("NextData");
+
+                    b.Property<string>("PACyberId");
+
+                    b.Property<string>("PreviousData");
+
+                    b.Property<int>("Sequence");
+
+                    b.Property<DateTime>("Timestamp");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StudentActivityRecords");
+                });
+
+            modelBuilder.Entity("models.Payment", b =>
+                {
+                    b.HasOne("models.SchoolDistrict", "SchoolDistrict")
+                        .WithMany()
+                        .HasForeignKey("SchoolDistrictId");
+                });
+
+            modelBuilder.Entity("models.Student", b =>
+                {
+                    b.HasOne("models.SchoolDistrict", "SchoolDistrict")
+                        .WithMany("Students")
+                        .HasForeignKey("SchoolDistrictId");
+                });
 #pragma warning restore 612, 618
-		}
-	}
+        }
+    }
 }
