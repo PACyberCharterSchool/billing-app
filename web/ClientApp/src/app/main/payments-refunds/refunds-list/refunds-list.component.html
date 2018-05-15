@@ -1,0 +1,34 @@
+<div class='row refunds-list-row'>
+  <div class='col-md-12'>
+    <div class='col-md-6 create-refund-col'>
+      <div class='col-md-4'><h3>Refunds</h3></div>
+      <div class='col-md-2 offset-md-6'>
+        <button type='button' class='btn btn-primary' (click)='createRefund()'>ADD NEW</button>
+      </div>
+    </div>
+    <div class='col-md-5 offset-md-7 search-refund-col'>
+      <div class='col-md-7 offset-md-5'>
+        <input type='text' [(ngModel)]='searchText' />
+        <button type='button' class='btn btn-primary' (click)='filterRefundRecords()'>SEARCH</button>
+        <button type='button' class='btn btn-outline-primary' (click)='resetRefundRecords()'>RESET</button>
+     </div>
+    </div>
+  </div>
+  <div class='col-md-12 refund-list-col'>
+    <table class='table table-fixed table-striped'>
+      <thead>
+        <tr>
+          <th *ngFor='let k of utilitiesService.objectKeys(refunds[0])' (click)='sort(k)'>
+            {{k | normalizeFieldName}}
+            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+          </th>
+        </tr>
+      </thead>
+      <tbody infiniteScroll>
+        <tr *ngFor='let refund of refunds | orderBy: {property: property, direction: direction}' (click)='editRefund(refund)'>
+          <td *ngFor='let v of utilitiesService.objectValues(refund)'>{{v}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

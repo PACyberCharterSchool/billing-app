@@ -7,8 +7,11 @@ import { SharedModule } from '../../shared/shared.module';
 import { PaymentsRefundsRoutingModule } from './payments-refunds-routing.module';
 
 import { PaymentsRefundsHomeComponent } from './payments-refunds-home/payments-refunds-home.component';
-import { PaymentsComponent } from './payments/payments.component';
 import { RefundsComponent } from './refunds/refunds.component';
+import { RefundsListComponent } from './refunds-list/refunds-list.component';
+import { RefundUpsertFormComponent } from './refund-upsert-form/refund-upsert-form.component';
+
+import { PaymentsComponent } from './payments/payments.component';
 import { PaymentsListComponent } from './payments-list/payments-list.component';
 import { PaymentUpsertFormComponent } from './payment-upsert-form/payment-upsert-form.component';
 
@@ -19,6 +22,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     PaymentsRefundsHomeComponent,
     PaymentsComponent,
     RefundsComponent,
+    RefundsListComponent,
+    RefundUpsertFormComponent,
     PaymentsListComponent,
     PaymentUpsertFormComponent
   ],
@@ -30,7 +35,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     NgbModule
   ],
   providers: [ ],
-  entryComponents: [ PaymentUpsertFormComponent ]
+  entryComponents: [ PaymentUpsertFormComponent, RefundUpsertFormComponent ]
 })
 
 export class PaymentsRefundsModule { }

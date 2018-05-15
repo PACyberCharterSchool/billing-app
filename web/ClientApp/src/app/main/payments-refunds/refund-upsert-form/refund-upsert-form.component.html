@@ -1,22 +1,16 @@
 <div class='col-md-12'>
   <div class='modal-header'>
-    <h4 class="modal-title">{{op | titlecase}} Payment</h4>
+    <h4 class="modal-title">{{op | titlecase}} Refund</h4>
     <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class='modal-body'>
     <div class='col-md-12 payment-not-upserted-error' [style.visibility]="upsertError ? 'visible' : 'hidden'">
-      Payment error:  {{upsertError}}
+      Refund error:  {{upsertError}}
     </div>
     <div class='col-md-12'>
-      <form #paymentUpsertForm='ngForm' (ngSubmit)='upsertPayment()'>
-        <div class='form-group'>
-          <div class='col-md-6'></div>
-          <div class='col-md-6'>
-            <button type='button' class='btn btn-outline-primary' (click)='isSplit = !isSplit' [attr.aria-expanded]="isSplit" aria-controls="collapseSplit">SPLIT</button>
-          </div>
-        </div>
+      <form #refundUpsertForm='ngForm' (ngSubmit)='upsertRefund()'>
         <div class='form-group col-md-12'>
           <div class='col-md-6'>
             <label>School District Name</label>
@@ -36,16 +30,16 @@
         </div>
         <div class='form-group'>
           <div class='col-md-6'>
-            <label>Payment Amount</label>
+            <label>Refund Amount</label>
           </div>
           <div class='col-md-6'>
-            <input type='text' class='form-control' id='paymentAmount' name='paymentAmount' [(ngModel)]='amount' required #paymentAmount='ngModel' />
-            <div [style.visibility]="paymentAmount.invalid && (paymentAmount.dirty || paymentAmount.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid payment amount</div>
+            <input type='text' class='form-control' id='refundAmount' name='refundAmount' [(ngModel)]='amount' required #refundAmount='ngModel' />
+            <div [style.visibility]="refundAmount.invalid && (refundAmount.dirty || refundAmount.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid refund amount</div>
           </div>
         </div>
         <div class='form-group'>
           <div class='col-md-6'>
-            <label>Payment Date</label>
+            <label>Refund Date</label>
           </div>
           <div class='col-md-6'>
             <div class='input-group'>
@@ -61,11 +55,11 @@
         </div>
         <div class='form-group'>
           <div class='col-md-6'>
-            <label>Check # or PDE UniPay Id</label>
+            <label>Check #</label>
           </div>
           <div class='col-md-6'>
-            <input type='text' class='form-control' id='paymentType' name='paymentType' [(ngModel)]='paymentTypeId' required #paymentType='ngModel' />
-            <div [style.visibility]="paymentType.invalid && (paymentType.dirty || paymentType.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid payment type</div>
+            <input type='text' class='form-control' id='refundCheckNumber' name='refundCheckNumber' [(ngModel)]='refundCheckNumberId' required #refundCheckNumber='ngModel' />
+            <div [style.visibility]="refundCheckNumber.invalid && (refundCheckNumber.dirty || refundCheckNumber.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid check number</div>
           </div>
         </div>
         <div class='form-group'>
@@ -81,46 +75,6 @@
             </div>
           </div>
         </div>
-        <div id='collapseSplit' [ngbCollapse]='isSplit'>
-          <hr>
-          <div class='form-group'>
-            <div class='col-md-6'>
-              <label>Payment Id</label>
-            </div>
-            <div class='col-md-6'>
-              <span></span>
-            </div>
-          </div>
-          <div class='form-group'>
-            <div class='col-md-6'>
-              <label>Split Amount</label>
-            </div>
-            <div class='col-md-6'>
-              <span></span>
-            </div>
-          </div>
-          <div class='form-group'>
-            <div class='col-md-6'>
-              <label>Date</label>
-            </div>
-            <div class='col-md-6'>
-              <label>Same as above</label>
-            </div>
-          </div>
-          <div class='form-group'>
-            <div class='col-md-6'>
-              <label>Academic Year</label>
-            </div>
-            <div class='col-md-6'>
-              <div ngbDropdown class='d-inline-block'>
-                <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown2'>Select</button>
-                <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown2'>
-                  <button type='button' class='dropdown-item' *ngFor='let y of schoolYears' (click)='setSelectedAcademicYear(y)'>{{y}}</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
         <div class='form-group'>
           <button type='submit' class='btn btn-primary'>{{op | uppercase}}</button>
           <button type='button' class='btn btn-outline' (click)="activeModal.close('Close click')">CANCEL</button>
@@ -128,5 +82,6 @@
       </form>
     </div>
   </div>
-  <div class='modal-footer'></div>
+  <div class='modal-footer'>
+  </div>
 </div>

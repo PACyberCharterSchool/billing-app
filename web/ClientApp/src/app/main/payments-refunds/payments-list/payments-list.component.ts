@@ -82,7 +82,7 @@ export class PaymentsListComponent implements OnInit {
   }
 
   createPayment() {
-    const modal = this.ngbModalService.open(PaymentUpsertFormComponent, { centered: true });
+    const modal = this.ngbModalService.open(PaymentUpsertFormComponent, { centered: true, size: 'lg' });
     modal.componentInstance.op = 'create';
     modal.componentInstance.schoolDistricts = this.schoolDistricts;
 

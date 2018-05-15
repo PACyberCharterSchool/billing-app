@@ -5,26 +5,26 @@ import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 
 import { SchoolDistrict } from '../../../models/school-district.model';
 
-import { PaymentsService } from '../../../services/payments.service';
+import { RefundsService } from '../../../services/refunds.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
 
-import { Payment } from '../../../models/payment.model';
+import { Refund } from '../../../models/refund.model';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-  selector: 'app-payment-upsert-form',
-  templateUrl: './payment-upsert-form.component.html',
-  styleUrls: ['./payment-upsert-form.component.scss']
+  selector: 'app-refund-upsert-form',
+  templateUrl: './refund-upsert-form.component.html',
+  styleUrls: ['./refund-upsert-form.component.scss']
 })
-export class PaymentUpsertFormComponent implements OnInit {
+export class RefundUpsertFormComponent implements OnInit {
   private amount: number;
   private selectedSchoolDistrict: SchoolDistrict;
   private schoolDistrictName: string;
   private selectedAcademicYear: string;
   private date: Date;
   private academicYear: string;
-  private paymentTypeId: string;
+  private refundCheckNumber: string;
   private schoolYears: string[] = [
     '2012-2013',
     '2013-2014',
@@ -33,17 +33,16 @@ export class PaymentUpsertFormComponent implements OnInit {
     '2016-2017',
     '2017-2018'
   ];
-  private isSplit: boolean;
 
   public model: any;
 
   @Input() op: string;
   @Input() schoolDistricts: SchoolDistrict[];
-  @Input() paymentRecord: Payment;
+  @Input() refundRecord: Refund;
 
   constructor(
     private activeModal: NgbActiveModal,
-    private paymentsService: PaymentsService,
+    private paymentsService: RefundsService,
     private schoolDistrictService: SchoolDistrictService
   ) {
   }
@@ -53,54 +52,48 @@ export class PaymentUpsertFormComponent implements OnInit {
     console.log('schoolDistricts are ', this.schoolDistricts);
 
     if (this.op === 'update') {
-      this.schoolDistrictService.getSchoolDistrict(this.paymentRecord.schoolDistrictId).subscribe(
+      this.schoolDistrictService.getSchoolDistrict(this.refundRecord.schoolDistrictId).subscribe(
         data => {
           this.selectedSchoolDistrict = data['schoolDistrict'];
         }
       );
     }
 
-    if (this.paymentRecord) {
-      this.amount = this.paymentRecord.paymentAmt;
-      this.paymentTypeId = this.paymentRecord.type;
-      this.academicYear = this.paymentRecord.academicYear;
-      this.date = this.paymentRecord.paymentDate;
-      this.selectedAcademicYear = this.paymentRecord.academicYear;
+    if (this.refundRecord) {
+      this.amount = this.refundRecord.refundAmt;
+      this.refundCheckNumber = this.refundRecord.refundCheckNumber;
+      this.academicYear = this.refundRecord.academicYear;
+      this.date = this.refundRecord.refundDate;
+      this.selectedAcademicYear = this.refundRecord.academicYear;
     }
-
-    this.isSplit = false;
   }
 
-  fillPaymentRecord() {
+  fillRefundRecord() {
     this.schoolDistrictName = this.selectedSchoolDistrict.name;
-    Object.assign(this.paymentRecord, {
-      type: this.paymentTypeId,
+    Object.assign(this.refundRecord, {
+      type: this.refundCheckNumber,
       schoolDistrictName: this.selectedSchoolDistrict.name,
       schoolDistrictId: this.selectedSchoolDistrict.id,
-      paymentDate: this.date,
-      paymentAmt: this.amount,
+      refundDate: this.date,
+      refundAmt: this.amount,
       academicYear: this.academicYear
     });
  }
 
-  upsertPayment() {
-    this.fillPaymentRecord();
+  upsertRefund() {
+    this.fillRefundRecord();
     if (this.op === 'create') {
-      this.paymentsService.createPayment(this.paymentRecord).subscribe(
+      this.paymentsService.createRefund(this.refundRecord).subscribe(
         data => {
-          console.log('PaymentUpsertFormComponent.createPayment():  payment successfully created.');
         },
         error => {
-          console.log('PaymentUpsertFormComponent.createPayment():  payment error: ', error);
         }
       );
     } else if (this.op === 'update') {
-      this.paymentsService.updatePayment(this.paymentRecord).subscribe(
+      this.paymentsService.updateRefund(this.refundRecord).subscribe(
         data => {
-          console.log('PaymentUpsertFormComponent.updatePayment():  payment successfully created.');
         },
         error => {
-          console.log('PaymentUpsertFormComponent.updatePayment():  payment error: ', error);
         }
       );
     }

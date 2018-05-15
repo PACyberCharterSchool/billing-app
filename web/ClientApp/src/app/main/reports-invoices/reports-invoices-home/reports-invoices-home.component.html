@@ -1,3 +1,59 @@
-<p>
-  reports-invoices-home works!
-</p>
+<div class='row reports-invoices-home-title-row'>
+  <div class='col-md-12'><h3>Reports & Invoices</h3></div>
+</div>
+<div class='row reports-invoices-home-content-row'>
+  <div class='col-md-12'>
+    <div class='row'>
+      <div class='col-md-3'>
+        <button id='accounts-receivable-aging-report-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
+          <img src='../../../../assets/images/sprite_2X.png' alt='A/R Report - Aging' />
+          <label>A/R Report - Aging</label>
+        </button>
+      </div>
+      <div class='col-md-3'>
+        <button id='accounts-receivable-aod-report-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
+          <img src='../../../../assets/images/sprite_2X.png' alt='A/R Report - As of Date' />
+          <label>A/R Report - As of Date</label>
+        </button>
+      </div>
+      <div class='col-md-3'>
+        <button id='csiu-export-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
+          <img src='../../../../assets/images/sprite_2X.png' alt='CSIU Export' />
+          <label>CSIU Export</label>
+        </button>
+      </div>
+      <div class='col-md-3'>
+        <button id='itemized-student-activity-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
+          <img src='../../../../assets/images/sprite_2X.png' alt='Itemized Student Activity' />
+          <label>Itemized Student Activity</label>
+        </button>
+      </div>
+    </div>
+    <div class='row'>
+      <div class='col-md-3'>
+        <button id='monthly-combined-invoice-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
+          <img src='../../../../assets/images/sprite_2X.png' alt='Monthly Combined Invoice' />
+          <label>Monthly Combined Invoice</label>
+        </button>
+      </div>
+      <div class='col-md-3'>
+        <button id='reconciliation-combine-invoice-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
+          <img src='../../../../assets/images/sprite_2X.png' alt='Reconciliation Combined Invoice' />
+          <label>Reconciliation Combined Invoice</label>
+        </button>
+      </div>
+      <div class='col-md-3'>
+        <button id='unipay-invoice-summary-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
+          <img src='../../../../assets/images/sprite_2X.png' alt='UniPay Invoice Summary' />
+          <label>UniPay Invoice Summary</label>
+        </button>
+      </div>
+      <div class='col-md-3'>
+        <button id='unipay-reconciliation-summary-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
+          <img src='../../../../assets/images/sprite_2X.png' alt='UniPay Reconciliation Summary' />
+          <label>UniPay Reconciliation Summary</label>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

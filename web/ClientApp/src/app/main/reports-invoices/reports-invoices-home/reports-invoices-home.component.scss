@@ -1,0 +1,110 @@
+.reports-invoices-home-title-row {
+  height: 25%;
+
+  h3 {
+    color: #58a719;
+  }
+}
+
+.reports-invoices-home-content-row {
+  height: 75%;
+
+  div.col-md-3 {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    button {
+      background-color: #ffffff;
+      border: 1px solid #dddddd;
+      border-radius: 5px;
+      height: 170px;
+      margin: 0 auto;
+      width: 190px;
+
+      label {
+        color: #4d4d4d;
+      }
+    }
+
+    button#accounts-receivable-aging-report-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -410px -200px;
+        height: 140px;
+        width: 160px;
+      }
+    }
+
+    button#accounts-receivable-aod-report-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -655px -215px;
+        height: 140px;
+        width: 160px;
+      }
+    }
+
+    button#csiu-export-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -410px -200px;
+        height: 140px;
+        width: 160px;
+      }
+    }
+
+    button#itemized-student-activity-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -410px -200px;
+        height: 140px;
+        width: 160px;
+      }
+    }
+
+    button#monthly-combined-invoice-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -410px -200px;
+        height: 140px;
+        width: 160px;
+      }
+    }
+
+    button#reconciliation-combine-invoice-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -655px -215px;
+        height: 140px;
+        width: 160px;
+      }
+    }
+
+    button#unipay-invoice-summary-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -410px -200px;
+        height: 140px;
+        width: 160px;
+      }
+    }
+
+    button#unipay-reconciliation-summary-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -410px -200px;
+        height: 140px;
+        width: 160px;
+      }
+    }
+  }
+}
