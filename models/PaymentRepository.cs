@@ -50,6 +50,7 @@ namespace models
 			{
 				create.PaymentId = HashPayment(create);
 				create.Created = time;
+				create.LastUpdated = time;
 			}
 
 			_payments.AddRange(creates);
