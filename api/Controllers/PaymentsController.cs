@@ -162,7 +162,7 @@ namespace api.Controllers
 			{
 				await Task.Run(() => _context.SaveChanges(() => _payments.UpdateMany(payments)));
 			}
-			catch (ArgumentException)
+			catch (NotFoundException)
 			{
 				return NotFound();
 			}

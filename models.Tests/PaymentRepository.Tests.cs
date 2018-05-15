@@ -243,7 +243,7 @@ namespace models.Tests
 			var updates = new[] {
 				new Payment { PaymentId = paymentId, Split = 1, Amount = 10m },
 			};
-			Assert.That(() => _context.SaveChanges(() => _uut.UpdateMany(time, updates)), Throws.TypeOf<ArgumentException>());
+			Assert.That(() => _context.SaveChanges(() => _uut.UpdateMany(time, updates)), Throws.TypeOf<NotFoundException>());
 		}
 	}
 }

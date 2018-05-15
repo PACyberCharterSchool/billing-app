@@ -303,7 +303,7 @@ namespace api.Tests.Controllers
 					},
 				}
 			};
-			_payments.Setup(ps => ps.UpdateMany(It.IsAny<IList<Payment>>())).Throws(new ArgumentException());
+			_payments.Setup(ps => ps.UpdateMany(It.IsAny<IList<Payment>>())).Throws(new NotFoundException());
 
 			var result = await _uut.Update("1234", update);
 			Assert.That(result, Is.TypeOf<NotFoundResult>());
