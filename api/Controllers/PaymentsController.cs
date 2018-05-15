@@ -115,6 +115,21 @@ namespace api.Controllers
 			});
 		}
 
+		[HttpGet]
+		[Authorize(Policy = "PAY+")]
+		[ProducesResponseType(typeof(PaymentsResponse), 200)]
+		public async Task<IActionResult> GetMany()
+		{
+			var payments = await Task.Run(() => _payments.GetMany());
+			if (payments == null)
+				payments = new List<Payment>();
+
+			return new ObjectResult(new PaymentsResponse
+			{
+				Payments = payments.Select(p => new PaymentDto(p)).ToList(),
+			});
+		}
+
 		[HttpGet("{id}")]
 		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(PaymentsResponse), 200)]

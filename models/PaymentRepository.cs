@@ -15,6 +15,7 @@ namespace models
 		IList<Payment> CreateMany(DateTime time, IList<Payment> creates);
 		IList<Payment> CreateMany(IList<Payment> creates);
 		IEnumerable<Payment> GetMany(string id);
+		IEnumerable<Payment> GetMany();
 		IList<Payment> UpdateMany(DateTime time, IList<Payment> updates);
 		IList<Payment> UpdateMany(IList<Payment> updates);
 	}
@@ -59,7 +60,11 @@ namespace models
 
 		public IList<Payment> CreateMany(IList<Payment> creates) => CreateMany(DateTime.Now, creates);
 
-		public IEnumerable<Payment> GetMany(string id) => _payments.Where(p => p.PaymentId == id).OrderBy(p => p.Split);
+		public IEnumerable<Payment> GetMany(string id) =>
+			_payments.Where(p => p.PaymentId == id).OrderBy(p => p.Date).ThenBy(p => p.Split);
+
+		public IEnumerable<Payment> GetMany() =>
+			_payments.OrderBy(p => p.Date).ThenBy(p => p.PaymentId).ThenBy(p => p.Split);
 
 		private static IList<string> _excludedFields = new List<string>
 		{

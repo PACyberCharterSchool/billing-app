@@ -95,7 +95,7 @@ namespace models.Tests
 		}
 
 		[Test]
-		public void GetManyReturnsListOrderBySplit()
+		public void GetManyByIdReturnsListOrderBySplit()
 		{
 			var paymentId = "1234";
 			var payments = new[] {
@@ -111,6 +111,34 @@ namespace models.Tests
 			Assert.That(actual[0].Split, Is.EqualTo(payments[0].Split));
 			Assert.That(actual[1].Split, Is.EqualTo(payments[2].Split));
 			Assert.That(actual[2].Split, Is.EqualTo(payments[1].Split));
+		}
+
+		[Test]
+		public void GetManyReturnsListOrderByDatePaymentIdSplit()
+		{
+			var time = DateTime.Now;
+			var payments = new[] {
+				new Payment { PaymentId = "1234", Split = 1, Date = time },
+				new Payment { PaymentId = "5678", Split = 1, Date = time.AddDays(-1) },
+				new Payment { PaymentId = "5678", Split = 2, Date = time.AddDays(-1) },
+			};
+			using (var ctx = NewContext())
+			{
+				ctx.AddRange(payments);
+				ctx.SaveChanges();
+			}
+
+			var actual = _uut.GetMany().ToList();
+			Assert.That(actual, Has.Count.EqualTo(payments.Length));
+
+			Assert.That(actual[0].PaymentId, Is.EqualTo(payments[1].PaymentId));
+			Assert.That(actual[0].Split, Is.EqualTo(payments[1].Split));
+
+			Assert.That(actual[1].PaymentId, Is.EqualTo(payments[2].PaymentId));
+			Assert.That(actual[1].Split, Is.EqualTo(payments[2].Split));
+
+			Assert.That(actual[2].PaymentId, Is.EqualTo(payments[0].PaymentId));
+			Assert.That(actual[2].Split, Is.EqualTo(payments[0].Split));
 		}
 
 		[Test]

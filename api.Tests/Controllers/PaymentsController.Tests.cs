@@ -208,6 +208,59 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
+		public async Task GetManyReturnsPayments()
+		{
+			var id = "1234";
+			var payments = new[] {
+				new Payment { PaymentId = id, Split = 1, Amount = 10m, SchoolDistrict = new SchoolDistrict() },
+				new Payment { PaymentId = id, Split = 2, Amount = 20m, SchoolDistrict = new SchoolDistrict() },
+			};
+			_payments.Setup(ps => ps.GetMany()).Returns(payments);
+
+			var result = await _uut.GetMany();
+			Assert.That(result, Is.TypeOf<ObjectResult>());
+			var value = ((ObjectResult)result).Value;
+
+			Assert.That(value, Is.TypeOf<PaymentsController.PaymentsResponse>());
+			var actuals = ((PaymentsController.PaymentsResponse)value).Payments;
+
+			Assert.That(actuals, Has.Count.EqualTo(payments.Length));
+			for (var i = 0; i < actuals.Count; i++)
+				AssertPayment(actuals[i], payments[i]);
+		}
+
+		[Test]
+		public async Task GetManyReturnsEmptyListWhenEmpty()
+		{
+			_payments.Setup(ps => ps.GetMany()).Returns(new List<Payment>());
+
+			var result = await _uut.GetMany();
+			Assert.That(result, Is.TypeOf<ObjectResult>());
+			var value = ((ObjectResult)result).Value;
+
+			Assert.That(value, Is.TypeOf<PaymentsController.PaymentsResponse>());
+			var actuals = ((PaymentsController.PaymentsResponse)value).Payments;
+
+			Assert.That(actuals, Is.Empty);
+		}
+
+		[Test]
+		public async Task GetManyReturnsEmptyListWhenNull()
+		{
+			_payments.Setup(ps => ps.GetMany()).Returns((List<Payment>)null);
+
+			var result = await _uut.GetMany();
+			Assert.That(result, Is.TypeOf<ObjectResult>());
+			var value = ((ObjectResult)result).Value;
+
+			Assert.That(value, Is.TypeOf<PaymentsController.PaymentsResponse>());
+			var actuals = ((PaymentsController.PaymentsResponse)value).Payments;
+
+			Assert.That(actuals, Is.Empty);
+		}
+
+
+		[Test]
 		public async Task UpdateUpdates()
 		{
 			var update = new PaymentsController.CreateUpdatePayment
