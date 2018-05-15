@@ -115,6 +115,7 @@ namespace models.Transformers
 			var studentCache = new Dictionary<string, Student>();
 			var districtCache = new Dictionary<int, SchoolDistrict>();
 
+			// TODO(Erik): group by PACyberId to only return a single student once
 			foreach (var record in records)
 			{
 				if (!studentCache.ContainsKey(record.PACyberId))

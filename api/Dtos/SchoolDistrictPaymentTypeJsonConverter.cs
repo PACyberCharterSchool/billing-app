@@ -1,7 +1,9 @@
 using System;
 using Newtonsoft.Json;
 
-namespace models
+using models;
+
+namespace api.Dtos
 {
 	public class SchoolDistrictPaymentTypeJsonConverter : JsonConverter<SchoolDistrictPaymentType>
 	{

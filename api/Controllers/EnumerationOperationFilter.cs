@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 
 using Swashbuckle.AspNetCore.Swagger;
@@ -6,7 +6,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace api.Controllers
 {
-	public class EnumerableOperationFilter : IOperationFilter
+	public class EnumerationOperationFilter : IOperationFilter
 	{
 		public void Apply(Operation operation, OperationFilterContext context)
 		{
@@ -23,11 +23,11 @@ namespace api.Controllers
 				if (prop == null)
 					continue;
 
-				var att = prop.GetCustomAttributes(typeof(EnumerableValidationAttribute), true).FirstOrDefault();
+				var att = prop.GetCustomAttributes(typeof(EnumerationValidationAttribute), true).FirstOrDefault();
 				if (att == null)
 					continue;
 
-				var values = ((EnumerableValidationAttribute)att).Values;
+				var values = ((EnumerationValidationAttribute)att).Values;
 				var def = operation.Parameters.SingleOrDefault(p => p.Name == param.Name);
 				if (def == null)
 					continue;

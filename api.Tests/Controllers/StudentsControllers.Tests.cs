@@ -10,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 
 using api.Controllers;
+using api.Dtos;
 using api.Tests.Util;
 using models;
 
@@ -32,33 +33,49 @@ namespace api.Tests.Controllers
 			_uut = new StudentsController(_students.Object, _logger);
 		}
 
-		private static void AssertStudent(Student student, object actual)
+		public void AssertSchoolDistrict(SchoolDistrictDto actual, SchoolDistrict district)
 		{
-			foreach (var p in typeof(Student).GetProperties())
-			{
-				if (p.Name == nameof(Student.SchoolDistrict))
-					continue;
+			Assert.That(actual.Id, Is.EqualTo(district.Id));
+			Assert.That(actual.Aun, Is.EqualTo(district.Aun));
+			Assert.That(actual.Name, Is.EqualTo(district.Name));
+			Assert.That(actual.Rate, Is.EqualTo(district.Rate));
+			Assert.That(actual.AlternateRate, Is.EqualTo(district.AlternateRate));
+			Assert.That(actual.PaymentType, Is.EqualTo(district.PaymentType));
+			Assert.That(actual.Created, Is.EqualTo(district.Created));
+			Assert.That(actual.LastUpdated, Is.EqualTo(district.LastUpdated));
+		}
 
-				Assert.That(actual.GetType().GetField(p.Name).GetValue(actual), Is.EqualTo(p.GetValue(student)));
-			}
+		public void AssertStudent(StudentDto actual, Student student)
+		{
+			Assert.That(actual.Id, Is.EqualTo(student.Id));
+			Assert.That(actual.PACyberId, Is.EqualTo(student.PACyberId));
+			Assert.That(actual.PASecuredId, Is.EqualTo(student.PASecuredId));
+			Assert.That(actual.FirstName, Is.EqualTo(student.FirstName));
+			Assert.That(actual.MiddleInitial, Is.EqualTo(student.MiddleInitial));
+			Assert.That(actual.LastName, Is.EqualTo(student.LastName));
+			Assert.That(actual.Grade, Is.EqualTo(student.Grade));
+			Assert.That(actual.DateOfBirth, Is.EqualTo(student.DateOfBirth));
+			Assert.That(actual.Street1, Is.EqualTo(student.Street1));
+			Assert.That(actual.Street2, Is.EqualTo(student.Street2));
+			Assert.That(actual.City, Is.EqualTo(student.City));
+			Assert.That(actual.State, Is.EqualTo(student.State));
+			Assert.That(actual.ZipCode, Is.EqualTo(student.ZipCode));
+			Assert.That(actual.IsSpecialEducation, Is.EqualTo(student.IsSpecialEducation));
+			Assert.That(actual.CurrentIep, Is.EqualTo(student.CurrentIep));
+			Assert.That(actual.FormerIep, Is.EqualTo(student.FormerIep));
+			Assert.That(actual.NorepDate, Is.EqualTo(student.NorepDate));
+			Assert.That(actual.StartDate, Is.EqualTo(student.StartDate));
+			Assert.That(actual.EndDate, Is.EqualTo(student.EndDate));
+			Assert.That(actual.Created, Is.EqualTo(student.Created));
+			Assert.That(actual.LastUpdated, Is.EqualTo(student.LastUpdated));
 
-			var district = actual.GetType().GetField(nameof(Student.SchoolDistrict)).GetValue(actual);
-			foreach (var p in typeof(SchoolDistrict).GetProperties())
-			{
-				if (p.Name == nameof(SchoolDistrict.Students))
-					continue;
-
-				Assert.That(district.GetType().GetField(p.Name).GetValue(district),
-					Is.EqualTo(p.GetValue(student.SchoolDistrict)));
-			}
-
-			Assert.That(district.GetType().GetField("Students"), Is.Null);
+			AssertSchoolDistrict(actual.SchoolDistrict, student.SchoolDistrict);
 		}
 
 		[Test]
 		public async Task GetManyNoArgsReturnsList()
 		{
-			var students = new List<Student>{
+			var students = new[] {
 				new Student
 				{
 					SchoolDistrict = new SchoolDistrict(),
@@ -70,9 +87,12 @@ namespace api.Tests.Controllers
 			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
-			var actuals = value.GetType().GetProperty("Students").GetValue(value);
-			var actual = ((IList)actuals)[0];
-			AssertStudent(students[0], actual);
+			Assert.That(value, Is.TypeOf<StudentsController.StudentsResponse>());
+			var actual = ((StudentsController.StudentsResponse)value).Students;
+
+			Assert.That(actual, Has.Count.EqualTo(students.Length));
+			for (var i = 0; i < actual.Count; i++)
+				AssertStudent(actual[i], students[i]);
 		}
 
 		[Test]
@@ -82,7 +102,7 @@ namespace api.Tests.Controllers
 			var dir = SortDirection.Ascending;
 			var skip = 10;
 			var take = 100;
-			var students = new List<Student>{
+			var students = new[] {
 				new Student
 				{
 					SchoolDistrict = new SchoolDistrict(),
@@ -100,9 +120,12 @@ namespace api.Tests.Controllers
 			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
-			var actuals = value.GetType().GetProperty("Students").GetValue(value);
-			var actual = ((IList)actuals)[0];
-			AssertStudent(students[0], actual);
+			Assert.That(value, Is.TypeOf<StudentsController.StudentsResponse>());
+			var actual = ((StudentsController.StudentsResponse)value).Students;
+
+			Assert.That(actual, Has.Count.EqualTo(students.Length));
+			for (var i = 0; i < actual.Count; i++)
+				AssertStudent(actual[i], students[i]);
 		}
 
 		[Test]
@@ -114,8 +137,10 @@ namespace api.Tests.Controllers
 			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
-			var actual = value.GetType().GetProperty("Students").GetValue(value);
-			Assert.Zero((int)actual.GetType().GetProperty("Count").GetValue(actual));
+			Assert.That(value, Is.TypeOf<StudentsController.StudentsResponse>());
+			var actual = ((StudentsController.StudentsResponse)value).Students;
+
+			Assert.That(actual, Has.Count.EqualTo(0));
 		}
 
 		[Test]
@@ -127,8 +152,10 @@ namespace api.Tests.Controllers
 			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
-			var actual = value.GetType().GetProperty("Students").GetValue(value);
-			Assert.Zero((int)actual.GetType().GetProperty("Count").GetValue(actual));
+			Assert.That(value, Is.TypeOf<StudentsController.StudentsResponse>());
+			var actual = ((StudentsController.StudentsResponse)value).Students;
+
+			Assert.That(actual, Has.Count.EqualTo(0));
 		}
 
 		[Test]
@@ -167,8 +194,10 @@ namespace api.Tests.Controllers
 			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
-			var actual = value.GetType().GetProperty("Student").GetValue(value);
-			AssertStudent(student, actual);
+			Assert.That(value, Is.TypeOf<StudentsController.StudentResponse>());
+			var actual = ((StudentsController.StudentResponse)value).Student;
+
+			AssertStudent(actual, student);
 		}
 
 		[Test]

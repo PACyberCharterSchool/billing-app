@@ -5,9 +5,10 @@ using Newtonsoft.Json;
 
 namespace models
 {
-	public class StudentActivity : Enumerable<StudentActivity>
+	public class StudentActivity : Enumeration<StudentActivity>
 	{
 		private StudentActivity(string value) : base(value) { }
+		private StudentActivity() : base() { }
 
 		public static readonly StudentActivity NewStudent = new StudentActivity("NewStudent");
 		public static readonly StudentActivity DateOfBirthChange = new StudentActivity("DateOfBirthChange");
