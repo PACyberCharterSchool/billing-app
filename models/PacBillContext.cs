@@ -11,6 +11,7 @@ namespace models
 		public DbSet<CommittedStudentStatusRecord> CommittedStudentStatusRecords { get; set; }
 		public DbSet<Payment> Payments { get; set; }
 		public DbSet<PendingStudentStatusRecord> PendingStudentStatusRecords { get; set; }
+		public DbSet<Refund> Refunds { get; set; }
 		public DbSet<SchoolDistrict> SchoolDistricts { get; set; }
 		public DbSet<Student> Students { get; set; }
 		public DbSet<StudentActivityRecord> StudentActivityRecords { get; set; }
