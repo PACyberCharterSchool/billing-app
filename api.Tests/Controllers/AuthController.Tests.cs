@@ -95,22 +95,25 @@ namespace api.Tests.Controllers
 		public async Task LoginReturnsTokenWithUserData()
 		{
 			var username = "username";
+			var displayName = "display";
 			var password = "password";
-			var user = new LdapUser(username, ADMIN);
+			var user = new LdapUser(username, displayName, ADMIN);
 			_ldap.Setup(l => l.GetUser(username, password)).Returns(user);
 
 			var token = new JwtSecurityToken();
-			// verify necessary claims are passed
-			_jwt.Setup(j => j.BuildToken(It.Is<Claim[]>(cs =>
-				cs[0].Type == "sub" && cs[0].Value == user.Username &&
-				cs[1].Type == "role" && cs[1].Value == user.Role
-			))).Returns(token);
+			_jwt.Setup(j => j.BuildToken(It.IsAny<Claim[]>())).Returns(token);
 
 			var result = await _uut.Login(new AuthController.LoginArgs
 			{
 				Username = username,
 				Password = password,
 			});
+
+			_jwt.Verify(j => j.BuildToken(It.Is<Claim[]>(cs =>
+				cs[0].Type == "sub" && cs[0].Value == user.Username &&
+				cs[1].Type == "name" && cs[1].Value == user.DisplayName &&
+				cs[2].Type == "role" && cs[2].Value == user.Role
+			)), Times.Once);
 
 			Assert.That(result, Is.TypeOf<OkObjectResult>());
 			var value = ((OkObjectResult)result).Value;

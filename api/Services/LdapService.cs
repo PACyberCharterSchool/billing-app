@@ -11,11 +11,13 @@ namespace api.Services
 	public struct LdapUser
 	{
 		public string Username { get; }
+		public string DisplayName { get; }
 		public string Role { get; }
 
-		public LdapUser(string username, string role)
+		public LdapUser(string username, string display, string role)
 		{
 			Username = username;
+			DisplayName = display;
 			Role = role;
 		}
 
@@ -98,7 +100,10 @@ namespace api.Services
 						@base: _cfg.SearchBase,
 						scope: LdapConnection.SCOPE_SUB,
 						filter: $"cn={username}",
-						attrs: new[] { "memberOf" },
+						attrs: new[] {
+							 "memberOf",
+							 "displayName",
+						},
 						typesOnly: false
 					);
 
@@ -115,7 +120,7 @@ namespace api.Services
 					if (string.IsNullOrEmpty(role))
 						throw new LdapUnauthorizedException("not a member of configured group");
 
-					return new LdapUser(username, role);
+					return new LdapUser(username, entry.getAttribute("displayName").StringValue, role);
 				}
 				catch (Exception e) when (e is LdapException || e is LdapReferralException)
 				{
