@@ -31,7 +31,7 @@ export class StudentActivityHistoryComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.currentStudentService.currentStudent.subscribe((s) => this.student = s);
+    this.currentStudentService.currentStudent.subscribe((s) => this.student = s, (e) => console.log('error'));
     this.studentsService.getStudentActivityRecordsByStudentId(this.student.paCyberId).subscribe(
       data => {
         this.activities = this.allActivities = data['studentActivityRecords'];

@@ -1,11 +1,15 @@
 import { TestBed, inject } from '@angular/core/testing';
 
+import { HttpClient, HttpHandler } from '@angular/common/http';
+
 import { PaymentsService } from './payments.service';
+
+import { Globals } from '../globals';
 
 describe('PaymentsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [PaymentsService]
+      providers: [ PaymentsService, Globals, HttpClient, HttpHandler ]
     });
   });
 

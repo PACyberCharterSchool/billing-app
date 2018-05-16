@@ -1,6 +1,26 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+
+import { HttpClient, HttpHandler } from '@angular/common/http';
 
 import { PaymentsListComponent } from './payments-list.component';
+
+import { NormalizeFieldNamePipe } from '../../../pipes/normalize-field-name.pipe';
+import { OrderByPipe } from '../../../pipes/orderby.pipe';
+import { NormalizeFieldValuePipe } from '../../../pipes/normalize-field-value.pipe';
+
+import { Globals } from '../../../globals';
+
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+
+import { UtilitiesService } from '../../../services/utilities.service';
+import { PaymentsService } from '../../../services/payments.service';
+import { SchoolDistrictService } from '../../../services/school-district.service';
+
+import {
+  NgbModule,
+  NgbModal
+} from '@ng-bootstrap/ng-bootstrap';
 
 describe('PaymentsListComponent', () => {
   let component: PaymentsListComponent;
@@ -8,7 +28,17 @@ describe('PaymentsListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PaymentsListComponent ]
+      declarations: [ PaymentsListComponent, NormalizeFieldNamePipe, NormalizeFieldValuePipe, OrderByPipe ],
+      imports: [ FormsModule, InfiniteScrollModule, NgbModule.forRoot() ],
+      providers: [
+        Globals,
+        UtilitiesService,
+        PaymentsService,
+        SchoolDistrictService,
+        HttpClient,
+        HttpHandler,
+        NgbModal
+      ]
     })
     .compileComponents();
   }));

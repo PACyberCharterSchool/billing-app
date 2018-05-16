@@ -41,6 +41,9 @@ export class RefundsListComponent implements OnInit {
       data => {
         this.allRefunds = this.refunds = data;
         console.log('RefundsListComponent.ngOnInit(): mocked data is ', this.allRefunds);
+      },
+      error => {
+        console.log('RefundsListComponent.ngOnInit(): error is ', error);
       }
     );
 
@@ -48,6 +51,9 @@ export class RefundsListComponent implements OnInit {
       data => {
         this.schoolDistricts = data['schoolDistricts'];
         console.log('RefundsListComponent.ngOnInit():  school district list is ', this.schoolDistricts);
+      },
+      error => {
+        console.log('RefundsListComponent.ngOnInit():  error is ', error);
       }
     );
   }

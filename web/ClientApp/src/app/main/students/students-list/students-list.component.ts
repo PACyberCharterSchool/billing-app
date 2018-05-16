@@ -50,6 +50,9 @@ export class StudentsListComponent implements OnInit {
         this.updateScrollingSkip();
         this.students = data['students'];
         console.log('StudentsListComponent.ngOnInit():  students are ', this.students);
+      },
+      error => {
+        console.log('StudentsListComponent.ngOnInit():  error is ', error);
       }
     );
 
@@ -57,16 +60,22 @@ export class StudentsListComponent implements OnInit {
       data => {
         this.schoolDistricts = data['schoolDistricts'];
         console.log('StudentsListComponent.ngOnInit():  school districts are', this.schoolDistricts);
+      },
+      error => {
+        console.log('StudentsListComponent.ngOnInit():  error is ', error);
       }
     );
 
-    this.currentStudentService.currentStudent.subscribe((student) => this.selectedStudent = student);
+    this.currentStudentService.currentStudent.subscribe((student) => this.selectedStudent = student, (error) => error);
   }
 
   dateSelectedStartDateHandler(date: Date) {
     this.studentsService.getStudentsFilteredByStartDate(date).subscribe(
       data => {
         this.students = data['students'];
+      },
+      error => {
+
       }
     );
   }
@@ -75,6 +84,9 @@ export class StudentsListComponent implements OnInit {
     this.studentsService.getStudentsFilteredByEndDate(date).subscribe(
       data => {
         this.students = data['students'];
+      },
+      error => {
+
       }
     );
   }
@@ -89,6 +101,9 @@ export class StudentsListComponent implements OnInit {
       data => {
         this.students = this.students.concat(data['students']);
         console.log('StudentsListComponent.getStudents():  students are ', this.students);
+      },
+      error => {
+
       }
     );
   }
@@ -114,6 +129,9 @@ export class StudentsListComponent implements OnInit {
     this.studentsService.getStudents(this.skip).subscribe(
       data => {
         this.students = data['students'];
+      },
+      error => {
+        console.log('StudentsListComponent.resetStudentList(): error is ', error);
       }
     );
   }
@@ -124,6 +142,9 @@ export class StudentsListComponent implements OnInit {
         data => {
           this.students = data['students'];
           console.log('StudentsListComponent.filterStudentList():  students are ', data);
+        },
+        error => {
+          console.log('StudentsListComponent.filterStudentList():  error is ', error);
         }
       );
     }

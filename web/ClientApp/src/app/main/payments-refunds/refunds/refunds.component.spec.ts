@@ -1,6 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { HttpClient, HttpHandler } from '@angular/common/http';
+
+import { FormsModule } from '@angular/forms';
+
 import { RefundsComponent } from './refunds.component';
+import { RefundsListComponent } from '../refunds-list/refunds-list.component';
+
+import { NormalizeFieldNamePipe } from '../../../pipes/normalize-field-name.pipe';
+import { OrderByPipe } from '../../../pipes/orderby.pipe';
+
+import { UtilitiesService } from '../../../services/utilities.service';
+import { RefundsService } from '../../../services/refunds.service';
+import { SchoolDistrictService } from '../../../services/school-district.service';
+
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 describe('RefundsComponent', () => {
   let component: RefundsComponent;
@@ -8,7 +22,9 @@ describe('RefundsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RefundsComponent ]
+      declarations: [ RefundsComponent, RefundsListComponent, NormalizeFieldNamePipe, OrderByPipe ],
+      providers: [ UtilitiesService, RefundsService, SchoolDistrictService, HttpClient, HttpHandler ],
+      imports: [ FormsModule, NgbModule.forRoot() ]
     })
     .compileComponents();
   }));

@@ -2,13 +2,16 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PaymentsRefundsHomeComponent } from './payments-refunds-home.component';
 
+import { RouterTestingModule } from '@angular/router/testing';
+
 describe('PaymentsRefundsHomeComponent', () => {
   let component: PaymentsRefundsHomeComponent;
   let fixture: ComponentFixture<PaymentsRefundsHomeComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PaymentsRefundsHomeComponent ]
+      declarations: [ PaymentsRefundsHomeComponent ],
+      imports: [ RouterTestingModule ]
     })
     .compileComponents();
   }));

@@ -12,48 +12,54 @@ import { StudentAdvancedFilterComponent } from '../student-advanced-filter/stude
 
 import { StudentsService } from '../../../services/students.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
-
+import { CurrentStudentService } from '../../../services/current-student.service';
 
 import { OrderByPipe } from '../../../pipes/orderby.pipe';
 import { IepEnrolledPipe } from '../../../pipes/iep-enrolled.pipe';
 
 import { NgbModule, NgbDateAdapter, NgbDatepicker, NgbDateParserFormatter, NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
 
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+
+import { Globals } from '../../../globals';
+
 describe('StudentsListComponent', () => {
-  // let component: StudentsListComponent;
-  // let fixture: ComponentFixture<StudentsListComponent>;
+  let component: StudentsListComponent;
+  let fixture: ComponentFixture<StudentsListComponent>;
 
-  // beforeEach(async(() => {
-  //   TestBed.configureTestingModule({
-  //     declarations: [
-  //       StudentsListComponent,
-  //       StudentDatepickerComponent,
-  //       StudentAdvancedFilterComponent,
-  //       OrderByPipe,
-  //       IepEnrolledPipe
-  //     ],
-  //     imports: [ FormsModule, NgbModule, RouterTestingModule ],
-  //     providers: [
-  //       NgbCalendar,
-  //       NgbDateAdapter,
-  //       NgbDateParserFormatter,
-  //       NgbDatepicker,
-  //       SchoolDistrictService,
-  //       StudentsService,
-  //       HttpClient,
-  //       HttpHandler
-  //     ]
-  //   })
-  //   .compileComponents();
-  // }));
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [
+        StudentsListComponent,
+        StudentDatepickerComponent,
+        StudentAdvancedFilterComponent,
+        OrderByPipe,
+        IepEnrolledPipe
+      ],
+      imports: [ FormsModule, NgbModule, RouterTestingModule, InfiniteScrollModule ],
+      providers: [
+        NgbCalendar,
+        NgbDateAdapter,
+        NgbDateParserFormatter,
+        NgbDatepicker,
+        SchoolDistrictService,
+        StudentsService,
+        CurrentStudentService,
+        HttpClient,
+        HttpHandler,
+        Globals
+      ]
+    })
+    .compileComponents();
+  }));
 
-  // beforeEach(() => {
-  //   fixture = TestBed.createComponent(StudentsListComponent);
-  //   component = fixture.componentInstance;
-  //   fixture.detectChanges();
-  // });
+  beforeEach(() => {
+    fixture = TestBed.createComponent(StudentsListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
-  // it('should create', () => {
-  //   expect(component).toBeTruthy();
-  // });
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
 });

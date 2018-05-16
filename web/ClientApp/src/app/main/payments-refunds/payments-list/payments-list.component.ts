@@ -49,6 +49,9 @@ export class PaymentsListComponent implements OnInit {
       data => {
         this.schoolDistricts = data['schoolDistricts'];
         console.log('PaymentsListComponent.ngOnInit():  school district list is ', this.schoolDistricts);
+      },
+      error => {
+        console.log('PaymentsListComponent.ngOnInit():  error is ', error);
       }
     );
   }
@@ -86,6 +89,9 @@ export class PaymentsListComponent implements OnInit {
       data => {
         this.allPayments = this.payments = data['payments'];
         console.log('PaymentsListComponent.ngOnInit(): payments are ', this.allPayments);
+      },
+      error => {
+        console.log('PaymentsListComponent.ngOnInit(): error is ', error);
       }
     );
   }
@@ -95,6 +101,9 @@ export class PaymentsListComponent implements OnInit {
       data => {
         this.payments = this.payments.concat(data['students']);
         console.log('PaymentsListComponent.getPayments():  payments are ', this.payments);
+      },
+      error => {
+        console.log('PaymentsListComponent.getPayments():  error is ', error);
       }
     );
   }
@@ -134,6 +143,13 @@ export class PaymentsListComponent implements OnInit {
 
   onScroll($event) {
     this.getAdditionalPayments($event);
+  }
+
+  listDisplayableFields() {
+    if (this.allPayments) {
+      const fields = this.utilitiesService.objectKeys(this.allPayments[0]);
+      return fields;
+    }
   }
 
   private updateScrollingSkip() {
