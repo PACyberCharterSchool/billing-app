@@ -99,7 +99,7 @@ namespace api.Services
 					var result = conn.Search(
 						@base: _cfg.SearchBase,
 						scope: LdapConnection.SCOPE_SUB,
-						filter: $"cn={username}",
+						filter: $"sAMAccountName={username}",
 						attrs: new[] {
 							 "memberOf",
 							 "displayName",
