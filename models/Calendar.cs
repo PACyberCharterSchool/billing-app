@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace models
 {
+	[Table("CalendarDays")]
 	public class CalendarDay
 	{
 		public int Id { get; set; }

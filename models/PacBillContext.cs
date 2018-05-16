@@ -23,9 +23,6 @@ namespace models
 				HasIndex(e => e.SchoolYear).
 				IsUnique();
 
-			// builder.Entity<Calendar>().
-			// 	HasMany(e => e.Days);
-
 			builder.Entity<Payment>().
 				HasIndex(e => new { e.PaymentId, e.Split }).
 				IsUnique();
