@@ -8,6 +8,7 @@ namespace models
 		public PacBillContext(DbContextOptions<PacBillContext> options) : base(options) { }
 
 		public DbSet<AuditRecord> AuditRecords { get; set; }
+		public DbSet<Calendar> Calendars { get; set; }
 		public DbSet<CommittedStudentStatusRecord> CommittedStudentStatusRecords { get; set; }
 		public DbSet<Payment> Payments { get; set; }
 		public DbSet<PendingStudentStatusRecord> PendingStudentStatusRecords { get; set; }
@@ -18,6 +19,13 @@ namespace models
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
+			builder.Entity<Calendar>().
+				HasIndex(e => e.SchoolYear).
+				IsUnique();
+
+			// builder.Entity<Calendar>().
+			// 	HasMany(e => e.Days);
+
 			builder.Entity<Payment>().
 				HasIndex(e => new { e.PaymentId, e.Split }).
 				IsUnique();
