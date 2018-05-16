@@ -1,8 +1,20 @@
+import { SchoolDistrict } from '../models/school-district.model';
+
+enum PaymentType {
+  Check = 'Check',
+  UniPay = 'UniPay'
+}
+
 export class Payment {
-  schoolDistrictName: string;
-  schoolDistrictId: number;
-  paymentAmt: number;
-  paymentDate: Date;
-  type: string;
-  academicYear: string;
+  id: number;
+  paymentId: string;
+  split: number;
+  date: Date;
+  created: Date;
+  externalId: string;
+  type: PaymentType;
+  amount: number;
+  schoolYear: string;
+  lastUpdated: Date;
+  schoolDistrict: SchoolDistrict;
 }

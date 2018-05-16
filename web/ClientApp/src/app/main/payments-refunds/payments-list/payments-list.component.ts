@@ -11,6 +11,8 @@ import { NormalizeFieldNamePipe } from '../../../pipes/normalize-field-name.pipe
 
 import { PaymentUpsertFormComponent } from '../payment-upsert-form/payment-upsert-form.component';
 
+import { Globals } from '../../../globals';
+
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -26,8 +28,10 @@ export class PaymentsListComponent implements OnInit {
   private allPayments: Payment[];
   private payments: Payment[];
   private schoolDistricts: SchoolDistrict[];
+  private skip: number;
 
   constructor(
+    private globals: Globals,
     private utilitiesService: UtilitiesService,
     private paymentsService: PaymentsService,
     private schoolDistrictsService: SchoolDistrictService,
@@ -35,16 +39,11 @@ export class PaymentsListComponent implements OnInit {
   ) {
     this.property = 'schoolDistrictName';
     this.direction = 1;
-    this.payments = this.allPayments;
+    this.skip = 0;
   }
 
   ngOnInit() {
-    this.paymentsService.getPayments().subscribe(
-      data => {
-        this.allPayments = this.payments = data;
-        console.log('PaymentsListComponent.ngOnInit(): mocked data is ', this.allPayments);
-      }
-    );
+    this.refreshPaymentList();
 
     this.schoolDistrictsService.getSchoolDistricts().subscribe(
       data => {
@@ -65,9 +64,10 @@ export class PaymentsListComponent implements OnInit {
       (i) => {
         const re = new RegExp(this.searchText, 'gi');
         if (
-          i.schoolDistrictId.toString().search(re) !== -1 ||
-          i.schoolDistrictName.search(re) !== -1 ||
-          i.type.search(re) !== -1
+          i.externalId.toString().search(re) !== -1 ||
+          i.schoolDistrict.aun.toString().search(re) !== -1 ||
+          i.type.search(re) !== -1 ||
+          i.paymentId.search(re) !== -1
         ) {
           return true;
         }
@@ -81,6 +81,24 @@ export class PaymentsListComponent implements OnInit {
     this.payments = this.allPayments;
   }
 
+  refreshPaymentList() {
+    this.paymentsService.getPayments(this.skip).subscribe(
+      data => {
+        this.allPayments = this.payments = data['payments'];
+        console.log('PaymentsListComponent.ngOnInit(): payments are ', this.allPayments);
+      }
+    );
+  }
+
+  getAdditionalPayments($event) {
+    this.paymentsService.getPayments(this.skip).subscribe(
+      data => {
+        this.payments = this.payments.concat(data['students']);
+        console.log('PaymentsListComponent.getPayments():  payments are ', this.payments);
+      }
+    );
+  }
+
   createPayment() {
     const modal = this.ngbModalService.open(PaymentUpsertFormComponent, { centered: true, size: 'lg' });
     modal.componentInstance.op = 'create';
@@ -89,6 +107,7 @@ export class PaymentsListComponent implements OnInit {
     modal.result.then(
       (result) => {
         console.log('PaymentsListComponent.createPayment():  result is ', result);
+        this.refreshPaymentList();
       },
       (reason) => {
         console.log('PaymentsListComponent.createPayment():  reason is ', reason);
@@ -105,10 +124,20 @@ export class PaymentsListComponent implements OnInit {
     modal.result.then(
       (result) => {
         console.log('PaymentsListComponent.editPayment():  result is ', result);
+        this.refreshPaymentList();
       },
       (reason) => {
         console.log('PaymentsListComponent.editPayment():  result is ', reason);
       }
     );
   }
+
+  onScroll($event) {
+    this.getAdditionalPayments($event);
+  }
+
+  private updateScrollingSkip() {
+    this.skip += this.globals.take;
+  }
+
 }

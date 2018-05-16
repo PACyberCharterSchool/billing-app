@@ -9,12 +9,16 @@ export class UtilitiesService {
     if (obj) {
       return Object.keys(obj);
     }
+
+    return [];
   }
 
   objectValues(obj) {
     if (obj) {
       return Object.values(obj);
     }
+
+    return [];
   }
 
   uniqueItemsInArray(theArray) {

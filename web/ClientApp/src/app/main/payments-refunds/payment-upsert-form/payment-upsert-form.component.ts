@@ -20,12 +20,12 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class PaymentUpsertFormComponent implements OnInit {
   private amount: number;
-  private splitAmt: number;
+  private splitAmount: number;
   private selectedSchoolDistrict: SchoolDistrict;
-  private schoolDistrictName: string;
   private selectedAcademicYear: string;
+  private selectedAcademicYearSplit: string;
   private date: Date;
-  private academicYear: string;
+  private paymentType: string;
   private paymentTypeId: string;
   private schoolYears: string[];
   private isSplit: boolean;
@@ -51,7 +51,7 @@ export class PaymentUpsertFormComponent implements OnInit {
     this.schoolYears = this.academicYearsService.getAcademicYears();
 
     if (this.op === 'update') {
-      this.schoolDistrictService.getSchoolDistrict(this.paymentRecord.schoolDistrictId).subscribe(
+      this.schoolDistrictService.getSchoolDistrict(this.paymentRecord.schoolDistrict.id).subscribe(
         data => {
           this.selectedSchoolDistrict = data['schoolDistrict'];
         }
@@ -59,25 +59,36 @@ export class PaymentUpsertFormComponent implements OnInit {
     }
 
     if (this.paymentRecord) {
-      this.amount = this.paymentRecord.paymentAmt;
-      this.paymentTypeId = this.paymentRecord.type;
-      this.academicYear = this.paymentRecord.academicYear;
-      this.date = this.paymentRecord.paymentDate;
-      this.selectedAcademicYear = this.paymentRecord.academicYear;
+      this.amount = this.paymentRecord.amount;
+      this.paymentType = this.paymentRecord.type;
+      this.date = this.paymentRecord.date;
+      this.selectedAcademicYear = this.paymentRecord.schoolYear;
+    } else {
+      this.paymentRecord = new Payment();
     }
 
     this.isSplit = false;
   }
 
+  fillSplitsColumn() {
+    let splits: Object[];
+
+    splits = [{ 'amount': this.amount, 'schoolYear': this.selectedAcademicYear }];
+    if (this.splitAmount) {
+      splits.push({ 'amount': this.splitAmount, 'schoolYear': this.selectedAcademicYearSplit });
+    }
+
+    return splits;
+  }
+
   fillPaymentRecord() {
-    this.schoolDistrictName = this.selectedSchoolDistrict.name;
+
     Object.assign(this.paymentRecord, {
-      type: this.paymentTypeId,
-      schoolDistrictName: this.selectedSchoolDistrict.name,
-      schoolDistrictId: this.selectedSchoolDistrict.id,
-      paymentDate: this.date,
-      paymentAmt: this.amount,
-      academicYear: this.academicYear
+      splits: this.fillSplitsColumn(),
+      date: this.date,
+      externalId: this.selectedSchoolDistrict.id,
+      type: this.paymentType ? 'Check' : 'UniPay',
+      schoolDistrictAun: +this.selectedSchoolDistrict.aun
     });
  }
 
@@ -87,29 +98,37 @@ export class PaymentUpsertFormComponent implements OnInit {
       this.paymentsService.createPayment(this.paymentRecord).subscribe(
         data => {
           console.log('PaymentUpsertFormComponent.createPayment():  payment successfully created.');
+          this.activeModal.close('success');
         },
         error => {
           console.log('PaymentUpsertFormComponent.createPayment():  payment error: ', error);
+          this.activeModal.close('error');
         }
       );
     } else if (this.op === 'update') {
       this.paymentsService.updatePayment(this.paymentRecord).subscribe(
         data => {
           console.log('PaymentUpsertFormComponent.updatePayment():  payment successfully created.');
+          this.activeModal.close('success');
         },
         error => {
           console.log('PaymentUpsertFormComponent.updatePayment():  payment error: ', error);
+          this.activeModal.close('error');
         }
       );
     }
   }
 
-  setSelectedSchoolDistrict(sd: SchoolDistrict) {
-    this.selectedSchoolDistrict = sd;
+  setSelectedSchoolDistrict($event) {
+    this.selectedSchoolDistrict = this.schoolDistricts.find((sd) => sd.name === $event.item);
   }
 
   setSelectedAcademicYear(year: string) {
     this.selectedAcademicYear = year;
+  }
+
+  setSelectedAcademicYearSplit(year: string) {
+    this.selectedAcademicYearSplit = year;
   }
 
   onDateChanged() {

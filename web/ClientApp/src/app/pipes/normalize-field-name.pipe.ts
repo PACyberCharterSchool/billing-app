@@ -33,10 +33,14 @@ export class NormalizeFieldNamePipe implements PipeTransform {
       case 'studentStreet2':
         fieldName = 'Street 2';
         break;
+      case 'externalId':
+        fieldName = 'External Id';
+        break;
       case 'studentState':
         fieldName = 'State';
         break;
       case 'schoolDistrictName':
+      case 'schoolDistrict':
         fieldName = 'School District Name';
         break;
       case 'activity':
@@ -125,6 +129,7 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         fieldName = 'New Value';
         break;
       case 'paymentAmt':
+      case 'amount':
         fieldName = 'Amount';
         break;
       case 'paymentDate':
@@ -135,6 +140,9 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         break;
       case 'studentId':
         fieldName = 'Student Id';
+        break;
+      case 'paymentId':
+        fieldName = 'Payment Id';
         break;
       case 'studentEnrollmentDate':
         fieldName = 'Enrollment Date';
@@ -147,6 +155,12 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         break;
       case 'studentNorep':
         fieldName = 'NOREP';
+        break;
+      case 'split':
+        fieldName = 'Split Payment';
+        break;
+      case 'schoolYear':
+        fieldName = 'Academic Year';
         break;
       default:
         fieldName = 'Column';

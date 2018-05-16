@@ -24,9 +24,9 @@
           </th>
         </tr>
       </thead>
-      <tbody infiniteScroll>
+      <tbody infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]='false'>
         <tr *ngFor='let payment of payments | orderBy: {property: property, direction: direction}' (click)='editPayment(payment)'>
-          <td *ngFor='let v of utilitiesService.objectValues(payment)'>{{v}}</td>
+          <td *ngFor='let v of utilitiesService.objectValues(payment)'>{{v | normalizeFieldValue}}</td>
         </tr>
       </tbody>
     </table>

@@ -5,11 +5,13 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 import { NormalizeFieldNamePipe } from '../pipes/normalize-field-name.pipe';
 import { OrderByPipe } from '../pipes/orderby.pipe';
+import { NormalizeFieldValuePipe } from '../pipes/normalize-field-value.pipe';
 
 @NgModule({
   declarations: [
     NormalizeFieldNamePipe,
-    OrderByPipe
+    OrderByPipe,
+    NormalizeFieldValuePipe,
   ],
   imports: [
     CommonModule,
@@ -17,6 +19,7 @@ import { OrderByPipe } from '../pipes/orderby.pipe';
   ],
   exports: [
     NormalizeFieldNamePipe,
+    NormalizeFieldValuePipe,
     OrderByPipe,
     InfiniteScrollModule
   ],
