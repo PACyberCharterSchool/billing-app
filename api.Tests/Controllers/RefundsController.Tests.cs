@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 using Moq;
@@ -52,6 +55,17 @@ namespace api.Tests.Controllers
 			_districts.Setup(ds => ds.GetByAun(create.SchoolDistrictAun)).
 				Returns(new SchoolDistrict { Aun = create.SchoolDistrictAun });
 
+			var username = "bob";
+			_uut.ControllerContext = new ControllerContext
+			{
+				HttpContext = new DefaultHttpContext
+				{
+					User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]{
+							new Claim(JwtRegisteredClaimNames.Sub, username),
+					})),
+				},
+			};
+
 			var result = await _uut.Create(create);
 			Assert.That(result, Is.TypeOf<CreatedResult>());
 			Assert.That(((CreatedResult)result).Location, Is.SupersetOf("/api/refunds"));
@@ -63,6 +77,7 @@ namespace api.Tests.Controllers
 			Assert.That(actual.Amount, Is.EqualTo(create.Amount));
 			Assert.That(actual.CheckNumber, Is.EqualTo(create.CheckNumber));
 			Assert.That(actual.Date, Is.EqualTo(create.Date));
+			Assert.That(actual.Username, Is.EqualTo(username));
 			Assert.That(actual.SchoolYear, Is.EqualTo(create.SchoolYear));
 			Assert.That(actual.SchoolDistrict, Is.Not.Null);
 			Assert.That(actual.SchoolDistrict.Aun, Is.EqualTo(create.SchoolDistrictAun));
@@ -71,6 +86,7 @@ namespace api.Tests.Controllers
 				r.Amount == create.Amount &&
 				r.CheckNumber == create.CheckNumber &&
 				r.Date == create.Date &&
+				r.Username == username &&
 				r.SchoolYear == create.SchoolYear &&
 				(r.SchoolDistrict != null && r.SchoolDistrict.Aun == create.SchoolDistrictAun)
 			)), Times.Once);

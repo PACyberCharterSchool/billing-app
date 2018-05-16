@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -71,11 +72,13 @@ namespace api.Controllers
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
+			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
 			var refund = new Refund
 			{
 				Amount = create.Amount,
 				CheckNumber = create.CheckNumber,
 				Date = create.Date,
+				Username = username,
 				SchoolYear = create.SchoolYear,
 				SchoolDistrict = _districts.GetByAun(create.SchoolDistrictAun),
 			};
