@@ -64,6 +64,7 @@ namespace models
 			for (var i = 0; i < calendar.Days.Count; i++)
 				MergeProperties(calendar.Days[i], update.Days[i], _excludedDaysFields);
 
+			// TODO(Erik): not actually deleting rows, just setting CalendarId to null
 			_context.Update(calendar);
 			return calendar;
 		}

@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="7.1.0" />
     <PackageReference Include="dotenv.net" Version="1.0.3" />
+    <PackageReference Include="DotNetCore.NPOI" Version="1.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0-rc1-final" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.0-rc1-final" />

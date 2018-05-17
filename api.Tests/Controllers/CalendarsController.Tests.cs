@@ -94,43 +94,54 @@ namespace api.Tests.Controllers
 			Assert.That(result, Is.TypeOf<NotFoundResult>());
 		}
 
-		// TODO(Erik): test cases?
 		[Test]
-		public async Task UploadUploads()
+		[TestCase("sample-calendar.csv", "text/csv")]
+		[TestCase("sample-calendar.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
+		[TestCase("sample-calendar-empty-first.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
+		[TestCase("sample-calendar-empty-last.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
+		public async Task UploadUploads(string fileName, string contentType)
 		{
 			var formFile = new Mock<IFormFile>();
 
-			const string fileName = "sample-calendar.csv";
-			using (var file = File.OpenRead($"../../../TestData/{fileName}"))
-			{
-				formFile.Setup(f => f.ContentType).Returns("text/csv").Verifiable();
-				formFile.Setup(f => f.OpenReadStream()).Returns(file).Verifiable();
+			var file = File.OpenRead($"../../../TestData/{fileName}");
+			formFile.Setup(f => f.ContentType).Returns(contentType).Verifiable();
+			formFile.Setup(f => f.OpenReadStream()).Returns(file).Verifiable();
 
-				_calendars.Setup(cs => cs.CreateOrUpdate(It.IsAny<Calendar>())).Returns<Calendar>(c => c).Verifiable();
+			var year = "2017-2018";
+			var day = "Nonceday";
+			var date = new DateTime(2017, 8, 30);
+			var schoolDay = 1;
+			var membership = 180;
+			_calendars.Setup(cs => cs.CreateOrUpdate(It.Is<Calendar>(c =>
+				c.SchoolYear == year &&
+				c.Days.Count == 1 &&
+				c.Days[0].DayOfWeek == day &&
+				c.Days[0].Date == date &&
+				c.Days[0].SchoolDay == schoolDay &&
+				c.Days[0].Membership == membership
+			))).Returns<Calendar>(c => c).Verifiable();
 
-				const string year = "2017-2018";
-				var result = await _uut.Upload(year, formFile.Object);
-				Assert.That(result, Is.TypeOf<CreatedResult>());
-				Assert.That(((CreatedResult)result).Location, Is.EqualTo($"/api/calendars/{year}"));
-				var value = ((CreatedResult)result).Value;
+			var result = await _uut.Upload(year, formFile.Object);
+			Assert.That(result, Is.TypeOf<CreatedResult>());
+			Assert.That(((CreatedResult)result).Location, Is.EqualTo($"/api/calendars/{year}"));
+			var value = ((CreatedResult)result).Value;
 
-				Assert.That(value, Is.TypeOf<CalendarsController.CalendarResponse>());
-				var actual = ((CalendarsController.CalendarResponse)value).Calendar;
+			Assert.That(value, Is.TypeOf<CalendarsController.CalendarResponse>());
+			var actual = ((CalendarsController.CalendarResponse)value).Calendar;
 
-				Assert.That(actual.SchoolYear, Is.EqualTo(year));
-				Assert.That(actual.Days, Has.Count.EqualTo(1));
-				Assert.That(actual.Days[0].DayOfWeek, Is.EqualTo("Nonceday"));
-				Assert.That(actual.Days[0].Date, Is.EqualTo(new DateTime(2017, 8, 30)));
-				Assert.That(actual.Days[0].SchoolDay, Is.EqualTo(1));
-				Assert.That(actual.Days[0].Membership, Is.EqualTo(180));
+			Assert.That(actual.SchoolYear, Is.EqualTo(year));
+			Assert.That(actual.Days, Has.Count.EqualTo(1));
+			Assert.That(actual.Days[0].DayOfWeek, Is.EqualTo(day));
+			Assert.That(actual.Days[0].Date, Is.EqualTo(date));
+			Assert.That(actual.Days[0].SchoolDay, Is.EqualTo(schoolDay));
+			Assert.That(actual.Days[0].Membership, Is.EqualTo(membership));
 
-				formFile.Verify();
-				_calendars.Verify();
-			}
+			formFile.Verify();
+			_calendars.Verify();
 		}
 
 		[Test]
-		public async Task UploadReturnsBadRequest()
+		public async Task UploadReturnsBadRequestWhenInvalidContentType()
 		{
 			var formFile = new Mock<IFormFile>();
 			var contentType = "bad";
@@ -143,7 +154,7 @@ namespace api.Tests.Controllers
 			Assert.That(value, Is.TypeOf<ErrorResponse>());
 			var actual = ((ErrorResponse)value).Error;
 
-			Assert.That(actual, Is.EqualTo($"File Content-Type must be text/csv; was {contentType}."));
+			Assert.That(actual, Is.EqualTo($"Invalid file Content-Type '{contentType}'."));
 		}
 	}
 }
