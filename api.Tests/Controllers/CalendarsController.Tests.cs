@@ -96,7 +96,7 @@ namespace api.Tests.Controllers
 
 		// TODO(Erik): test cases?
 		[Test]
-		public async Task ImportImports()
+		public async Task UploadUploads()
 		{
 			var formFile = new Mock<IFormFile>();
 
@@ -127,6 +127,23 @@ namespace api.Tests.Controllers
 				formFile.Verify();
 				_calendars.Verify();
 			}
+		}
+
+		[Test]
+		public async Task UploadReturnsBadRequest()
+		{
+			var formFile = new Mock<IFormFile>();
+			var contentType = "bad";
+			formFile.Setup(f => f.ContentType).Returns(contentType);
+
+			var result = await _uut.Upload("2017-2018", formFile.Object);
+			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+			var value = ((BadRequestObjectResult)result).Value;
+
+			Assert.That(value, Is.TypeOf<ErrorResponse>());
+			var actual = ((ErrorResponse)value).Error;
+
+			Assert.That(actual, Is.EqualTo($"File Content-Type must be text/csv; was {contentType}."));
 		}
 	}
 }
