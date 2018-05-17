@@ -59,12 +59,16 @@ namespace models
 				foreach (var day in update.Days.Skip(calendar.Days.Count))
 					calendar.Days.Add(day);
 			else if (calendar.Days.Count > update.Days.Count)
+			{
+				var deletes = calendar.Days.Skip(update.Days.Count);
 				calendar.Days = calendar.Days.Take(update.Days.Count).ToList();
+
+				_context.RemoveRange(deletes);
+			}
 
 			for (var i = 0; i < calendar.Days.Count; i++)
 				MergeProperties(calendar.Days[i], update.Days[i], _excludedDaysFields);
 
-			// TODO(Erik): not actually deleting rows, just setting CalendarId to null
 			_context.Update(calendar);
 			return calendar;
 		}
