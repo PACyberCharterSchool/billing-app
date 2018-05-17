@@ -34,7 +34,7 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         fieldName = 'Street 2';
         break;
       case 'externalId':
-        fieldName = 'External Id';
+        fieldName = 'Check/UniPay #';
         break;
       case 'studentState':
         fieldName = 'State';

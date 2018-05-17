@@ -9,7 +9,7 @@ import { PaymentsService } from '../../../services/payments.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
 
-import { Payment } from '../../../models/payment.model';
+import { Payment, PaymentType } from '../../../models/payment.model';
 
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -24,13 +24,14 @@ export class PaymentUpsertFormComponent implements OnInit {
   private selectedSchoolDistrict: SchoolDistrict;
   private selectedAcademicYear: string;
   private selectedAcademicYearSplit: string;
-  private date: Date;
   private paymentType: string;
   private paymentTypeId: string;
   private schoolYears: string[];
   private isSplit: boolean;
-
-  public model: any;
+  private date: Date;
+  public dateModel: any;
+  public paymentTypeModel = { 'check': false, 'unipay': false };
+  public schoolDistrictNameModel: string;
 
   @Input() op: string;
   @Input() schoolDistricts: SchoolDistrict[];
@@ -48,6 +49,8 @@ export class PaymentUpsertFormComponent implements OnInit {
     console.log('op is ', this.op);
     console.log('schoolDistricts are ', this.schoolDistricts);
 
+    this.paymentTypeModel = { 'check': false, 'unipay': false };
+
     this.schoolYears = this.academicYearsService.getAcademicYears();
 
     if (this.op === 'update') {
@@ -59,41 +62,45 @@ export class PaymentUpsertFormComponent implements OnInit {
     }
 
     if (this.paymentRecord) {
-      this.amount = this.paymentRecord.amount;
-      this.paymentType = this.paymentRecord.type;
-      this.date = this.paymentRecord.date;
-      this.selectedAcademicYear = this.paymentRecord.schoolYear;
+      this.updatePaymentComponentValues();
     } else {
       this.paymentRecord = new Payment();
     }
-
-    this.isSplit = false;
   }
 
-  fillSplitsColumn() {
-    let splits: Object[];
+  updatePaymentComponentValues() {
+    this.selectedSchoolDistrict = this.paymentRecord.schoolDistrict;
+    this.schoolDistrictNameModel = this.paymentRecord.schoolDistrict.name;
+    this.amount = this.paymentRecord.amount;
+    this.splitAmount = this.paymentRecord.splitAmount;
+    this.paymentType = this.paymentRecord.type;
 
-    splits = [{ 'amount': this.amount, 'schoolYear': this.selectedAcademicYear }];
-    if (this.splitAmount) {
-      splits.push({ 'amount': this.splitAmount, 'schoolYear': this.selectedAcademicYearSplit });
-    }
+    const date = new Date(this.paymentRecord.date);
 
-    return splits;
+    this.dateModel = { 'month': date.getMonth(), 'day': date.getDate(), 'year': date.getFullYear() };
+    this.selectedAcademicYear = this.paymentRecord.schoolYear;
+    this.selectedAcademicYearSplit = this.paymentRecord.schoolYearSplit;
+    this.paymentTypeId = this.paymentRecord.paymentId;
+    this.paymentTypeModel = this.paymentType === 'Check' ? { 'check': true, 'unipay': false } : { 'check': false, 'unipay': true };
+    this.isSplit = this.paymentRecord.split === 2 ? true : false ;
   }
 
-  fillPaymentRecord() {
-
-    Object.assign(this.paymentRecord, {
-      splits: this.fillSplitsColumn(),
-      date: this.date,
-      externalId: this.selectedSchoolDistrict.id,
-      type: this.paymentType ? 'Check' : 'UniPay',
-      schoolDistrictAun: +this.selectedSchoolDistrict.aun
-    });
- }
+  updatePaymentRecord() {
+    this.paymentRecord.schoolDistrict = this.selectedSchoolDistrict;
+    this.paymentRecord.amount = this.amount;
+    this.paymentRecord.externalId = this.paymentTypeId;
+    this.paymentRecord.splitAmount = this.splitAmount;
+    this.paymentRecord.type = this.paymentTypeModel.check ? PaymentType.Check : PaymentType.UniPay;
+    this.paymentRecord.date = new Date(`${this.dateModel.month}/${this.dateModel.day}/${this.dateModel.year}`);
+    this.paymentRecord.schoolYear = this.selectedAcademicYear;
+    this.paymentRecord.schoolYearSplit = this.selectedAcademicYearSplit;
+    // this.paymentRecord.paymentId = this.paymentTypeId;
+    this.paymentRecord.split = this.isSplit ? 2 : 1;
+    this.paymentRecord.schoolYearSplit = this.selectedAcademicYearSplit;
+  }
 
   upsertPayment() {
-    this.fillPaymentRecord();
+    this.updatePaymentRecord();
     if (this.op === 'create') {
       this.paymentsService.createPayment(this.paymentRecord).subscribe(
         data => {
@@ -132,7 +139,10 @@ export class PaymentUpsertFormComponent implements OnInit {
   }
 
   onDateChanged() {
-    this.date = new Date(this.model.year, this.model.month - 1, this.model.day); // yes, that bit of math on the month value is necessary
+    // yes, that bit of math on the month value is necessary
+    console.log('PaymentUpsertFormComponent.onDateChanged():  dateModel type is ', typeof(this.dateModel));
+    console.log('PaymentUpsertFormComponent.onDateChanged(): dateModel is ', this.dateModel);
+    this.date = new Date(`${this.dateModel.month}/${this.dateModel.day}/${this.dateModel.year}`);
   }
 
   search = (text$: Observable<string>) => {

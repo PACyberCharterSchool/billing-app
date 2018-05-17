@@ -1,5 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
+import { SchoolDistrict } from '../models/school-district.model';
+
 import * as moment from 'moment';
 
 @Pipe({
@@ -14,11 +16,18 @@ export class NormalizeFieldValuePipe implements PipeTransform {
       moment.ISO_8601
     ];
 
-    if (typeof(value) === 'string') {
-      if (moment(value, formats, true).isValid()) {
-        const d = new Date(value);
-        v = d.toLocaleDateString();
-      }
+    switch (typeof(value)) {
+      case 'string':
+        if (moment(value, formats, true).isValid()) {
+          const d = new Date(value);
+          v = d.toLocaleDateString();
+        }
+        break;
+      case 'object':
+        if (value.name) {
+          v = value.name;
+        }
+        break;
     }
 
     return v;

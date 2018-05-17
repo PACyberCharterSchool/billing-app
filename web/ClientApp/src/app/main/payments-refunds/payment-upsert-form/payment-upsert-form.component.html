@@ -14,7 +14,7 @@
         <div class='form-group' *ngIf='op === "create"'>
           <div class='col-md-6'></div>
           <div class='col-md-6'>
-            <button type='button' class='btn btn-outline-primary' (click)='isSplit = !isSplit' [attr.aria-expanded]="!isSplit" aria-controls="collapseSplit collapseSplitAmt">SPLIT</button>
+            <button type='button' class='btn btn-outline-primary' (click)='isSplit = !isSplit' [attr.aria-expanded]="!isSplit" aria-controls="collapseSplit">SPLIT</button>
           </div>
         </div>
         <div class='form-group col-md-12'>
@@ -23,7 +23,7 @@
           </div>
           <div class='col-md-6'>
             <label for='typeahead-school-district'></label>
-            <input id='typeahead-school-district' type='text' class='form-control' [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
+            <input id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='schoolDistrictNameModel' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
           </div>
         </div>
         <div class='form-group'>
@@ -48,23 +48,13 @@
           </div>
         </div>
         <div class='form-group'>
-          <div id='collapseSplitAmt' [ngbCollapse]='!isSplit'>
-            <div class='col-md-6'>
-              <label>Split Amount</label>
-            </div>
-            <div class='col-md-6' id='split-payment-amt-input'>
-              <input type='number' class='form-control' id='splitAmount' name='splitAmount' [(ngModel)]='splitAmt' #splitAmount='ngModel' />
-            </div>
-          </div>
-        </div>
-        <div class='form-group'>
           <div class='col-md-6'>
             <label>Payment Date</label>
           </div>
           <div class='col-md-6'>
             <div class='input-group'>
               <input class='form-control' placeholder='mm-dd-yyyy'
-                      name='dp' [(ngModel)]='model' ngbDatepicker #d='ngbDatepicker' (ngModelChange)='onDateChanged()'>
+                      name='dp' [(ngModel)]='dateModel' ngbDatepicker #d='ngbDatepicker' (ngModelChange)='onDateChanged()'>
               <div class='input-group-append'>
                 <button class='btn btn-outline-secondary' (click)='d.toggle()' type='button'>
                   <i class="fa fa-calendar fa-2x"></i>
@@ -80,10 +70,10 @@
           <div class='col-md-6'>
             <div class='btn-group btn-group-toggle'>
               <label class='btn-primary' ngbButtonLabel>
-                <input type='checkbox' ngbButton [(ngModel)]='paymentType' [ngModelOptions]="{standalone: true}"/>Check
+                <input type='checkbox' ngbButton [(ngModel)]='paymentTypeModel.check' [ngModelOptions]="{standalone: true}"/>Check
               </label>
               <label class='btn-primary' ngbButtonLabel>
-                <input type='checkbox' ngbButton [(ngModel)]='paymentType' [ngModelOptions]="{standalone: true}" />UniPay
+                <input type='checkbox' ngbButton [(ngModel)]='paymentTypeModel.unipay' [ngModelOptions]="{standalone: true}" />UniPay
               </label>
             </div>
           </div>
@@ -112,19 +102,13 @@
         <div id='collapseSplit' [ngbCollapse]='!isSplit'>
           <hr>
           <div class='form-group'>
-            <div class='col-md-6'>
-              <label>Payment Id</label>
-            </div>
-            <div class='col-md-6'>
-              <span></span>
-            </div>
-          </div>
-          <div class='form-group'>
-            <div class='col-md-6'>
-              <label>Split Amount</label>
-            </div>
-            <div class='col-md-6'>
-              <span>{{splitAmount}}</span>
+            <div id='collapse-split-amt' [ngbCollapse]='!isSplit'>
+              <div class='col-md-6'>
+                <label>Split Amount</label>
+              </div>
+              <div class='col-md-6' id='split-payment-amt-input'>
+                <input type='number' class='form-control' id='split-amount' name='split-amount' [(ngModel)]='splitAmount' />
+              </div>
             </div>
           </div>
           <div class='form-group'>
@@ -132,7 +116,7 @@
               <label>Date</label>
             </div>
             <div class='col-md-6'>
-              <label>{{date}}</label>
+              <label>{{date | date:'MM-dd-yyyy'}}</label>
             </div>
           </div>
           <div class='form-group'>
@@ -141,7 +125,7 @@
             </div>
             <div class='col-md-6'>
               <div ngbDropdown class='d-inline-block'>
-                <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown2'>Select</button>
+                <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown2'>{{selectedAcademicYearSplit}}</button>
                 <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown2'>
                   <button type='button' class='dropdown-item' *ngFor='let y of schoolYears' (click)='setSelectedAcademicYearSplit(y)'>{{y}}</button>
                 </div>

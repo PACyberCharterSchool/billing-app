@@ -125,7 +125,7 @@ export class PaymentsListComponent implements OnInit {
   }
 
   editPayment(p: Payment) {
-    const modal = this.ngbModalService.open(PaymentUpsertFormComponent, { centered: true });
+    const modal = this.ngbModalService.open(PaymentUpsertFormComponent, { centered: true, size: 'lg' });
     modal.componentInstance.op = 'update';
     modal.componentInstance.schoolDistricts = this.schoolDistricts;
     modal.componentInstance.paymentRecord = p;

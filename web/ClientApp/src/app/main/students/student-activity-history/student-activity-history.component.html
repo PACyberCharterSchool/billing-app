@@ -27,7 +27,7 @@
       </thead>
       <tbody infiniteScroll>
         <tr *ngFor='let activity of activities | orderBy: {property: property, direction: direction}'>
-          <td *ngFor='let v of listDisplayableValues(activity)'>{{v}}</td>
+          <td *ngFor='let v of listDisplayableValues(activity)'>{{v | normalizeFieldValue}}</td>
         </tr>
       </tbody>
     </table>

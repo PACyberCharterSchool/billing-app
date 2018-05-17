@@ -23,7 +23,7 @@
       </thead>
       <tbody infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]="false">
         <tr *ngFor='let ssr of studentStatusRecords'>
-          <td *ngFor='let v of listDisplayableValues(ssr)'>{{v}}</td>
+          <td *ngFor='let v of listDisplayableValues(ssr)'>{{v | normalizeFieldValue}}</td>
         </tr>
       </tbody>
     </table>

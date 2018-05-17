@@ -10,33 +10,6 @@ import { Payment } from '../models/payment.model';
 
 import { Globals } from '../globals';
 
-// let payments: Payment[] = [
-//   {
-//     schoolDistrictName: 'Seneca Valley SD',
-//     schoolDistrictId: 123456,
-//     paymentAmt: 4300.00,
-//     type: '#14534',
-//     paymentDate: new Date('04/01/2018'),
-//     academicYear: '2018-2019'
-//   },
-//   {
-//     schoolDistrictName: 'Mars SD',
-//     schoolDistrictId: 654321,
-//     paymentAmt: 1800.00,
-//     type: '#99999',
-//     paymentDate: new Date('07/22/2018'),
-//     academicYear: '2018-2019'
-//   },
-//   {
-//     schoolDistrictName: 'Indiana SD',
-//     schoolDistrictId: 789023,
-//     paymentAmt: 40000.00,
-//     type: '#99999',
-//     paymentDate: new Date('07/22/2018'),
-//     academicYear: '2018-2019'
-//   }
-// ];
-
 @Injectable()
 export class PaymentsService {
   private apiPaymentsUrl;
@@ -59,12 +32,38 @@ export class PaymentsService {
   public createPayment(payment: Payment): Observable<Payment> {
     // just return some fake data for now
     const url = this.apiPaymentsUrl;
-    return this.httpClient.post<Payment>(url, payment, this.headers);
+    const reqBody = this.buildPaymentRequestBodyObject(payment);
+    return this.httpClient.post<Payment>(url, reqBody, this.headers);
   }
 
   public updatePayment(payment: Payment): Observable<Payment> {
     // just return some fake data for now
-    const url = this.apiPaymentsUrl;
-    return this.httpClient.put<Payment>(url, payment, this.headers);
+    const url = this.apiPaymentsUrl + `/${payment.paymentId}`;
+    const reqBody = this.buildPaymentRequestBodyObject(payment);
+    return this.httpClient.put<Payment>(url, reqBody, this.headers);
+  }
+
+  private buildPaymentRequestBodyObject(payment: Payment) {
+    const requestObject = Object.assign({}, {
+      id: payment.paymentId,
+      splits: this.fillSplitsColumn(payment),
+      date: payment.date,
+      externalId: payment.externalId,
+      type: payment.type,
+      schoolDistrictAun: +payment.schoolDistrict.aun
+    });
+
+    return requestObject;
+  }
+
+  private fillSplitsColumn(payment: Payment) {
+    let splits: Object[];
+
+    splits = [{ 'amount': payment.amount, 'schoolYear': payment.schoolYear }];
+    if (payment.splitAmount) {
+      splits.push({ 'amount': payment.splitAmount, 'schoolYear': payment.schoolYearSplit });
+    }
+
+    return splits;
   }
 }
