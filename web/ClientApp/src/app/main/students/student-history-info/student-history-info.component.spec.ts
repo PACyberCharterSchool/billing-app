@@ -11,6 +11,7 @@ import { NgbModule, NgbTabsetConfig, NgbDropdownConfig } from '@ng-bootstrap/ng-
 
 import { OrderByPipe } from '../../../pipes/orderby.pipe';
 import { NormalizeFieldNamePipe } from '../../../pipes/normalize-field-name.pipe';
+import { NormalizeFieldValuePipe } from '../../../pipes/normalize-field-value.pipe';
 
 import { UtilitiesService } from '../../../services/utilities.service';
 import { StudentsService } from '../../../services/students.service';
@@ -28,7 +29,8 @@ describe('StudentHistoryInfoComponent', () => {
         StudentHistoryInfoComponent,
         StudentActivityHistoryComponent,
         OrderByPipe,
-        NormalizeFieldNamePipe
+        NormalizeFieldNamePipe,
+        NormalizeFieldValuePipe
       ],
       imports: [ NgbModule, FormsModule ],
       providers: [

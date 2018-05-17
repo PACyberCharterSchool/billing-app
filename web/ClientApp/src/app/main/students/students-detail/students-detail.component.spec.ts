@@ -17,6 +17,7 @@ import { NgbModule, NgbTabset, NgbTabsetConfig, NgbDropdownConfig } from '@ng-bo
 
 import { OrderByPipe } from '../../../pipes/orderby.pipe';
 import { NormalizeFieldNamePipe } from '../../../pipes/normalize-field-name.pipe';
+import { NormalizeFieldValuePipe } from '../../../pipes/normalize-field-value.pipe';
 
 import { Globals } from '../../../globals';
 
@@ -32,7 +33,8 @@ describe('StudentsDetailComponent', () => {
         StudentHistoryInfoComponent,
         StudentActivityHistoryComponent,
         OrderByPipe,
-        NormalizeFieldNamePipe
+        NormalizeFieldNamePipe,
+        NormalizeFieldValuePipe
       ],
       imports: [ NgbModule, RouterTestingModule ],
       providers: [

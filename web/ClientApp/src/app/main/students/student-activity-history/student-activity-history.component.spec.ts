@@ -6,6 +6,7 @@ import { StudentActivityHistoryComponent } from './student-activity-history.comp
 
 import { OrderByPipe } from '../../../pipes/orderby.pipe';
 import { NormalizeFieldNamePipe } from '../../../pipes/normalize-field-name.pipe';
+import { NormalizeFieldValuePipe } from '../../../pipes/normalize-field-value.pipe';
 
 import { UtilitiesService } from '../../../services/utilities.service';
 import { StudentsService } from '../../../services/students.service';
@@ -19,7 +20,7 @@ describe('StudentActivityHistoryComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ StudentActivityHistoryComponent, OrderByPipe, NormalizeFieldNamePipe ],
+      declarations: [ StudentActivityHistoryComponent, OrderByPipe, NormalizeFieldNamePipe, NormalizeFieldValuePipe ],
       providers: [ CurrentStudentService, UtilitiesService, StudentsService, HttpClient, HttpHandler, Globals ]
     })
     .compileComponents();
