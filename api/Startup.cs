@@ -165,6 +165,7 @@ namespace api
 				o.SchemaFilter<EnumerationSchemaFilter>();
 				o.OperationFilter<EnumerationOperationFilter>();
 				o.OperationFilter<StudentFieldOperationFilter>();
+				o.OperationFilter<AuthorizeOperationFilter>();
 			});
 			#endregion
 
