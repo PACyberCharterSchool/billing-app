@@ -75,6 +75,7 @@ namespace api.Controllers
 
 			return Ok(new TokenResponse(new JwtSecurityTokenHandler().WriteToken(_jwt.BuildToken(new[]{
 				new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+				new Claim("name", user.DisplayName),
 				new Claim("role", user.Role)
 			}))));
 		}
