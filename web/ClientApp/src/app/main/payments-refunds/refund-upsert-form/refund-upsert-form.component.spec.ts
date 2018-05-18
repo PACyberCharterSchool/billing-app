@@ -6,6 +6,10 @@ import { FormsModule } from '@angular/forms';
 
 import { RefundUpsertFormComponent } from './refund-upsert-form.component';
 
+import { AcademicYearsService } from '../../../services/academic-years.service';
+
+import { Globals } from '../../../globals';
+
 import {
   NgbModule,
   NgbTypeahead,
@@ -36,9 +40,11 @@ describe('RefundUpsertFormComponent', () => {
         NgbDateAdapter,
         RefundsService,
         SchoolDistrictService,
+        AcademicYearsService,
         HttpClient,
         HttpHandler,
-        NgbDropdownConfig
+        NgbDropdownConfig,
+        Globals
       ],
       imports: [ FormsModule, NgbModule ]
     })

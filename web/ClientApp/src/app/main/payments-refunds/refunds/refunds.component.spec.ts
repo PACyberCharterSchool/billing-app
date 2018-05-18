@@ -9,6 +9,7 @@ import { RefundsListComponent } from '../refunds-list/refunds-list.component';
 
 import { NormalizeFieldNamePipe } from '../../../pipes/normalize-field-name.pipe';
 import { OrderByPipe } from '../../../pipes/orderby.pipe';
+import { NormalizeFieldValuePipe } from '../../../pipes/normalize-field-value.pipe';
 
 import { UtilitiesService } from '../../../services/utilities.service';
 import { RefundsService } from '../../../services/refunds.service';
@@ -16,14 +17,23 @@ import { SchoolDistrictService } from '../../../services/school-district.service
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
+import { Globals } from '../../../globals';
+
 describe('RefundsComponent', () => {
   let component: RefundsComponent;
   let fixture: ComponentFixture<RefundsComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RefundsComponent, RefundsListComponent, NormalizeFieldNamePipe, OrderByPipe ],
-      providers: [ UtilitiesService, RefundsService, SchoolDistrictService, HttpClient, HttpHandler ],
+      declarations: [
+        RefundsComponent,
+        RefundsListComponent,
+        NormalizeFieldNamePipe,
+        OrderByPipe,
+        NormalizeFieldValuePipe,
+      ],
+      providers: [ UtilitiesService, RefundsService, SchoolDistrictService, HttpClient, HttpHandler, Globals
+    ],
       imports: [ FormsModule, NgbModule.forRoot() ]
     })
     .compileComponents();

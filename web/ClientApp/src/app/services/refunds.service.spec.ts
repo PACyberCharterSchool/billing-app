@@ -1,11 +1,15 @@
 import { TestBed, inject } from '@angular/core/testing';
 
+import { HttpClient, HttpHandler } from '@angular/common/http';
+
 import { RefundsService } from './refunds.service';
+
+import { Globals } from '../globals';
 
 describe('RefundsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [RefundsService]
+      providers: [ RefundsService, Globals, HttpClient, HttpHandler ]
     });
   });
 
