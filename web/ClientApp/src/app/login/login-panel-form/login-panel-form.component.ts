@@ -56,9 +56,9 @@ export class LoginPanelFormComponent implements OnInit {
     this.authService.authenticate(this.email, this.password).subscribe(
       data => {
         console.log('LoginPanelFormComponent.login():  authentication successful.  data is ', data);
-        localStorage.setItem('jwt-token', data.token);
-        user.firstName = data.token;
-        localStorage.setItem('current-user', user.firstName);
+        this.authService.saveJWTToStorage(data.token);
+        this.authService.saveUserToStorage(data.token);
+
         this.router.navigate(['main']);
       },
       error => {

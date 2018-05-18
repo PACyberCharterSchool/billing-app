@@ -12,6 +12,11 @@ export class LoginTitleBarComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.user.firstName = localStorage.getItem('current-user').substring(0, 28);
+    const userName = localStorage.getItem('current-user');
+    let names: string[];
+
+    names = userName.split(' ');
+    this.user.firstName = names[0];
+    this.user.lastName = names[1];
   }
 }

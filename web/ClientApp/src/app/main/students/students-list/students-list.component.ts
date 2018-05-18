@@ -75,7 +75,7 @@ export class StudentsListComponent implements OnInit {
         this.students = data['students'];
       },
       error => {
-
+        console.log('error');
       }
     );
   }
@@ -86,7 +86,7 @@ export class StudentsListComponent implements OnInit {
         this.students = data['students'];
       },
       error => {
-
+        console.log('error');
       }
     );
   }
@@ -103,7 +103,7 @@ export class StudentsListComponent implements OnInit {
         console.log('StudentsListComponent.getStudents():  students are ', this.students);
       },
       error => {
-
+        console.log('error');
       }
     );
   }
