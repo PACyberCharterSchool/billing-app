@@ -7,6 +7,7 @@ import { SchoolDistrict } from '../../../models/school-district.model';
 
 import { RefundsService } from '../../../services/refunds.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
+import { AcademicYearsService } from '../../../services/academic-years.service';
 
 import { Refund } from '../../../models/refund.model';
 
@@ -20,21 +21,13 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 export class RefundUpsertFormComponent implements OnInit {
   private amount: number;
   private selectedSchoolDistrict: SchoolDistrict;
-  private schoolDistrictName: string;
   private selectedAcademicYear: string;
-  private date: Date;
-  private academicYear: string;
+  private selectedSchoolDistrictName: string;
+  private dateModel: any;
   private refundCheckNumber: string;
-  private schoolYears: string[] = [
-    '2012-2013',
-    '2013-2014',
-    '2014-2015',
-    '2016-2016',
-    '2016-2017',
-    '2017-2018'
-  ];
-
+  private schoolYears: string[];
   public model: any;
+  private skip: number;
 
   @Input() op: string;
   @Input() schoolDistricts: SchoolDistrict[];
@@ -42,7 +35,8 @@ export class RefundUpsertFormComponent implements OnInit {
 
   constructor(
     private activeModal: NgbActiveModal,
-    private paymentsService: RefundsService,
+    private refundsService: RefundsService,
+    private academicYearsService: AcademicYearsService,
     private schoolDistrictService: SchoolDistrictService
   ) {
   }
@@ -51,8 +45,10 @@ export class RefundUpsertFormComponent implements OnInit {
     console.log('op is ', this.op);
     console.log('schoolDistricts are ', this.schoolDistricts);
 
+    this.schoolYears = this.academicYearsService.getAcademicYears();
+
     if (this.op === 'update') {
-      this.schoolDistrictService.getSchoolDistrict(this.refundRecord.schoolDistrictId).subscribe(
+      this.schoolDistrictService.getSchoolDistrict(this.refundRecord.schoolDistrict.id).subscribe(
         data => {
           this.selectedSchoolDistrict = data['schoolDistrict'];
         }
@@ -60,47 +56,64 @@ export class RefundUpsertFormComponent implements OnInit {
     }
 
     if (this.refundRecord) {
-      this.amount = this.refundRecord.refundAmt;
-      this.refundCheckNumber = this.refundRecord.refundCheckNumber;
-      this.academicYear = this.refundRecord.academicYear;
-      this.date = this.refundRecord.refundDate;
-      this.selectedAcademicYear = this.refundRecord.academicYear;
+      this.updateRefundComponentValues();
+    } else {
+      this.refundRecord = new Refund();
     }
   }
 
-  fillRefundRecord() {
-    this.schoolDistrictName = this.selectedSchoolDistrict.name;
-    Object.assign(this.refundRecord, {
-      type: this.refundCheckNumber,
-      schoolDistrictName: this.selectedSchoolDistrict.name,
-      schoolDistrictId: this.selectedSchoolDistrict.id,
-      refundDate: this.date,
-      refundAmt: this.amount,
-      academicYear: this.academicYear
-    });
- }
+  updateRefundComponentValues() {
+    this.amount = this.refundRecord.amount;
+    this.refundCheckNumber = this.refundRecord.checkNumber;
+    this.selectedAcademicYear = this.refundRecord.schoolYear;
+
+    const date = new Date(this.refundRecord.date);
+
+    this.dateModel = {
+      'month': date.getMonth() + 1,
+      'day': date.getDate(),
+      'year': date.getFullYear()
+    };
+
+    this.selectedSchoolDistrict = this.refundRecord.schoolDistrict;
+    this.selectedSchoolDistrictName = this.selectedSchoolDistrict.name;
+  }
+
+  updateRefundRecord() {
+    this.refundRecord.amount = this.amount;
+    this.refundRecord.checkNumber = this.refundCheckNumber;
+    this.refundRecord.schoolYear = this.selectedAcademicYear;
+    this.refundRecord.date = new Date(`${this.dateModel.month}/${this.dateModel.day}/${this.dateModel.year}`);
+    this.refundRecord.schoolDistrict = this.schoolDistricts.find((sd) => sd.name === this.selectedSchoolDistrictName);
+  }
 
   upsertRefund() {
-    this.fillRefundRecord();
+    this.updateRefundRecord();
     if (this.op === 'create') {
-      this.paymentsService.createRefund(this.refundRecord).subscribe(
+      this.refundsService.createRefund(this.refundRecord).subscribe(
         data => {
+          this.activeModal.close('success');
         },
         error => {
+          this.activeModal.close('error');
+          console.log('RefundUpsertFormComponent.upsertRefund(): error is ', error);
         }
       );
     } else if (this.op === 'update') {
-      this.paymentsService.updateRefund(this.refundRecord).subscribe(
+      this.refundsService.updateRefund(this.refundRecord).subscribe(
         data => {
+          this.activeModal.close('success');
         },
         error => {
+          this.activeModal.close('error');
+          console.log('RefundUpsertFormComponent.upsertRefund(): error is ', error);
         }
       );
     }
   }
 
-  setSelectedSchoolDistrict(sd: SchoolDistrict) {
-    this.selectedSchoolDistrict = sd;
+  setSelectedSchoolDistrict($event) {
+    this.selectedSchoolDistrict = this.schoolDistricts.find((sd) => sd.name === $event.item);
   }
 
   setSelectedAcademicYear(year: string) {
@@ -108,7 +121,6 @@ export class RefundUpsertFormComponent implements OnInit {
   }
 
   onDateChanged() {
-    this.date = new Date(this.model.year, this.model.month - 1, this.model.day); // yes, that bit of math on the month value is necessary
   }
 
   search = (text$: Observable<string>) => {

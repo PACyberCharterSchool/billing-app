@@ -24,6 +24,12 @@
             button {
               width: 100%;
             }
+
+            div.dropdown-menu {
+              height: 120px;
+              overflow-y: scroll;
+              width: 100%;
+            }
           }
         }
       }

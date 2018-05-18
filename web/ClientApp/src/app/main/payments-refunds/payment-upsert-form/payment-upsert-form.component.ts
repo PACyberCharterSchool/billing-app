@@ -94,7 +94,6 @@ export class PaymentUpsertFormComponent implements OnInit {
     this.paymentRecord.date = new Date(`${this.dateModel.month}/${this.dateModel.day}/${this.dateModel.year}`);
     this.paymentRecord.schoolYear = this.selectedAcademicYear;
     this.paymentRecord.schoolYearSplit = this.selectedAcademicYearSplit;
-    // this.paymentRecord.paymentId = this.paymentTypeId;
     this.paymentRecord.split = this.isSplit ? 2 : 1;
     this.paymentRecord.schoolYearSplit = this.selectedAcademicYearSplit;
   }

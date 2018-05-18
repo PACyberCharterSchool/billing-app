@@ -36,6 +36,9 @@ export class NormalizeFieldNamePipe implements PipeTransform {
       case 'externalId':
         fieldName = 'Check/UniPay #';
         break;
+      case 'checkNumber':
+        fieldName = 'Check #';
+        break;
       case 'studentState':
         fieldName = 'State';
         break;
@@ -161,6 +164,12 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         break;
       case 'schoolYear':
         fieldName = 'Academic Year';
+        break;
+      case 'userName':
+        fieldName = 'User Name';
+        break;
+      case 'username':
+        fieldName = 'Created By'
         break;
       default:
         fieldName = 'Column';

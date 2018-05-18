@@ -8,32 +8,8 @@ import { environment } from '../../environments/environment';
 
 import { Refund } from '../models/refund.model';
 
-let refunds: Refund[] = [
-  {
-    schoolDistrictName: 'Seneca Valley SD',
-    schoolDistrictId: 123456,
-    refundAmt: 4300.00,
-    refundCheckNumber: '#14534',
-    refundDate: new Date('04/01/2018'),
-    academicYear: '2018-2019'
-  },
-  {
-    schoolDistrictName: 'Mars SD',
-    schoolDistrictId: 654321,
-    refundAmt: 1800.00,
-    refundCheckNumber: '#99999',
-    refundDate: new Date('07/22/2018'),
-    academicYear: '2018-2019'
-  },
-  {
-    schoolDistrictName: 'Indiana SD',
-    schoolDistrictId: 789023,
-    refundAmt: 40000.00,
-    refundCheckNumber: '#99999',
-    refundDate: new Date('07/22/2018'),
-    academicYear: '2018-2019'
-  }
-];
+import { Globals } from '../globals';
+
 @Injectable()
 export class RefundsService {
   private apiRefundsUrl;
@@ -43,25 +19,21 @@ export class RefundsService {
     })
   };
 
-  constructor() {
-    this.apiRefundsUrl = 'api/refunds';
+  constructor(private globals: Globals, private httpClient: HttpClient) {
+    this.apiRefundsUrl = 'api/Refunds';
   }
 
-  public getRefunds(): Observable<Refund[]> {
+  public getRefunds(skip: number): Observable<Refund[]> {
     // just return some fake data for now
-    return new Observable<Refund[]>((o) => {
-      o.next(refunds);
-      o.complete();
-    });
+    const url = this.apiRefundsUrl + `?skip=${skip}&take=${this.globals.take}`;
+    return this.httpClient.get<Refund[]>(url, this.headers);
   }
 
   public createRefund(refund: Refund): Observable<Refund> {
     // just return some fake data for now
-    return new Observable<Refund>((o) => {
-      refunds.push(refund);
-      o.next(refund);
-      o.complete();
-    });
+    const url = this.apiRefundsUrl;
+    const reqBodyObj = this.buildRefundRequestBodyObject(refund);
+    return this.httpClient.post<Refund>(url, reqBodyObj, this.headers);
   }
 
   public updateRefund(refund: Refund): Observable<Refund> {
@@ -70,5 +42,17 @@ export class RefundsService {
       o.next(refund);
       o.complete();
     });
+  }
+
+  private buildRefundRequestBodyObject(refund: Refund) {
+    const reqBodyObj = Object.assign({}, {
+      amount: refund.amount,
+      checkNumber: refund.checkNumber,
+      date: refund.date,
+      schoolYear: refund.schoolYear,
+      schoolDistrictAun: +refund.schoolDistrict.aun
+    });
+
+    return reqBodyObj;
   }
 }

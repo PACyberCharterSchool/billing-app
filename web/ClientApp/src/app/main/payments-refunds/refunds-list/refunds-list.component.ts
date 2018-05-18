@@ -6,10 +6,13 @@ import { SchoolDistrict } from '../../../models/school-district.model';
 import { UtilitiesService } from '../../../services/utilities.service';
 import { RefundsService } from '../../../services/refunds.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
+import { AcademicYearsService } from '../../../services/academic-years.service';
 
 import { RefundUpsertFormComponent } from '../refund-upsert-form/refund-upsert-form.component';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { Globals } from '../../../globals';
 
 @Component({
   selector: 'app-refunds-list',
@@ -24,8 +27,10 @@ export class RefundsListComponent implements OnInit {
   private allRefunds: Refund[];
   private refunds: Refund[];
   private schoolDistricts: SchoolDistrict[];
+  private skip: number;
 
   constructor(
+    private globals: Globals,
     private utilitiesService: UtilitiesService,
     private refundsService: RefundsService,
     private schoolDistrictsService: SchoolDistrictService,
@@ -34,12 +39,14 @@ export class RefundsListComponent implements OnInit {
     this.property = 'schoolDistrictName';
     this.direction = 1;
     this.refunds = this.allRefunds;
+    this.skip = 0;
   }
 
   ngOnInit() {
-    this.refundsService.getRefunds().subscribe(
+    this.refreshRefundList();
+    this.refundsService.getRefunds(this.skip).subscribe(
       data => {
-        this.allRefunds = this.refunds = data;
+        this.allRefunds = this.refunds = data['refunds'];
         console.log('RefundsListComponent.ngOnInit(): mocked data is ', this.allRefunds);
       },
       error => {
@@ -64,14 +71,33 @@ export class RefundsListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
+  refreshRefundList() {
+    this.refundsService.getRefunds(this.skip).subscribe(
+      data => {
+        this.allRefunds = this.refunds = data['refunds'];
+        console.log('PaymentsListComponent.ngOnInit(): payments are ', this.allRefunds);
+      },
+      error => {
+        console.log('PaymentsListComponent.ngOnInit(): error is ', error);
+      }
+    );
+  }
+
+  listDisplayableFields() {
+    if (this.allRefunds) {
+      const fields = this.utilitiesService.objectKeys(this.allRefunds[0]);
+      return fields;
+    }
+  }
+
   filterRefundRecords() {
     this.refunds = this.allRefunds.filter(
       (i) => {
         const re = new RegExp(this.searchText, 'gi');
         if (
-          i.schoolDistrictId.toString().search(re) !== -1 ||
-          i.schoolDistrictName.search(re) !== -1 ||
-          i.refundCheckNumber.search(re) !== -1
+          i.amount.toString().search(re) !== -1 ||
+          i.checkNumber.search(re) !== -1 ||
+          i.schoolDistrict.name.search(re) !== -1
         ) {
           return true;
         }
@@ -92,6 +118,7 @@ export class RefundsListComponent implements OnInit {
     modal.result.then(
       (result) => {
         console.log('RefundsListComponent.createRefund():  result is ', result);
+        this.refreshRefundList();
       },
       (reason) => {
         console.log('RefundsListComponent.createRefund():  reason is ', reason);
@@ -108,6 +135,7 @@ export class RefundsListComponent implements OnInit {
     modal.result.then(
       (result) => {
         console.log('RefundsListComponent.editPayment():  result is ', result);
+        this.refreshRefundList();
       },
       (reason) => {
         console.log('RefundsListComponent.editPayment():  result is ', reason);
