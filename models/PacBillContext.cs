@@ -17,6 +17,8 @@ namespace models
 		public DbSet<Student> Students { get; set; }
 		public DbSet<StudentActivityRecord> StudentActivityRecords { get; set; }
 
+		public DbQuery<Enrollment> Enrollments { get; set; }
+
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
 			builder.Entity<Calendar>().
@@ -61,6 +63,8 @@ namespace models
 					v => v.Value,
 					v => StudentActivity.FromString(v)
 				);
+
+			builder.Query<Enrollment>().ToView("Enrollments");
 		}
 	}
 }
