@@ -62,6 +62,7 @@ namespace api
 				opt.UseLazyLoadingProxies();
 			});
 			services.AddTransient<IAuditRecordRepository, AuditRecordRepository>();
+			services.AddTransient<ICalendarRepository, CalendarRepository>();
 			services.AddTransient<ICommittedStudentStatusRecordRepository, CommittedStudentStatusRecordRepository>();
 			services.AddTransient<IPaymentRepository, PaymentRepository>();
 			services.AddTransient<IPendingStudentStatusRecordRepository, PendingStudentStatusRecordRepository>();
@@ -164,6 +165,7 @@ namespace api
 				o.SchemaFilter<EnumerationSchemaFilter>();
 				o.OperationFilter<EnumerationOperationFilter>();
 				o.OperationFilter<StudentFieldOperationFilter>();
+				o.OperationFilter<AuthorizeOperationFilter>();
 			});
 			#endregion
 
