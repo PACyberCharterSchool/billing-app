@@ -153,15 +153,7 @@ namespace api.Tests.Controllers
 		public void CommitCommits()
 		{
 			var username = "bob";
-			_uut.ControllerContext = new ControllerContext
-			{
-				HttpContext = new DefaultHttpContext
-				{
-					User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]{
-							new Claim(JwtRegisteredClaimNames.Sub, username),
-					})),
-				},
-			};
+			_uut.SetUsername(username);
 
 			var pending = new[] {
 				new PendingStudentStatusRecord{Id = 1},
