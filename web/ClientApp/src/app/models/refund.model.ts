@@ -9,4 +9,5 @@ export class Refund {
   created: Date;
   lastUpdated: Date;
   schoolDistrict: SchoolDistrict;
+  username: string;
 }

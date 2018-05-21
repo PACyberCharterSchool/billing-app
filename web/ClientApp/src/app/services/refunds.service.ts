@@ -38,10 +38,9 @@ export class RefundsService {
 
   public updateRefund(refund: Refund): Observable<Refund> {
     // just return some fake data for now
-    return new Observable<Refund>((o) => {
-      o.next(refund);
-      o.complete();
-    });
+    const url = this.apiRefundsUrl + `/${refund.id}`;
+    const reqBodyObj = this.buildRefundRequestBodyObject(refund);
+    return this.httpClient.put<Refund>(url, reqBodyObj, this.headers);
   }
 
   private buildRefundRequestBodyObject(refund: Refund) {
