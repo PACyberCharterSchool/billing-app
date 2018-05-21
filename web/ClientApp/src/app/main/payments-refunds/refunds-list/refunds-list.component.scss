@@ -57,7 +57,7 @@
   }
 
   .refund-list-col {
-    height: calc(100% - 60px);
+    height: calc(100% - 120px);
 
     table {
       thead {
@@ -65,4 +65,9 @@
       }
     }
   }
+
+  .refund-action-col {
+    margin-top: 10px;
+  }
+
 }

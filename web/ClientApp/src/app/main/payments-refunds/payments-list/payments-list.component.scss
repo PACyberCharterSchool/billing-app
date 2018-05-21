@@ -57,12 +57,16 @@
   }
 
   .payment-list-col {
-    height: calc(100% - 95px);
+    height: calc(100% - 125px);
 
     table {
       thead {
         height: 95px;
       }
     }
+  }
+
+  .payment-action-col {
+    margin-top: 10px;
   }
 }

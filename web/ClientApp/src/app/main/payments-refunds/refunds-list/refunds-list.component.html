@@ -31,4 +31,9 @@
       </tbody>
     </table>
   </div>
+  <div class='col-md-12 refund-action-col'>
+    <a class='btn btn-primary' [routerLink]='["/payments-refunds", { outlets: { "action": ["home"] } }]' (click)='collapse()'>
+      <span class='fa'></span> Back to Payments & Refunds
+    </a>
+  </div>
 </div>
