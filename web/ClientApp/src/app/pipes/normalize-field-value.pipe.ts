@@ -18,13 +18,13 @@ export class NormalizeFieldValuePipe implements PipeTransform {
 
     switch (typeof(value)) {
       case 'string':
-        if (moment(value, formats, true).isValid()) {
+        if (value && moment(value, formats, true).isValid()) {
           const d = new Date(value);
           v = d.toLocaleDateString();
         }
         break;
       case 'object':
-        if (value.name) {
+        if (value && value.name) {
           v = value.name;
         }
         break;
