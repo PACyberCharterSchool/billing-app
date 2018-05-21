@@ -147,12 +147,14 @@ namespace api.Controllers
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
+			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
 			var refund = new Refund
 			{
 				Id = id,
 				Amount = update.Amount,
 				CheckNumber = update.CheckNumber,
 				Date = update.Date,
+				Username = username,
 				SchoolYear = update.SchoolYear,
 				SchoolDistrict = _districts.GetByAun(update.SchoolDistrictAun),
 			};
