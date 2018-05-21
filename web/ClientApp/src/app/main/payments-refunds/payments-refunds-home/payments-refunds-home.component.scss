@@ -18,11 +18,12 @@
       background-color: #ffffff;
       border: 1px solid #dddddd;
       border-radius: 5px;
-      height: 170px;
+      height: 205px;
       margin: 0 auto;
       margin-bottom: 40px;
+      overflow: hidden;
       padding: 0;
-      width: 190px;
+      width: 195px;
 
       label {
         color: #4d4d4d;
@@ -33,9 +34,8 @@
       img {
         display: block;
         object-fit: none;
-        object-position: -420px -430px;
-        height: 140px;
-        width: 160px;
+        object-position: -410px -420px;
+        height: 180px;
       }
     }
 
@@ -43,9 +43,8 @@
       img {
         display: block;
         object-fit: none;
-        object-position: -650px -435px;
-        height: 140px;
-        width: 160px;
+        object-position: -635px -420px;
+        height: 180px;
       }
     }
   }
