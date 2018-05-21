@@ -3,6 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 
 import { FormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { RefundsComponent } from './refunds.component';
 import { RefundsListComponent } from '../refunds-list/refunds-list.component';
@@ -33,8 +34,8 @@ describe('RefundsComponent', () => {
         NormalizeFieldValuePipe,
       ],
       providers: [ UtilitiesService, RefundsService, SchoolDistrictService, HttpClient, HttpHandler, Globals
-    ],
-      imports: [ FormsModule, NgbModule.forRoot() ]
+      ],
+      imports: [ FormsModule, NgbModule.forRoot(), RouterTestingModule ]
     })
     .compileComponents();
   }));

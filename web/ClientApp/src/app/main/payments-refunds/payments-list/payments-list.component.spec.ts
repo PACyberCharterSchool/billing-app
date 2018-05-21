@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { HttpClient, HttpHandler } from '@angular/common/http';
 
@@ -29,7 +30,7 @@ describe('PaymentsListComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ PaymentsListComponent, NormalizeFieldNamePipe, NormalizeFieldValuePipe, OrderByPipe ],
-      imports: [ FormsModule, InfiniteScrollModule, NgbModule.forRoot() ],
+      imports: [ FormsModule, InfiniteScrollModule, NgbModule.forRoot(), RouterTestingModule ],
       providers: [
         Globals,
         UtilitiesService,

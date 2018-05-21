@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { HttpClient, HttpHandler } from '@angular/common/http';
 
@@ -25,7 +26,7 @@ describe('RefundsListComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ RefundsListComponent, NormalizeFieldNamePipe, OrderByPipe, NormalizeFieldValuePipe ],
       providers: [ UtilitiesService, RefundsService, SchoolDistrictService, HttpClient, HttpHandler, NgbModal, Globals ],
-      imports: [ FormsModule, NgbModule.forRoot() ]
+      imports: [ FormsModule, NgbModule.forRoot(), RouterTestingModule ]
     })
     .compileComponents();
   }));
