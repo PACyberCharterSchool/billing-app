@@ -1,0 +1,54 @@
+.school-district-filter-row {
+  display: flex;
+  align-items: center;
+  height: 60px;
+
+  .create-payment-col {
+    // align-items: center;
+    // display: inline-block;
+    // height: 100%;
+
+    h3 {
+      color: #58a917;
+      display: inline-block;
+      height: 100%;
+    }
+  }
+
+  .search-payment-col {
+    // display: inline-block;
+    // align-items: center;
+    height: 100%;
+  }
+}
+
+.school-district-list-row {
+  height: 100%;
+  
+  div.col-md-12 {
+    height: 100%;
+
+    table {
+      height: calc(100% - 60px);
+      thead {
+        height: 60px;
+      }
+    }
+  }
+
+}
+
+.school-district-details-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+
+  .school-district-rates {
+    margin: 20px;
+
+    h4 {
+      color: #58a917;
+    }
+  }
+}
