@@ -22,7 +22,7 @@ namespace models.Tests.Reporters.Generators
 				{key, value},
 			};
 
-			var actual = Input(i => i[key]).Generate(input);
+			var actual = Input(i => i[key])(input);
 			Assert.That(actual, Is.EqualTo(value));
 		}
 
@@ -37,9 +37,9 @@ namespace models.Tests.Reporters.Generators
 			};
 
 			var prop = "A";
-			var actual = Object(new Dictionary<string, IGenerator> {
+			var actual = Object(new Dictionary<string, GeneratorFunc> {
 				{prop, Input(i => i[key])},
-			}).Generate(input);
+			})(input);
 
 			Assert.That(actual, Contains.Key(prop));
 			Assert.That(actual[prop], Is.EqualTo(value));
@@ -57,7 +57,7 @@ namespace models.Tests.Reporters.Generators
 				}},
 			};
 
-			var actual = Reference(s => s["a"]["b"]).Generate(input: null, state: state);
+			var actual = Reference(s => s["a"]["b"])(input: null, state: state);
 
 			Assert.That(actual, Is.EqualTo(value));
 		}
@@ -66,7 +66,7 @@ namespace models.Tests.Reporters.Generators
 		public void LambdaGenerateWithNoParamsReturnsResults()
 		{
 			var value = 1;
-			var actual = Lambda(() => value).Generate(null);
+			var actual = Lambda(() => value)(null);
 			Assert.That(actual, Is.EqualTo(value));
 		}
 
@@ -74,7 +74,7 @@ namespace models.Tests.Reporters.Generators
 		public void LambdaGenerateWithOneParamReturnsResults()
 		{
 			var value = 1;
-			var actual = Lambda((int x) => x * x, new[] { Constant(value) }).Generate(null);
+			var actual = Lambda((int x) => x * x, new[] { Constant(value) })(null);
 			Assert.That(actual, Is.EqualTo(value * value));
 		}
 
@@ -83,7 +83,7 @@ namespace models.Tests.Reporters.Generators
 		{
 			var value1 = 1;
 			var value2 = 2;
-			var actual = Lambda((int x, int y) => x + y, new[] { Constant(value1), Constant(value2) }).Generate(null);
+			var actual = Lambda((int x, int y) => x + y, new[] { Constant(value1), Constant(value2) })(null);
 			Assert.That(actual, Is.EqualTo(value1 + value2));
 		}
 
@@ -116,7 +116,7 @@ namespace models.Tests.Reporters.Generators
 					from Refunds
 				";
 
-				var actual = Sql(NewContext().Database.GetDbConnection(), query).Generate(null);
+				var actual = Sql(NewContext().Database.GetDbConnection(), query)(null);
 				Assert.That(actual[0].Amount, Is.EqualTo(refund.Amount.ToString("0.0")));
 			}
 		}
@@ -140,8 +140,8 @@ namespace models.Tests.Reporters.Generators
 					from Refunds
 					where Id = @id
 				";
-				var args = Object(new Dictionary<string, IGenerator> { { "id", Constant(3) } });
-				var actual = Sql(NewContext().Database.GetDbConnection(), query, args).Generate(null);
+				var args = Object(new Dictionary<string, GeneratorFunc> { { "id", Constant(3) } });
+				var actual = Sql(NewContext().Database.GetDbConnection(), query, args)(null);
 				Assert.That(actual[0].Amount, Is.EqualTo(refund.Amount.ToString("0.0")));
 			}
 		}
