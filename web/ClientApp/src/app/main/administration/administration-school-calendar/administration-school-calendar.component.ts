@@ -13,11 +13,14 @@ import { Globals } from '../../../globals';
 })
 export class AdministrationSchoolCalendarComponent implements OnInit {
   private schoolCalendar: Calendar;
+  private academicYear: string;
 
   constructor(
     private schoolCalendarService: SchoolCalendarService,
     private globals: Globals
-  ) { }
+  ) {
+    this.academicYear = globals.currentSchoolYear;
+  }
 
   ngOnInit() {
     this.schoolCalendarService.getByYear(this.globals.currentSchoolYear).subscribe(
@@ -28,6 +31,21 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
         console.log('AdministrationSchoolCalendarComponent.ngOnInit(): error is ', error);
       }
     );
+  }
+
+  handleFileSelection($event) {
+    if ($event) {
+      const files = $event.target.files;
+
+      this.schoolCalendarService.updateByYear(this.academicYear, files[0]).subscribe(
+        data => {
+          console.log('AdministrationSchoolCalendarComponent.handleFileSelection(): data is ', data['calendar']);
+        },
+        error => {
+          console.log('AdministrationSchoolCalendarComponent.handleFileSelection(): error is ', error);
+        }
+      );
+    }
   }
 
 }

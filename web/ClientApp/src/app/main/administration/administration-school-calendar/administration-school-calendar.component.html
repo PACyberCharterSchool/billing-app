@@ -1,8 +1,18 @@
 <div class='row calendar-filter-row'>
-  <div class='col-md-6 calendar-title-col'>
-    <h4>Pennsylvania Cyber Charter School {{academicYear}} School Calendar</h4>
+  <div class='col-md-3 calendar-title-col'>
+    <h4>{{academicYear}} School Calendar</h4>
   </div>
-  <div class='col-md-6 calendar-search-col'>
+  <div class='col-md-5 calendar-import-col'>
+    <label for='calendar-file-selector'>Select calendar file:</label>
+    <span class='btn btn-primary btn-file'>
+      <input
+        type='file'
+        accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
+        id='calendar-file-selector'
+        (change)='handleFileSelection($event)' />
+    </span>
+  </div>
+  <div class='col-md-4 calendar-search-col'>
   </div>
 </div>
 <div class='row calendar-list-row'>
