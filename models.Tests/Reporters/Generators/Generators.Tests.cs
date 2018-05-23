@@ -1,7 +1,9 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 
+using Newtonsoft.Json;
 using NUnit.Framework;
 
 using models.Reporters.Generators;
@@ -60,6 +62,38 @@ namespace models.Tests.Reporters.Generators
 			var actual = Reference(s => s["a"]["b"])(input: null, state: state);
 
 			Assert.That(actual, Is.EqualTo(value));
+		}
+
+		[Test]
+		public void ReferenceGeneratorCanReferenceObjectProperty()
+		{
+			var key = "a";
+			var reference = "b";
+			var value = 1;
+
+			var actual = Object(new Dictionary<string, GeneratorFunc> {
+				{key, Constant(value)},
+				{reference, Reference(s => s[key])},
+			})(null);
+
+			Assert.That(actual[reference], Is.EqualTo(value));
+		}
+
+		[Test]
+		public void ReferenceGeneratorCanReferenceOtherObjectProperty()
+		{
+			var key = "a";
+			var reference = "b";
+			var value = 1;
+
+			var actual = Object(new Dictionary<string, GeneratorFunc> {
+				{"obj", Object(new Dictionary<string, GeneratorFunc> {
+					{key, Constant(value)},
+				})},
+				{reference, Reference(s => s["obj"][key])},
+			})(null);
+
+			Assert.That(actual[reference], Is.EqualTo(value));
 		}
 
 		[Test]

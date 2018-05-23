@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 
 using Dapper;
+using System.Collections;
 
 namespace models.Reporters.Generators
 {
@@ -18,7 +19,7 @@ namespace models.Reporters.Generators
 		{
 			var next = new Dictionary<string, dynamic>();
 			foreach (var property in properties)
-				next.Add(property.Key, property.Value(input, state));
+				next.Add(property.Key, property.Value(input, next));
 			return next;
 		};
 
