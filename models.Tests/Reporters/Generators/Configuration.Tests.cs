@@ -22,7 +22,7 @@ namespace models.Tests.Reporters.Generators
 				{key, value},
 			};
 
-			var actual = Input(key).Generate(input);
+			var actual = Input(i => i[key]).Generate(input);
 			Assert.That(actual, Is.EqualTo(value));
 		}
 
@@ -38,7 +38,7 @@ namespace models.Tests.Reporters.Generators
 
 			var prop = "A";
 			var actual = Properties(new Dictionary<string, IGenerator> {
-				{prop, Input(key)},
+				{prop, Input(i => i[key])},
 			}).Generate(input);
 
 			Assert.That(actual, Contains.Key(prop));
@@ -57,7 +57,7 @@ namespace models.Tests.Reporters.Generators
 				}},
 			};
 
-			var actual = Reference("a.b").Generate(input: null, state: state);
+			var actual = Reference(s => s["a"]["b"]).Generate(input: null, state: state);
 
 			Assert.That(actual, Is.EqualTo(value));
 		}

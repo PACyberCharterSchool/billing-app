@@ -40,54 +40,34 @@ namespace models.Reporters.Generators
 		public dynamic Generate(Dictionary<string, dynamic> input, dynamic state = null) => _constant;
 	}
 
-	// TODO(Erik): use selector expression
 	public sealed class InputGenerator : IGenerator
 	{
-		private readonly string _path;
+		private readonly Func<IReadOnlyDictionary<string, dynamic>, dynamic> _select;
 
-		internal InputGenerator(string path) => _path = path;
+		internal InputGenerator(Func<IReadOnlyDictionary<string, dynamic>, dynamic> select) => _select = select;
 
-		public dynamic Generate(Dictionary<string, dynamic> input, dynamic state = null)
-		{
-			if (input == null || input.Count == 0)
-				return null;
-
-			dynamic value = null;
-			foreach (var part in _path.Split("."))
-				value = input[part];
-
-			return value;
-		}
+		public dynamic Generate(Dictionary<string, dynamic> input, dynamic state = null) => _select(input);
 	}
 
-	// TODO(Erik): use selector expression
 	public sealed class ReferenceGenerator : IGenerator
 	{
-		private readonly string _path;
+		private readonly Func<dynamic, dynamic> _select;
 
-		internal ReferenceGenerator(string path) => _path = path;
+		internal ReferenceGenerator(Func<dynamic, dynamic> select) => _select = select;
 
-		public dynamic Generate(Dictionary<string, dynamic> input, dynamic state = null)
-		{
-			if (state == null)
-				return null;
-
-			dynamic value = state;
-			foreach (var part in _path.Split("."))
-				value = value[part];
-
-			return value;
-		}
+		public dynamic Generate(Dictionary<string, dynamic> input, dynamic state = null) => _select(state);
 	}
 
 	public sealed class LambdaGenerator : IGenerator
 	{
 		private readonly LambdaExpression _lambda;
+		private readonly Delegate _delegate;
 		private readonly IList<IGenerator> _values;
 
 		internal LambdaGenerator(LambdaExpression lambda, IList<IGenerator> values = null)
 		{
-			_lambda = lambda; ;
+			_lambda = lambda;
+			_delegate = lambda.Compile();
 			_values = values;
 		}
 
@@ -100,12 +80,11 @@ namespace models.Reporters.Generators
 		public dynamic Generate(Dictionary<string, dynamic> input, dynamic state = null)
 		{
 			var count = _lambda.Parameters.Count;
-			var del = _lambda.Compile();
 			dynamic[] values = null;
 			if (_values != null)
 				values = _values.Select(v => v.Generate(input, state)).ToArray();
 
-			return _actions[count](del, values);
+			return _actions[count](_delegate, values);
 		}
 	}
 

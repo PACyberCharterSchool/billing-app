@@ -12,9 +12,10 @@ namespace models.Reporters.Generators
 
 		public static ConstantGenerator<T> Constant<T>(T constant) => new ConstantGenerator<T>(constant);
 
-		public static InputGenerator Input(string key) => new InputGenerator(key);
+		public static InputGenerator Input(Func<IReadOnlyDictionary<string, dynamic>, dynamic> select) =>
+			new InputGenerator(select);
 
-		public static ReferenceGenerator Reference(string path) => new ReferenceGenerator(path);
+		public static ReferenceGenerator Reference(Func<dynamic, dynamic> select) => new ReferenceGenerator(select);
 
 		public static LambdaGenerator Lambda<R>(Expression<Func<R>> lambda) => new LambdaGenerator(lambda);
 
