@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace api.Tests.Controllers
 	[TestFixture]
 	public class SchoolDistrictsControllerTests
 	{
+		private PacBillContext _context;
 		private Mock<ISchoolDistrictRepository> _schoolDistricts;
 		private ILogger<SchoolDistrictsController> _logger;
 
@@ -25,10 +27,18 @@ namespace api.Tests.Controllers
 		[SetUp]
 		public void SetUp()
 		{
+			_context = new PacBillContext(new DbContextOptionsBuilder<PacBillContext>().
+				UseInMemoryDatabase("schools-district-controller").Options);
 			_schoolDistricts = new Mock<ISchoolDistrictRepository>();
 			_logger = new TestLogger<SchoolDistrictsController>();
 
-			_uut = new SchoolDistrictsController(_schoolDistricts.Object, _logger);
+			_uut = new SchoolDistrictsController(_context, _schoolDistricts.Object, _logger);
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			_context.Database.EnsureDeleted();
 		}
 
 		public void AssertSchoolDistrict(SchoolDistrictDto actual, SchoolDistrict district)

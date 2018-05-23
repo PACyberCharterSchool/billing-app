@@ -18,13 +18,16 @@ namespace api.Controllers
 	[Route("api/[controller]")]
 	public class SchoolDistrictsController : Controller
 	{
+		private readonly PacBillContext _context;
 		private readonly ISchoolDistrictRepository _schoolDistricts;
 		private readonly ILogger<SchoolDistrictsController> _logger;
 
 		public SchoolDistrictsController(
+			PacBillContext context,
 			ISchoolDistrictRepository schoolDistricts,
 			ILogger<SchoolDistrictsController> logger)
 		{
+			_context = context;
 			_schoolDistricts = schoolDistricts;
 			_logger = logger;
 		}
@@ -111,7 +114,7 @@ namespace api.Controllers
 				AlternateRate = update.AlternateRate,
 				PaymentType = update.PaymentType,
 			};
-			await Task.Run(() => _schoolDistricts.CreateOrUpdate(district));
+			await Task.Run(() => _context.SaveChanges(() => _schoolDistricts.CreateOrUpdate(district)));
 			return Ok();
 		}
 	}
