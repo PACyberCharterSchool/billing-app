@@ -15,11 +15,11 @@ namespace models.Reporters.Generators
 
 	public static class Generator
 	{
-		public static GeneratorFunc Object(IDictionary<string, GeneratorFunc> properties) => (input, state) =>
+		public static GeneratorFunc Object(params (string Key, GeneratorFunc Generate)[] properties) => (input, state) =>
 		{
 			var next = new Dictionary<string, dynamic>();
 			foreach (var property in properties)
-				next.Add(property.Key, property.Value(input, next));
+				next.Add(property.Key, property.Generate(input, next));
 			return next;
 		};
 
@@ -37,26 +37,26 @@ namespace models.Reporters.Generators
 			(del, values) => del.DynamicInvoke(values[0], values[1]),
 		};
 
-		private static GeneratorFunc Lambda(LambdaExpression lambda, IList<GeneratorFunc> generators = null) =>
-			(input, state) =>
-			{
-				var count = lambda.Parameters.Count;
-				dynamic[] values = null;
-				if (generators != null)
-					values = generators.Select(g => g(input, state)).ToArray();
+		private static GeneratorFunc Lambda(LambdaExpression lambda, params GeneratorFunc[] generators) => (input, state) =>
+		{
+			var count = lambda.Parameters.Count;
+			dynamic[] values = null;
+			if (generators != null && generators.Length > 0)
+				values = generators.Select(g => g(input, state)).ToArray();
 
-				return _actions[count](lambda.Compile(), values);
-			};
+			return _actions[count](lambda.Compile(), values);
+		};
 
-		public static GeneratorFunc Lambda<R>(Expression<Func<R>> lambda, IList<GeneratorFunc> generators = null) =>
+		public static GeneratorFunc Lambda<R>(Expression<Func<R>> lambda, params GeneratorFunc[] generators) =>
 			Lambda(lambda as LambdaExpression, generators);
 
-		public static GeneratorFunc Lambda<T, R>(Expression<Func<T, R>> lambda, IList<GeneratorFunc> generators = null) =>
+		public static GeneratorFunc Lambda<T, R>(Expression<Func<T, R>> lambda, params GeneratorFunc[] generators) =>
 			Lambda(lambda as LambdaExpression, generators);
 
-		public static GeneratorFunc Lambda<T1, T2, R>(Expression<Func<T1, T2, R>> lambda, IList<GeneratorFunc> generators = null) =>
+		public static GeneratorFunc Lambda<T1, T2, R>(Expression<Func<T1, T2, R>> lambda, params GeneratorFunc[] generators) =>
 			Lambda(lambda as LambdaExpression, generators);
 
+		// TODO(Erik): pass properties directly
 		public static GeneratorFunc Sql(IDbConnection db, string query, GeneratorFunc generator = null) => (input, state) =>
 		{
 			if (generator == null)

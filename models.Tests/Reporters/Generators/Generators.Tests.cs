@@ -39,9 +39,9 @@ namespace models.Tests.Reporters.Generators
 			};
 
 			var prop = "A";
-			var actual = Object(new Dictionary<string, GeneratorFunc> {
-				{prop, Input(i => i[key])},
-			})(input);
+			var actual = Object(
+				(prop, Input(i => i[key]))
+			)(input);
 
 			Assert.That(actual, Contains.Key(prop));
 			Assert.That(actual[prop], Is.EqualTo(value));
@@ -71,10 +71,10 @@ namespace models.Tests.Reporters.Generators
 			var reference = "b";
 			var value = 1;
 
-			var actual = Object(new Dictionary<string, GeneratorFunc> {
-				{key, Constant(value)},
-				{reference, Reference(s => s[key])},
-			})(null);
+			var actual = Object(
+				(key, Constant(value)),
+				(reference, Reference(s => s[key]))
+			)(null);
 
 			Assert.That(actual[reference], Is.EqualTo(value));
 		}
@@ -86,12 +86,12 @@ namespace models.Tests.Reporters.Generators
 			var reference = "b";
 			var value = 1;
 
-			var actual = Object(new Dictionary<string, GeneratorFunc> {
-				{"obj", Object(new Dictionary<string, GeneratorFunc> {
-					{key, Constant(value)},
-				})},
-				{reference, Reference(s => s["obj"][key])},
-			})(null);
+			var actual = Object(
+				("obj", Object(
+					(key, Constant(value))
+				)),
+				(reference, Reference(s => s["obj"][key]))
+			)(null);
 
 			Assert.That(actual[reference], Is.EqualTo(value));
 		}
@@ -174,7 +174,7 @@ namespace models.Tests.Reporters.Generators
 					from Refunds
 					where Id = @id
 				";
-				var args = Object(new Dictionary<string, GeneratorFunc> { { "id", Constant(3) } });
+				var args = Object(("id", Constant(3)));
 				var actual = Sql(NewContext().Database.GetDbConnection(), query, args)(null);
 				Assert.That(actual[0].Amount, Is.EqualTo(refund.Amount.ToString("0.0")));
 			}
