@@ -4,9 +4,7 @@
   height: 60px;
 
   .create-payment-col {
-    // align-items: center;
-    // display: inline-block;
-    // height: 100%;
+    top: 25%;
 
     h3 {
       color: #58a917;
@@ -16,9 +14,8 @@
   }
 
   .search-payment-col {
-    // display: inline-block;
-    // align-items: center;
     height: 100%;
+    top: -45%;
   }
 }
 
