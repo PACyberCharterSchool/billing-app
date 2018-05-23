@@ -56,15 +56,7 @@ namespace api.Tests.Controllers
 				Returns(new SchoolDistrict { Aun = create.SchoolDistrictAun });
 
 			var username = "bob";
-			_uut.ControllerContext = new ControllerContext
-			{
-				HttpContext = new DefaultHttpContext
-				{
-					User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]{
-							new Claim(JwtRegisteredClaimNames.Sub, username),
-					})),
-				},
-			};
+			_uut.SetUsername(username);
 
 			var result = await _uut.Create(create);
 			Assert.That(result, Is.TypeOf<CreatedResult>());
@@ -247,20 +239,25 @@ namespace api.Tests.Controllers
 				SchoolYear = "2017-2018",
 				SchoolDistrictAun = 123456789,
 			};
-			_refunds.Setup(rs => rs.Update(It.IsAny<Refund>())).Returns<Refund>(r => r);
+
+			var username = "bob";
+			_uut.SetUsername(username);
+
+			_refunds.Setup(rs => rs.Update(It.Is<Refund>(r =>
+				r.Amount == update.Amount &&
+				r.CheckNumber == update.CheckNumber &&
+				r.Date == update.Date &&
+				r.Username == username &&
+				r.SchoolYear == update.SchoolYear &&
+				(r.SchoolDistrict != null && r.SchoolDistrict.Aun == update.SchoolDistrictAun)
+			))).Returns<Refund>(r => r).Verifiable();
 			_districts.Setup(ds => ds.GetByAun(update.SchoolDistrictAun)).
 				Returns(new SchoolDistrict { Aun = update.SchoolDistrictAun });
 
 			var result = await _uut.Update(id, update);
 			Assert.That(result, Is.TypeOf<OkResult>());
 
-			_refunds.Verify(rs => rs.Update(It.Is<Refund>(r =>
-				r.Amount == update.Amount &&
-				r.CheckNumber == update.CheckNumber &&
-				r.Date == update.Date &&
-				r.SchoolYear == update.SchoolYear &&
-				(r.SchoolDistrict != null && r.SchoolDistrict.Aun == update.SchoolDistrictAun)
-			)));
+			_refunds.Verify();
 		}
 
 		[Test]
@@ -295,6 +292,8 @@ namespace api.Tests.Controllers
 			};
 			_districts.Setup(ds => ds.GetByAun(update.SchoolDistrictAun)).
 				Returns(new SchoolDistrict { Aun = update.SchoolDistrictAun });
+
+			_uut.SetUsername("bob");
 
 			var result = await _uut.Update(id, update);
 			Assert.That(result, Is.TypeOf<NotFoundResult>());
