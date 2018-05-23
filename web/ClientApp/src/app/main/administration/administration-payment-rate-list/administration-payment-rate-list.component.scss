@@ -20,32 +20,24 @@
 }
 
 .school-district-list-row {
-  height: 100%;
-  
+  height: calc(100% - 100px);
+  margin-bottom: 10px;
+
   div.col-md-12 {
     height: 100%;
 
     table {
-      height: calc(100% - 60px);
+      height: 100%;
       thead {
         height: 60px;
       }
     }
   }
-
 }
 
-.school-district-details-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
+.school-district-rates-action-row {
+  height: 30px;
+  .school-district-rates-action-col {
 
-  .school-district-rates {
-    margin: 20px;
-
-    h4 {
-      color: #58a917;
-    }
   }
 }
