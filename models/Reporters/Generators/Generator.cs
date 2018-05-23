@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq.Expressions;
 
 namespace models.Reporters.Generators
 {
-	public static class Static
+	public static class Generator
 	{
 		public static PropertiesGenerator Properties(IDictionary<string, IGenerator> properties) =>
 			new PropertiesGenerator(properties);

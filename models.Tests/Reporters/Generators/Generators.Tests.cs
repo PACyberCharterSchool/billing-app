@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using NUnit.Framework;
 
 using models.Reporters.Generators;
-using static models.Reporters.Generators.Static;
+using static models.Reporters.Generators.Generator;
 
 namespace models.Tests.Reporters.Generators
 {
 	[TestFixture]
-	public class ConfigurationTests
+	public class GeneratorsTests
 	{
 		[Test]
 		public void InputGeneratorReturnsFromInput()
