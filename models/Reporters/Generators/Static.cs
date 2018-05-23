@@ -15,7 +15,8 @@ namespace models.Reporters.Generators
 		public static InputGenerator Input(Func<IReadOnlyDictionary<string, dynamic>, dynamic> select) =>
 			new InputGenerator(select);
 
-		public static ReferenceGenerator Reference(Func<dynamic, dynamic> select) => new ReferenceGenerator(select);
+		public static ReferenceGenerator Reference(Func<IReadOnlyDictionary<string, dynamic>, dynamic> select) =>
+			new ReferenceGenerator(select);
 
 		public static LambdaGenerator Lambda<R>(Expression<Func<R>> lambda) => new LambdaGenerator(lambda);
 
