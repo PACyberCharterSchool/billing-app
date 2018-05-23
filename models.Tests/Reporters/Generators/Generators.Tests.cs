@@ -27,7 +27,7 @@ namespace models.Tests.Reporters.Generators
 		}
 
 		[Test]
-		public void PropertiesGeneratorSetsProperty()
+		public void ObjectGeneratorSetsProperty()
 		{
 			var key = "a";
 			var value = 1;
@@ -37,7 +37,7 @@ namespace models.Tests.Reporters.Generators
 			};
 
 			var prop = "A";
-			var actual = Properties(new Dictionary<string, IGenerator> {
+			var actual = Object(new Dictionary<string, IGenerator> {
 				{prop, Input(i => i[key])},
 			}).Generate(input);
 
@@ -140,7 +140,7 @@ namespace models.Tests.Reporters.Generators
 					from Refunds
 					where Id = @id
 				";
-				var args = Properties(new Dictionary<string, IGenerator> { { "id", Constant(3) } });
+				var args = Object(new Dictionary<string, IGenerator> { { "id", Constant(3) } });
 				var actual = Sql(NewContext().Database.GetDbConnection(), query, args).Generate(null);
 				Assert.That(actual[0].Amount, Is.EqualTo(refund.Amount.ToString("0.0")));
 			}

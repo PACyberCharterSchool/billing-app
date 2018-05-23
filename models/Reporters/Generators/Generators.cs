@@ -15,11 +15,11 @@ namespace models.Reporters.Generators
 		dynamic Generate(Dictionary<string, dynamic> input, Dictionary<string, dynamic> state = null);
 	}
 
-	public sealed class PropertiesGenerator : IGenerator
+	public sealed class ObjectGenerator : IGenerator
 	{
 		private readonly IDictionary<string, IGenerator> _properties;
 
-		internal PropertiesGenerator(IDictionary<string, IGenerator> properties) => _properties = properties;
+		internal ObjectGenerator(IDictionary<string, IGenerator> properties) => _properties = properties;
 
 		public dynamic Generate(Dictionary<string, dynamic> input, Dictionary<string, dynamic> state = null)
 		{
@@ -94,9 +94,9 @@ namespace models.Reporters.Generators
 	{
 		private readonly IDbConnection _db;
 		private readonly string _query;
-		private readonly PropertiesGenerator _args;
+		private readonly ObjectGenerator _args;
 
-		internal SqlGenerator(IDbConnection db, string query, PropertiesGenerator args = null)
+		internal SqlGenerator(IDbConnection db, string query, ObjectGenerator args = null)
 		{
 			_db = db;
 			_query = query;

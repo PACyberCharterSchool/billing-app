@@ -7,8 +7,8 @@ namespace models.Reporters.Generators
 {
 	public static class Generator
 	{
-		public static PropertiesGenerator Properties(IDictionary<string, IGenerator> properties) =>
-			new PropertiesGenerator(properties);
+		public static ObjectGenerator Object(IDictionary<string, IGenerator> properties) =>
+			new ObjectGenerator(properties);
 
 		public static ConstantGenerator<T> Constant<T>(T constant) => new ConstantGenerator<T>(constant);
 
@@ -26,7 +26,7 @@ namespace models.Reporters.Generators
 		public static LambdaGenerator Lambda<T1, T2, R>(Expression<Func<T1, T2, R>> lambda, IList<IGenerator> values = null) =>
 			new LambdaGenerator(lambda, values);
 
-		public static SqlGenerator Sql(IDbConnection conn, string query, PropertiesGenerator args = null) =>
+		public static SqlGenerator Sql(IDbConnection conn, string query, ObjectGenerator args = null) =>
 			new SqlGenerator(conn, query, args);
 	}
 }
