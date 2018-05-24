@@ -1,0 +1,43 @@
+.school-district-filter-row {
+  display: flex;
+  align-items: center;
+  height: 60px;
+
+  .create-payment-col {
+    top: 25%;
+
+    h3 {
+      color: #58a917;
+      display: inline-block;
+      height: 100%;
+    }
+  }
+
+  .search-payment-col {
+    height: 100%;
+    top: -45%;
+  }
+}
+
+.school-district-list-row {
+  height: calc(100% - 100px);
+  margin-bottom: 10px;
+
+  div.col-md-12 {
+    height: 100%;
+
+    table {
+      height: 100%;
+      thead {
+        height: 60px;
+      }
+    }
+  }
+}
+
+.school-district-rates-action-row {
+  height: 30px;
+  .school-district-rates-action-col {
+
+  }
+}

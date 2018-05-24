@@ -100,6 +100,7 @@ export class PaymentsListComponent implements OnInit {
     this.paymentsService.getPayments(this.skip).subscribe(
       data => {
         this.payments = this.payments.concat(data['students']);
+        this.updateScrollingSkip();
         console.log('PaymentsListComponent.getPayments():  payments are ', this.payments);
       },
       error => {

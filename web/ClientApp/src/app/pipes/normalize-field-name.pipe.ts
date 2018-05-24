@@ -22,6 +22,7 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         fieldName = 'Last Name';
         break;
       case 'schoolDistrictId':
+      case 'aun':
         fieldName = 'AUN #';
         break;
       case 'studentCity':
@@ -169,7 +170,19 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         fieldName = 'User Name';
         break;
       case 'username':
-        fieldName = 'Created By'
+        fieldName = 'Created By';
+        break;
+      case 'name':
+        fieldName = 'Name';
+        break;
+      case 'rate':
+        fieldName = 'Rate';
+        break;
+      case 'alternateRate':
+        fieldName = 'Alternate Rate';
+        break;
+      case 'paymentType':
+        fieldName = 'Payment Type';
         break;
       default:
         fieldName = 'Column';

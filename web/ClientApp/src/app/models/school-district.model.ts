@@ -1,3 +1,5 @@
+import { Student } from '../models/student.model';
+
 export class SchoolDistrict {
   id: number;
   alternateRate: number;
@@ -5,7 +7,6 @@ export class SchoolDistrict {
   name: string;
   aun: number;
   paymentType: string;
-  students: any;
   created: Date;
   lastUpdate: Date;
 }

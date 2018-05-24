@@ -17,11 +17,13 @@ export class SchoolDistrictService {
     })
   };
 
-  constructor(private httpClient: HttpClient) {
+  constructor(
+    private httpClient: HttpClient) {
     this.apiSchoolDistrictsUrl = '/api/schoolDistricts';
   }
 
   public getSchoolDistricts(): Observable<SchoolDistrict[]> {
+    const url = this.apiSchoolDistrictsUrl;
     return this.httpClient.get<SchoolDistrict[]>(this.apiSchoolDistrictsUrl, this.headers);
   }
 
@@ -31,11 +33,25 @@ export class SchoolDistrictService {
 
   public updateSchoolDistrict(schoolDistrict: SchoolDistrict): Observable<SchoolDistrict> {
     if (schoolDistrict) {
+      const reqBodyObj = this.buildRequestBodyObject(schoolDistrict);
       return this.httpClient.put<SchoolDistrict>(
         this.apiSchoolDistrictsUrl + `/${schoolDistrict.id}`,
-        { 'schoolDistrict': schoolDistrict },
+        reqBodyObj,
         this.headers
       );
     }
+  }
+
+  private buildRequestBodyObject(sd: SchoolDistrict): Object {
+    const reqBodyObj = Object.assign({}, {
+      aun: sd.aun,
+      name: sd.name,
+      rate: sd.rate,
+      alternateRate: sd.alternateRate,
+      paymentRate: sd.alternateRate,
+      paymentType: sd.paymentType
+    });
+
+    return reqBodyObj;
   }
 }

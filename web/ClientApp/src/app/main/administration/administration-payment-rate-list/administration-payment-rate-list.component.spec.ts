@@ -1,17 +1,16 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHandler } from '@angular/common/http';
 
-import { AdministrationPaymentRateComponent } from './administration-payment-rate.component';
+import { AdministrationPaymentRateListComponent } from './administration-payment-rate-list.component';
 import { SchoolDistrictService } from '../../../services/school-district.service';
 
-describe('AdministrationPaymentRateComponent', () => {
-  // let component: AdministrationPaymentRateComponent;
-  // let fixture: ComponentFixture<AdministrationPaymentRateComponent>;
+describe('AdministrationPaymentRateListComponent', () => {
+  // let component: AdministrationPaymentRateListComponent;
+  // let fixture: ComponentFixture<AdministrationPaymentRateListComponent>;
 
   // beforeEach(async(() => {
   //   TestBed.configureTestingModule({
-  //     declarations: [ AdministrationPaymentRateComponent ],
+  //     declarations: [ AdministrationPaymentRateListComponent ],
   //     imports: [ FormsModule ],
   //     providers: [ SchoolDistrictService, HttpClient, HttpHandler ]
   //   })
@@ -19,7 +18,7 @@ describe('AdministrationPaymentRateComponent', () => {
   // }));
 
   // beforeEach(() => {
-  //   fixture = TestBed.createComponent(AdministrationPaymentRateComponent);
+  //   fixture = TestBed.createComponent(AdministrationPaymentRateListComponent);
   //   component = fixture.componentInstance;
   //   fixture.detectChanges();
   // });

@@ -4,7 +4,7 @@ import { RouterModule, Routes, RouterOutlet } from '@angular/router';
 import { MainComponent } from '../main.component';
 
 import { AdministrationHomeComponent } from './administration-home/administration-home.component';
-import { AdministrationPaymentRateComponent } from './administration-payment-rate/administration-payment-rate.component';
+import { AdministrationPaymentRateListComponent } from './administration-payment-rate-list/administration-payment-rate-list.component';
 import {
   AdministrationImportStudentDataComponent
 } from './administration-import-student-data/administration-import-student-data.component';
@@ -25,7 +25,7 @@ const adminRoutes: Routes = [
       },
       {
         path: 'payment-rates',
-        component: AdministrationPaymentRateComponent,
+        component: AdministrationPaymentRateListComponent,
         outlet: 'action',
         canActivate: [ AuthenticationGuardService ]
       },

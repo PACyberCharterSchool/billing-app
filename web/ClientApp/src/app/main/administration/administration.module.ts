@@ -7,19 +7,21 @@ import { SharedModule } from '../../shared/shared.module';
 import { AdministrationRoutingModule } from './administration-routing.module';
 
 import { AdministrationHomeComponent } from './administration-home/administration-home.component';
-import { AdministrationPaymentRateComponent } from './administration-payment-rate/administration-payment-rate.component';
+import { AdministrationPaymentRateListComponent } from './administration-payment-rate-list/administration-payment-rate-list.component';
 import {
   AdministrationImportStudentDataComponent
 } from './administration-import-student-data/administration-import-student-data.component';
+import { AdministrationPaymentRateUpdateFormComponent } from './administration-payment-rate-update-form/administration-payment-rate-update-form.component';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [
-    AdministrationPaymentRateComponent,
+    AdministrationPaymentRateListComponent,
     AdministrationHomeComponent,
     AdministrationImportStudentDataComponent,
+    AdministrationPaymentRateUpdateFormComponent
   ],
   imports: [
     CommonModule,
@@ -29,7 +31,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     NgbModule,
     NgxSpinnerModule
   ],
-  providers: [ ]
+  providers: [ NgbActiveModal ],
+  entryComponents: [ AdministrationPaymentRateUpdateFormComponent ]
 })
 
 export class AdministrationModule { }

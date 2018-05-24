@@ -142,4 +142,8 @@ export class RefundsListComponent implements OnInit {
       }
     );
   }
+
+  updateScrollingSkip() {
+    this.skip += this.globals.take;
+  }
 }
