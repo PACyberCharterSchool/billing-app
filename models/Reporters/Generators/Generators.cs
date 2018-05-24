@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,7 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 
 using Dapper;
-using System.Collections;
 
 namespace models.Reporters.Generators
 {
@@ -56,16 +53,10 @@ namespace models.Reporters.Generators
 		public static GeneratorFunc Lambda<T1, T2, R>(Expression<Func<T1, T2, R>> lambda, params GeneratorFunc[] generators) =>
 			Lambda(lambda as LambdaExpression, generators);
 
-		// TODO(Erik): pass properties directly
-		public static GeneratorFunc Sql(IDbConnection db, string query, GeneratorFunc generator = null) => (input, state) =>
+		public static GeneratorFunc Sql(IDbConnection db, string query, params (string Key, GeneratorFunc Generator)[] properties)
+		 => (input, state) =>
 		{
-			if (generator == null)
-				return db.Query<dynamic>(query);
-
-			var args = generator(input, state);
-			if (!(args is Dictionary<string, dynamic>))
-				throw new ArgumentException("Sql param must be Object", nameof(generator));
-
+			var args = Object(properties)(input, state);
 			return db.Query<dynamic>(query, args as Dictionary<string, dynamic>);
 		};
 	}

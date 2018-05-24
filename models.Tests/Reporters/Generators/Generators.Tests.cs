@@ -174,8 +174,7 @@ namespace models.Tests.Reporters.Generators
 					from Refunds
 					where Id = @id
 				";
-				var args = Object(("id", Constant(3)));
-				var actual = Sql(NewContext().Database.GetDbConnection(), query, args)(null);
+				var actual = Sql(NewContext().Database.GetDbConnection(), query, ("id", Constant(3)))(null);
 				Assert.That(actual[0].Amount, Is.EqualTo(refund.Amount.ToString("0.0")));
 			}
 		}
