@@ -107,8 +107,8 @@ namespace models.Tests.Reporters.Generators
 		[Test]
 		public void LambdaGenerateWithOneParamReturnsResults()
 		{
-			var value = 1;
-			var actual = Lambda((int x) => x * x, new[] { Constant(value) })(null);
+			var value = 2;
+			var actual = Lambda((int x) => x * x, Constant(value))(null);
 			Assert.That(actual, Is.EqualTo(value * value));
 		}
 
@@ -117,7 +117,7 @@ namespace models.Tests.Reporters.Generators
 		{
 			var value1 = 1;
 			var value2 = 2;
-			var actual = Lambda((int x, int y) => x + y, new[] { Constant(value1), Constant(value2) })(null);
+			var actual = Lambda((int x, int y) => x + y, Constant(value1), Constant(value2))(null);
 			Assert.That(actual, Is.EqualTo(value1 + value2));
 		}
 
