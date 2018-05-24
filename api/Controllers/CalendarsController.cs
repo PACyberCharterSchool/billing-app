@@ -122,6 +122,10 @@ namespace api.Controllers
 		[ProducesResponseType(typeof(ErrorResponse), 400)]
 		public async Task<IActionResult> Upload(string year, IFormFile file)
 		{
+			if (file == null)
+				return new BadRequestObjectResult(
+					new ErrorResponse($"Could not find parameter named '{nameof(file)}'."));
+
 			if (!_parsers.ContainsKey(file.ContentType))
 				return new BadRequestObjectResult(
 					new ErrorResponse($"Invalid file Content-Type '{file.ContentType}'."));
