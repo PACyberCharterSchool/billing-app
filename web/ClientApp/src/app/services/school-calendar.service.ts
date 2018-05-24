@@ -27,8 +27,11 @@ export class SchoolCalendarService {
     return this.httpClient.get<Calendar>(url, this.headers);
   }
 
-  updateByYear(year: string, file: any): Observable<Calendar> {
+  updateByYear(year: string, formData: FormData): Observable<Calendar> {
+    // NOTE: this request is specifically *not* sending a Content-Type HTTP request header
+    // because Angular needs to form that value on it's own when sending a request of
+    // Content-Type multipart/form-data
     const url = this.apiSchoolCalendarUrl + `/${year}`;
-    return this.httpClient.put<any>(url, file, this.headers);
+    return this.httpClient.put<any>(url, formData);
   }
 }

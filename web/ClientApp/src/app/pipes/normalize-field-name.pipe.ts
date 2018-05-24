@@ -184,6 +184,15 @@ export class NormalizeFieldNamePipe implements PipeTransform {
       case 'paymentType':
         fieldName = 'Payment Type';
         break;
+      case 'dayOfWeek':
+        fieldName = 'Day of Week';
+        break;
+      case 'membership':
+        fieldName = 'Membership';
+        break;
+      case 'schoolDay':
+        fieldName = 'School Day';
+        break;
       default:
         fieldName = 'Column';
         break;
