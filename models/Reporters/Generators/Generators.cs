@@ -7,7 +7,7 @@ using Dapper;
 
 namespace models.Reporters.Generators
 {
-	public delegate dynamic GeneratorFunc(Dictionary<string, dynamic> input, Dictionary<string, dynamic> state = null);
+	public delegate dynamic GeneratorFunc(Dictionary<string, dynamic> input = null, Dictionary<string, dynamic> state = null);
 
 	public static class Generator
 	{
@@ -15,7 +15,25 @@ namespace models.Reporters.Generators
 		{
 			var next = new Dictionary<string, dynamic>();
 			foreach (var property in properties)
-				next.Add(property.Key, property.Generate(input, next));
+				next.Add(property.Key, property.Generate);
+
+			void Expand(Dictionary<string, dynamic> d)
+			{
+				var keys = d.Keys.ToArray();
+				for (var i = 0; i < keys.Length; i++)
+				{
+					var key = keys[i];
+					if (d[key] is GeneratorFunc)
+						d[key] = d[key](input, next); // pass down top-level state
+
+					if (d[key] is Dictionary<string, dynamic>)
+						Expand(d[key]);
+				}
+			}
+
+			if (state == null) // this is the top-level object
+				Expand(next);
+
 			return next;
 		};
 
@@ -48,8 +66,10 @@ namespace models.Reporters.Generators
 		public static GeneratorFunc Sql(IDbConnection db, string query, params (string Key, GeneratorFunc Generator)[] properties)
 		 => (input, state) =>
 		{
-			var args = Object(properties)(input, state);
-			return db.Query<dynamic>(query, args as Dictionary<string, dynamic>);
+			var args = new Dictionary<string, dynamic>();
+			foreach (var property in properties)
+				args.Add(property.Key, property.Generator(input, state));
+			return db.Query<dynamic>(query, args);
 		};
 	}
 }

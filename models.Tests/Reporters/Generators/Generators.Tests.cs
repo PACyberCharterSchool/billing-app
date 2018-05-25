@@ -24,7 +24,7 @@ namespace models.Tests.Reporters.Generators
 				{key, value},
 			};
 
-			var actual = Input(i => i[key])(input);
+			var actual = Input(i => i[key])(input: input);
 			Assert.That(actual, Is.EqualTo(value));
 		}
 
@@ -41,7 +41,7 @@ namespace models.Tests.Reporters.Generators
 			var prop = "A";
 			var actual = Object(
 				(prop, Input(i => i[key]))
-			)(input);
+			)(input: input);
 
 			Assert.That(actual, Contains.Key(prop));
 			Assert.That(actual[prop], Is.EqualTo(value));
@@ -59,13 +59,13 @@ namespace models.Tests.Reporters.Generators
 				}},
 			};
 
-			var actual = Reference(s => s["a"]["b"])(input: null, state: state);
+			var actual = Reference(s => s["a"]["b"])(state: state);
 
 			Assert.That(actual, Is.EqualTo(value));
 		}
 
 		[Test]
-		public void ReferenceGeneratorCanReferenceObjectProperty()
+		public void ReferenceGeneratorCanReferenceSibling()
 		{
 			var key = "a";
 			var reference = "b";
@@ -74,33 +74,67 @@ namespace models.Tests.Reporters.Generators
 			var actual = Object(
 				(key, Constant(value)),
 				(reference, Reference(s => s[key]))
-			)(null);
+			)();
 
 			Assert.That(actual[reference], Is.EqualTo(value));
 		}
 
 		[Test]
-		public void ReferenceGeneratorCanReferenceOtherObjectProperty()
+		public void ReferenceGeneratorCanReferenceGrandSibling()
 		{
 			var key = "a";
 			var reference = "b";
 			var value = 1;
 
 			var actual = Object(
-				("obj", Object(
+				("parent", Object(
+					(key, Constant(value)),
+					(reference, Reference(s => s["parent"][key]))
+				)
+			))();
+
+			Assert.That(actual["parent"][reference], Is.EqualTo(value));
+		}
+
+		[Test]
+		public void ReferenceGeneratorCanReferenceNephew()
+		{
+			var key = "a";
+			var reference = "b";
+			var value = 1;
+
+			var actual = Object(
+				("sibling", Object(
 					(key, Constant(value))
 				)),
-				(reference, Reference(s => s["obj"][key]))
-			)(null);
+				(reference, Reference(s => s["sibling"][key]))
+			)();
 
 			Assert.That(actual[reference], Is.EqualTo(value));
+		}
+
+		[Test]
+		public void ReferenceGeneratorCanReferenceUncle()
+		{
+			var key = "a";
+			var reference = "b";
+			var value = 1;
+
+			var actual = Object(
+				(key, Constant(value)),
+				("parent", Object(
+					(reference, Reference(s => s[key]))
+				))
+			)();
+
+			Assert.That(actual["parent"][reference], Is.EqualTo(value));
 		}
 
 		[Test]
 		public void LambdaGenerateWithNoParamsReturnsResults()
 		{
 			var value = 1;
-			var actual = Lambda(() => value)(null);
+			var actual = Lambda(() => value)();
 			Assert.That(actual, Is.EqualTo(value));
 		}
 
@@ -108,7 +142,7 @@ namespace models.Tests.Reporters.Generators
 		public void LambdaGenerateWithOneParamReturnsResults()
 		{
 			var value = 2;
-			var actual = Lambda((int x) => x * x, Constant(value))(null);
+			var actual = Lambda((int x) => x * x, Constant(value))();
 			Assert.That(actual, Is.EqualTo(value * value));
 		}
 
@@ -117,7 +151,7 @@ namespace models.Tests.Reporters.Generators
 		{
 			var value1 = 1;
 			var value2 = 2;
-			var actual = Lambda((int x, int y) => x + y, Constant(value1), Constant(value2))(null);
+			var actual = Lambda((int x, int y) => x + y, Constant(value1), Constant(value2))();
 			Assert.That(actual, Is.EqualTo(value1 + value2));
 		}
 
@@ -150,7 +184,7 @@ namespace models.Tests.Reporters.Generators
 					from Refunds
 				";
 
-				var actual = Sql(NewContext().Database.GetDbConnection(), query)(null);
+				var actual = Sql(NewContext().Database.GetDbConnection(), query)();
 				Assert.That(actual[0].Amount, Is.EqualTo(refund.Amount.ToString("0.0")));
 			}
 		}
@@ -174,7 +208,7 @@ namespace models.Tests.Reporters.Generators
 					from Refunds
 					where Id = @id
 				";
-				var actual = Sql(NewContext().Database.GetDbConnection(), query, ("id", Constant(3)))(null);
+				var actual = Sql(NewContext().Database.GetDbConnection(), query, ("id", Constant(3)))();
 				Assert.That(actual[0].Amount, Is.EqualTo(refund.Amount.ToString("0.0")));
 			}
 		}
