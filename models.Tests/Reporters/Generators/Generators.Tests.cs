@@ -10,8 +10,26 @@ namespace models.Tests.Reporters.Generators
 	[TestFixture]
 	public class GeneratorsTests
 	{
+		public class TestConfig
+		{
+			public int a { get; set; }
+		}
+
 		[Test]
 		public void InputGeneratorReturnsFromInput()
+		{
+			var value = 1;
+			var input = new TestConfig
+			{
+				a = value,
+			};
+
+			var actual = Input<TestConfig>(i => i.a)(input: input);
+			Assert.That(actual, Is.EqualTo(value));
+		}
+
+		[Test]
+		public void InputGeneratorReturnsFromInputDynamic()
 		{
 			var value = 1;
 			var input = new
@@ -27,14 +45,14 @@ namespace models.Tests.Reporters.Generators
 		public void ObjectGeneratorSetsProperty()
 		{
 			var value = 1;
-			var input = new
+			var input = new TestConfig
 			{
 				a = value,
 			};
 
 			var prop = "A";
 			var actual = Object(
-				(prop, Input(i => i.a))
+				(prop, Input<TestConfig>(i => i.a))
 			)(input: input);
 
 			Assert.That(actual, Contains.Key(prop));

@@ -41,8 +41,9 @@ namespace models.Reporters.Generators
 
 		public static GeneratorFunc Constant<T>(T constant) => (_, __) => constant;
 
-		public static GeneratorFunc Input(Func<dynamic, dynamic> select) =>
-			(input, _) => select(input);
+		public static GeneratorFunc Input(Func<dynamic, dynamic> select) => (input, _) => select(input);
+
+		public static GeneratorFunc Input<T>(Func<T, dynamic> select) => (input, _) => select(input);
 
 		public static GeneratorFunc Reference(Func<IReadOnlyDictionary<string, dynamic>, dynamic> select) =>
 			(_, state) => select(state);
