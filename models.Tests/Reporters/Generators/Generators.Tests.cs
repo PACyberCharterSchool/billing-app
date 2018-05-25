@@ -1,9 +1,5 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-
-using Newtonsoft.Json;
 using NUnit.Framework;
 
 using models.Reporters.Generators;
