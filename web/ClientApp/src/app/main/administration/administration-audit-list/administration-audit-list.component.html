@@ -1,0 +1,17 @@
+<div class='row audits-title-row'>
+  <div class='col-md-12'>
+    <h4>Audits</h4>
+  </div>
+</div>
+<div class='row audits-filter-row'>
+  <div class='col-md-12'>
+    <div ngbDropdown class='d-inline-block'>
+      <button ngbDropdownToggle class='btn btn-outline-primary' id='auditTypeDropdown'>Audit Type</button>
+      <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='auditTypeDropdown'>
+        <button class='dropdown-item' *ngFor='let item of auditTypes' (click)='filterAuditType(item)'>{{item}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class='row audits-list-row'>
+</div>

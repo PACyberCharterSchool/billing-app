@@ -13,7 +13,7 @@ import {
 } from './administration-import-student-data/administration-import-student-data.component';
 import { AdministrationPaymentRateUpdateFormComponent } from './administration-payment-rate-update-form/administration-payment-rate-update-form.component';
 import { AdministrationSchoolCalendarComponent } from './administration-school-calendar/administration-school-calendar.component';
-
+import { AdministrationAuditListComponent } from './administration-audit-list/administration-audit-list.component';
 
 import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
@@ -24,7 +24,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     AdministrationHomeComponent,
     AdministrationImportStudentDataComponent,
     AdministrationPaymentRateUpdateFormComponent,
-    AdministrationSchoolCalendarComponent
+    AdministrationSchoolCalendarComponent,
+    AdministrationAuditListComponent
   ],
   imports: [
     CommonModule,

@@ -53,6 +53,9 @@ export class StudentAdvancedFilterComponent implements OnInit {
         data => {
           this.studentsUpdated.emit(data['students']);
           console.log('StudentAdvancedFilterComponent.filterStudentListByGrade(): students are ', data);
+        },
+        error => {
+          console.log('StudentAdvancedFilterComponent.filterStudentListByGrade(): error is ', error);
         }
       );
     }
@@ -64,6 +67,9 @@ export class StudentAdvancedFilterComponent implements OnInit {
         data => {
           this.studentsUpdated.emit(data['students']);
           console.log('StudentAdvancedFilterComponent.filterStudentListByDateOfBirth(): students are ', data);
+        },
+        error => {
+          console.log('StudentAdvancedFilterComponent.filterStudentListByDateOfBirth():  error is ', error);
         }
       );
     }
@@ -74,6 +80,9 @@ export class StudentAdvancedFilterComponent implements OnInit {
       data => {
         this.studentsUpdated.emit(data['students']);
         console.log('StudentAdvancedFilterComponent.filterStudentListByIep(): students are ', data);
+      },
+      error => {
+        console.log('StudentAdvancedFilterComponent.filterStudentListByIep():  error is ', error);
       }
     );
   }
