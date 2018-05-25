@@ -17,30 +17,28 @@ namespace models.Tests.Reporters.Generators
 		[Test]
 		public void InputGeneratorReturnsFromInput()
 		{
-			var key = "a";
 			var value = 1;
-			var input = new Dictionary<string, dynamic>
+			var input = new
 			{
-				{key, value},
+				a = value,
 			};
 
-			var actual = Input(i => i[key])(input: input);
+			var actual = Input(i => i.a)(input: input);
 			Assert.That(actual, Is.EqualTo(value));
 		}
 
 		[Test]
 		public void ObjectGeneratorSetsProperty()
 		{
-			var key = "a";
 			var value = 1;
-			var input = new Dictionary<string, dynamic>
+			var input = new
 			{
-				{key, value},
+				a = value,
 			};
 
 			var prop = "A";
 			var actual = Object(
-				(prop, Input(i => i[key]))
+				(prop, Input(i => i.a))
 			)(input: input);
 
 			Assert.That(actual, Contains.Key(prop));

@@ -7,7 +7,8 @@ using Dapper;
 
 namespace models.Reporters.Generators
 {
-	public delegate dynamic GeneratorFunc(Dictionary<string, dynamic> input = null, Dictionary<string, dynamic> state = null);
+	// TODO(Erik): use ExpandoObject for state?
+	public delegate dynamic GeneratorFunc(dynamic input = null, Dictionary<string, dynamic> state = null);
 
 	public static class Generator
 	{
@@ -39,7 +40,7 @@ namespace models.Reporters.Generators
 
 		public static GeneratorFunc Constant<T>(T constant) => (_, __) => constant;
 
-		public static GeneratorFunc Input(Func<IReadOnlyDictionary<string, dynamic>, dynamic> select) =>
+		public static GeneratorFunc Input(Func<dynamic, dynamic> select) =>
 			(input, _) => select(input);
 
 		public static GeneratorFunc Reference(Func<IReadOnlyDictionary<string, dynamic>, dynamic> select) =>
