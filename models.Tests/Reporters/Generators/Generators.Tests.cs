@@ -49,9 +49,9 @@ namespace models.Tests.Reporters.Generators
 		public void ReferenceGeneratorReturnsFromState()
 		{
 			var value = 1;
-			var state = new Dictionary<string, dynamic>
+			var state = new State
 			{
-				{"a", new Dictionary<string, dynamic>
+				{"a", new State
 				{
 					{"b", value},
 				}},

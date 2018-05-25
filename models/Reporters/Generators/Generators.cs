@@ -7,28 +7,29 @@ using Dapper;
 
 namespace models.Reporters.Generators
 {
-	// TODO(Erik): use ExpandoObject for state?
-	public delegate dynamic GeneratorFunc(dynamic input = null, Dictionary<string, dynamic> state = null);
+	public class State : Dictionary<string, dynamic> { }
+
+	public delegate dynamic GeneratorFunc(dynamic input = null, State state = null);
 
 	public static class Generator
 	{
 		public static GeneratorFunc Object(params (string Key, GeneratorFunc Generate)[] properties) => (input, state) =>
 		{
-			var next = new Dictionary<string, dynamic>();
+			var next = new State();
 			foreach (var property in properties)
 				next.Add(property.Key, property.Generate);
 
-			void Expand(Dictionary<string, dynamic> d)
+			void Expand(State s)
 			{
-				var keys = d.Keys.ToArray();
+				var keys = s.Keys.ToArray();
 				for (var i = 0; i < keys.Length; i++)
 				{
 					var key = keys[i];
-					if (d[key] is GeneratorFunc)
-						d[key] = d[key](input, next); // pass down top-level state
+					if (s[key] is GeneratorFunc)
+						s[key] = s[key](input, next); // pass down top-level state
 
-					if (d[key] is Dictionary<string, dynamic>)
-						Expand(d[key]);
+					if (s[key] is State)
+						Expand(s[key]);
 				}
 			}
 
@@ -64,8 +65,9 @@ namespace models.Reporters.Generators
 		public static GeneratorFunc Lambda<T1, T2, R>(Func<T1, T2, R> lambda, params GeneratorFunc[] generators) =>
 			Lambda(lambda as Delegate, generators);
 
-		public static GeneratorFunc Sql(IDbConnection db, string query, params (string Key, GeneratorFunc Generator)[] properties)
-		 => (input, state) =>
+		public static GeneratorFunc Sql(
+			IDbConnection db, string query,
+			params (string Key, GeneratorFunc Generator)[] properties) => (input, state) =>
 		{
 			var args = new Dictionary<string, dynamic>();
 			foreach (var property in properties)
