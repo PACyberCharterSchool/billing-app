@@ -66,6 +66,9 @@ namespace models.Reporters.Generators
 		public static GeneratorFunc Lambda<T1, T2, R>(Func<T1, T2, R> lambda, params GeneratorFunc[] generators) =>
 			Lambda(lambda as Delegate, generators);
 
+		public static GeneratorFunc Lambda<T1, T2, T3, R>(Func<T1, T2, T3, R> lambda, params GeneratorFunc[] generators) =>
+			Lambda(lambda as Delegate, generators);
+
 		private static Dictionary<string, dynamic> SqlArgs(
 			dynamic input, State state,
 			params (string Key, GeneratorFunc Generator)[] properties)
