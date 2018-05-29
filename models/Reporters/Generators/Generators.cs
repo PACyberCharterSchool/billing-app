@@ -66,25 +66,32 @@ namespace models.Reporters.Generators
 		public static GeneratorFunc Lambda<T1, T2, R>(Func<T1, T2, R> lambda, params GeneratorFunc[] generators) =>
 			Lambda(lambda as Delegate, generators);
 
-		// TODO(Erik): Single values?
-		public static GeneratorFunc Sql(
-			IDbConnection db, string query,
-			params (string Key, GeneratorFunc Generator)[] properties) => (input, state) =>
+		private static Dictionary<string, dynamic> SqlArgs(
+			dynamic input, State state,
+			params (string Key, GeneratorFunc Generator)[] properties)
 		{
 			var args = new Dictionary<string, dynamic>();
 			foreach (var property in properties)
 				args.Add(property.Key, property.Generator(input, state));
-			return db.Query<dynamic>(query, args);
-		};
+			return args;
+		}
 
-		public static GeneratorFunc Sql<T>(
+		public static GeneratorFunc SqlList<T>(
 			IDbConnection db, string query,
 			params (string Key, GeneratorFunc Generator)[] properties) => (input, state) =>
-		{
-			var args = new Dictionary<string, dynamic>();
-			foreach (var property in properties)
-				args.Add(property.Key, property.Generator(input, state));
-			return db.Query<T>(query, args);
-		};
+				db.Query<T>(query, SqlArgs(input, state, properties) as Dictionary<string, dynamic>);
+
+		public static GeneratorFunc SqlList(
+			IDbConnection db, string query,
+			params (string Key, GeneratorFunc Generator)[] properties) => SqlList<dynamic>(db, query, properties);
+
+		public static GeneratorFunc SqlObject<T>(
+			IDbConnection db, string query,
+			params (string Key, GeneratorFunc Generator)[] properties) => (input, state) =>
+				db.Query<T>(query, SqlArgs(input, state, properties) as Dictionary<string, dynamic>).SingleOrDefault();
+
+		public static GeneratorFunc SqlObject(
+			IDbConnection db, string query,
+			params (string Key, GeneratorFunc Generator)[] properties) => SqlObject<dynamic>(db, query, properties);
 	}
 }

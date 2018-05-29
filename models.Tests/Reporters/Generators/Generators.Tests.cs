@@ -179,7 +179,7 @@ namespace models.Tests.Reporters.Generators
 		}
 
 		[Test]
-		public void SqlGeneratorReturnsQueryWithoutArgs()
+		public void SqlListGeneratorReturnsQueryWithoutArgs()
 		{
 			using (_conn)
 			{
@@ -196,13 +196,13 @@ namespace models.Tests.Reporters.Generators
 					from Refunds
 				";
 
-				var actual = Sql(NewContext().Database.GetDbConnection(), query)();
+				var actual = SqlList(NewContext().Database.GetDbConnection(), query)();
 				Assert.That(actual[0].Amount, Is.EqualTo(refund.Amount.ToString("0.0")));
 			}
 		}
 
 		[Test]
-		public void SqlGeneratorReturnsQueryWithArgs()
+		public void SqlListGeneratorReturnsQueryWithArgs()
 		{
 			using (_conn)
 			{
@@ -220,13 +220,37 @@ namespace models.Tests.Reporters.Generators
 					from Refunds
 					where Id = @id
 				";
-				var actual = Sql(NewContext().Database.GetDbConnection(), query, ("id", Constant(3)))();
+				var actual = SqlList(NewContext().Database.GetDbConnection(), query, properties: ("id", Constant(3)))();
 				Assert.That(actual[0].Amount, Is.EqualTo(refund.Amount.ToString("0.0")));
 			}
 		}
 
 		[Test]
-		public void SqlGeneratorReturnsStronglyTyped()
+		public void SqlObjectGeneratorReturns()
+		{
+			using (_conn)
+			{
+				_conn.Open();
+				var refund = new Refund
+				{
+					Id = 3,
+					Amount = 10m,
+				};
+				using (var ctx = NewContext())
+					ctx.SaveChanges(() => ctx.Add(refund));
+
+				var query = @"
+					select *
+					from Refunds
+					where Id = @id
+				";
+				var actual = SqlObject(NewContext().Database.GetDbConnection(), query, properties: ("id", Constant(3)))();
+				Assert.That(actual.Amount, Is.EqualTo(refund.Amount.ToString("0.0")));
+			}
+		}
+
+		[Test]
+		public void SqlListGeneratorReturnsStronglyTyped()
 		{
 			using (_conn)
 			{
@@ -243,9 +267,36 @@ namespace models.Tests.Reporters.Generators
 					from Refunds
 					where Id = @id
 				";
-				var actual = Sql<Refund>(NewContext().Database.GetDbConnection(), query, ("id", Constant(refund.Id)))();
+				var actual = SqlList<Refund>(NewContext().Database.GetDbConnection(), query, properties: ("id", Constant(refund.Id)))();
 				Assert.That(actual[0], Is.TypeOf<Refund>());
 				Assert.That(actual[0].Amount, Is.EqualTo(refund.Amount));
+			}
+		}
+
+		[Test]
+		public void SqlObjectGeneratorReturnsStronglyTyped()
+		{
+			using (_conn)
+			{
+				_conn.Open();
+				var refund = new Refund
+				{
+					Amount = 10m,
+				};
+				using (var ctx = NewContext())
+					ctx.SaveChanges(() => ctx.Add(refund));
+
+				var query = @"
+					select *
+					from Refunds
+					where Id = @id
+				";
+				var actual = SqlObject<Refund>(
+					NewContext().Database.GetDbConnection(),
+					query,
+					("id", Constant(refund.Id)))();
+				Assert.That(actual, Is.TypeOf<Refund>());
+				Assert.That(actual.Amount, Is.EqualTo(refund.Amount));
 			}
 		}
 	}
