@@ -66,6 +66,7 @@ namespace models.Reporters.Generators
 		public static GeneratorFunc Lambda<T1, T2, R>(Func<T1, T2, R> lambda, params GeneratorFunc[] generators) =>
 			Lambda(lambda as Delegate, generators);
 
+		// TODO(Erik): Single values?
 		public static GeneratorFunc Sql(
 			IDbConnection db, string query,
 			params (string Key, GeneratorFunc Generator)[] properties) => (input, state) =>
@@ -74,6 +75,16 @@ namespace models.Reporters.Generators
 			foreach (var property in properties)
 				args.Add(property.Key, property.Generator(input, state));
 			return db.Query<dynamic>(query, args);
+		};
+
+		public static GeneratorFunc Sql<T>(
+			IDbConnection db, string query,
+			params (string Key, GeneratorFunc Generator)[] properties) => (input, state) =>
+		{
+			var args = new Dictionary<string, dynamic>();
+			foreach (var property in properties)
+				args.Add(property.Key, property.Generator(input, state));
+			return db.Query<T>(query, args);
 		};
 	}
 }

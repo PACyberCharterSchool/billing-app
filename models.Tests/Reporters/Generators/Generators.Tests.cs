@@ -224,5 +224,29 @@ namespace models.Tests.Reporters.Generators
 				Assert.That(actual[0].Amount, Is.EqualTo(refund.Amount.ToString("0.0")));
 			}
 		}
+
+		[Test]
+		public void SqlGeneratorReturnsStronglyTyped()
+		{
+			using (_conn)
+			{
+				_conn.Open();
+				var refund = new Refund
+				{
+					Amount = 10m,
+				};
+				using (var ctx = NewContext())
+					ctx.SaveChanges(() => ctx.Add(refund));
+
+				var query = @"
+					select *
+					from Refunds
+					where Id = @id
+				";
+				var actual = Sql<Refund>(NewContext().Database.GetDbConnection(), query, ("id", Constant(refund.Id)))();
+				Assert.That(actual[0], Is.TypeOf<Refund>());
+				Assert.That(actual[0].Amount, Is.EqualTo(refund.Amount));
+			}
+		}
 	}
 }
