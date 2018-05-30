@@ -141,7 +141,7 @@ namespace models.Tests.Reporters
 			});
 
 			Console.WriteLine($"actual: {JsonConvert.SerializeObject(actual, Formatting.Indented)}");
-			Assert.Fail("output");
+			// Assert.Fail("output");
 		}
 	}
 }

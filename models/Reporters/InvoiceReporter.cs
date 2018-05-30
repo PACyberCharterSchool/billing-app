@@ -79,14 +79,19 @@ namespace models.Reporters
 			GeneratorFunc secondYear,
 			bool isSpecial)
 		{
-			// TODO(Erik): drop Enrollments view and use CommittedStudentStatusRecords directly?
 			string EnrollmentCount(string month) =>
 				$@"SELECT COUNT(*)
-					FROM Enrollments
-					WHERE Aun = @Aun
-					AND IsSpecialEducation = @IsSpecial
-					AND StartDate <= @End{month}
-					AND (EndDate IS NULL OR (StartDate != EndDate AND EndDate >= @{month}))";
+					FROM CommittedStudentStatusRecords
+					WHERE SchoolDistrictId = @Aun
+					AND StudentIsSpecialEducation = @IsSpecial
+					AND StudentEnrollmentDate <= @End{month}
+					AND (
+						StudentWithdrawalDate IS NULL
+						OR (
+							StudentEnrollmentDate != StudentWithdrawalDate
+							AND StudentWithdrawalDate >= @{month}
+						)
+					)";
 
 			var sb = new StringBuilder();
 			sb.AppendLine("SELECT ");
@@ -113,8 +118,6 @@ namespace models.Reporters
 
 		private static decimal CalculateAmountDue(Enrollments enrollments, decimal rate)
 		{
-			Console.WriteLine($"enrollments: {enrollments}");
-
 			var sum = 0;
 			foreach (var month in _months)
 			{
