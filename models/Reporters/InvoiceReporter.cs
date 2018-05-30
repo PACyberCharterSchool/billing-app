@@ -29,13 +29,12 @@ namespace models.Reporters
 		}
 
 		private static GeneratorFunc GetSchoolDistrict(IDbConnection conn, GeneratorFunc aun) =>
-			// TODO(Erik): return alternate rate instead of rate if exists
 			SqlObject<SchoolDistrict>(conn, @"
 				SELECT
 					Id,
 					Aun,
 					Name,
-					Rate AS RegularRate,
+					COALESCE(AlternateRate, Rate) AS RegularRate,
 					SpecialEducationRate AS SpecialRate
 				FROM SchoolDistricts
 				WHERE Aun = @Aun",
@@ -75,7 +74,7 @@ namespace models.Reporters
 		private static DateTime EndOfMonth(int year, int month) =>
 			new DateTime(year, month, DateTime.DaysInMonth(year, month));
 
-		// TODO(Erik): 0 for future months
+		// TODO(Erik): 0 beyond "as of" date
 		private static GeneratorFunc GetEnrollments(
 			IDbConnection conn,
 			GeneratorFunc aun,
@@ -383,7 +382,7 @@ namespace models.Reporters
 					start: Lambda((string year) => new DateTime(int.Parse(year), 7, 1),
 						Reference(s => s["FirstYear"])
 					),
-					// TODO(Erik): end of current month
+					// TODO(Erik): end of "as of" month
 					end: Lambda((string year) => EndOfMonth(int.Parse(year), 6),
 						Reference(s => s["SecondYear"])
 					)
@@ -391,6 +390,7 @@ namespace models.Reporters
 			);
 		}
 
+		// TODO(Erik): "as of" date?
 		public dynamic GenerateReport(Config config) => BuildGenerator()(input: config);
 	}
 }
