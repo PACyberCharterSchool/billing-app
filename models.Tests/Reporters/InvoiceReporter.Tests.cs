@@ -51,6 +51,7 @@ namespace models.Tests.Reporters
 				Aun = aun,
 				Name = "Some SD",
 				Rate = 1.23m,
+				SpecialEducationRate = 2.46m,
 			};
 			using (var ctx = NewContext())
 			{

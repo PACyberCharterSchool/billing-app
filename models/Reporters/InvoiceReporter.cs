@@ -30,9 +30,13 @@ namespace models.Reporters
 
 		private static GeneratorFunc GetSchoolDistrict(IDbConnection conn, GeneratorFunc aun) =>
 			// TODO(Erik): return alternate rate instead of rate if exists
-			// TODO(Erik): SpecialEducationRate
 			SqlObject<SchoolDistrict>(conn, @"
-				SELECT Id, Aun, Name, Rate AS RegularRate
+				SELECT
+					Id,
+					Aun,
+					Name,
+					Rate AS RegularRate,
+					SpecialEducationRate AS SpecialRate
 				FROM SchoolDistricts
 				WHERE Aun = @Aun",
 				("Aun", aun));
