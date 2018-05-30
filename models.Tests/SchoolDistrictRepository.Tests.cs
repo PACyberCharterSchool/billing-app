@@ -121,6 +121,7 @@ namespace models.Tests
 				Name = "Bob",
 				Rate = 1.0m,
 				AlternateRate = null,
+				SpecialEducationRate = 2.0m,
 				PaymentType = SchoolDistrictPaymentType.Ach,
 			};
 
@@ -131,6 +132,7 @@ namespace models.Tests
 			Assert.That(actual.Name, Is.EqualTo(district.Name));
 			Assert.That(actual.Rate, Is.EqualTo(district.Rate));
 			Assert.That(actual.AlternateRate, Is.EqualTo(district.AlternateRate));
+			Assert.That(actual.SpecialEducationRate, Is.EqualTo(district.SpecialEducationRate));
 			Assert.That(actual.Created, Is.EqualTo(time));
 			Assert.That(actual.LastUpdated, Is.EqualTo(time));
 		}
@@ -147,6 +149,7 @@ namespace models.Tests
 				Name = "Bob",
 				Rate = 1.0m,
 				AlternateRate = null,
+				SpecialEducationRate = 2.0m,
 				PaymentType = SchoolDistrictPaymentType.Ach,
 				LastUpdated = time.AddDays(-1),
 			};
@@ -157,6 +160,7 @@ namespace models.Tests
 			district.Name = "Charlie";
 			district.Rate = 2.0m;
 			district.AlternateRate = 3.0m;
+			district.SpecialEducationRate = 4.0m;
 			district.PaymentType = SchoolDistrictPaymentType.Check;
 			_context.SaveChanges(() => _uut.CreateOrUpdate(district));
 
@@ -164,6 +168,7 @@ namespace models.Tests
 			Assert.That(actual.Name, Is.EqualTo(district.Name));
 			Assert.That(actual.Rate, Is.EqualTo(district.Rate));
 			Assert.That(actual.AlternateRate, Is.EqualTo(district.AlternateRate));
+			Assert.That(actual.SpecialEducationRate, Is.EqualTo(district.SpecialEducationRate));
 			Assert.That(actual.PaymentType, Is.EqualTo(district.PaymentType));
 			Assert.That(actual.LastUpdated.Date, Is.EqualTo(time.Date));
 		}
@@ -178,6 +183,7 @@ namespace models.Tests
 				Name = "Bob",
 				Rate = 1.0m,
 				AlternateRate = null,
+				SpecialEducationRate = 2.0m,
 				PaymentType = SchoolDistrictPaymentType.Ach,
 			};
 			_context.Add(district);
@@ -189,6 +195,7 @@ namespace models.Tests
 				Name = "Charlie",
 				Rate = 2.0m,
 				AlternateRate = 3.0m,
+				SpecialEducationRate = 4.0m,
 				PaymentType = SchoolDistrictPaymentType.Check,
 			};
 			_context.SaveChanges(() => _uut.CreateOrUpdate(updated));
@@ -198,6 +205,7 @@ namespace models.Tests
 			Assert.That(actual.Name, Is.EqualTo(updated.Name));
 			Assert.That(actual.Rate, Is.EqualTo(updated.Rate));
 			Assert.That(actual.AlternateRate, Is.EqualTo(updated.AlternateRate));
+			Assert.That(actual.SpecialEducationRate, Is.EqualTo(updated.SpecialEducationRate));
 			Assert.That(actual.PaymentType, Is.EqualTo(updated.PaymentType));
 		}
 	}

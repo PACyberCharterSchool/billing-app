@@ -40,6 +40,7 @@ namespace api.Tests.Controllers
 			Assert.That(actual.Name, Is.EqualTo(district.Name));
 			Assert.That(actual.Rate, Is.EqualTo(district.Rate));
 			Assert.That(actual.AlternateRate, Is.EqualTo(district.AlternateRate));
+			Assert.That(actual.SpecialEducationRate, Is.EqualTo(district.SpecialEducationRate));
 			Assert.That(actual.PaymentType, Is.EqualTo(district.PaymentType));
 			Assert.That(actual.Created, Is.EqualTo(district.Created));
 			Assert.That(actual.LastUpdated, Is.EqualTo(district.LastUpdated));

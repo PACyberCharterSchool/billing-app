@@ -13,6 +13,7 @@ namespace api.Dtos
 		public string Name { get; set; }
 		public decimal Rate { get; set; }
 		public decimal? AlternateRate { get; set; }
+		public decimal SpecialEducationRate { get; set; }
 
 		[JsonConverter(typeof(SchoolDistrictPaymentTypeJsonConverter))]
 		public SchoolDistrictPaymentType PaymentType { get; set; }
@@ -27,6 +28,7 @@ namespace api.Dtos
 			this.Name = model.Name;
 			this.Rate = model.Rate;
 			this.AlternateRate = model.AlternateRate;
+			this.SpecialEducationRate = model.SpecialEducationRate;
 			this.PaymentType = model.PaymentType;
 			this.Created = model.Created;
 			this.LastUpdated = model.LastUpdated;
