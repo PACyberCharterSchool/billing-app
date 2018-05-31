@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Newtonsoft.Json;
@@ -51,9 +52,7 @@ namespace models.Tests.Reporters
 				Aun = aun,
 				Name = "Some SD",
 				Rate = 10000m,
-				// TODO(Erik): AlternateRate = 5m,
 				SpecialEducationRate = 20000m,
-				// TODO(Erik): AlternateSpecialEducationRate = 10m,
 			};
 
 			var statuses = new[] {
@@ -313,6 +312,185 @@ namespace models.Tests.Reporters
 					Assert.That(student.FormerIep, Is.EqualTo(status.StudentFormerIep));
 				}
 			}
+		}
+
+		[Test]
+		public void GenerateReportUsesAlternateRates()
+		{
+			var schoolDistrict = new SchoolDistrict
+			{
+				Aun = 1234567890,
+				Name = "Some SD",
+				Rate = 1m,
+				AlternateRate = 10000m,
+				SpecialEducationRate = 5m,
+				AlternateSpecialEducationRate = 50000m,
+			};
+
+			using (var ctx = NewContext())
+			{
+				ctx.Add(schoolDistrict);
+				ctx.SaveChanges();
+			}
+
+			var time = new DateTime(2018, 2, 1);
+			var config = new InvoiceReporter.Config
+			{
+				InvoiceNumber = "1234567890",
+				SchoolYear = "2017-2018",
+				AsOf = time,
+				Prepared = time.AddDays(5),
+				ToSchoolDistrict = time.AddDays(10),
+				ToPDE = time.AddDays(20),
+				SchoolDistrictAun = schoolDistrict.Aun,
+			};
+			var actual = _uut.GenerateReport(config);
+
+			Console.WriteLine($"actual: {JsonConvert.SerializeObject(actual, Formatting.Indented)}");
+
+			Assert.That(actual["SchoolDistrict"], Is.Not.Null);
+			var district = actual["SchoolDistrict"] as InvoiceReporter.SchoolDistrict;
+			Assert.That(district.RegularRate, Is.EqualTo(schoolDistrict.AlternateRate));
+			Assert.That(district.SpecialRate, Is.EqualTo(schoolDistrict.AlternateSpecialEducationRate));
+		}
+
+		[Test]
+		public void GenerateReportDoesNotIncludeOptOuts()
+		{
+			var schoolDistrict = new SchoolDistrict
+			{
+				Aun = 1234567890,
+				Name = "Some SD",
+				Rate = 10000m,
+				SpecialEducationRate = 20000m,
+			};
+
+			var statuses = new[] {
+				new CommittedStudentStatusRecord
+				{
+					StudentId = "123456",
+					StudentPaSecuredId = 1234567890,
+					SchoolDistrictId = schoolDistrict.Aun,
+					StudentFirstName = "Alice",
+					StudentMiddleInitial = "B",
+					StudentLastName = "Charlie",
+					StudentStreet1 = "Somewhere",
+					StudentCity = "Over The Rainbow",
+					StudentState = "PA",
+					StudentZipCode = "15000",
+					StudentGradeLevel = "K",
+					StudentDateOfBirth = new DateTime(2012, 7, 1),
+					StudentEnrollmentDate = new DateTime(2017, 7, 1),
+					StudentWithdrawalDate = new DateTime(2017, 7, 1),
+					StudentIsSpecialEducation = false,
+				}
+			};
+
+			using (var ctx = NewContext())
+			{
+				ctx.Add(schoolDistrict);
+				ctx.AddRange(statuses);
+				ctx.SaveChanges();
+			}
+
+			var time = new DateTime(2018, 2, 1);
+			var config = new InvoiceReporter.Config
+			{
+				InvoiceNumber = "1234567890",
+				SchoolYear = "2017-2018",
+				AsOf = time,
+				Prepared = time.AddDays(5),
+				ToSchoolDistrict = time.AddDays(10),
+				ToPDE = time.AddDays(20),
+				SchoolDistrictAun = schoolDistrict.Aun,
+			};
+			var actual = _uut.GenerateReport(config);
+
+			Console.WriteLine($"actual: {JsonConvert.SerializeObject(actual, Formatting.Indented)}");
+
+			Assert.That(actual["RegularEnrollments"], Is.Not.Null);
+			var enrollments = actual["RegularEnrollments"] as InvoiceReporter.Enrollments;
+			foreach (var property in enrollments.GetType().GetProperties())
+			{
+				var value = property.GetValue(enrollments);
+				Assert.That(value, Is.EqualTo(0));
+			}
+
+			Assert.That(actual["Students"], Has.Count.EqualTo(0));
+		}
+
+		[Test]
+		public void GenerateReportOrdersStudentByName()
+		{
+			var schoolDistrict = new SchoolDistrict
+			{
+				Aun = 1234567890,
+				Name = "Some SD",
+				Rate = 10000m,
+				SpecialEducationRate = 20000m,
+			};
+
+			var statuses = new[] {
+				new CommittedStudentStatusRecord { // fourth
+					StudentPaSecuredId = 1234567890,
+					SchoolDistrictId = schoolDistrict.Aun,
+					StudentFirstName = "B",
+					StudentMiddleInitial = "C",
+					StudentLastName = "D",
+				},
+				new CommittedStudentStatusRecord { // first
+					StudentPaSecuredId = 2345678901,
+					SchoolDistrictId = schoolDistrict.Aun,
+					StudentFirstName = "B",
+					StudentMiddleInitial = "C",
+					StudentLastName = "A",
+				},
+				new CommittedStudentStatusRecord { // third
+					StudentPaSecuredId = 3456789012,
+					SchoolDistrictId = schoolDistrict.Aun,
+					StudentFirstName = "B",
+					StudentMiddleInitial = "A",
+					StudentLastName = "D"
+				},
+				new CommittedStudentStatusRecord { // second
+					StudentPaSecuredId = 4567890123,
+					SchoolDistrictId = schoolDistrict.Aun,
+					StudentFirstName = "A",
+					StudentMiddleInitial = "C",
+					StudentLastName = "D",
+				},
+			};
+
+			using (var ctx = NewContext())
+			{
+				ctx.Add(schoolDistrict);
+				ctx.AddRange(statuses);
+				ctx.SaveChanges();
+			}
+
+			var time = new DateTime(2018, 2, 1);
+			var config = new InvoiceReporter.Config
+			{
+				InvoiceNumber = "1234567890",
+				SchoolYear = "2017-2018",
+				AsOf = time,
+				Prepared = time.AddDays(5),
+				ToSchoolDistrict = time.AddDays(10),
+				ToPDE = time.AddDays(20),
+				SchoolDistrictAun = schoolDistrict.Aun,
+			};
+			var actual = _uut.GenerateReport(config);
+
+			Console.WriteLine($"actual: {JsonConvert.SerializeObject(actual, Formatting.Indented)}");
+
+			Assert.That(actual["Students"], Is.Not.Null);
+			Assert.That(actual["Students"], Has.Count.EqualTo(4));
+			var students = (actual["Students"] as IEnumerable<InvoiceReporter.Student>).ToArray();
+
+			Assert.That(students[0].PASecuredID, Is.EqualTo(statuses[1].StudentPaSecuredId));
+			Assert.That(students[1].PASecuredID, Is.EqualTo(statuses[3].StudentPaSecuredId));
+			Assert.That(students[2].PASecuredID, Is.EqualTo(statuses[2].StudentPaSecuredId));
+			Assert.That(students[3].PASecuredID, Is.EqualTo(statuses[0].StudentPaSecuredId));
 		}
 	}
 }

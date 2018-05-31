@@ -214,9 +214,6 @@ namespace models.Reporters
 			var payments = new List<Payment>();
 			foreach (var month in _months)
 			{
-				if (!transactions.ContainsKey(month.Name) || transactions[month.Name] == null)
-					continue;
-
 				var transaction = transactions[month.Name] as State;
 				if (!transaction.ContainsKey(key) || transaction[key] == null)
 					continue;
@@ -238,13 +235,7 @@ namespace models.Reporters
 			var refunds = new List<decimal>();
 			foreach (var month in _months)
 			{
-				if (!transactions.ContainsKey(month.Name) || transactions[month.Name] == null)
-					continue;
-
 				var transaction = transactions[month.Name] as State;
-				if (!transaction.ContainsKey(key) || transaction[key] == null)
-					continue;
-
 				refunds.Add(transaction[key]);
 			}
 
