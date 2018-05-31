@@ -127,8 +127,7 @@ namespace models.Reporters
 				args.Add(($"End{month.Name}", endDate));
 			}
 
-			var query = sb.ToString().TrimEnd(", \n".ToCharArray());
-			Console.WriteLine($"query: {query}");
+			var query = sb.ToString().Trim().TrimEnd(',');
 
 			return SqlObject<Enrollments>(conn, query, args.ToArray());
 		}
