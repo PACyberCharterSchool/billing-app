@@ -141,8 +141,7 @@ namespace models.Reporters
 				sum += (int)property.GetValue(enrollments);
 			}
 
-			// TODO(Erik): round to nearest $0.01
-			return (sum * rate) / 12;
+			return Decimal.Round((sum * rate) / 12, 2, MidpointRounding.ToEven);
 		}
 
 		private class Payment
@@ -229,7 +228,7 @@ namespace models.Reporters
 				payments.Add(transaction[key] as Payment);
 			}
 
-			return payments.Sum(p => p.Amount);
+			return Decimal.Round(payments.Sum(p => p.Amount), 2, MidpointRounding.ToEven);
 		}
 
 		private static decimal CalculateRefunded(dynamic transactions)
@@ -249,7 +248,7 @@ namespace models.Reporters
 				refunds.Add(transaction[key]);
 			}
 
-			return refunds.Sum();
+			return Decimal.Round(refunds.Sum(), 2, MidpointRounding.ToEven);
 		}
 
 		private class Student
@@ -368,7 +367,7 @@ namespace models.Reporters
 					)
 				),
 				("TotalDue",
-					Lambda((decimal regular, decimal special) => regular + special,
+					Lambda((decimal regular, decimal special) => Decimal.Round(regular + special, 2, MidpointRounding.ToEven),
 						Reference(s => s["DueForRegular"]),
 						Reference(s => s["DueForSpecial"])
 					)
@@ -390,7 +389,7 @@ namespace models.Reporters
 					)
 				),
 				("TotalPaid",
-					Lambda((decimal check, decimal unipay) => check + unipay,
+					Lambda((decimal check, decimal unipay) => Decimal.Round(check + unipay, 2, MidpointRounding.ToEven),
 						Reference(s => s["PaidByCheck"]),
 						Reference(s => s["PaidByUniPay"])
 					)
@@ -402,7 +401,7 @@ namespace models.Reporters
 				),
 				// TODO(Erik): less refunded?
 				("NetDue",
-					Lambda((decimal due, decimal paid) => due - paid,
+					Lambda((decimal due, decimal paid) => Decimal.Round(due - paid, 2, MidpointRounding.ToEven),
 						Reference(s => s["TotalDue"]),
 						Reference(s => s["TotalPaid"])
 					)
