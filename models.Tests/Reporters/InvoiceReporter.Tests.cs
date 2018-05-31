@@ -89,6 +89,7 @@ namespace models.Tests.Reporters
 					StudentEnrollmentDate = new DateTime(2017, 7, 1),
 					StudentWithdrawalDate = new DateTime(2017, 8, 1),
 					StudentCurrentIep = new DateTime(2017, 7, 1),
+					StudentFormerIep = new DateTime(2016, 8, 1),
 					StudentIsSpecialEducation = true,
 				},
 			};
