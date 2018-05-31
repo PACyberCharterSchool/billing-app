@@ -35,7 +35,7 @@ namespace models.Reporters
 					Aun,
 					Name,
 					COALESCE(AlternateRate, Rate) AS RegularRate,
-					SpecialEducationRate AS SpecialRate
+					COALESCE(AlternateSpecialEducationRate, SpecialEducationRate) AS SpecialRate
 				FROM SchoolDistricts
 				WHERE Aun = @Aun",
 				("Aun", aun));
