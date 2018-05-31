@@ -135,6 +135,7 @@ namespace models.Tests.Reporters
 			{
 				InvoiceNumber = "1234567890",
 				SchoolYear = schoolYear,
+				AsOf = time,
 				Prepared = time,
 				ToSchoolDistrict = time.AddDays(1),
 				ToPDE = time.AddDays(10),

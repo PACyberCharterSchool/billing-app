@@ -71,12 +71,15 @@ namespace models.Reporters
 			public int June { get; set; }
 		}
 
+		private static bool IsBeforeAsOf(DateTime asOf, int month) =>
+			month >= 7 && month >= asOf.Month || month < 7 && month <= asOf.Month;
+
 		private static DateTime EndOfMonth(int year, int month) =>
 			new DateTime(year, month, DateTime.DaysInMonth(year, month));
 
-		// TODO(Erik): 0 beyond "as of" date
 		private static GeneratorFunc GetEnrollments(
 			IDbConnection conn,
+			DateTime asOf,
 			GeneratorFunc aun,
 			GeneratorFunc firstYear,
 			GeneratorFunc secondYear,
@@ -98,16 +101,22 @@ namespace models.Reporters
 
 			var sb = new StringBuilder();
 			sb.AppendLine("SELECT ");
-			foreach (var month in _months)
-				sb.AppendLine($"({EnrollmentCount(month.Name)}) AS {month.Name}{(month.Name != "June" ? ", " : "")}");
-			var query = sb.ToString();
 
 			var args = new List<(string Key, GeneratorFunc Generator)> {
 				("Aun", aun),
 				("IsSpecial", Constant(isSpecial)),
 			};
+
 			foreach (var month in _months)
 			{
+				if (!IsBeforeAsOf(asOf, month.Number))
+				{
+					sb.AppendLine($"0 AS {month.Name}, ");
+					continue;
+				}
+
+				sb.AppendLine($"({EnrollmentCount(month.Name)}) AS {month.Name}, ");
+
 				var startDate = Lambda((string year) => new DateTime(int.Parse(year), month.Number, 1),
 					month.Number >= 7 ? firstYear : secondYear);
 
@@ -117,6 +126,8 @@ namespace models.Reporters
 				args.Add((month.Name, startDate));
 				args.Add(($"End{month.Name}", endDate));
 			}
+
+			var query = sb.ToString().TrimEnd(new[] { ',', ' ', '\n' });
 
 			return SqlObject<Enrollments>(conn, query, args.ToArray());
 		}
@@ -142,7 +153,9 @@ namespace models.Reporters
 			public DateTime Date { get; set; }
 		}
 
-		private static GeneratorFunc GetTransactions(IDbConnection conn,
+		private static GeneratorFunc GetTransactions(
+			IDbConnection conn,
+			DateTime asOf,
 			GeneratorFunc schoolDistrictId,
 			GeneratorFunc schoolYear,
 			GeneratorFunc firstYear,
@@ -151,38 +164,45 @@ namespace models.Reporters
 			var generators = new List<(string Key, GeneratorFunc Generator)>();
 			foreach (var month in _months)
 			{
+				if (!IsBeforeAsOf(asOf, month.Number))
+				{
+					generators.Add((month.Name, Object(
+						("Payment", Constant<Payment>(null)),
+						("Refund", Constant(0m))
+					)));
+					continue;
+				}
+
 				var startDate = Lambda((string year) => new DateTime(int.Parse(year), month.Number, 1),
 					month.Number >= 7 ? firstYear : secondYear);
 
 				var endDate = Lambda((string year) => EndOfMonth(int.Parse(year), month.Number),
 					month.Number >= 7 ? firstYear : secondYear);
 
-				generators.Add(
-					(month.Name, Object(
-						("Payment", SqlObject<Payment>(conn, @"
-							SELECT Type, ExternalId AS CheckNumber, Amount, Date
-							FROM Payments
-							WHERE SchoolDistrictId = @SchoolDistrictId
-							AND SchoolYear = @SchoolYear
-							AND (Date >= @StartDate AND Date <= @EndDate)",
-							("SchoolDistrictId", schoolDistrictId),
-							("SchoolYear", schoolYear),
-							("StartDate", startDate),
-							("EndDate", endDate)
-						)),
-						("Refund", SqlObject<decimal>(conn, @"
-							SELECT Amount
-							From Refunds
-							WHERE SchoolDistrictId = @SchoolDistrictId
-							AND SchoolYear = @SchoolYear
-							AND (Date >= @StartDate AND Date <= @EndDate)",
-							("SchoolDistrictId", schoolDistrictId),
-							("SchoolYear", schoolYear),
-							("StartDate", startDate),
-							("EndDate", endDate)
-						))
+				generators.Add((month.Name, Object(
+					("Payment", SqlObject<Payment>(conn, @"
+						SELECT Type, ExternalId AS CheckNumber, Amount, Date
+						FROM Payments
+						WHERE SchoolDistrictId = @SchoolDistrictId
+						AND SchoolYear = @SchoolYear
+						AND (Date >= @StartDate AND Date <= @EndDate)",
+						("SchoolDistrictId", schoolDistrictId),
+						("SchoolYear", schoolYear),
+						("StartDate", startDate),
+						("EndDate", endDate)
+					)),
+					("Refund", SqlObject<decimal>(conn, @"
+						SELECT Amount
+						From Refunds
+						WHERE SchoolDistrictId = @SchoolDistrictId
+						AND SchoolYear = @SchoolYear
+						AND (Date >= @StartDate AND Date <= @EndDate)",
+						("SchoolDistrictId", schoolDistrictId),
+						("SchoolYear", schoolYear),
+						("StartDate", startDate),
+						("EndDate", endDate)
 					))
-				);
+				)));
 			}
 
 			return Object(generators.ToArray());
@@ -195,6 +215,9 @@ namespace models.Reporters
 			var payments = new List<Payment>();
 			foreach (var month in _months)
 			{
+				if (!transactions.ContainsKey(month.Name) || transactions[month.Name] == null)
+					continue;
+
 				var transaction = transactions[month.Name] as State;
 				if (!transaction.ContainsKey(key) || transaction[key] == null)
 					continue;
@@ -216,6 +239,9 @@ namespace models.Reporters
 			var refunds = new List<decimal>();
 			foreach (var month in _months)
 			{
+				if (!transactions.ContainsKey(month.Name) || transactions[month.Name] == null)
+					continue;
+
 				var transaction = transactions[month.Name] as State;
 				if (!transaction.ContainsKey(key) || transaction[key] == null)
 					continue;
@@ -291,6 +317,7 @@ namespace models.Reporters
 		{
 			public string InvoiceNumber { get; set; }
 			public string SchoolYear { get; set; }
+			public DateTime AsOf { get; set; }
 			public DateTime Prepared { get; set; }
 			public DateTime ToSchoolDistrict { get; set; }
 			public DateTime ToPDE { get; set; }
@@ -298,7 +325,7 @@ namespace models.Reporters
 		}
 
 		// TODO(Erik): signature
-		private GeneratorFunc BuildGenerator()
+		private GeneratorFunc BuildGenerator(DateTime asOf)
 		{
 			return Object(
 				("Number", Input<Config>(i => i.InvoiceNumber)),
@@ -309,11 +336,12 @@ namespace models.Reporters
 				("SecondYear",
 					Lambda((string year) => year.Split("-")[1], Input<Config>(i => i.SchoolYear))
 				),
+				("AsOf", Input<Config>(i => i.AsOf.Date)),
 				("Prepared", Input<Config>(i => i.Prepared)),
 				("ToSchoolDistrict", Input<Config>(i => i.ToSchoolDistrict)),
 				("ToPDE", Input<Config>(i => i.ToPDE)),
 				("SchoolDistrict", GetSchoolDistrict(_conn, aun: Input<Config>(i => i.SchoolDistrictAun))),
-				("RegularEnrollments", GetEnrollments(_conn,
+				("RegularEnrollments", GetEnrollments(_conn, asOf,
 					aun: Input<Config>(i => i.SchoolDistrictAun),
 					firstYear: Reference(s => s["FirstYear"]),
 					secondYear: Reference(s => s["SecondYear"]),
@@ -326,7 +354,7 @@ namespace models.Reporters
 					 	Reference(s => s["RegularRate"])
 					)
 				),
-				("SpecialEnrollments", GetEnrollments(_conn,
+				("SpecialEnrollments", GetEnrollments(_conn, asOf,
 					aun: Input<Config>(i => i.SchoolDistrictAun),
 					firstYear: Reference(s => s["FirstYear"]),
 					secondYear: Reference(s => s["SecondYear"]),
@@ -345,7 +373,7 @@ namespace models.Reporters
 						Reference(s => s["DueForSpecial"])
 					)
 				),
-				("Transactions", GetTransactions(_conn,
+				("Transactions", GetTransactions(_conn, asOf,
 					schoolDistrictId: Reference(s => s["SchoolDistrict"].Id),
 					schoolYear: Input<Config>(i => i.SchoolYear),
 					firstYear: Reference(s => s["FirstYear"]),
@@ -384,15 +412,11 @@ namespace models.Reporters
 					start: Lambda((string year) => new DateTime(int.Parse(year), 7, 1),
 						Reference(s => s["FirstYear"])
 					),
-					// TODO(Erik): end of "as of" month
-					end: Lambda((string year) => EndOfMonth(int.Parse(year), 6),
-						Reference(s => s["SecondYear"])
-					)
+					end: Lambda(() => EndOfMonth(asOf.Year, asOf.Month))
 				))
 			);
 		}
 
-		// TODO(Erik): "as of" date?
-		public dynamic GenerateReport(Config config) => BuildGenerator()(input: config);
+		public dynamic GenerateReport(Config config) => BuildGenerator(config.AsOf)(input: config);
 	}
 }
