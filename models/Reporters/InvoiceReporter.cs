@@ -19,7 +19,7 @@ namespace models.Reporters
 			_conn = context.Database.GetDbConnection();
 		}
 
-		private class SchoolDistrict
+		public class SchoolDistrict
 		{
 			public int Id { get; set; }
 			public int Aun { get; set; }
@@ -55,7 +55,7 @@ namespace models.Reporters
 				("June", 6),
 			};
 
-		private class Enrollments
+		public class Enrollments
 		{
 			public int July { get; set; }
 			public int August { get; set; }
@@ -144,7 +144,7 @@ namespace models.Reporters
 			return Decimal.Round((sum * rate) / 12, 2, MidpointRounding.ToEven);
 		}
 
-		private class Payment
+		public class Payment
 		{
 			public string Type { get; set; }
 			public string CheckNumber { get; set; }
@@ -251,10 +251,10 @@ namespace models.Reporters
 			return Decimal.Round(refunds.Sum(), 2, MidpointRounding.ToEven);
 		}
 
-		private class Student
+		public class Student
 		{
 			// TODO(Erik): what do we display if null?
-			public ulong? PASecureID { get; set; }
+			public ulong? PASecuredID { get; set; }
 			public string FirstName { get; set; }
 			public string MiddleInitial { get; set; }
 			public string LastName { get; set; }
@@ -305,7 +305,8 @@ namespace models.Reporters
 						StudentWithdrawalDate != StudentEnrollmentDate
 						AND StudentWithdrawalDate >= @Start
 					)
-				)",
+				)
+				ORDER BY StudentLastName, StudentFirstName, StudentMiddleInitial",
 				("Aun", aun),
 				("Start", start),
 				("End", end)
