@@ -1,3 +1,5 @@
+import { SchoolDistrict } from './school-district.model';
+
 export class Student {
   id: number;
   city: string;
@@ -5,7 +7,7 @@ export class Student {
   lastName: string;
   middleInitial: string;
   paCyberId: number;
-  paSecureId: number;
+  paSecuredId: number;
   grade: number;
   dateOfBirth: Date;
   isSpecialEducation: boolean;
@@ -16,4 +18,5 @@ export class Student {
   street1: string;
   street2: string;
   zipCode: string;
+  schoolDistrict: SchoolDistrict;
 }

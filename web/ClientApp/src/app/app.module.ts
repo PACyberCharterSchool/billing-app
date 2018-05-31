@@ -24,6 +24,7 @@ import { StudentStatusRecordsImportService } from './services/student-status-rec
 import { PaymentsService } from './services/payments.service';
 import { RefundsService } from './services/refunds.service';
 import { AcademicYearsService } from './services/academic-years.service';
+import { SchoolCalendarService } from './services/school-calendar.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
@@ -62,6 +63,7 @@ const pacbillProviders = [
   Globals,
   PaymentsService,
   RefundsService,
+  SchoolCalendarService,
   SchoolDistrictService,
   StudentsService,
   StudentStatusRecordsImportService,

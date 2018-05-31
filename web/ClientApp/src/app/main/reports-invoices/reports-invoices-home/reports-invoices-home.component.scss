@@ -27,6 +27,7 @@
 
       label {
         color: #4d4d4d;
+        white-space: normal;
       }
     }
 
@@ -34,7 +35,7 @@
       img {
         display: block;
         object-fit: none;
-        object-position: -412px -10px;
+        object-position: -412px 0px;
         height: 180px;
       }
     }
@@ -43,7 +44,7 @@
       img {
         display: block;
         object-fit: none;
-        object-position: -635px -10px;
+        object-position: -635px 0px;
         height: 180px;
       }
     }
@@ -52,7 +53,7 @@
       img {
         display: block;
         object-fit: none;
-        object-position: -900px -10px;
+        object-position: -900px 10px;
         height: 180px;
       }
     }
@@ -61,7 +62,7 @@
       img {
         display: block;
         object-fit: none;
-        object-position: -1180px -10px;
+        object-position: -1190px 0px;
         height: 180px;
       }
     }
@@ -70,7 +71,7 @@
       img {
         display: block;
         object-fit: none;
-        object-position: -1450px -2px;
+        object-position: -1445px 5px;
         height: 180px;
       }
     }
@@ -79,7 +80,7 @@
       img {
         display: block;
         object-fit: none;
-        object-position: -405px -210px;
+        object-position: -405px -200px;
         height: 180px;
       }
     }

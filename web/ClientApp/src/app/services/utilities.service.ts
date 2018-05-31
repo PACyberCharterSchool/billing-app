@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 
+import * as moment from 'moment';
+
 @Injectable()
 export class UtilitiesService {
 
@@ -36,5 +38,17 @@ export class UtilitiesService {
   pick(obj, keys) {
     return keys.map(k => k in obj ? {[k]: obj[k]} : {})
                .reduce((res, o) => Object.assign(res, o), {});
+  }
+
+  isDateValue(val: string): boolean {
+    const formats = [
+      'MM/DD/YYYY',
+      'M/D/YYYY',
+      'MM/D/YYYY',
+      'M/DD/YYYY',
+      moment.ISO_8601
+    ];
+
+    return moment(val, formats, true).isValid();
   }
 }

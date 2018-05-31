@@ -4,7 +4,8 @@ import { Router } from '@angular/router';
 
 enum BUTTON_IDS {
   SchoolDistrictRatesBtn = 'school-district-rates-btn',
-  ImportStudentDataBtn = 'import-student-data-btn'
+  ImportStudentDataBtn = 'import-student-data-btn',
+  SchoolCalendarBtn = 'school-calendar-btn'
 }
 
 @Component({
@@ -36,6 +37,9 @@ export class AdministrationHomeComponent implements OnInit {
         break;
       case BUTTON_IDS.ImportStudentDataBtn:
         this.router.navigate(['/administration', { outlets: { 'action': ['import-student-data'] } }]);
+        break;
+      case BUTTON_IDS.SchoolCalendarBtn:
+        this.router.navigate(['/administration', { outlets: { 'action': ['school-calendar'] } }]);
         break;
       default:
         this.router.navigate(['/administration', { outlets: { 'action': ['home'] } }]);

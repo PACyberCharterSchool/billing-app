@@ -1,0 +1,27 @@
+.calendar-filter-row {
+  display: flex;
+  align-items: center;
+  height: 60px;
+
+  .calendar-title-col {
+    h4 {
+      color: #58a719;
+    }
+  }
+}
+
+.calendar-list-row {
+  height: calc(100% - 60px);
+
+  div.col-md-12 {
+    table {
+      thead {
+        height: 60px;
+      }
+
+      tbody {
+        height: calc(100% - 60px);
+      }
+    }
+  }
+}
