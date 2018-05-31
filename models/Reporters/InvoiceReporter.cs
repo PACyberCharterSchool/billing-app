@@ -108,12 +108,14 @@ namespace models.Reporters
 			};
 			foreach (var month in _months)
 			{
-				args.Add((month.Name,
-					Lambda((string year) => new DateTime(int.Parse(year), month.Number, 1),
-						month.Number >= 7 ? firstYear : secondYear)));
-				args.Add(($"End{month.Name}",
-					Lambda((string year) => EndOfMonth(int.Parse(year), month.Number),
-						month.Number >= 7 ? firstYear : secondYear)));
+				var startDate = Lambda((string year) => new DateTime(int.Parse(year), month.Number, 1),
+					month.Number >= 7 ? firstYear : secondYear);
+
+				var endDate = Lambda((string year) => EndOfMonth(int.Parse(year), month.Number),
+					month.Number >= 7 ? firstYear : secondYear);
+
+				args.Add((month.Name, startDate));
+				args.Add(($"End{month.Name}", endDate));
 			}
 
 			return SqlObject<Enrollments>(conn, query, args.ToArray());
