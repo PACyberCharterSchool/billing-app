@@ -179,6 +179,18 @@ namespace models.Tests.Reporters.Generators
 		}
 
 		[Test]
+		public void LambdaGenerateWithThreeParamsReturnsResults()
+		{
+			var value1 = 1;
+			var value2 = 2;
+			var value3 = 3;
+			var actual = Lambda((int x, int y, int z) => x + y + z,
+				Constant(value1), Constant(value2), Constant(value3)
+			)();
+			Assert.That(actual, Is.EqualTo(value1 + value2 + value3));
+		}
+
+		[Test]
 		public void SqlListGeneratorReturnsQueryWithoutArgs()
 		{
 			using (_conn)
