@@ -326,90 +326,105 @@ namespace models.Reporters
 		// TODO(Erik): signature
 		private GeneratorFunc BuildGenerator(DateTime asOf)
 		{
+			const string firstYearKey = "FirstYear";
+			const string secondYearKey = "SecondYear";
+			const string schoolDistrictKey = "SchoolDistrict";
+			const string regularEnrollmentsKey = "RegularEnrollments";
+			const string regularRateKey = "RegularRate";
+			const string dueForRegularKey = "DueForRegular";
+			const string specialEnrollmentsKey = "SpecialEnrollments";
+			const string specialRateKey = "SpecialRate";
+			const string dueForSpecialKey = "DueForSpecial";
+			const string transactionsKey = "Transactions";
+			const string paidByCheckKey = "PaidByCheck";
+			const string paidByUniPayKey = "PaidByUniPay";
+			const string totalDueKey = "TotalDue";
+			const string totalPaidKey = "TotalPaid";
+
 			return Object(
 				("Number", Input<Config>(i => i.InvoiceNumber)),
 				("SchoolYear", Input<Config>(i => i.SchoolYear)),
-				("FirstYear",
+				(firstYearKey,
 					Lambda((string year) => year.Split("-")[0], Input<Config>(i => i.SchoolYear))
 				),
-				("SecondYear",
+				(secondYearKey,
 					Lambda((string year) => year.Split("-")[1], Input<Config>(i => i.SchoolYear))
 				),
 				("AsOf", Input<Config>(i => i.AsOf.Date)),
 				("Prepared", Input<Config>(i => i.Prepared)),
 				("ToSchoolDistrict", Input<Config>(i => i.ToSchoolDistrict)),
 				("ToPDE", Input<Config>(i => i.ToPDE)),
-				("SchoolDistrict", GetSchoolDistrict(_conn, aun: Input<Config>(i => i.SchoolDistrictAun))),
-				("RegularEnrollments", GetEnrollments(_conn, asOf,
+				(schoolDistrictKey, GetSchoolDistrict(_conn, aun: Input<Config>(i => i.SchoolDistrictAun))),
+				(regularEnrollmentsKey, GetEnrollments(_conn, asOf,
 					aun: Input<Config>(i => i.SchoolDistrictAun),
-					firstYear: Reference(s => s["FirstYear"]),
-					secondYear: Reference(s => s["SecondYear"]),
+					firstYear: Reference(s => s[firstYearKey]),
+					secondYear: Reference(s => s[secondYearKey]),
 					isSpecial: false)
 				),
-				("RegularRate", Reference(s => s["SchoolDistrict"].RegularRate)),
-				("DueForRegular",
+				(regularRateKey, Reference(s => s[schoolDistrictKey].RegularRate)),
+				(dueForRegularKey,
 					Lambda((Enrollments enrollments, decimal rate) => CalculateAmountDue(enrollments, rate),
-					 	Reference(s => s["RegularEnrollments"]),
-					 	Reference(s => s["RegularRate"])
+					 	Reference(s => s[regularEnrollmentsKey]),
+					 	Reference(s => s[regularRateKey])
 					)
 				),
-				("SpecialEnrollments", GetEnrollments(_conn, asOf,
+				(specialEnrollmentsKey, GetEnrollments(_conn, asOf,
 					aun: Input<Config>(i => i.SchoolDistrictAun),
-					firstYear: Reference(s => s["FirstYear"]),
-					secondYear: Reference(s => s["SecondYear"]),
+					firstYear: Reference(s => s[firstYearKey]),
+					secondYear: Reference(s => s[secondYearKey]),
 					isSpecial: true)
 				),
-				("SpecialRate", Reference(s => s["SchoolDistrict"].SpecialRate)),
-				("DueForSpecial",
+				(specialRateKey, Reference(s => s[schoolDistrictKey].SpecialRate)),
+				(dueForSpecialKey,
 					Lambda((Enrollments enrollments, decimal rate) => CalculateAmountDue(enrollments, rate),
-						Reference(s => s["SpecialEnrollments"]),
-						Reference(s => s["SpecialRate"])
+						Reference(s => s[specialEnrollmentsKey]),
+						Reference(s => s[specialRateKey])
 					)
 				),
-				("TotalDue",
+				(totalDueKey,
 					Lambda((decimal regular, decimal special) => Decimal.Round(regular + special, 2, MidpointRounding.ToEven),
-						Reference(s => s["DueForRegular"]),
-						Reference(s => s["DueForSpecial"])
+						Reference(s => s[dueForRegularKey]),
+						Reference(s => s[dueForSpecialKey])
 					)
 				),
-				("Transactions", GetTransactions(_conn, asOf,
-					schoolDistrictId: Reference(s => s["SchoolDistrict"].Id),
+				(transactionsKey, GetTransactions(_conn, asOf,
+					schoolDistrictId: Reference(s => s[schoolDistrictKey].Id),
 					schoolYear: Input<Config>(i => i.SchoolYear),
-					firstYear: Reference(s => s["FirstYear"]),
-					secondYear: Reference(s => s["SecondYear"]))
+					firstYear: Reference(s => s[firstYearKey]),
+					secondYear: Reference(s => s[secondYearKey]))
 				),
-				("PaidByCheck",
+				(paidByCheckKey,
 					Lambda((dynamic transactions) => CalculatePaid(transactions, PaymentType.Check),
-						Reference(s => s["Transactions"])
+						Reference(s => s[transactionsKey])
 					)
 				),
-				("PaidByUniPay",
+				(paidByUniPayKey,
 					Lambda((dynamic transactions) => CalculatePaid(transactions, PaymentType.UniPay),
-						Reference(s => s["Transactions"])
+						Reference(s => s[transactionsKey])
 					)
 				),
-				("TotalPaid",
+				(totalPaidKey,
 					Lambda((decimal check, decimal unipay) => Decimal.Round(check + unipay, 2, MidpointRounding.ToEven),
-						Reference(s => s["PaidByCheck"]),
-						Reference(s => s["PaidByUniPay"])
+						Reference(s => s[paidByCheckKey]),
+						Reference(s => s[paidByUniPayKey])
 					)
 				),
 				("Refunded",
 					Lambda((dynamic transactions) => CalculateRefunded(transactions),
-						Reference(s => s["Transactions"])
+						Reference(s => s[transactionsKey])
 					)
 				),
 				// TODO(Erik): less refunded?
 				("NetDue",
 					Lambda((decimal due, decimal paid) => Decimal.Round(due - paid, 2, MidpointRounding.ToEven),
-						Reference(s => s["TotalDue"]),
-						Reference(s => s["TotalPaid"])
+						Reference(s => s[totalDueKey]),
+						Reference(s => s[totalPaidKey])
 					)
 				),
 				("Students", GetStudents(_conn,
 					aun: Input<Config>(i => i.SchoolDistrictAun),
 					start: Lambda((string year) => new DateTime(int.Parse(year), 7, 1),
-						Reference(s => s["FirstYear"])
+						Reference(s => s[firstYearKey])
 					),
 					end: Lambda(() => EndOfMonth(asOf.Year, asOf.Month))
 				))
