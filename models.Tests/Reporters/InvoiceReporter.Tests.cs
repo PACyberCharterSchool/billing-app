@@ -153,33 +153,30 @@ namespace models.Tests.Reporters
 			Console.WriteLine($"actual: {JsonConvert.SerializeObject(actual, Formatting.Indented)}");
 
 			// basic header information
-			Assert.That(actual["Number"], Is.EqualTo(config.InvoiceNumber));
-			Assert.That(actual["SchoolYear"], Is.EqualTo(config.SchoolYear));
-			Assert.That(actual["FirstYear"], Is.EqualTo("2017"));
-			Assert.That(actual["SecondYear"], Is.EqualTo("2018"));
-			Assert.That(actual["AsOf"], Is.EqualTo(config.AsOf));
-			Assert.That(actual["Prepared"], Is.EqualTo(config.Prepared));
-			Assert.That(actual["ToSchoolDistrict"], Is.EqualTo(config.ToSchoolDistrict));
-			Assert.That(actual["ToPDE"], Is.EqualTo(config.ToPDE));
+			Assert.That(actual.Number, Is.EqualTo(config.InvoiceNumber));
+			Assert.That(actual.SchoolYear, Is.EqualTo(config.SchoolYear));
+			Assert.That(actual.FirstYear, Is.EqualTo(2017));
+			Assert.That(actual.SecondYear, Is.EqualTo(2018));
+			Assert.That(actual.AsOf, Is.EqualTo(config.AsOf));
+			Assert.That(actual.Prepared, Is.EqualTo(config.Prepared));
+			Assert.That(actual.ToSchoolDistrict, Is.EqualTo(config.ToSchoolDistrict));
+			Assert.That(actual.ToPDE, Is.EqualTo(config.ToPDE));
 
 			// school district
 			{
-				Assert.That(actual["SchoolDistrict"], Is.Not.Null);
-				var district = actual["SchoolDistrict"] as InvoiceReporter.SchoolDistrict;
+				Assert.That(actual.SchoolDistrict, Is.Not.Null);
+				var district = actual.SchoolDistrict;
 				Assert.That(district.Id, Is.EqualTo(schoolDistrict.Id));
 				Assert.That(district.Aun, Is.EqualTo(schoolDistrict.Aun));
 				Assert.That(district.Name, Is.EqualTo(schoolDistrict.Name));
 				Assert.That(district.RegularRate, Is.EqualTo(schoolDistrict.Rate));
 				Assert.That(district.SpecialRate, Is.EqualTo(schoolDistrict.SpecialEducationRate));
-
-				Assert.That(actual["RegularRate"], Is.EqualTo(district.RegularRate));
-				Assert.That(actual["SpecialRate"], Is.EqualTo(district.SpecialRate));
 			}
 
 			// regular enrollments
 			{
-				Assert.That(actual["RegularEnrollments"], Is.Not.Null);
-				var enrollments = actual["RegularEnrollments"] as InvoiceReporter.Enrollments;
+				Assert.That(actual.RegularEnrollments, Is.Not.Null);
+				var enrollments = actual.RegularEnrollments;
 				Assert.That(enrollments.July, Is.EqualTo(1));
 				Assert.That(enrollments.August, Is.EqualTo(1));
 				Assert.That(enrollments.September, Is.EqualTo(1));
@@ -197,8 +194,8 @@ namespace models.Tests.Reporters
 
 			// special enrollments
 			{
-				Assert.That(actual["SpecialEnrollments"], Is.Not.Null);
-				var enrollments = actual["SpecialEnrollments"] as InvoiceReporter.Enrollments;
+				Assert.That(actual.SpecialEnrollments, Is.Not.Null);
+				var enrollments = actual.SpecialEnrollments;
 				Assert.That(enrollments.July, Is.EqualTo(1));
 				Assert.That(enrollments.August, Is.EqualTo(1));
 				Assert.That(enrollments.September, Is.EqualTo(0));
@@ -215,8 +212,8 @@ namespace models.Tests.Reporters
 
 			// transactions
 			{
-				Assert.That(actual["Transactions"], Is.Not.Null);
-				var transactions = actual["Transactions"];
+				Assert.That(actual.Transactions, Is.Not.Null);
+				var transactions = actual.Transactions;
 
 				// empty months
 				foreach (var month in new[] {
@@ -234,56 +231,58 @@ namespace models.Tests.Reporters
 					"June",
 				})
 				{
-					Assert.That(transactions[month], Is.Not.Null);
-					var m = transactions[month];
-					Assert.That(m["Payment"], Is.Null);
-					Assert.That(m["Refund"], Is.EqualTo(0m));
+					var property = typeof(InvoiceTransactions).GetProperty(month);
+					var transaction = property.GetValue(transactions) as InvoiceTransaction;
+
+					Assert.That(transaction, Is.Not.Null);
+					Assert.That(transaction.Payment, Is.Null);
+					Assert.That(transaction.Refund, Is.EqualTo(0m));
 				}
 
 				// August
 				{
-					Assert.That(transactions["August"], Is.Not.Null);
-					var month = transactions["August"];
-					Assert.That(month["Payment"], Is.Not.Null);
-					var payment = month["Payment"] as InvoiceReporter.Payment;
+					Assert.That(transactions.August, Is.Not.Null);
+					var month = transactions.August;
+					Assert.That(month.Payment, Is.Not.Null);
+					var payment = month.Payment;
 					Assert.That(payment.Type, Is.EqualTo(payments[0].Type.Value));
 					Assert.That(payment.Amount, Is.EqualTo(payments[0].Amount));
 					Assert.That(payment.CheckNumber, Is.EqualTo(payments[0].ExternalId));
 					Assert.That(payment.Date, Is.EqualTo(payments[0].Date));
-					Assert.That(month["Refund"], Is.EqualTo(0m));
+					Assert.That(month.Refund, Is.EqualTo(0m));
 				}
 
 				// October
 				{
-					Assert.That(transactions["October"], Is.Not.Null);
-					var month = transactions["October"];
-					Assert.That(month["Payment"], Is.Null);
-					Assert.That(month["Refund"], Is.EqualTo(refunds[0].Amount));
+					Assert.That(transactions.October, Is.Not.Null);
+					var month = transactions.October;
+					Assert.That(month.Payment, Is.Null);
+					Assert.That(month.Refund, Is.EqualTo(refunds[0].Amount));
 				}
 
 				// January
 				{
-					Assert.That(transactions["January"], Is.Not.Null);
-					var month = transactions["January"];
-					Assert.That(month["Payment"], Is.Not.Null);
-					var payment = month["Payment"] as InvoiceReporter.Payment;
+					Assert.That(transactions.January, Is.Not.Null);
+					var month = transactions.January;
+					Assert.That(month.Payment, Is.Not.Null);
+					var payment = month.Payment;
 					Assert.That(payment.Type, Is.EqualTo(payments[1].Type.Value));
 					Assert.That(payment.Amount, Is.EqualTo(payments[1].Amount));
 					Assert.That(payment.CheckNumber, Is.EqualTo(payments[1].ExternalId));
 					Assert.That(payment.Date, Is.EqualTo(payments[1].Date));
-					Assert.That(month["Refund"], Is.EqualTo(refunds[1].Amount));
+					Assert.That(month.Refund, Is.EqualTo(refunds[1].Amount));
 				}
 			}
 
 			// students
 			{
-				Assert.That(actual["Students"], Is.Not.Null);
-				var students = actual["Students"];
+				Assert.That(actual.Students, Is.Not.Null);
+				var students = actual.Students;
 				Assert.That(students, Has.Count.EqualTo(2));
 
 				for (var i = 0; i < students.Count; i++)
 				{
-					var student = students[i] as InvoiceReporter.Student;
+					var student = students[i];
 					var status = statuses[i];
 					Assert.That(student.PASecuredID, Is.EqualTo(status.StudentPaSecuredId));
 					Assert.That(student.FirstName, Is.EqualTo(status.StudentFirstName));
@@ -339,8 +338,8 @@ namespace models.Tests.Reporters
 
 			Console.WriteLine($"actual: {JsonConvert.SerializeObject(actual, Formatting.Indented)}");
 
-			Assert.That(actual["SchoolDistrict"], Is.Not.Null);
-			var district = actual["SchoolDistrict"] as InvoiceReporter.SchoolDistrict;
+			Assert.That(actual.SchoolDistrict, Is.Not.Null);
+			var district = actual.SchoolDistrict;
 			Assert.That(district.RegularRate, Is.EqualTo(schoolDistrict.AlternateRate));
 			Assert.That(district.SpecialRate, Is.EqualTo(schoolDistrict.AlternateSpecialEducationRate));
 		}
@@ -399,15 +398,15 @@ namespace models.Tests.Reporters
 
 			Console.WriteLine($"actual: {JsonConvert.SerializeObject(actual, Formatting.Indented)}");
 
-			Assert.That(actual["RegularEnrollments"], Is.Not.Null);
-			var enrollments = actual["RegularEnrollments"] as InvoiceReporter.Enrollments;
+			Assert.That(actual.RegularEnrollments, Is.Not.Null);
+			var enrollments = actual.RegularEnrollments;
 			foreach (var property in enrollments.GetType().GetProperties())
 			{
 				var value = property.GetValue(enrollments);
 				Assert.That(value, Is.EqualTo(0));
 			}
 
-			Assert.That(actual["Students"], Has.Count.EqualTo(0));
+			Assert.That(actual.Students, Has.Count.EqualTo(0));
 		}
 
 		[Test]
@@ -474,10 +473,9 @@ namespace models.Tests.Reporters
 
 			Console.WriteLine($"actual: {JsonConvert.SerializeObject(actual, Formatting.Indented)}");
 
-			Assert.That(actual["Students"], Is.Not.Null);
-			Assert.That(actual["Students"], Has.Count.EqualTo(4));
-			var students = (actual["Students"] as IEnumerable<InvoiceReporter.Student>).ToArray();
-
+			Assert.That(actual.Students, Is.Not.Null);
+			Assert.That(actual.Students, Has.Count.EqualTo(4));
+			var students = actual.Students;
 			Assert.That(students[0].PASecuredID, Is.EqualTo(statuses[1].StudentPaSecuredId));
 			Assert.That(students[1].PASecuredID, Is.EqualTo(statuses[3].StudentPaSecuredId));
 			Assert.That(students[2].PASecuredID, Is.EqualTo(statuses[2].StudentPaSecuredId));

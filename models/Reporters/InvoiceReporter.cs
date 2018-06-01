@@ -5,31 +5,116 @@ using System.Data;
 using System.Linq;
 using System.Text;
 
-using models.Reporters.Generators;
-using static models.Reporters.Generators.Generator;
+using Dapper;
 
 namespace models.Reporters
 {
-	public class InvoiceReporter
+	public interface IReporter<T, U>
+	{
+		T GenerateReport(U config);
+	}
+
+	public class InvoiceSchoolDistrict
+	{
+		public int Id { get; set; }
+		public int Aun { get; set; }
+		public string Name { get; set; }
+		public decimal RegularRate { get; set; }
+		public decimal SpecialRate { get; set; }
+	}
+
+	public class InvoiceEnrollments
+	{
+		public int July { get; set; }
+		public int August { get; set; }
+		public int September { get; set; }
+		public int October { get; set; }
+		public int November { get; set; }
+		public int December { get; set; }
+		public int January { get; set; }
+		public int February { get; set; }
+		public int March { get; set; }
+		public int April { get; set; }
+		public int May { get; set; }
+		public int June { get; set; }
+	}
+
+	public class InvoicePayment
+	{
+		public string Type { get; set; }
+		public string CheckNumber { get; set; }
+		public decimal Amount { get; set; }
+		public DateTime Date { get; set; }
+	}
+
+	public class InvoiceTransaction
+	{
+		public InvoicePayment Payment { get; set; }
+		public decimal Refund { get; set; }
+	}
+
+	public class InvoiceTransactions
+	{
+		public InvoiceTransaction July { get; set; }
+		public InvoiceTransaction August { get; set; }
+		public InvoiceTransaction September { get; set; }
+		public InvoiceTransaction October { get; set; }
+		public InvoiceTransaction November { get; set; }
+		public InvoiceTransaction December { get; set; }
+		public InvoiceTransaction January { get; set; }
+		public InvoiceTransaction February { get; set; }
+		public InvoiceTransaction March { get; set; }
+		public InvoiceTransaction April { get; set; }
+		public InvoiceTransaction May { get; set; }
+		public InvoiceTransaction June { get; set; }
+	}
+
+	public class InvoiceStudent
+	{
+		// TODO(Erik): what do we display if null?
+		public ulong? PASecuredID { get; set; }
+		public string FirstName { get; set; }
+		public string MiddleInitial { get; set; }
+		public string LastName { get; set; }
+		public string Street1 { get; set; }
+		public string Street2 { get; set; }
+		public string City { get; set; }
+		public string State { get; set; }
+		public string ZipCode { get; set; }
+		public DateTime DateOfBirth { get; set; }
+		public string Grade { get; set; }
+		public DateTime FirstDay { get; set; }
+		public DateTime? LastDay { get; set; }
+		public bool IsSpecialEducation { get; set; }
+		public DateTime? CurrentIep { get; set; }
+		public DateTime? FormerIep { get; set; }
+	}
+
+	public class Invoice
+	{
+		public string Number { get; set; }
+		public string SchoolYear { get; set; }
+		public int FirstYear => int.Parse(SchoolYear.Split("-")[0]);
+		public int SecondYear => int.Parse(SchoolYear.Split("-")[1]);
+		public DateTime AsOf { get; set; }
+		public DateTime Prepared { get; set; }
+		public DateTime ToSchoolDistrict { get; set; }
+		public DateTime ToPDE { get; set; }
+		public InvoiceSchoolDistrict SchoolDistrict { get; set; }
+		public InvoiceEnrollments RegularEnrollments { get; set; }
+		public InvoiceEnrollments SpecialEnrollments { get; set; }
+		public InvoiceTransactions Transactions { get; set; }
+		public IList<InvoiceStudent> Students { get; set; }
+	}
+
+	public class InvoiceReporter : IReporter<Invoice, InvoiceReporter.Config>
 	{
 		private readonly IDbConnection _conn;
 
-		public InvoiceReporter(PacBillContext context)
-		{
-			_conn = context.Database.GetDbConnection();
-		}
+		public InvoiceReporter(PacBillContext context) => _conn = context.Database.GetDbConnection();
 
-		public class SchoolDistrict
-		{
-			public int Id { get; set; }
-			public int Aun { get; set; }
-			public string Name { get; set; }
-			public decimal RegularRate { get; set; }
-			public decimal SpecialRate { get; set; }
-		}
-
-		private static GeneratorFunc GetSchoolDistrict(IDbConnection conn, GeneratorFunc aun) =>
-			SqlObject<SchoolDistrict>(conn, @"
+		private InvoiceSchoolDistrict GetSchoolDistrict(int aun) =>
+			_conn.Query<InvoiceSchoolDistrict>(@"
 				SELECT
 					Id,
 					Aun,
@@ -38,7 +123,7 @@ namespace models.Reporters
 					COALESCE(AlternateSpecialEducationRate, SpecialEducationRate) AS SpecialRate
 				FROM SchoolDistricts
 				WHERE Aun = @Aun",
-				("Aun", aun));
+				new { Aun = aun }).Single();
 
 		private static readonly List<(string Name, int Number)> _months = new List<(string Name, int Number)>{
 				("July", 7),
@@ -55,34 +140,17 @@ namespace models.Reporters
 				("June", 6),
 			};
 
-		public class Enrollments
-		{
-			public int July { get; set; }
-			public int August { get; set; }
-			public int September { get; set; }
-			public int October { get; set; }
-			public int November { get; set; }
-			public int December { get; set; }
-			public int January { get; set; }
-			public int February { get; set; }
-			public int March { get; set; }
-			public int April { get; set; }
-			public int May { get; set; }
-			public int June { get; set; }
-		}
-
 		private static bool IsBeforeAsOf(DateTime asOf, int month) =>
 			month >= 7 && month >= asOf.Month || month < 7 && month <= asOf.Month;
 
 		private static DateTime EndOfMonth(int year, int month) =>
 			new DateTime(year, month, DateTime.DaysInMonth(year, month));
 
-		private static GeneratorFunc GetEnrollments(
-			IDbConnection conn,
+		private InvoiceEnrollments GetEnrollments(
 			DateTime asOf,
-			GeneratorFunc aun,
-			GeneratorFunc firstYear,
-			GeneratorFunc secondYear,
+			int aun,
+			int firstYear,
+			int secondYear,
 			bool isSpecial)
 		{
 			string EnrollmentCount(string month) =>
@@ -102,9 +170,9 @@ namespace models.Reporters
 			var sb = new StringBuilder();
 			sb.AppendLine("SELECT ");
 
-			var args = new List<(string Key, GeneratorFunc Generator)> {
-				("Aun", aun),
-				("IsSpecial", Constant(isSpecial)),
+			var args = new Dictionary<string, object> {
+				{"Aun", aun},
+				{"IsSpecial", isSpecial},
 			};
 
 			foreach (var month in _months)
@@ -117,112 +185,76 @@ namespace models.Reporters
 
 				sb.AppendLine($"({EnrollmentCount(month.Name)}) AS {month.Name}, ");
 
-				var startDate = Lambda((string year) => new DateTime(int.Parse(year), month.Number, 1),
-					month.Number >= 7 ? firstYear : secondYear);
+				var year = month.Number >= 7 ? firstYear : secondYear;
+				var startDate = new DateTime(year, month.Number, 1);
+				var endDate = EndOfMonth(year, month.Number);
 
-				var endDate = Lambda((string year) => EndOfMonth(int.Parse(year), month.Number),
-					month.Number >= 7 ? firstYear : secondYear);
-
-				args.Add((month.Name, startDate));
-				args.Add(($"End{month.Name}", endDate));
+				args.Add(month.Name, startDate);
+				args.Add($"End{month.Name}", endDate);
 			}
 
 			var query = sb.ToString().Trim().TrimEnd(',');
 
-			return SqlObject<Enrollments>(conn, query, args.ToArray());
+			return _conn.Query<InvoiceEnrollments>(query, args).SingleOrDefault();
 		}
 
-		public class Payment
-		{
-			public string Type { get; set; }
-			public string CheckNumber { get; set; }
-			public decimal Amount { get; set; }
-			public DateTime Date { get; set; }
-		}
-
-		private static GeneratorFunc GetTransactions(
-			IDbConnection conn,
+		private InvoiceTransactions GetTransactions(
 			DateTime asOf,
-			GeneratorFunc schoolDistrictId,
-			GeneratorFunc schoolYear,
-			GeneratorFunc firstYear,
-			GeneratorFunc secondYear)
+			int schoolDistrictId,
+			string schoolYear,
+			int firstYear,
+			int secondYear)
 		{
-			var generators = new List<(string Key, GeneratorFunc Generator)>();
+			var transactions = new InvoiceTransactions();
 			foreach (var month in _months)
 			{
+				var property = typeof(InvoiceTransactions).GetProperty(month.Name);
 				if (!IsBeforeAsOf(asOf, month.Number))
 				{
-					generators.Add((month.Name, Object(
-						("Payment", Constant<Payment>(null)),
-						("Refund", Constant(0m))
-					)));
+					property.SetValue(transactions, new InvoiceTransaction());
 					continue;
 				}
 
-				var startDate = Lambda((string year) => new DateTime(int.Parse(year), month.Number, 1),
-					month.Number >= 7 ? firstYear : secondYear);
+				var year = month.Number >= 7 ? firstYear : secondYear;
+				var startDate = new DateTime(year, month.Number, 1);
+				var endDate = EndOfMonth(year, month.Number);
 
-				var endDate = Lambda((string year) => EndOfMonth(int.Parse(year), month.Number),
-					month.Number >= 7 ? firstYear : secondYear);
+				var args = new
+				{
+					SchoolDistrictId = schoolDistrictId,
+					SchoolYear = schoolYear,
+					StartDate = startDate,
+					EndDate = endDate,
+				};
 
-				generators.Add((month.Name, Object(
-					("Payment", SqlObject<Payment>(conn, @"
+				property.SetValue(transactions, new InvoiceTransaction
+				{
+					Payment = _conn.Query<InvoicePayment>(@"
 						SELECT Type, ExternalId AS CheckNumber, Amount, Date
 						FROM Payments
 						WHERE SchoolDistrictId = @SchoolDistrictId
 						AND SchoolYear = @SchoolYear
 						AND (Date >= @StartDate AND Date <= @EndDate)",
-						("SchoolDistrictId", schoolDistrictId),
-						("SchoolYear", schoolYear),
-						("StartDate", startDate),
-						("EndDate", endDate)
-					)),
-					("Refund", SqlObject<decimal>(conn, @"
+						args).SingleOrDefault(),
+					Refund = _conn.Query<decimal>(@"
 						SELECT Amount
 						From Refunds
 						WHERE SchoolDistrictId = @SchoolDistrictId
 						AND SchoolYear = @SchoolYear
 						AND (Date >= @StartDate AND Date <= @EndDate)",
-						("SchoolDistrictId", schoolDistrictId),
-						("SchoolYear", schoolYear),
-						("StartDate", startDate),
-						("EndDate", endDate)
-					))
-				)));
+						args).SingleOrDefault(),
+				});
 			}
 
-			return Object(generators.ToArray());
+			return transactions;
 		}
 
-		public class Student
+		private IList<InvoiceStudent> GetStudents(
+			int aun,
+			DateTime start,
+			DateTime end)
 		{
-			// TODO(Erik): what do we display if null?
-			public ulong? PASecuredID { get; set; }
-			public string FirstName { get; set; }
-			public string MiddleInitial { get; set; }
-			public string LastName { get; set; }
-			public string Street1 { get; set; }
-			public string Street2 { get; set; }
-			public string City { get; set; }
-			public string State { get; set; }
-			public string ZipCode { get; set; }
-			public DateTime DateOfBirth { get; set; }
-			public string Grade { get; set; }
-			public DateTime FirstDay { get; set; }
-			public DateTime? LastDay { get; set; }
-			public bool IsSpecialEducation { get; set; }
-			public DateTime? CurrentIep { get; set; }
-			public DateTime? FormerIep { get; set; }
-		}
-
-		private static GeneratorFunc GetStudents(
-			IDbConnection conn,
-			GeneratorFunc aun,
-			GeneratorFunc start,
-			GeneratorFunc end)
-		{
-			return SqlList<Student>(conn, $@"
+			return _conn.Query<InvoiceStudent>($@"
 				SELECT
 					StudentPASecuredId AS PASecuredId,
 					StudentFirstName AS FirstName,
@@ -251,10 +283,12 @@ namespace models.Reporters
 					)
 				)
 				ORDER BY StudentLastName, StudentFirstName, StudentMiddleInitial",
-				("Aun", aun),
-				("Start", start),
-				("End", end)
-			);
+				new
+				{
+					Aun = aun,
+					Start = start,
+					End = end,
+				}).ToList();
 		}
 
 		public class Config
@@ -269,56 +303,46 @@ namespace models.Reporters
 		}
 
 		// TODO(Erik): signature
-		private GeneratorFunc BuildGenerator(DateTime asOf)
+		public Invoice GenerateReport(Config config)
 		{
-			const string firstYearKey = "FirstYear";
-			const string secondYearKey = "SecondYear";
-			const string schoolDistrictKey = "SchoolDistrict";
+			var invoice = new Invoice
+			{
+				Number = config.InvoiceNumber,
+				SchoolYear = config.SchoolYear,
+				AsOf = config.AsOf,
+				Prepared = config.Prepared,
+				ToSchoolDistrict = config.ToSchoolDistrict,
+				ToPDE = config.ToPDE,
+			};
 
-			return Object(
-				("Number", Input<Config>(i => i.InvoiceNumber)),
-				("SchoolYear", Input<Config>(i => i.SchoolYear)),
-				(firstYearKey,
-					Lambda((string year) => year.Split("-")[0], Input<Config>(i => i.SchoolYear))
-				),
-				(secondYearKey,
-					Lambda((string year) => year.Split("-")[1], Input<Config>(i => i.SchoolYear))
-				),
-				("AsOf", Input<Config>(i => i.AsOf.Date)),
-				("Prepared", Input<Config>(i => i.Prepared)),
-				("ToSchoolDistrict", Input<Config>(i => i.ToSchoolDistrict)),
-				("ToPDE", Input<Config>(i => i.ToPDE)),
-				(schoolDistrictKey, GetSchoolDistrict(_conn, aun: Input<Config>(i => i.SchoolDistrictAun))),
-				("RegularEnrollments", GetEnrollments(_conn, asOf,
-					aun: Input<Config>(i => i.SchoolDistrictAun),
-					firstYear: Reference(s => s[firstYearKey]),
-					secondYear: Reference(s => s[secondYearKey]),
-					isSpecial: false)
-				),
-				("RegularRate", Reference(s => s[schoolDistrictKey].RegularRate)),
-				("SpecialEnrollments", GetEnrollments(_conn, asOf,
-					aun: Input<Config>(i => i.SchoolDistrictAun),
-					firstYear: Reference(s => s[firstYearKey]),
-					secondYear: Reference(s => s[secondYearKey]),
-					isSpecial: true)
-				),
-				("SpecialRate", Reference(s => s[schoolDistrictKey].SpecialRate)),
-				("Transactions", GetTransactions(_conn, asOf,
-					schoolDistrictId: Reference(s => s[schoolDistrictKey].Id),
-					schoolYear: Input<Config>(i => i.SchoolYear),
-					firstYear: Reference(s => s[firstYearKey]),
-					secondYear: Reference(s => s[secondYearKey]))
-				),
-				("Students", GetStudents(_conn,
-					aun: Input<Config>(i => i.SchoolDistrictAun),
-					start: Lambda((string year) => new DateTime(int.Parse(year), 7, 1),
-						Reference(s => s[firstYearKey])
-					),
-					end: Lambda(() => EndOfMonth(asOf.Year, asOf.Month))
-				))
-			);
+			invoice.SchoolDistrict = GetSchoolDistrict(config.SchoolDistrictAun);
+
+			invoice.RegularEnrollments = GetEnrollments(
+				config.AsOf,
+				config.SchoolDistrictAun,
+				invoice.FirstYear,
+				invoice.SecondYear,
+				isSpecial: false);
+			invoice.SpecialEnrollments = GetEnrollments(
+				config.AsOf,
+				config.SchoolDistrictAun,
+				invoice.FirstYear,
+				invoice.SecondYear,
+				isSpecial: true);
+
+			invoice.Transactions = GetTransactions(
+				config.AsOf,
+				invoice.SchoolDistrict.Id,
+				config.SchoolYear,
+				invoice.FirstYear,
+				invoice.SecondYear);
+
+			invoice.Students = GetStudents(
+				config.SchoolDistrictAun,
+				new DateTime(invoice.FirstYear, 7, 1),
+				EndOfMonth(config.AsOf.Year, config.AsOf.Month));
+
+			return invoice;
 		}
-
-		public dynamic GenerateReport(Config config) => BuildGenerator(config.AsOf)(input: config);
 	}
 }
