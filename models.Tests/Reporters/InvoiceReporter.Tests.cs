@@ -284,6 +284,7 @@ namespace models.Tests.Reporters
 			Assert.That(actual["PaidByUniPay"], Is.EqualTo(payments[1].Amount));
 			Assert.That(actual["TotalPaid"], Is.EqualTo(payments.Sum(p => p.Amount)));
 			Assert.That(actual["Refunded"], Is.EqualTo(refunds.Sum(r => r.Amount)));
+			Assert.That(actual["NetDue"], Is.EqualTo(10050m)); // 10050 (total due) - (300 (total paid) - 350 (total refunded))
 
 			// students
 			{

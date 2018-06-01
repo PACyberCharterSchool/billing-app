@@ -332,6 +332,7 @@ namespace models.Reporters
 			const string paidByUniPayKey = "PaidByUniPay";
 			const string totalDueKey = "TotalDue";
 			const string totalPaidKey = "TotalPaid";
+			const string refundedKey = "Refunded";
 
 			return Object(
 				("Number", Input<Config>(i => i.InvoiceNumber)),
@@ -401,16 +402,17 @@ namespace models.Reporters
 						Reference(s => s[paidByUniPayKey])
 					)
 				),
-				("Refunded",
+				(refundedKey,
 					Lambda((dynamic transactions) => CalculateRefunded(transactions),
 						Reference(s => s[transactionsKey])
 					)
 				),
-				// TODO(Erik): less refunded?
 				("NetDue",
-					Lambda((decimal due, decimal paid) => Decimal.Round(due - paid, 2, MidpointRounding.ToEven),
-						Reference(s => s[totalDueKey]),
-						Reference(s => s[totalPaidKey])
+					Lambda((decimal due, decimal paid, decimal refunded) =>
+						Decimal.Round(due - (paid - refunded), 2, MidpointRounding.ToEven),
+							Reference(s => s[totalDueKey]),
+							Reference(s => s[totalPaidKey]),
+							Reference(s => s[refundedKey])
 					)
 				),
 				("Students", GetStudents(_conn,
