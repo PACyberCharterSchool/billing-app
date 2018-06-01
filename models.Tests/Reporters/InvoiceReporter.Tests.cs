@@ -195,8 +195,6 @@ namespace models.Tests.Reporters
 				Assert.That(enrollments.June, Is.EqualTo(0));
 			}
 
-			Assert.That(actual["DueForRegular"], Is.EqualTo(6666.67m)); // ((1 * 8) * 10000) / 12
-
 			// special enrollments
 			{
 				Assert.That(actual["SpecialEnrollments"], Is.Not.Null);
@@ -214,9 +212,6 @@ namespace models.Tests.Reporters
 				Assert.That(enrollments.May, Is.EqualTo(0));
 				Assert.That(enrollments.June, Is.EqualTo(0));
 			}
-
-			Assert.That(actual["DueForSpecial"], Is.EqualTo(3333.33m)); // ((1 * 2)) * 20000) / 12
-			Assert.That(actual["TotalDue"], Is.EqualTo(10000m)); // 6666.67 + 3333.33
 
 			// transactions
 			{
@@ -279,12 +274,6 @@ namespace models.Tests.Reporters
 					Assert.That(month["Refund"], Is.EqualTo(refunds[1].Amount));
 				}
 			}
-
-			Assert.That(actual["PaidByCheck"], Is.EqualTo(payments[0].Amount));
-			Assert.That(actual["PaidByUniPay"], Is.EqualTo(payments[1].Amount));
-			Assert.That(actual["TotalPaid"], Is.EqualTo(payments.Sum(p => p.Amount)));
-			Assert.That(actual["Refunded"], Is.EqualTo(refunds.Sum(r => r.Amount)));
-			Assert.That(actual["NetDue"], Is.EqualTo(10050m)); // 10000 (total due) - (300 (total paid) - 350 (total refunded))
 
 			// students
 			{

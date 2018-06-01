@@ -132,18 +132,6 @@ namespace models.Reporters
 			return SqlObject<Enrollments>(conn, query, args.ToArray());
 		}
 
-		private static decimal CalculateAmountDue(Enrollments enrollments, decimal rate)
-		{
-			var sum = 0;
-			foreach (var month in _months)
-			{
-				var property = typeof(Enrollments).GetProperty(month.Name);
-				sum += (int)property.GetValue(enrollments);
-			}
-
-			return Decimal.Round((sum * rate) / 12, 2, MidpointRounding.ToEven);
-		}
-
 		public class Payment
 		{
 			public string Type { get; set; }
@@ -205,41 +193,6 @@ namespace models.Reporters
 			}
 
 			return Object(generators.ToArray());
-		}
-
-		private static decimal CalculatePaid(dynamic transactions, PaymentType type)
-		{
-			const string key = "Payment";
-
-			var payments = new List<Payment>();
-			foreach (var month in _months)
-			{
-				var transaction = transactions[month.Name] as State;
-				if (!transaction.ContainsKey(key) || transaction[key] == null)
-					continue;
-
-				var payment = transaction[key] as Payment;
-				if (payment.Type != type.Value)
-					continue;
-
-				payments.Add(transaction[key] as Payment);
-			}
-
-			return Decimal.Round(payments.Sum(p => p.Amount), 2, MidpointRounding.ToEven);
-		}
-
-		private static decimal CalculateRefunded(dynamic transactions)
-		{
-			const string key = "Refund";
-
-			var refunds = new List<decimal>();
-			foreach (var month in _months)
-			{
-				var transaction = transactions[month.Name] as State;
-				refunds.Add(transaction[key]);
-			}
-
-			return Decimal.Round(refunds.Sum(), 2, MidpointRounding.ToEven);
 		}
 
 		public class Student
@@ -321,18 +274,6 @@ namespace models.Reporters
 			const string firstYearKey = "FirstYear";
 			const string secondYearKey = "SecondYear";
 			const string schoolDistrictKey = "SchoolDistrict";
-			const string regularEnrollmentsKey = "RegularEnrollments";
-			const string regularRateKey = "RegularRate";
-			const string dueForRegularKey = "DueForRegular";
-			const string specialEnrollmentsKey = "SpecialEnrollments";
-			const string specialRateKey = "SpecialRate";
-			const string dueForSpecialKey = "DueForSpecial";
-			const string transactionsKey = "Transactions";
-			const string paidByCheckKey = "PaidByCheck";
-			const string paidByUniPayKey = "PaidByUniPay";
-			const string totalDueKey = "TotalDue";
-			const string totalPaidKey = "TotalPaid";
-			const string refundedKey = "Refunded";
 
 			return Object(
 				("Number", Input<Config>(i => i.InvoiceNumber)),
@@ -348,72 +289,25 @@ namespace models.Reporters
 				("ToSchoolDistrict", Input<Config>(i => i.ToSchoolDistrict)),
 				("ToPDE", Input<Config>(i => i.ToPDE)),
 				(schoolDistrictKey, GetSchoolDistrict(_conn, aun: Input<Config>(i => i.SchoolDistrictAun))),
-				(regularEnrollmentsKey, GetEnrollments(_conn, asOf,
+				("RegularEnrollments", GetEnrollments(_conn, asOf,
 					aun: Input<Config>(i => i.SchoolDistrictAun),
 					firstYear: Reference(s => s[firstYearKey]),
 					secondYear: Reference(s => s[secondYearKey]),
 					isSpecial: false)
 				),
-				(regularRateKey, Reference(s => s[schoolDistrictKey].RegularRate)),
-				(dueForRegularKey,
-					Lambda((Enrollments enrollments, decimal rate) => CalculateAmountDue(enrollments, rate),
-					 	Reference(s => s[regularEnrollmentsKey]),
-					 	Reference(s => s[regularRateKey])
-					)
-				),
-				(specialEnrollmentsKey, GetEnrollments(_conn, asOf,
+				("RegularRate", Reference(s => s[schoolDistrictKey].RegularRate)),
+				("SpecialEnrollments", GetEnrollments(_conn, asOf,
 					aun: Input<Config>(i => i.SchoolDistrictAun),
 					firstYear: Reference(s => s[firstYearKey]),
 					secondYear: Reference(s => s[secondYearKey]),
 					isSpecial: true)
 				),
-				(specialRateKey, Reference(s => s[schoolDistrictKey].SpecialRate)),
-				(dueForSpecialKey,
-					Lambda((Enrollments enrollments, decimal rate) => CalculateAmountDue(enrollments, rate),
-						Reference(s => s[specialEnrollmentsKey]),
-						Reference(s => s[specialRateKey])
-					)
-				),
-				(totalDueKey,
-					Lambda((decimal regular, decimal special) => Decimal.Round(regular + special, 2, MidpointRounding.ToEven),
-						Reference(s => s[dueForRegularKey]),
-						Reference(s => s[dueForSpecialKey])
-					)
-				),
-				(transactionsKey, GetTransactions(_conn, asOf,
+				("SpecialRate", Reference(s => s[schoolDistrictKey].SpecialRate)),
+				("Transactions", GetTransactions(_conn, asOf,
 					schoolDistrictId: Reference(s => s[schoolDistrictKey].Id),
 					schoolYear: Input<Config>(i => i.SchoolYear),
 					firstYear: Reference(s => s[firstYearKey]),
 					secondYear: Reference(s => s[secondYearKey]))
-				),
-				(paidByCheckKey,
-					Lambda((dynamic transactions) => CalculatePaid(transactions, PaymentType.Check),
-						Reference(s => s[transactionsKey])
-					)
-				),
-				(paidByUniPayKey,
-					Lambda((dynamic transactions) => CalculatePaid(transactions, PaymentType.UniPay),
-						Reference(s => s[transactionsKey])
-					)
-				),
-				(totalPaidKey,
-					Lambda((decimal check, decimal unipay) => Decimal.Round(check + unipay, 2, MidpointRounding.ToEven),
-						Reference(s => s[paidByCheckKey]),
-						Reference(s => s[paidByUniPayKey])
-					)
-				),
-				(refundedKey,
-					Lambda((dynamic transactions) => CalculateRefunded(transactions),
-						Reference(s => s[transactionsKey])
-					)
-				),
-				("NetDue",
-					Lambda((decimal due, decimal paid, decimal refunded) =>
-						Decimal.Round(due - (paid - refunded), 2, MidpointRounding.ToEven),
-							Reference(s => s[totalDueKey]),
-							Reference(s => s[totalPaidKey]),
-							Reference(s => s[refundedKey])
-					)
 				),
 				("Students", GetStudents(_conn,
 					aun: Input<Config>(i => i.SchoolDistrictAun),
