@@ -59,7 +59,7 @@ namespace models.Tests
 		{
 			var template = new Template
 			{
-				ReportType = ReportType.MonthlyInvoice,
+				ReportType = ReportType.Invoice,
 				SchoolYear = "2017-2018",
 				Name = "template",
 				Content = Encoding.UTF8.GetBytes("hello"),
@@ -81,7 +81,7 @@ namespace models.Tests
 			var then = DateTime.Now.AddHours(-1);
 			var template = new Template
 			{
-				ReportType = ReportType.MonthlyInvoice,
+				ReportType = ReportType.Invoice,
 				SchoolYear = "2017-2018",
 				Name = "template",
 				Content = Encoding.UTF8.GetBytes("hello"),
@@ -106,7 +106,7 @@ namespace models.Tests
 			var then = DateTime.Now.AddHours(-1);
 			var template = new Template
 			{
-				ReportType = ReportType.MonthlyInvoice,
+				ReportType = ReportType.Invoice,
 				SchoolYear = "2017-2018",
 				Name = "template",
 				Content = Encoding.UTF8.GetBytes("hello"),
@@ -141,7 +141,7 @@ namespace models.Tests
 			var time = DateTime.Now;
 			var template = new Template
 			{
-				ReportType = ReportType.MonthlyInvoice,
+				ReportType = ReportType.Invoice,
 				SchoolYear = "2017-2018",
 				Name = "template",
 				Content = Encoding.UTF8.GetBytes("hello"),
@@ -158,7 +158,7 @@ namespace models.Tests
 		[Test]
 		public void GetReturnsNullIfNotFound()
 		{
-			var actual = _uut.Get(ReportType.MonthlyInvoice, "2017-2018");
+			var actual = _uut.Get(ReportType.Invoice, "2017-2018");
 			Assert.That(actual, Is.Null);
 		}
 	}

@@ -44,7 +44,7 @@ namespace api.Tests.Controllers
 		{
 			var template = new Template
 			{
-				ReportType = ReportType.MonthlyInvoice,
+				ReportType = ReportType.Invoice,
 				SchoolYear = "2017-2018",
 				Name = "template",
 				Content = Encoding.UTF8.GetBytes("hello"),
@@ -66,7 +66,7 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task GetReturnsNotFound()
 		{
-			var type = ReportType.MonthlyInvoice;
+			var type = ReportType.Invoice;
 			var year = "2017-2018";
 			_templates.Setup(ts => ts.Get(type, year)).Returns<Template>(null);
 
@@ -102,7 +102,7 @@ namespace api.Tests.Controllers
 			formFile.Setup(ff => ff.ContentType).Returns("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 			formFile.Setup(ff => ff.OpenReadStream()).Returns(file);
 
-			var type = ReportType.MonthlyInvoice;
+			var type = ReportType.Invoice;
 			var year = "2017-2018";
 
 			byte[] content;
@@ -141,7 +141,7 @@ namespace api.Tests.Controllers
 			var contentType = "bad";
 			formFile.Setup(f => f.ContentType).Returns(contentType);
 
-			var result = await _uut.Upload(ReportType.MonthlyInvoice.Value, "2017-2018", formFile.Object);
+			var result = await _uut.Upload(ReportType.Invoice.Value, "2017-2018", formFile.Object);
 			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
 			var value = ((BadRequestObjectResult)result).Value;
 
