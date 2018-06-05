@@ -1,0 +1,39 @@
+<div class='row digital-signatures-title-row'>
+  <div class='col-md-12'>
+    <h4>Digital Signatures</h4>
+  </div>
+</div>
+<div class='row digital-signatures-action-row'>
+  <div class='col-md-12'>
+    <div class='col-md-3'>
+    </div>
+    <div class='col-md-3'>
+    </div>
+    <div class='col-md-3'>
+      <button class='btn btn-primary' type='button' (click)='createDigitalSignature()'>
+        CREATE
+      </button>
+    </div>
+    <div class='col-md-3'>
+    </div>
+  </div>
+</div>
+<div class='row digital-signatures-list-row'>
+  <div class='col-md-12'>
+    <table class='table table-striped'>
+      <thead>
+        <tr>
+          <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
+            {{k | normalizeFieldName}}
+            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor='let ds of signatures' (click)='editDigitalSignature(ds)'>
+          <td>{{ds.title}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

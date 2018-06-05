@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using models;
 
 namespace models.Migrations
 {
     [DbContext(typeof(PacBillContext))]
-    partial class PacBillContextModelSnapshot : ModelSnapshot
+    [Migration("20180531165746_DigitalSignatures")]
+    partial class DigitalSignatures
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -144,34 +146,6 @@ namespace models.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CommittedStudentStatusRecords");
-                });
-
-            modelBuilder.Entity("models.DigitalSignature", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("Created");
-
-                    b.Property<string>("FileName");
-
-                    b.Property<DateTime>("LastUpdated");
-
-                    b.Property<string>("Title")
-                        .IsRequired();
-
-                    b.Property<string>("Username")
-                        .IsRequired();
-
-                    b.Property<byte[]>("imgData");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Title")
-                        .IsUnique();
-
-                    b.ToTable("DigitalSignatures");
                 });
 
             modelBuilder.Entity("models.Payment", b =>

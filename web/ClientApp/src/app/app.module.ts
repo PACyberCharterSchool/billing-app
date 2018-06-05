@@ -25,6 +25,7 @@ import { PaymentsService } from './services/payments.service';
 import { RefundsService } from './services/refunds.service';
 import { AcademicYearsService } from './services/academic-years.service';
 import { SchoolCalendarService } from './services/school-calendar.service';
+import { DigitalSignaturesService } from './services/digital-signatures.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
@@ -60,6 +61,7 @@ const pacbillProviders = [
   AuthenticationGuardService,
   AuthenticationService,
   CurrentStudentService,
+  DigitalSignaturesService,
   Globals,
   PaymentsService,
   RefundsService,

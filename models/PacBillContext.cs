@@ -16,6 +16,7 @@ namespace models
 		public DbSet<SchoolDistrict> SchoolDistricts { get; set; }
 		public DbSet<Student> Students { get; set; }
 		public DbSet<StudentActivityRecord> StudentActivityRecords { get; set; }
+    public DbSet<DigitalSignature> DigitalSignatures { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
@@ -61,6 +62,10 @@ namespace models
 					v => v.Value,
 					v => StudentActivity.FromString(v)
 				);
+
+      builder.Entity<DigitalSignature>().
+        HasIndex(s => s.Title).
+        IsUnique();
 		}
 	}
 }
