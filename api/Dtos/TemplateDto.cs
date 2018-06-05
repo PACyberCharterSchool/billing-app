@@ -1,5 +1,7 @@
 using System;
 
+using Newtonsoft.Json;
+
 using models;
 
 namespace api.Dtos
@@ -7,7 +9,7 @@ namespace api.Dtos
 	public class TemplateDto
 	{
 		public int Id { get; set; }
-		// TODO(Erik): JsonConverter
+		[JsonConverter(typeof(ReportTypeJsonConverter))]
 		public ReportType ReportType { get; set; }
 		public string SchoolYear { get; set; }
 		public string Name { get; set; }
