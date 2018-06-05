@@ -7,6 +7,7 @@ namespace models
 		private ReportType(string value) : base(value) { }
 
 		public static readonly ReportType Invoice = new ReportType("Invoice");
+		public static readonly ReportType StudentInformation = new ReportType("StudentInformation");
 	}
 
 	public class Report

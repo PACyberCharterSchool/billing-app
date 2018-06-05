@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -50,6 +52,42 @@ namespace api.Controllers
 			{
 				FileDownloadName = template.Name,
 			};
+		}
+
+		public struct TemplatesResponse
+		{
+			public IList<TemplateDto> Templates { get; set; }
+		}
+
+		public class GetManyArgs
+		{
+			[EnumerationValidation(typeof(ReportType))]
+			public string ReportType { get; set; }
+
+			[RegularExpression(@"^\d{4}\-\d{4}$")]
+			public string SchoolYear { get; set; }
+		}
+
+		[HttpGet]
+		[Authorize(Policy = "ADM=")]
+		[ProducesResponseType(typeof(TemplatesResponse), 200)]
+		[ProducesResponseType(typeof(ErrorsResponse), 400)]
+		public async Task<IActionResult> GetMany([FromQuery]GetManyArgs args)
+		{
+			if (!ModelState.IsValid)
+				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
+
+			var templates = await Task.Run(() => _templates.GetManyMetadata(
+				type: args.ReportType == null ? null : ReportType.FromString(args.ReportType),
+				year: args.SchoolYear
+			));
+			if (templates == null)
+				templates = new List<TemplateMetadata>();
+
+			return new ObjectResult(new TemplatesResponse
+			{
+				Templates = templates.Select(t => new TemplateDto(t)).ToList(),
+			});
 		}
 
 		public struct TemplateResponse

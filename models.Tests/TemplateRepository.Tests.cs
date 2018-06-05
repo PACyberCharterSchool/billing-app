@@ -54,6 +54,14 @@ namespace models.Tests
 			Assert.That(actual.Content, Is.EqualTo(template.Content));
 		}
 
+		public static void AssertTemplate(TemplateMetadata actual, Template template)
+		{
+			Assert.That(actual.Id, Is.EqualTo(template.Id));
+			Assert.That(actual.ReportType, Is.EqualTo(template.ReportType));
+			Assert.That(actual.SchoolYear, Is.EqualTo(template.SchoolYear));
+			Assert.That(actual.Name, Is.EqualTo(template.Name));
+		}
+
 		[Test]
 		public void CreateOrUpdateWithNewObjectCreates()
 		{
@@ -160,6 +168,83 @@ namespace models.Tests
 		{
 			var actual = _uut.Get(ReportType.Invoice, "2017-2018");
 			Assert.That(actual, Is.Null);
+		}
+
+		[Test]
+		public void GetManyMetadataReturnsAll()
+		{
+			var templates = new[] {
+				new Template {
+					ReportType = ReportType.Invoice,
+					SchoolYear = "2017-2018",
+					Name = "template1",
+				},
+				new Template {
+					ReportType = ReportType.Invoice,
+					SchoolYear = "2018-2019",
+					Name = "template2",
+				},
+			};
+			using (var ctx = NewContext())
+				ctx.SaveChanges(() => ctx.AddRange(templates));
+
+			var actual = _uut.GetManyMetadata();
+			Assert.That(actual, Has.Count.EqualTo(templates.Length));
+			for (var i = 0; i < actual.Count; i++)
+				AssertTemplate(actual[i], templates[i]);
+		}
+
+		[Test]
+		public void GetManyMetadataReturnsEmptyListWhenEmpty()
+		{
+			var actual = _uut.GetManyMetadata();
+			Assert.That(actual, Is.Empty);
+		}
+
+		[Test]
+		public void GetManyMetadataFiltersByReportType()
+		{
+			var templates = new[] {
+				new Template {
+					ReportType = ReportType.Invoice,
+					SchoolYear = "2017-2018",
+					Name = "template",
+				},
+				new Template {
+					ReportType = ReportType.StudentInformation,
+					SchoolYear = "2017-2018",
+					Name = "template",
+				},
+			};
+			using (var ctx = NewContext())
+				ctx.SaveChanges(() => ctx.AddRange(templates));
+
+			var actual = _uut.GetManyMetadata(type: ReportType.Invoice);
+			Assert.That(actual, Has.Count.EqualTo(1));
+			AssertTemplate(actual[0], templates[0]);
+		}
+
+		[Test]
+		public void GetManyMetadataFiltersBySchoolYear()
+		{
+			var templates = new[] {
+				new Template {
+					ReportType = ReportType.Invoice,
+					SchoolYear = "2017-2018",
+					Name = "template",
+				},
+				new Template {
+					ReportType = ReportType.Invoice,
+					SchoolYear = "2018-2019",
+					Name = "template",
+				},
+			};
+			using (var ctx = NewContext())
+				ctx.SaveChanges(() => ctx.AddRange(templates));
+
+			var actual = _uut.GetManyMetadata(year: "2018-2019");
+			Assert.That(actual, Has.Count.EqualTo(1));
+			AssertTemplate(actual[0], templates[1]);
 		}
 	}
 }

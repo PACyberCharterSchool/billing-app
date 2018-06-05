@@ -12,9 +12,8 @@ namespace models
 	{
 		Template CreateOrUpdate(DateTime time, Template update);
 		Template CreateOrUpdate(Template update);
-		Template Get(ReportType type, string schoolYear);
-		// TODO(Erik): GetMetadata?
-		// TODO(Erik): GetManyMetadata?
+		Template Get(ReportType type, string year);
+		IList<TemplateMetadata> GetManyMetadata(ReportType type = null, string year = null);
 	}
 
 	public class TemplateRepository : ITemplateRepository
@@ -58,7 +57,28 @@ namespace models
 
 		public Template CreateOrUpdate(Template update) => CreateOrUpdate(DateTime.Now, update);
 
-		public Template Get(ReportType type, string schoolYear) =>
-			_templates.SingleOrDefault(t => t.ReportType == type && t.SchoolYear == schoolYear);
+		public Template Get(ReportType type, string year) =>
+			_templates.SingleOrDefault(t => t.ReportType == type && t.SchoolYear == year);
+
+		public IList<TemplateMetadata> GetManyMetadata(ReportType type = null, string year = null)
+		{
+			var templates = _templates.Select(t => new TemplateMetadata
+			{
+				Id = t.Id,
+				ReportType = t.ReportType,
+				SchoolYear = t.SchoolYear,
+				Name = t.Name,
+				Created = t.Created,
+				LastUpdated = t.LastUpdated,
+			});
+
+			if (type != null)
+				templates = templates.Where(t => t.ReportType == type);
+
+			if (year != null)
+				templates = templates.Where(t => t.SchoolYear == year);
+
+			return templates.ToList();
+		}
 	}
 }

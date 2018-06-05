@@ -14,7 +14,7 @@ namespace api.Dtos
 		public DateTime Created { get; set; }
 		public DateTime LastUpdated { get; set; }
 
-		public TemplateDto(Template model)
+		public TemplateDto(TemplateMetadata model)
 		{
 			this.Id = model.Id;
 			this.ReportType = model.ReportType;
