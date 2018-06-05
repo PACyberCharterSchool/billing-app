@@ -4,6 +4,8 @@ using System.Linq;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
+using models;
+
 namespace api.Controllers
 {
 	public class EnumerationOperationFilter : IOperationFilter
@@ -12,6 +14,15 @@ namespace api.Controllers
 		{
 			if (operation.Parameters == null)
 				return;
+
+			foreach (var att in context.ApiDescription.ActionAttributes().
+				Where(a => a is EnumerationPathParameterAttribute).
+				Select(a => a as EnumerationPathParameterAttribute))
+			{
+				var def = operation.Parameters.SingleOrDefault(p => p.Name == att.Param);
+				if (def != null && !def.Extensions.ContainsKey("enum"))
+					def.Extensions.Add("enum", att.Values);
+			}
 
 			foreach (var param in context.ApiDescription.ParameterDescriptions)
 			{
@@ -29,7 +40,7 @@ namespace api.Controllers
 
 				var values = ((EnumerationValidationAttribute)att).Values;
 				var def = operation.Parameters.SingleOrDefault(p => p.Name == param.Name);
-				if (def == null)
+				if (def == null || def.Extensions.ContainsKey("enum"))
 					continue;
 
 				def.Extensions.Add("enum", values);
