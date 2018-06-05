@@ -13,6 +13,7 @@ namespace models
 		public DbSet<Payment> Payments { get; set; }
 		public DbSet<PendingStudentStatusRecord> PendingStudentStatusRecords { get; set; }
 		public DbSet<Refund> Refunds { get; set; }
+		public DbSet<Report> Reports { get; set; }
 		public DbSet<Template> Templates { get; set; }
 		public DbSet<SchoolDistrict> SchoolDistricts { get; set; }
 		public DbSet<Student> Students { get; set; }
@@ -34,6 +35,17 @@ namespace models
 				HasConversion(
 					v => v.Value,
 					v => PaymentType.FromString(v)
+				);
+
+			builder.Entity<Report>().
+				HasIndex(e => e.Name).
+				IsUnique();
+
+			builder.Entity<Report>().
+				Property(e => e.Type).
+				HasConversion(
+					v => v.Value,
+					v => ReportType.FromString(v)
 				);
 
 			builder.Entity<Template>().
