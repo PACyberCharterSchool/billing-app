@@ -290,17 +290,15 @@ namespace models.Migrations
 
                     b.Property<string>("SchoolYear");
 
-                    b.Property<int?>("TemplateId");
-
                     b.Property<string>("Type");
+
+                    b.Property<byte[]>("Xlsx");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique()
                         .HasFilter("[Name] IS NOT NULL");
-
-                    b.HasIndex("TemplateId");
 
                     b.ToTable("Reports");
                 });
@@ -473,13 +471,6 @@ namespace models.Migrations
                     b.HasOne("models.SchoolDistrict", "SchoolDistrict")
                         .WithMany()
                         .HasForeignKey("SchoolDistrictId");
-                });
-
-            modelBuilder.Entity("models.Report", b =>
-                {
-                    b.HasOne("models.Template", "Template")
-                        .WithMany()
-                        .HasForeignKey("TemplateId");
                 });
 
             modelBuilder.Entity("models.Student", b =>

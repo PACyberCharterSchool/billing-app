@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
+using System.Text;
 
 using NUnit.Framework;
 
@@ -71,28 +72,6 @@ namespace models.Tests
 			Assert.That(() => _uut.Approve("bob"), Throws.TypeOf<NotFoundException>());
 		}
 
-		private static void AssertTemplate(Template actual, Template template)
-		{
-			Assert.That(actual.Id, Is.EqualTo(template.Id));
-			Assert.That(actual.ReportType, Is.EqualTo(template.ReportType));
-			Assert.That(actual.SchoolYear, Is.EqualTo(template.SchoolYear));
-			Assert.That(actual.Name, Is.EqualTo(template.Name));
-			Assert.That(actual.Created, Is.EqualTo(template.Created));
-			Assert.That(actual.LastUpdated, Is.EqualTo(template.LastUpdated));
-		}
-
-		private static void AssertReport(Report actual, Report report)
-		{
-			Assert.That(actual.Id, Is.EqualTo(report.Id));
-			Assert.That(actual.Type, Is.EqualTo(report.Type));
-			Assert.That(actual.SchoolYear, Is.EqualTo(report.SchoolYear));
-			Assert.That(actual.Name, Is.EqualTo(report.Name));
-			Assert.That(actual.Approved, Is.EqualTo(report.Approved));
-			Assert.That(actual.Created, Is.EqualTo(report.Created));
-			Assert.That(actual.Data, Is.EqualTo(report.Data));
-			AssertTemplate(actual.Template, report.Template);
-		}
-
 		private static void AssertReport(ReportMetadata actual, Report report)
 		{
 			Assert.That(actual.Id, Is.EqualTo(report.Id));
@@ -101,6 +80,13 @@ namespace models.Tests
 			Assert.That(actual.Name, Is.EqualTo(report.Name));
 			Assert.That(actual.Approved, Is.EqualTo(report.Approved));
 			Assert.That(actual.Created, Is.EqualTo(report.Created));
+		}
+
+		private static void AssertReport(Report actual, Report report)
+		{
+			AssertReport(actual as ReportMetadata, report);
+			Assert.That(actual.Data, Is.EqualTo(report.Data));
+			Assert.That(actual.Xlsx, Is.EqualTo(report.Xlsx));
 		}
 
 		[Test]
@@ -112,14 +98,8 @@ namespace models.Tests
 				SchoolYear = "2017-2018",
 				Name = "invoice",
 				Data = "hello",
-				Template = new Template
-				{
-					ReportType = ReportType.Invoice,
-					SchoolYear = "2017-2018",
-					Name = "invoice-template",
-				},
+				Xlsx = Encoding.UTF8.GetBytes("hello"),
 			};
-			_context.SaveChanges(() => _context.Add(report.Template));
 
 			var now = DateTime.Now;
 			var result = _context.SaveChanges(() => _uut.Create(now, report));
@@ -140,12 +120,6 @@ namespace models.Tests
 				SchoolYear = "2017-2018",
 				Name = "invoice",
 				Data = "hello",
-				Template = new Template
-				{
-					ReportType = ReportType.Invoice,
-					SchoolYear = "2017-2018",
-					Name = "invoice-template",
-				},
 			};
 			using (var ctx = NewContext())
 				ctx.SaveChanges(() => ctx.Add(report));
@@ -162,12 +136,6 @@ namespace models.Tests
 				SchoolYear = "2017-2018",
 				Name = "invoice",
 				Data = "hello",
-				Template = new Template
-				{
-					ReportType = ReportType.Invoice,
-					SchoolYear = "2017-2018",
-					Name = "invoice-template",
-				},
 			};
 			using (var ctx = NewContext())
 				ctx.SaveChanges(() => ctx.Add(report));
@@ -186,33 +154,22 @@ namespace models.Tests
 		[Test]
 		public void GetManyMetadataReturnsAll()
 		{
-			var template = new Template
-			{
-				ReportType = ReportType.Invoice,
-				SchoolYear = "2017-2018",
-			};
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
 					SchoolYear = "2017-2018",
 					Name = "invoice1",
 					Data = "hello",
-					Template = template,
 				},
 				new Report {
 					Type = ReportType.Invoice,
 					SchoolYear = "2017-2018",
 					Name = "invoice2",
 					Data = "hello",
-					Template = template,
 				},
 			};
 			using (var ctx = NewContext())
-			{
-				ctx.Add(template);
-				ctx.AddRange(reports);
-				ctx.SaveChanges();
-			}
+				ctx.SaveChanges(() => ctx.AddRange(reports));
 
 			var actuals = _uut.GetManyMetadata();
 			Assert.That(actuals, Has.Count.EqualTo(reports.Length));
@@ -230,33 +187,22 @@ namespace models.Tests
 		[Test]
 		public void GetManyMetadataFiltersByName()
 		{
-			var template = new Template
-			{
-				ReportType = ReportType.Invoice,
-				SchoolYear = "2017-2018",
-			};
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
 					SchoolYear = "2017-2018",
 					Name = "invoice1",
 					Data = "hello",
-					Template = template,
 				},
 				new Report {
 					Type = ReportType.Invoice,
 					SchoolYear = "2017-2018",
 					Name = "invoice2",
 					Data = "hello",
-					Template = template,
 				},
 			};
 			using (var ctx = NewContext())
-			{
-				ctx.Add(template);
-				ctx.AddRange(reports);
-				ctx.SaveChanges();
-			}
+				ctx.SaveChanges(() => ctx.AddRange(reports));
 
 			var actuals = _uut.GetManyMetadata(name: "invoice2");
 			Assert.That(actuals, Has.Count.EqualTo(1));
@@ -266,33 +212,22 @@ namespace models.Tests
 		[Test]
 		public void GetManyMetadataFiltersByReportType()
 		{
-			var template = new Template
-			{
-				ReportType = ReportType.Invoice,
-				SchoolYear = "2017-2018",
-			};
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
 					SchoolYear = "2017-2018",
 					Name = "invoice",
 					Data = "hello",
-					Template = template,
 				},
 				new Report {
 					Type = ReportType.StudentInformation,
 					SchoolYear = "2017-2018",
 					Name = "student-info",
 					Data = "hello",
-					Template = template,
 				},
 			};
 			using (var ctx = NewContext())
-			{
-				ctx.Add(template);
-				ctx.AddRange(reports);
-				ctx.SaveChanges();
-			}
+				ctx.SaveChanges(() => ctx.AddRange(reports));
 
 			var actuals = _uut.GetManyMetadata(type: ReportType.StudentInformation);
 			Assert.That(actuals, Has.Count.EqualTo(1));
@@ -303,33 +238,22 @@ namespace models.Tests
 		[Test]
 		public void GetManyMetadataFiltersBySchoolYear()
 		{
-			var template = new Template
-			{
-				ReportType = ReportType.Invoice,
-				SchoolYear = "2017-2018",
-			};
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
 					SchoolYear = "2017-2018",
 					Name = "invoice1",
 					Data = "hello",
-					Template = template,
 				},
 				new Report {
 					Type = ReportType.Invoice,
 					SchoolYear = "2018-2019",
 					Name = "invoice2",
 					Data = "hello",
-					Template = template,
 				},
 			};
 			using (var ctx = NewContext())
-			{
-				ctx.Add(template);
-				ctx.AddRange(reports);
-				ctx.SaveChanges();
-			}
+				ctx.SaveChanges(() => ctx.AddRange(reports));
 
 			var actuals = _uut.GetManyMetadata(year: "2018-2019");
 			Assert.That(actuals, Has.Count.EqualTo(1));
@@ -339,34 +263,23 @@ namespace models.Tests
 		[Test]
 		public void GetManyMetadataFiltersByApproved()
 		{
-			var template = new Template
-			{
-				ReportType = ReportType.Invoice,
-				SchoolYear = "2017-2018",
-			};
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
 					SchoolYear = "2017-2018",
 					Name = "invoice1",
 					Data = "hello",
-					Template = template,
 				},
 				new Report {
 					Type = ReportType.Invoice,
 					SchoolYear = "2017-2018",
 					Name = "invoice2",
 					Data = "hello",
-					Template = template,
 					Approved = true,
 				},
 			};
 			using (var ctx = NewContext())
-			{
-				ctx.Add(template);
-				ctx.AddRange(reports);
-				ctx.SaveChanges();
-			}
+				ctx.SaveChanges(() => ctx.AddRange(reports));
 
 			var actuals = _uut.GetManyMetadata(approved: true);
 			Assert.That(actuals, Has.Count.EqualTo(1));
@@ -382,12 +295,6 @@ namespace models.Tests
 				SchoolYear = "2017-2018",
 				Name = "invoice",
 				Data = "hello",
-				Template = new Template
-				{
-					ReportType = ReportType.Invoice,
-					SchoolYear = "2017-2018",
-					Name = "invoice-template",
-				},
 			};
 			using (var ctx = NewContext())
 				ctx.SaveChanges(() => ctx.Add(report));

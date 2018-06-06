@@ -23,7 +23,6 @@ namespace models
 	public class Report : ReportMetadata
 	{
 		public string Data { get; set; }
-
-		public virtual Template Template { get; set; }
+		public byte[] Xlsx { get; set; }
 	}
 }
