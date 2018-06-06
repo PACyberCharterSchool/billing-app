@@ -49,6 +49,7 @@ namespace api.Controllers
 		[HttpGet]
 		[Authorize(Policy = "STD+")]
 		[ProducesResponseType(typeof(StudentsResponse), 200)]
+		[ProducesResponseType(typeof(ErrorsResponse), 400)]
 		public async Task<IActionResult> GetMany([FromQuery]GetManyArgs args)
 		{
 			if (!ModelState.IsValid)

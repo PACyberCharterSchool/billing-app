@@ -11,5 +11,11 @@ namespace models
 			context.SaveChanges();
 			return result;
 		}
+
+		public static void SaveChanges(this DbContext context, Action action)
+		{
+			action();
+			context.SaveChanges();
+		}
 	}
 }

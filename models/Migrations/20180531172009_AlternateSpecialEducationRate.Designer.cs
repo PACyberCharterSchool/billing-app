@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using models;
 
 namespace models.Migrations
 {
     [DbContext(typeof(PacBillContext))]
-    partial class PacBillContextModelSnapshot : ModelSnapshot
+    [Migration("20180531172009_AlternateSpecialEducationRate")]
+    partial class AlternateSpecialEducationRate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -394,33 +396,6 @@ namespace models.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("StudentActivityRecords");
-                });
-
-            modelBuilder.Entity("models.Template", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<byte[]>("Content");
-
-                    b.Property<DateTime>("Created");
-
-                    b.Property<DateTime>("LastUpdated");
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("ReportType");
-
-                    b.Property<string>("SchoolYear");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReportType", "SchoolYear")
-                        .IsUnique()
-                        .HasFilter("[ReportType] IS NOT NULL AND [SchoolYear] IS NOT NULL");
-
-                    b.ToTable("Templates");
                 });
 
             modelBuilder.Entity("models.CalendarDay", b =>

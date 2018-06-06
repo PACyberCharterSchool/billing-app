@@ -87,6 +87,12 @@ namespace api.Controllers
 			[Range(0, double.PositiveInfinity)]
 			public decimal? AlternateRate { get; set; }
 
+			[Range(0, double.PositiveInfinity)]
+			public decimal SpecialEducationRate { get; set; }
+
+			[Range(0, double.PositiveInfinity)]
+			public decimal? AlternateSpecialEducationRate { get; set; }
+
 			[Required]
 			[JsonConverter(typeof(SchoolDistrictPaymentTypeJsonConverter))]
 			public SchoolDistrictPaymentType PaymentType { get; set; }
