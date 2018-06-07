@@ -1,11 +1,36 @@
 .digital-signatures-title-row {
   height: 40px;
+  
+  h4 {
+    color: #58a917;
+  }
 }
 
 .digital-signatures-action-row {
   height: 60px;
+
+  div.col-md-12 {
+    display: inline-flex;
+    align-items: center;
+
+    div.col-md-6 {
+      padding: 0;
+    }
+  }
 }
 
 .digital-signatures-list-row {
   height: calc(100% - 100px);
+
+  div.col-md-12 {
+    table {
+      thead {
+        height: 60px;
+      }
+
+      tbody {
+        height: calc(100% - 60px);
+      }
+    }
+  }
 }

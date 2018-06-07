@@ -43,6 +43,11 @@ export class DigitalSignaturesService {
     return this.httpClient.post<any>(url, reqBodyObj);
   }
 
+  public deleteDigitalSignature(id: number): Observable<DigitalSignature> {
+    const url = this.apiDigitalSignatureUrl + `/${id}`;
+    return this.httpClient.delete<DigitalSignature>(url, this.headers);
+  }
+
   private serializeSignatureRequestBodyObject(signatureData: FormData): Object {
     Object.keys(signatureData).forEach(
       k => {

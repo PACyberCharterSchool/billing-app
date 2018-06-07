@@ -193,6 +193,12 @@ export class NormalizeFieldNamePipe implements PipeTransform {
       case 'schoolDay':
         fieldName = 'School Day';
         break;
+      case 'fileName':
+        fieldName = 'File Name';
+        break;
+      case 'title':
+        fieldName = 'Title';
+        break;
       default:
         fieldName = 'Column';
         break;

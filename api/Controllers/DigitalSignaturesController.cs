@@ -36,6 +36,11 @@ namespace api.Controllers
       _logger = logger;
     }
 
+		public struct DigitalSignatureResponse
+		{
+			public DigitalSignatureDto DigitalSignature { get; set; }
+		}
+
     public struct DigitalSignaturesResponse
     {
       public IList<DigitalSignatureDto> DigitalSignatures { get; set; }
@@ -57,6 +62,27 @@ namespace api.Controllers
       );
     }
 
+    [HttpGet("{id}")]
+		[Authorize(Policy = "ADM=")]
+    [ProducesResponseType(typeof(DigitalSignatureResponse), 200)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> Get(int id)
+    {
+      try
+      {
+        var signature = await Task.Run(() => _signatures.Get(id));
+        _logger.LogInformation($"DigitalSignaturesController#Get(): signature is {signature}.");
+        return new ObjectResult(new DigitalSignatureResponse
+        {
+          DigitalSignature = new DigitalSignatureDto(signature)
+        });
+      }
+      catch (NotFoundException)
+      {
+        return NotFound();
+      }
+    }
+
 		public class CreateUpdateDigitalSignature
 		{
       public CreateUpdateDigitalSignature() {}
@@ -72,17 +98,14 @@ namespace api.Controllers
       public string userName { get; set; }
 
       public IFormFile file { get; set; }
-		}
 
-		public struct DigitalSignatureResponse
-		{
-			public DigitalSignatureDto DigitalSignature { get; set; }
+      public byte[] imgData { get; set; }
 		}
 
     [HttpPost]
     [Authorize(Policy = "ADM=")]
     [ProducesResponseType(typeof(DigitalSignatureResponse), 200)]
-    [ProducesResponseType(typeof(ErrorResponse), 400)]
+    [ProducesResponseType(typeof(ErrorsResponse), 400)]
     [ProducesResponseType(409)]
     public async Task<IActionResult> Create(CreateUpdateDigitalSignature create)
     {
@@ -123,6 +146,57 @@ namespace api.Controllers
       catch (DbUpdateException)
       {
         return new StatusCodeResult(409);
+      }
+    }
+
+    [HttpDelete("{id}")]
+    [Authorize(Policy = "ADM=")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(ErrorsResponse), 400)]
+    public async Task<IActionResult> Delete(int id)
+    {
+      if (!ModelState.IsValid)
+        return new BadRequestObjectResult(new ErrorsResponse(ModelState));
+
+      var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+
+      try {
+        await Task.Run(() => _context.SaveChanges(() => _signatures.Delete(id)));
+        return Ok();
+      }
+      catch (NotFoundException)
+      {
+        return NotFound();
+      }
+    }
+
+    [HttpPut("{id}")]
+    [Authorize(Policy = "ADM=")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(typeof(ErrorsResponse), 400)]
+    [ProducesResponseType(404)]
+    public async Task<IActionResult> Update(int id, [FromBody]CreateUpdateDigitalSignature update)
+    {
+      if (!ModelState.IsValid)
+        return new BadRequestObjectResult(new ErrorsResponse(ModelState));
+
+			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+      var signature = new DigitalSignature
+      {
+        Id = id,
+        Title = update.title,
+        Username = update.userName,
+        FileName = update.fileName,
+        imgData = update.imgData
+      };
+
+      try {
+        await Task.Run(() => _context.SaveChanges(() => _signatures.Update(signature)));
+        return Ok();
+      }
+      catch (NotFoundException)
+      {
+        return NotFound();
       }
     }
   }

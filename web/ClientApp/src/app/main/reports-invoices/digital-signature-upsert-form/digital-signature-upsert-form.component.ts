@@ -6,6 +6,8 @@ import { DigitalSignaturesService } from '../../../services/digital-signatures.s
 
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
+import { Globals } from '../../../globals';
+
 @Component({
   selector: 'app-digital-signature-upsert-form',
   templateUrl: './digital-signature-upsert-form.component.html',
@@ -18,20 +20,25 @@ export class DigitalSignatureUpsertFormComponent implements OnInit {
   private fileName: string;
   private imageUrl: string;
   private selectedFiles;
+  private imgData: string;
+  private isImageAssigned: boolean;
 
   @Input() op: string;
   @Input() digitalSignature: DigitalSignature;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private digitalSignaturesService: DigitalSignaturesService
+    private digitalSignaturesService: DigitalSignaturesService,
+    private globals: Globals
   ) { }
 
   ngOnInit() {
     if (this.op === 'update') {
       this.digitalSignaturesService.getDigitalSignature(this.digitalSignature.id).subscribe(
         data => {
-          console.log('DigitalSignatureUpsertFormComponent.ngOnInit(): data is ', data['digitalSignatures']);
+          console.log('DigitalSignatureUpsertFormComponent.ngOnInit(): data is ', data['digitalSignature']);
+
+          this.digitalSignature = data['digitalSignature'];
         },
         error => {
           console.log('DigitalSignatureUpsertFormComponent.ngOnInit(): error is ', error);
@@ -44,13 +51,22 @@ export class DigitalSignatureUpsertFormComponent implements OnInit {
     }
     else {
       this.digitalSignature = new DigitalSignature();
+      this.imageUrl = this.globals.sprite2X;
+      this.isImageAssigned = false;
     }
   }
 
   updateDigitalSignatureComponentValues() {
     this.title = this.digitalSignature.title;
     this.userName = this.digitalSignature.userName;
-    this.fileName = this.digitalSignature.fileName;
+    this.fileName = '';
+    if (this.digitalSignature.imgData) {
+      this.imageUrl = 'data:image/png;base64,' + this.digitalSignature.imgData;
+      this.isImageAssigned = true;
+    }
+    else {
+      this.isImageAssigned = false;
+    }
   }
 
   updateDigitalSignatureRecord() {
@@ -87,9 +103,18 @@ export class DigitalSignatureUpsertFormComponent implements OnInit {
     }
   }
 
-  setImageUrl($event) {
+  setImageUrl($event: any) {
     if ($event.target.files && $event.target.files[0]) {
+      var reader = new FileReader();
+
+      reader.onload = (event: any) => {
+        this.imageUrl = event.target.result;
+      }
+
+      reader.readAsDataURL($event.target.files[0]);
+
       this.selectedFiles = $event.target.files;
+      this.isImageAssigned = (this.selectedFiles.length > 0);
     }
   }
 }

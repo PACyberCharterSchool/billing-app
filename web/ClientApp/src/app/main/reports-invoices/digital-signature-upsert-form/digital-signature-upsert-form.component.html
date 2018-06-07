@@ -1,7 +1,7 @@
 <div class='col-md-12'>
   <div class='modal-header'>
     <div class='modal-title'>
-      <h4>Add Signature</h4>
+      <h4>{{op | titlecase}} Signature</h4>
     </div>
     <button type='button' class='close' aria-label='Close' (click)='ngbActiveModal.dismiss("Cross click")'>
       <span aria-hidden='true'>&times;</span>
@@ -12,22 +12,30 @@
       <form #signatureUpsertForm='ngForm' (ngSubmit)='upsertDigitalSignature()'>
         <div class='form-group col-md-12'>
           <div class='col-md-8'>
-            <input type='text' placeholder='Signature name' [(ngModel)]='title' [ngModelOptions]="{standalone: true}" />
-            <input type='file'
-              [(ngModel)]='fileName'
-              [ngModelOptions]="{standalone: true}"
-              accept='image/png; image/jpeg; image/gif'
-              (change)='setImageUrl($event)'
-              /> Select image file
+            <div class='col-md-12'>
+              <input type='text' placeholder='Signature name' [(ngModel)]='title' [ngModelOptions]="{standalone: true}" />
+            </div>
+            <div class='col-md-12'>
+              <input type='file'
+                [(ngModel)]='fileName'
+                [ngModelOptions]='{standalone: true}'
+                accept='image/png'
+                (change)='setImageUrl($event)'
+                /> Select image file
+            </div>
           </div>
           <div class='col-md-4'>
-            <img [src]="" />
+            <div class='col-md-12'>
+              <img [src]="imageUrl" [ngClass]='isImageAssigned ? "assigned" : "unassigned"' />
+            </div>
           </div>
         </div>
         <div class='form-group col-md-12'>
-          <div class='col-md-6 offset-md-6'>
-            <button type='button' class='btn btn-outline'>CANCEL</button>
-            <button type='submit' class='btn btn-primary'>SAVE</button>
+          <div class='col-md-4 offset-md-8'>
+            <div class='col-md-10 offset-md-2'>
+              <button type='button' class='btn btn-outline' (click)='ngbActiveModal.dismiss("Cancel")'>CANCEL</button>
+              <button type='submit' class='btn btn-primary'>SAVE</button>
+            </div>
           </div>
         </div>
       </form>

@@ -10,6 +10,7 @@ namespace api.Dtos
 		public string Title { get; set; }
 		public string Username { get; set; }
     public string FileName { get; set; }
+    public byte[] imgData { get; set; }
 		public DateTime Created { get; set; }
 		public DateTime LastUpdated { get; set; }
 
@@ -20,6 +21,7 @@ namespace api.Dtos
       this.Title = model.Title;
 			this.Username = model.Username;
       this.FileName = model.FileName;
+      this.imgData = model.imgData;
 			this.Created = model.Created;
 			this.LastUpdated = model.LastUpdated;
 		}

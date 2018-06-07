@@ -3,6 +3,7 @@ export class DigitalSignature {
   userName: string;
   title: string;
   fileName: string;
+  imgData: Blob;
   created: Date;
   lastUpdated: Date;
 }

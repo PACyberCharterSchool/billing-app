@@ -13,6 +13,7 @@ namespace models
   {
     DigitalSignature Create(DigitalSignature create);
     DigitalSignature Create(DateTime time, DigitalSignature create);
+    bool Delete(int id);
     DigitalSignature Get(int id);
     IEnumerable<DigitalSignature> GetMany();
     DigitalSignature Update(DateTime time, DigitalSignature update);
@@ -44,6 +45,17 @@ namespace models
     public DigitalSignature Create(DateTime time, DigitalSignature create) => CreateMany(time, new[] { create })[0];
 
     public DigitalSignature Create(DigitalSignature create) => Create(DateTime.Now, create);
+
+    public bool Delete(int id)
+    {
+      var signature = _signatures.SingleOrDefault(ds => ds.Id == id);
+      if (signature != null) {
+        _signatures.Remove(signature);
+        return true;
+      }
+
+      return false;
+    }
 
     public DigitalSignature Get(int id) => _signatures.SingleOrDefault(ds => ds.Id == id);
 
