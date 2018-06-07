@@ -132,7 +132,7 @@ namespace api.Controllers
       {
         Title = create.title,
         FileName = create.fileName,
-        Username = username,
+        UserName = username,
         imgData = imgData
       };
       
@@ -185,7 +185,7 @@ namespace api.Controllers
       {
         Id = id,
         Title = update.title,
-        Username = update.userName,
+        UserName = update.userName,
         FileName = update.fileName,
         imgData = update.imgData
       };

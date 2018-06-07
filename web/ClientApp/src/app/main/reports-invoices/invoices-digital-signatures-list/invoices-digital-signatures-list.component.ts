@@ -80,7 +80,7 @@ export class InvoicesDigitalSignaturesListComponent implements OnInit {
         if (
           i.title.search(re) !== -1 ||
           i.fileName.search(re) !== -1 ||
-          i.username.search(re) !== -1
+          i.userName.search(re) !== -1
         ) {
           return true;
         }
@@ -149,9 +149,10 @@ export class InvoicesDigitalSignaturesListComponent implements OnInit {
             }
           );
         }
-        else (result === this.CloseDeleteDlgWithNo) {
+        else if (result === this.CloseDeleteDlgWithNo) {
           console.log('DigitalSignaturesListComponent.deleteDigitalSignature(): result is ', result);
         }
+
       },
       (reason) => {
         console.log('DigitalSignaturesListComponent.deleteDigitalSignature(): reason is ', reason);

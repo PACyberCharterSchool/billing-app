@@ -1,11 +1,15 @@
 import { TestBed, inject } from '@angular/core/testing';
 
+import { HttpClient, HttpHandler } from '@angular/common/http';
+
 import { DigitalSignaturesService } from './digital-signatures.service';
+
+import { Globals } from '../globals';
 
 describe('DigitalSignaturesService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [DigitalSignaturesService]
+      providers: [DigitalSignaturesService, Globals, HttpClient, HttpHandler]
     });
   });
 
