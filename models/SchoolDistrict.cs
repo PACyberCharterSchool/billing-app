@@ -21,6 +21,8 @@ namespace models
 		public string Name { get; set; }
 		public decimal Rate { get; set; }
 		public decimal? AlternateRate { get; set; }
+		public decimal SpecialEducationRate { get; set; }
+		public decimal? AlternateSpecialEducationRate { get; set; }
 		public SchoolDistrictPaymentType PaymentType { get; set; }
 
 		public DateTime Created { get; set; }

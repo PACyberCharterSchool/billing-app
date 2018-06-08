@@ -67,6 +67,7 @@ namespace api
 			services.AddTransient<IPaymentRepository, PaymentRepository>();
 			services.AddTransient<IPendingStudentStatusRecordRepository, PendingStudentStatusRecordRepository>();
 			services.AddTransient<IRefundRepository, RefundRepository>();
+			services.AddTransient<ITemplateRepository, TemplateRepository>();
 			services.AddTransient<ISchoolDistrictRepository, SchoolDistrictRepository>();
 			services.AddTransient<IStudentRepository, StudentRepository>();
 			services.AddTransient<IStudentActivityRecordRepository, StudentActivityRecordRepository>();
