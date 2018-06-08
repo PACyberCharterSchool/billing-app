@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 enum BUTTON_IDS {
+  InvoicesBtn = 'invoices-btn',
   DigitalSignaturesBtn = 'digital-signatures-btn',
   AgingReportsBtn = 'aging-reports-btn',
   AsOfDateReportsBtn = 'as-of-date-reports-btn',
@@ -34,6 +35,9 @@ export class ReportsInvoicesHomeComponent implements OnInit {
 
   handleInvoicesReportsHomeBtnSelection(id: string) {
     switch (id) {
+      case BUTTON_IDS.InvoicesBtn:
+        this.router.navigate(['/reports-invoices', { outlets: { 'action': ['invoices'] } }]);
+        break;
       case BUTTON_IDS.DigitalSignaturesBtn:
         this.router.navigate(['/reports-invoices', { outlets: { 'action': ['digital-signatures'] } }]);
         break;

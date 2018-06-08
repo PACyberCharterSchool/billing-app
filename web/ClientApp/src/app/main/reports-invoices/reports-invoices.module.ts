@@ -8,6 +8,7 @@ import { ReportsInvoicesComponent } from './reports-invoices.component';
 import { ReportsInvoicesHomeComponent } from './reports-invoices-home/reports-invoices-home.component';
 import { InvoicesDigitalSignaturesListComponent } from './invoices-digital-signatures-list/invoices-digital-signatures-list.component';
 import { DigitalSignatureUpsertFormComponent } from './digital-signature-upsert-form/digital-signature-upsert-form.component';
+import { InvoicesListComponent } from './invoices-list/invoices-list.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -18,7 +19,8 @@ import { SharedModule } from '../../shared/shared.module';
     ReportsInvoicesComponent,
     ReportsInvoicesHomeComponent,
     InvoicesDigitalSignaturesListComponent,
-    DigitalSignatureUpsertFormComponent
+    DigitalSignatureUpsertFormComponent,
+    InvoicesListComponent
   ],
   imports: [
     CommonModule,

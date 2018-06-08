@@ -5,6 +5,12 @@
   <div class='col-md-12'>
     <div class='row'>
       <div class='col-md-3'>
+        <button id='invoices-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
+          <img src='../../../../assets/images/sprite_2X.png' alt='Invoices' />
+          <label>Invoices</label>
+        </button>
+      </div>
+      <div class='col-md-3'>
         <button id='accounts-receivable-aging-report-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
           <img src='../../../../assets/images/sprite_2X.png' alt='A/R Report - Aging' />
           <label>A/R Report - Aging</label>
@@ -20,12 +26,6 @@
         <button id='csiu-export-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
           <img src='../../../../assets/images/sprite_2X.png' alt='CSIU Export' />
           <label>CSIU Export</label>
-        </button>
-      </div>
-      <div class='col-md-3'>
-        <button id='itemized-student-activity-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
-          <img src='../../../../assets/images/sprite_2X.png' alt='Itemized Student Activity' />
-          <label>Itemized Student Activity</label>
         </button>
       </div>
     </div>
@@ -49,9 +49,9 @@
         </button>
       </div>
       <div class='col-md-3'>
-        <button id='unipay-reconciliation-summary-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
-          <img src='../../../../assets/images/sprite_2X.png' alt='UniPay Reconciliation Summary' />
-          <label>UniPay Reconciliation Summary</label>
+        <button id='itemized-student-activity-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
+          <img src='../../../../assets/images/sprite_2X.png' alt='Itemized Student Activity' />
+          <label>Itemized Student Activity</label>
         </button>
       </div>
     </div>
@@ -60,6 +60,12 @@
         <button id='digital-signatures-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
           <img src='../../../../assets/images/sprite_2X.png' alt='Digital Signatures' />
           <label>Digital Signatures</label>
+        </button>
+      </div>
+      <div class='col-md-3'>
+        <button id='unipay-reconciliation-summary-btn' type='button' class='btn btn-outline-primary' (click)='handleClick($event)'>
+          <img src='../../../../assets/images/sprite_2X.png' alt='UniPay Reconciliation Summary' />
+          <label>UniPay Reconciliation Summary</label>
         </button>
       </div>
     </div>

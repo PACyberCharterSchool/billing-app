@@ -31,6 +31,15 @@
       }
     }
 
+    button#invoices-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -1450px -200px;
+        height: 180px;
+      }
+    }
+
     button#accounts-receivable-aging-report-btn {
       img {
         display: block;
