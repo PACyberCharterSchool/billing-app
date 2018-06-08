@@ -9,22 +9,32 @@ import * as moment from 'moment';
 })
 export class NormalizeFieldValuePipe implements PipeTransform {
 
-  transform(value: any, args?: any): any {
-    let v = value;
+  private isDateValue(val: any) {
     const formats = [
       'MM/DD/YYYY',
+      'M/D/YYYY',
+      'M/DD/YYYY',
+      'MM/D/YYYY',
       moment.ISO_8601
     ];
 
+    return (val && moment(val, formats, true).isValid());
+  }
+
+  transform(value: any, args?: any): any {
+    let v = value;
     switch (typeof(value)) {
       case 'string':
-        if (value && moment(value, formats, true).isValid()) {
+        if (this.isDateValue(value)) {
           const d = new Date(value);
           v = d.toLocaleDateString();
         }
         break;
       case 'object':
-        if (value && value.name) {
+        if (this.isDateValue(value)) {
+          const d = new Date(value);
+          v = d.toLocaleDateString();
+        } else if (value && value.name) {
           v = value.name;
         }
         break;

@@ -26,6 +26,7 @@ import { RefundsService } from './services/refunds.service';
 import { AcademicYearsService } from './services/academic-years.service';
 import { SchoolCalendarService } from './services/school-calendar.service';
 import { DigitalSignaturesService } from './services/digital-signatures.service';
+import { AuditRecordsService } from './services/audit-records.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
@@ -58,6 +59,7 @@ const pacbillImports = [
 const pacbillProviders = [
   AcademicYearsService,
   AppTitleService,
+  AuditRecordsService,
   AuthenticationGuardService,
   AuthenticationService,
   CurrentStudentService,
