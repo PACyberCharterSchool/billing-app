@@ -34,7 +34,7 @@ namespace models.Reporters.Exporters
 				switch (token.Type)
 				{
 					case JTokenType.Boolean:
-						return token.Value<bool>(); // TODO(Erik): YES|NO?
+						return token.Value<bool>() ? "YES" : "NO";
 
 					case JTokenType.Date:
 						return token.Value<DateTime>();
