@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -24,7 +23,6 @@ namespace models.Reporters.Exporters
 		// TODO(Erik): dictionary overload?
 		private static dynamic GetValue(JObject data, string value)
 		{
-			// Console.WriteLine($"value (PRE): {value}");
 			if (IsToken(value) && value.Count(c => c == '$') == 1)
 			{
 				var token = data.SelectToken(value.Trim().TrimStart("${".ToCharArray()).TrimEnd('}'));
