@@ -90,6 +90,49 @@ namespace models.Tests
 		}
 
 		[Test]
+		public void CreateManyCreates()
+		{
+			var reports = new[] {
+				new Report {
+					Type = ReportType.Invoice,
+					SchoolYear = "2017-2018",
+					Name = "invoice",
+					Data = "hello",
+					Xlsx = Encoding.UTF8.GetBytes("hello"),
+				},
+			};
+
+			var now = DateTime.Now;
+			var results = _context.SaveChanges(() => _uut.CreateMany(now, reports));
+			Assert.That(results, Is.EqualTo(reports));
+
+			var actuals = NewContext().Reports.ToList();
+			Assert.That(actuals, Has.Count.EqualTo(reports.Length));
+			for (var i = 0; i < actuals.Count; i++)
+			{
+				AssertReport(actuals[i], reports[i]);
+				Assert.That(actuals[0].Created, Is.EqualTo(now));
+			}
+		}
+
+		[Test]
+		public void CreateManyThrowsOnConflict()
+		{
+			var reports = new[] {
+				new Report {
+					Type = ReportType.Invoice,
+					SchoolYear = "2017-2018",
+					Name = "invoice",
+					Data = "hello",
+				},
+			};
+			using (var ctx = NewContext())
+				ctx.SaveChanges(() => ctx.AddRange(reports));
+
+			Assert.That(() => _context.SaveChanges(() => _uut.CreateMany(reports)), Throws.TypeOf<DbUpdateException>());
+		}
+
+		[Test]
 		public void CreateCreates()
 		{
 			var report = new Report

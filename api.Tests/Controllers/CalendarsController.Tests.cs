@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 
+using api.Common;
 using api.Controllers;
 using api.Tests.Util;
 using models;
@@ -96,9 +97,9 @@ namespace api.Tests.Controllers
 
 		[Test]
 		[TestCase("sample-calendar.csv", "text/csv")]
-		[TestCase("sample-calendar.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
-		[TestCase("sample-calendar-empty-first.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
-		[TestCase("sample-calendar-empty-last.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
+		[TestCase("sample-calendar.xlsx", ContentTypes.XLSX)]
+		[TestCase("sample-calendar-empty-first.xlsx", ContentTypes.XLSX)]
+		[TestCase("sample-calendar-empty-last.xlsx", ContentTypes.XLSX)]
 		public async Task UploadUploads(string fileName, string contentType)
 		{
 			var formFile = new Mock<IFormFile>();

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace api.Controllers
 {
@@ -11,6 +12,11 @@ namespace api.Controllers
 		public ErrorsResponse(IList<string> errors)
 		{
 			Errors = errors;
+		}
+
+		public ErrorsResponse(params string[] errors)
+		{
+			Errors = errors.ToList();
 		}
 
 		private static IList<string> ModelStateToList(ModelStateDictionary modelState)

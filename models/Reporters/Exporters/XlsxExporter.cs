@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 using Newtonsoft.Json.Linq;
 using NPOI.SS.UserModel;
@@ -8,46 +9,101 @@ using NPOI.XSSF.UserModel;
 
 namespace models.Reporters.Exporters
 {
-	public interface IExporter
+	public interface IXlsxExporter
 	{
-		XSSFWorkbook Export(XSSFWorkbook template, dynamic data);
+		XSSFWorkbook Export(XSSFWorkbook wb, dynamic data);
 	}
 
-	public class XlsxExporter : IExporter
+	public class XlsxExporter : IXlsxExporter
 	{
 		private static bool IsToken(string value) => (value.StartsWith("${") && value.EndsWith("}"));
 
+		private static bool ContainsToken(string value) => (value.Contains("${") && value.Contains("}"));
+
 		// TODO(Erik): generic overload?
 		// TODO(Erik): dictionary overload?
-		private static dynamic GetValue(JObject data, string path)
+		private static dynamic GetValue(JObject data, string value)
 		{
-			path = path.Trim().TrimStart("${".ToCharArray()).TrimEnd('}');
-
-			var token = data.SelectToken(path);
-			switch (token.Type)
+			// Console.WriteLine($"value (PRE): {value}");
+			if (IsToken(value) && value.Count(c => c == '$') == 1)
 			{
-				case JTokenType.Boolean:
-					return token.Value<bool>();
-
-				case JTokenType.Date:
-					return token.Value<DateTime>();
-
-				case JTokenType.Float:
-					return token.Value<float>();
-
-				case JTokenType.Integer:
-					return token.Value<int>();
-
-				case JTokenType.String:
-					return token.Value<string>();
-
-				default:
+				var token = data.SelectToken(value.Trim().TrimStart("${".ToCharArray()).TrimEnd('}'));
+				if (token == null)
 					return null;
+
+				switch (token.Type)
+				{
+					case JTokenType.Boolean:
+						return token.Value<bool>(); // TODO(Erik): YES|NO?
+
+					case JTokenType.Date:
+						return token.Value<DateTime>();
+
+					case JTokenType.Float:
+						return token.Value<float>();
+
+					case JTokenType.Integer:
+						return token.Value<int>();
+
+					case JTokenType.String:
+						return token.Value<string>();
+
+					default:
+						return null;
+				}
 			}
+
+			var pos = 0;
+			var sb = new StringBuilder();
+
+			var inPath = false;
+			var path = string.Empty;
+
+			while (true)
+			{
+				if (pos >= value.Length)
+					break;
+
+				var s = value[pos];
+				if (!inPath)
+				{
+					if (s != '$')
+					{
+						sb.Append(s);
+						pos++;
+						continue;
+					}
+
+					if (s == '$' && value[pos + 1] == '{')
+					{
+						inPath = true;
+						pos += 2;
+						continue;
+					}
+				}
+
+				if (s == '}')
+				{
+					pos++;
+					var token = data.SelectToken(path);
+					if (token != null)
+						sb.Append(token.ToString());
+
+					path = string.Empty;
+					inPath = false;
+					continue;
+				}
+
+				path += s;
+				pos++;
+			}
+
+			return sb.ToString();
 		}
 
 		public XSSFWorkbook Export(XSSFWorkbook wb, dynamic data)
 		{
+			// Console.WriteLine($"data: {data}");
 			for (var s = 0; s < wb.NumberOfSheets; s++)
 			{
 				var sheet = wb.GetSheetAt(s);
@@ -60,8 +116,15 @@ namespace models.Reporters.Exporters
 						continue;
 
 					foreach (var cell in row.Cells.Where(c => c.CellType == CellType.String))
-						if (IsToken(cell.StringCellValue))
-							cell.SetCellValue(GetValue(data, cell.StringCellValue));
+						if (ContainsToken(cell.StringCellValue))
+						{
+							var value = GetValue(data, cell.StringCellValue);
+							// Console.WriteLine($"value (POS): {value}");
+							if (value != null)
+								cell.SetCellValue(value);
+							else
+								cell.SetCellValue((string)null);
+						}
 				}
 			}
 

@@ -3,6 +3,7 @@ using System.Linq;
 using System.IO;
 
 using Newtonsoft.Json;
+using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using NUnit.Framework;
 
@@ -43,6 +44,14 @@ namespace models.Tests.Reporters.Exporters
 						Integer = 3, // JTokenType.Integer
 					},
 				},
+				Me = "me",
+				Multiple = new
+				{
+					Tokens = new dynamic[] {
+						"One",
+						"Two",
+					},
+				},
 			};
 
 			var actual = _uut.Export(template, JsonConvert.DeserializeObject(JsonConvert.SerializeObject(data)));
@@ -57,6 +66,11 @@ namespace models.Tests.Reporters.Exporters
 				Is.EqualTo(data.Array[1].Integer));
 			Assert.That(sheet.GetRow(5).GetCell(0).BooleanCellValue,
 				Is.EqualTo(data.Object.Deeper.Boolean));
+			Assert.That(sheet.GetRow(6).GetCell(0).StringCellValue,
+				Is.EqualTo("Please replace me!"));
+			Assert.That(sheet.GetRow(7).GetCell(0).CellType, Is.EqualTo(CellType.Blank));
+			Assert.That(sheet.GetRow(8).GetCell(0).StringCellValue,
+				Is.EqualTo("One Two"));
 
 			XSSFFormulaEvaluator.EvaluateAllFormulaCells(actual);
 			Assert.That(sheet.GetRow(4).GetCell(0).StringCellValue,

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using api.Common;
 using api.Dtos;
 using models;
 
@@ -34,7 +35,7 @@ namespace api.Controllers
 
 		[HttpGet("{type}/{year}")]
 		[Authorize(Policy = "ADM=")]
-		[Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
+		[Produces(ContentTypes.XLSX)]
 		[ProducesResponseType(typeof(ErrorResponse), 400)]
 		[ProducesResponseType(404)]
 		[EnumerationPathParameter("type", typeof(ReportType))]
@@ -48,7 +49,7 @@ namespace api.Controllers
 				return NotFound();
 
 			var stream = new MemoryStream(template.Content);
-			return new FileStreamResult(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+			return new FileStreamResult(stream, ContentTypes.XLSX)
 			{
 				FileDownloadName = template.Name,
 			};
@@ -109,7 +110,7 @@ namespace api.Controllers
 				return new BadRequestObjectResult(
 					new ErrorResponse($"Could not find parameter named '{nameof(content)}'."));
 
-			if (content.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+			if (content.ContentType != ContentTypes.XLSX)
 				return new BadRequestObjectResult(
 					new ErrorResponse($"Invalid file Content-Type '{content.ContentType}'."));
 

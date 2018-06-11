@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 
+using api.Common;
 using api.Controllers;
 using api.Dtos;
 using api.Tests.Util;
@@ -58,7 +59,7 @@ namespace api.Tests.Controllers
 			var file = (FileStreamResult)result;
 
 			Assert.That(file.FileDownloadName, Is.EqualTo(template.Name));
-			Assert.That(file.ContentType, Is.EqualTo("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+			Assert.That(file.ContentType, Is.EqualTo(ContentTypes.XLSX));
 
 			var stream = file.FileStream;
 			using (var reader = new StreamReader(stream))
@@ -215,7 +216,7 @@ namespace api.Tests.Controllers
 			var file = File.OpenRead(filepath);
 			var name = "template";
 			formFile.Setup(ff => ff.FileName).Returns(name);
-			formFile.Setup(ff => ff.ContentType).Returns("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+			formFile.Setup(ff => ff.ContentType).Returns(ContentTypes.XLSX);
 			formFile.Setup(ff => ff.OpenReadStream()).Returns(file);
 
 			var type = ReportType.Invoice;

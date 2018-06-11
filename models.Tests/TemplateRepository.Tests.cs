@@ -144,7 +144,34 @@ namespace models.Tests
 		}
 
 		[Test]
-		public void GetGets()
+		public void GetByIdGets()
+		{
+			var time = DateTime.Now;
+			var template = new Template
+			{
+				ReportType = ReportType.Invoice,
+				SchoolYear = "2017-2018",
+				Name = "template",
+				Content = Encoding.UTF8.GetBytes("hello"),
+				Created = time,
+				LastUpdated = time,
+			};
+			using (var ctx = NewContext())
+				ctx.SaveChanges(() => ctx.Add(template));
+
+			var actual = _uut.Get(template.Id);
+			AssertTemplate(actual, template);
+		}
+
+		[Test]
+		public void GetByIdReturnsNullIfNotFound()
+		{
+			var actual = _uut.Get(1);
+			Assert.That(actual, Is.Null);
+		}
+
+		[Test]
+		public void GetByReportTypeAndSchoolYearGets()
 		{
 			var time = DateTime.Now;
 			var template = new Template
@@ -164,7 +191,7 @@ namespace models.Tests
 		}
 
 		[Test]
-		public void GetReturnsNullIfNotFound()
+		public void GetByReportTypeAndSchoolYearReturnsNullIfNotFound()
 		{
 			var actual = _uut.Get(ReportType.Invoice, "2017-2018");
 			Assert.That(actual, Is.Null);

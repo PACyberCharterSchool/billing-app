@@ -21,6 +21,8 @@ using static api.Common.UserRoles;
 using api.Controllers;
 using api.Services;
 using models;
+using models.Reporters;
+using models.Reporters.Exporters;
 using models.Transformers;
 
 namespace api
@@ -67,12 +69,16 @@ namespace api
 			services.AddTransient<IPaymentRepository, PaymentRepository>();
 			services.AddTransient<IPendingStudentStatusRecordRepository, PendingStudentStatusRecordRepository>();
 			services.AddTransient<IRefundRepository, RefundRepository>();
+			services.AddTransient<IReportRepository, ReportRepository>();
 			services.AddTransient<ITemplateRepository, TemplateRepository>();
 			services.AddTransient<ISchoolDistrictRepository, SchoolDistrictRepository>();
 			services.AddTransient<IStudentRepository, StudentRepository>();
 			services.AddTransient<IStudentActivityRecordRepository, StudentActivityRecordRepository>();
 
 			services.AddTransient<IFilterParser, FilterParser>();
+
+			services.AddSingleton<IReporterFactory, ReporterFactory>();
+			services.AddSingleton<IXlsxExporter, XlsxExporter>();
 			#endregion
 
 			#region Transformer

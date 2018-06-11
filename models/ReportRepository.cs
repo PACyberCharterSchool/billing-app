@@ -9,10 +9,12 @@ namespace models
 	public interface IReportRepository
 	{
 		void Approve(string name);
+		IList<Report> CreateMany(DateTime time, IList<Report> creates);
+		IList<Report> CreateMany(IList<Report> creates);
 		Report Create(DateTime time, Report create);
 		Report Create(Report create);
 		Report Get(string name);
-		IList<ReportMetadata> GetManyMetadata(
+		IList<ReportMetadata> GetManyMetadata( // TODO(Erik): skip take
 			string name = null,
 			ReportType type = null,
 			string year = null,
@@ -41,17 +43,24 @@ namespace models
 			_reports.Update(report);
 		}
 
-		public Report Create(DateTime time, Report create)
+		public IList<Report> CreateMany(DateTime time, IList<Report> creates)
 		{
-			create.Created = time;
-			_reports.Add(create);
-			return create;
+			foreach (var report in creates)
+				report.Created = time;
+
+			_reports.AddRange(creates);
+			return creates;
 		}
+
+		public IList<Report> CreateMany(IList<Report> creates) => CreateMany(DateTime.Now, creates);
+
+		public Report Create(DateTime time, Report create) => CreateMany(time, new[] { create })[0];
 
 		public Report Create(Report create) => Create(DateTime.Now, create);
 
 		public Report Get(string name) => _reports.SingleOrDefault(r => r.Name == name);
 
+		// TODO(Erik): filter by report data?
 		public IList<ReportMetadata> GetManyMetadata(
 			string name = null,
 			ReportType type = null,

@@ -12,6 +12,7 @@ using CsvHelper;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
+using api.Common;
 using models;
 
 namespace api.Controllers
@@ -113,7 +114,7 @@ namespace api.Controllers
 		private static Dictionary<string, Func<string, Stream, Calendar>> _parsers = new Dictionary<string, Func<string, Stream, Calendar>>
 		{
 			{"text/csv", CsvToCalendar},
-			{"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", XlsxToCalendar},
+			{ContentTypes.XLSX, XlsxToCalendar},
 		};
 
 		[HttpPut("{year}")]
