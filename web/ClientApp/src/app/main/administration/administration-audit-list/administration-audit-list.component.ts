@@ -20,7 +20,7 @@ export class AdministrationAuditListComponent implements OnInit {
   private isDescending: boolean;
   private allAudits: AuditRecord[];
   private audits: AuditRecord[];
-  private skip;
+  private skip: number;
   private collapsed: boolean;
   private selectedAuditRecord: AuditRecord;
   private searchText: string;

@@ -1,0 +1,46 @@
+div.col-md-12 {
+  div.modal-header {
+    div.modal-title {
+      h4 {
+        color: #58a917;
+      }
+    }
+  }
+
+  div.modal-body {
+    div.col-md-12 {
+      padding: 0;
+
+      form {
+        div.form-group {
+          display: flex;
+          div.col-md-6 {
+            align-items: center;
+            display: flex;
+            padding-left: 0;
+            padding-right: 0;
+          }
+
+          .dropdown-ctrl-col, .datepicker-ctrl-col {
+            div.d-inline-block {
+              width: 100%;
+
+              button {
+                width: 100%;
+              }
+
+              div.dropdown-menu {
+                height: 120px;
+                overflow-y: scroll;
+                width: 100%;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  div.modal-footer {
+  }
+}

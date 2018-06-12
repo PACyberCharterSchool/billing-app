@@ -27,6 +27,8 @@ import { AcademicYearsService } from './services/academic-years.service';
 import { SchoolCalendarService } from './services/school-calendar.service';
 import { DigitalSignaturesService } from './services/digital-signatures.service';
 import { AuditRecordsService } from './services/audit-records.service';
+import { ReportsService } from './services/reports.service';
+import { TemplatesService } from './services/templates.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
@@ -72,7 +74,9 @@ const pacbillProviders = [
   StudentsService,
   StudentStatusRecordsImportService,
   tokenInterceptor,
-  UtilitiesService
+  UtilitiesService,
+  ReportsService,
+  TemplatesService
 ];
 
 @NgModule({

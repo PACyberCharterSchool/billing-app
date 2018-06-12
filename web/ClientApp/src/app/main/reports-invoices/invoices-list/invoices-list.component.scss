@@ -1,0 +1,42 @@
+.invoices-title-row {
+  height: 60px;
+  padding-bottom: 5px;
+
+  h4 {
+    color: #58a917;
+  }
+}
+
+.invoices-action-row {
+  height: 60px;
+  padding-bottom: 5px;
+
+  div.col-md-12 {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+.invoices-list-row {
+  height: calc(100% - 100px);
+
+  .invoices-list-col {
+    height: calc(100% - 60px);
+
+    table {
+      height: 100%;
+
+      thead {
+        height: 60px;
+      }
+
+      tbody {
+        height: calc(100% - 60px);
+      }
+    }
+  }
+
+  .invoices-back-col {
+    height: 40px;
+  }
+}

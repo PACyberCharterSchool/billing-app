@@ -3,9 +3,9 @@ export enum ReportType {
   StudentInformation = 'StudentInformation'
 }
 
-export class ReportMetadata {
+class ReportMetadata {
   id: number;
-  type: ReportType;
+  type: string;
   schoolYear: string;
   name: string;
   approved: boolean;

@@ -199,6 +199,9 @@ export class NormalizeFieldNamePipe implements PipeTransform {
       case 'title':
         fieldName = 'Title';
         break;
+      case 'approved':
+        fieldName = 'Approved';
+        break;
       default:
         fieldName = 'Column';
         break;

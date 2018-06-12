@@ -1,0 +1,22 @@
+<div class='col-md-12'>
+  <div class='modal-header'>
+    <div class='modal-title'>
+      <h4>Preview Invoices</h4>
+    </div>
+    <button type='button' class='close' aria-label='Close' (click)='ngbActiveModal.dismiss("Cross click")'>
+      <span aria-hidden='true'>&times;</span>
+    </button>
+  </div>
+  <div class='modal-body'>
+    <div class='col-md-12'>
+      <app-invoice-excel-preview></app-invoice-excel-preview>
+    </div>
+  </div>
+  <div class='modal-footer'>
+    <div class='col-md-6 offset-md-7'>
+      <button type='button' class='btn btn-primary'>ACCEPT</button>
+      <button type='button' class='btn btn-warning'>REJECT</button>
+    </div>
+  </div>
+</div>
+
