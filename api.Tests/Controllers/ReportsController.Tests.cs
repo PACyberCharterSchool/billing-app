@@ -174,7 +174,8 @@ namespace api.Tests.Controllers
 					{
 						Payment = new InvoicePayment
 						{
-							Amount = 10m,
+							Type = PaymentType.Check.Value,
+							CheckAmount = 10m,
 							Date = time,
 							CheckNumber = "1234",
 						},
@@ -240,6 +241,7 @@ namespace api.Tests.Controllers
 				return wb;
 			});
 
+			// TODO(Erik): Something in VerifyReport occassionally fails.
 			// save report
 			Report report = null;
 			_reports.Setup(rs => rs.Create(It.Is<Report>(r =>

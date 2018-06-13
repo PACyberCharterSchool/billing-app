@@ -38,7 +38,8 @@ namespace models.Reporters
 	{
 		public string Type { get; set; }
 		public string CheckNumber { get; set; }
-		public decimal Amount { get; set; } // TODO(Erik): CheckAmount / UniPayAmount
+		public decimal? CheckAmount { get; set; }
+		public decimal? UniPayAmount { get; set; }
 		public DateTime Date { get; set; }
 	}
 
@@ -226,15 +227,25 @@ namespace models.Reporters
 
 				property.SetValue(transactions, new InvoiceTransaction
 				{
-					// TODO(Erik): CheckAmount/PdeAmount
-					// TODO(Erik): ExternalId == PDE UNIPAY?
-					Payment = _conn.Query<InvoicePayment>(@"
-						SELECT Type, ExternalId AS CheckNumber, Amount, Date
+					Payment = _conn.Query<InvoicePayment>($@"
+						SELECT
+							Type,
+							ExternalId AS CheckNumber,
+							CASE Type
+								WHEN '{PaymentType.Check.Value}' THEN Amount
+								ELSE NULL
+							END AS CheckAmount,
+							CASE Type
+								WHEN '{PaymentType.UniPay.Value}' THEN Amount
+								ELSE NULL
+							END	AS UniPayAmount,
+							Date
 						FROM Payments
 						WHERE SchoolDistrictId = @SchoolDistrictId
 						AND SchoolYear = @SchoolYear
 						AND (Date >= @StartDate AND Date <= @EndDate)",
 						args).SingleOrDefault(),
+					// TODO(Erik): nullable
 					Refund = _conn.Query<decimal>(@"
 						SELECT Amount
 						From Refunds

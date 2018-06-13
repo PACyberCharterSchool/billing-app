@@ -246,7 +246,7 @@ namespace models.Tests.Reporters
 					Assert.That(month.Payment, Is.Not.Null);
 					var payment = month.Payment;
 					Assert.That(payment.Type, Is.EqualTo(payments[0].Type.Value));
-					Assert.That(payment.Amount, Is.EqualTo(payments[0].Amount));
+					Assert.That(payment.CheckAmount, Is.EqualTo(payments[0].Amount));
 					Assert.That(payment.CheckNumber, Is.EqualTo(payments[0].ExternalId));
 					Assert.That(payment.Date, Is.EqualTo(payments[0].Date));
 					Assert.That(month.Refund, Is.EqualTo(0m));
@@ -267,7 +267,7 @@ namespace models.Tests.Reporters
 					Assert.That(month.Payment, Is.Not.Null);
 					var payment = month.Payment;
 					Assert.That(payment.Type, Is.EqualTo(payments[1].Type.Value));
-					Assert.That(payment.Amount, Is.EqualTo(payments[1].Amount));
+					Assert.That(payment.UniPayAmount, Is.EqualTo(payments[1].Amount));
 					Assert.That(payment.CheckNumber, Is.EqualTo(payments[1].ExternalId));
 					Assert.That(payment.Date, Is.EqualTo(payments[1].Date));
 					Assert.That(month.Refund, Is.EqualTo(refunds[1].Amount));
