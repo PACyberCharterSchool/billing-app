@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -89,11 +90,52 @@ namespace api.Controllers
 			public CreateInvoiceReport Invoice { get; set; }
 		}
 
-		private class MissingTemplateException : Exception
+		private void CloneInvoiceSheets(XSSFWorkbook wb, int count)
 		{
-			public MissingTemplateException(int templateId) :
-				base($"Could not find template with Id '{templateId}'.")
-			{ }
+			const int per = 8;
+
+			var numSheets = (int)count / per + (count % per == 0 ? 0 : 1);
+			for (var s = 0; s < numSheets - 1; s++)
+			{
+				wb.CloneSheet(1);
+
+				var sheet = wb.GetSheetAt(s + 2);
+				for (var r = sheet.FirstRowNum; r < sheet.LastRowNum; r++)
+				{
+					var row = sheet.GetRow(r);
+					if (row.Cells.All(c => c.CellType == CellType.Blank))
+						continue;
+
+					for (var c = row.FirstCellNum; c < row.LastCellNum; c++)
+					{
+						var cell = row.GetCell(c);
+
+						if (r == 12 && c == 1) // Number column
+						{
+							cell.SetCellValue(((s + 1) * per) + 1);
+							continue;
+						}
+
+						if (!(cell.CellType == CellType.String))
+							continue;
+
+						var value = cell.StringCellValue;
+						if (!value.Contains("${Students["))
+							continue;
+
+						const string pattern = @"\[(\d+)\]";
+						var matches = Regex.Matches(value, pattern);
+						if (matches.Count > 0)
+						{
+							var match = matches[0];
+							var i = int.Parse(match.Groups[1].Value);
+
+							value = Regex.Replace(value, pattern, $"[{(i + ((s + 1) * per))}]");
+							cell.SetCellValue(value);
+						}
+					}
+				}
+			}
 		}
 
 		private Report CreateInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
@@ -119,7 +161,10 @@ namespace api.Controllers
 			// compose workbook
 			var wb = new XSSFWorkbook(new MemoryStream(invoiceTemplate.Content));
 
-			// TODO(Erik): clone second sheet for every 8 students; adjust indexes
+			if (invoice.Students.Count > 0)
+				CloneInvoiceSheets(wb, invoice.Students.Count);
+			else
+				wb.RemoveSheetAt(1);
 
 			// generate xlsx
 			var data = JsonConvert.SerializeObject(invoice);
@@ -146,6 +191,13 @@ namespace api.Controllers
 			return report;
 		}
 
+		private class MissingTemplateException : Exception
+		{
+			public MissingTemplateException(int templateId) :
+				base($"Could not find template with Id '{templateId}'.")
+			{ }
+		}
+
 		private Report CreateInvoice(DateTime time, CreateReport create)
 		{
 			// get template
@@ -163,7 +215,7 @@ namespace api.Controllers
 		[ProducesResponseType(typeof(ErrorsResponse), 400)]
 		[ProducesResponseType(409)]
 		[ProducesResponseType(424)]
-		[SwaggerResponse(statusCode: 501, description: "Not Implemented")] // Swashbuckel sees this as "Server Error".
+		[SwaggerResponse(statusCode: 501, description: "Not Implemented")] // Swashbuckle sees this as "Server Error".
 		public async Task<IActionResult> Create([FromBody]CreateReport create)
 		{
 			if (!ModelState.IsValid)
@@ -273,7 +325,7 @@ namespace api.Controllers
 		[ProducesResponseType(409)]
 		[SwaggerResponse(statusCode: 423, description: "Locked")] // Swashbuckle sees this as "Client Error".
 		[ProducesResponseType(424)]
-		[SwaggerResponse(statusCode: 501, description: "Not Implemented")] // Swashbuckel sees this as "Server Error".
+		[SwaggerResponse(statusCode: 501, description: "Not Implemented")] // Swashbuckle sees this as "Server Error".
 		public IActionResult CreateMany([FromBody]CreateManyReports create)
 		{
 			var acquired = false;

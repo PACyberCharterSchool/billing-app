@@ -113,6 +113,13 @@ namespace api.Tests.Controllers
 			}
 		}
 
+		private static bool MatchWorkbook(XSSFWorkbook wb, int expected)
+		{
+			Console.WriteLine($"num sheets: {wb.NumberOfSheets}");
+			Console.WriteLine($"wb.Count: {wb.Count}");
+			return wb.NumberOfSheets == expected;
+		}
+
 		[Test]
 		public async Task CreateCreatesInvoice()
 		{
@@ -174,7 +181,7 @@ namespace api.Tests.Controllers
 						Refund = 50m,
 					}
 				},
-				Students = new List<InvoiceStudent>
+				Students = new List<InvoiceStudent> // TODO(Erik): 9? students
 				{
 					new InvoiceStudent
 					{
@@ -208,7 +215,7 @@ namespace api.Tests.Controllers
 				))).Returns(invoice);
 
 			// get templates
-			using (var fs01 = File.OpenRead("../../../TestData/test-template.xlsx"))
+			using (var fs01 = File.OpenRead("../../../TestData/invoice-template.xlsx"))
 			using (var ms01 = new MemoryStream())
 			{
 				fs01.CopyTo(ms01);
@@ -225,7 +232,7 @@ namespace api.Tests.Controllers
 			// generate xlsx
 			XSSFWorkbook xlsx = null;
 			_exporter.Setup(ex => ex.Export(
-				It.IsAny<XSSFWorkbook>(),
+				It.Is<XSSFWorkbook>(wb => MatchWorkbook(wb, 2)),
 				It.IsAny<JObject>()
 			)).Returns<XSSFWorkbook, dynamic>((wb, _) =>
 			{
@@ -335,10 +342,13 @@ namespace api.Tests.Controllers
 			var invoice = new Invoice
 			{
 				SchoolYear = "2017-2018",
+				Students = new[] {
+					new InvoiceStudent(),
+				},
 			};
 			reporter.Setup(r => r.GenerateReport(It.IsAny<InvoiceReporter.Config>())).Returns(invoice);
 
-			using (var fs = File.OpenRead("../../../TestData/test-template.xlsx"))
+			using (var fs = File.OpenRead("../../../TestData/invoice-template.xlsx"))
 			using (var ms = new MemoryStream())
 			{
 				fs.CopyTo(ms);
@@ -370,14 +380,12 @@ namespace api.Tests.Controllers
 			int aun,
 			Invoice invoice)
 		{
-			// Console.WriteLine($"BGN MatchConfig");
-			// Console.WriteLine($"  number: {config.InvoiceNumber} == {create.SchoolYear}_{aun}_???");
-			// Console.WriteLine($"  schoolYear: {config.SchoolYear} == {create.SchoolYear}");
-			// Console.WriteLine($"  asOf: {config.AsOf} == {create.Invoice.AsOf}");
-			// Console.WriteLine($"  toSchoolDistrict: {config.ToSchoolDistrict} == {create.Invoice.ToSchoolDistrict}");
-			// Console.WriteLine($"  toPDE: {config.ToPDE} == {create.Invoice.ToPDE}");
-			// Console.WriteLine($"  aun: {config.SchoolDistrictAun} == {aun}");
-			// Console.WriteLine($"END MatchConfig");
+			Console.WriteLine($"number: {config.InvoiceNumber} == {create.SchoolYear}_{aun}_???");
+			Console.WriteLine($"schoolYear: {config.SchoolYear} == {create.SchoolYear}");
+			Console.WriteLine($"asOf: {config.AsOf} == {create.Invoice.AsOf}");
+			Console.WriteLine($"toSchoolDistrict: {config.ToSchoolDistrict} == {create.Invoice.ToSchoolDistrict}");
+			Console.WriteLine($"toPDE: {config.ToPDE} == {create.Invoice.ToPDE}");
+			Console.WriteLine($"aun: {config.SchoolDistrictAun} == {aun}");
 			return config.InvoiceNumber.StartsWith($"{create.SchoolYear}_{aun}_") && // TODO(erik): inject time?
 				config.SchoolYear == create.SchoolYear &&
 				config.AsOf == create.Invoice.AsOf &&
@@ -425,6 +433,9 @@ namespace api.Tests.Controllers
 					{
 						Aun = auns[0],
 					},
+					Students = new[] {
+						new InvoiceStudent(),
+					},
 				},
 				new Invoice {
 					SchoolYear = "2017-2018",
@@ -432,12 +443,18 @@ namespace api.Tests.Controllers
 					{
 						Aun = auns[1],
 					},
+					Students = new[] {
+						new InvoiceStudent(),
+					},
 				},
 				new Invoice {
 					SchoolYear = "2017-2018",
 					SchoolDistrict = new InvoiceSchoolDistrict
 					{
 						Aun = auns[2],
+					},
+					Students = new[] {
+						new InvoiceStudent(),
 					},
 				},
 			};
@@ -457,7 +474,7 @@ namespace api.Tests.Controllers
 			))).Returns(invoices[2]).Verifiable();
 
 			// get template
-			using (var fs01 = File.OpenRead("../../../TestData/test-template.xlsx"))
+			using (var fs01 = File.OpenRead("../../../TestData/invoice-template.xlsx"))
 			using (var ms01 = new MemoryStream())
 			{
 				fs01.CopyTo(ms01);
@@ -474,7 +491,7 @@ namespace api.Tests.Controllers
 			// generate xlsx
 			var xlsxs = new List<XSSFWorkbook>();
 			_exporter.Setup(ex => ex.Export(
-				It.IsAny<XSSFWorkbook>(),
+				It.Is<XSSFWorkbook>(wb => MatchWorkbook(wb, 2)),
 				It.IsAny<JObject>()
 			)).Returns<XSSFWorkbook, dynamic>((wb, _) =>
 			{
@@ -598,10 +615,13 @@ namespace api.Tests.Controllers
 			var invoice = new Invoice
 			{
 				SchoolYear = "2017-2018",
+				Students = new[] {
+					new InvoiceStudent(),
+				},
 			};
 			reporter.Setup(r => r.GenerateReport(It.IsAny<InvoiceReporter.Config>())).Returns(invoice);
 
-			using (var fs = File.OpenRead("../../../TestData/test-template.xlsx"))
+			using (var fs = File.OpenRead("../../../TestData/invoice-template.xlsx"))
 			using (var ms = new MemoryStream())
 			{
 				fs.CopyTo(ms);
@@ -631,7 +651,7 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task GetGetsXlsx()
 		{
-			var templateFileStream = File.OpenRead("../../../TestData/test-template.xlsx");
+			var templateFileStream = File.OpenRead("../../../TestData/invoice-template.xlsx");
 			Report report;
 			using (var templateMemoryStream = new MemoryStream())
 			{

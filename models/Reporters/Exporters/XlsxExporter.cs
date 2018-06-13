@@ -114,15 +114,16 @@ namespace models.Reporters.Exporters
 						continue;
 
 					foreach (var cell in row.Cells.Where(c => c.CellType == CellType.String))
+					{
 						if (ContainsToken(cell.StringCellValue))
 						{
 							var value = GetValue(data, cell.StringCellValue);
-							// Console.WriteLine($"value (POS): {value}");
 							if (value != null)
 								cell.SetCellValue(value);
 							else
 								cell.SetCellValue((string)null);
 						}
+					}
 				}
 			}
 
