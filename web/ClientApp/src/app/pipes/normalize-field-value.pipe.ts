@@ -38,6 +38,9 @@ export class NormalizeFieldValuePipe implements PipeTransform {
           v = value.name;
         }
         break;
+      case 'boolean':
+        v = value ? 'Yes' : 'No';
+        break;
     }
 
     return v;

@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-
-import * as XLSX from 'xlsx';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-excel',
@@ -8,11 +7,16 @@ import * as XLSX from 'xlsx';
   styleUrls: ['./excel.component.scss']
 })
 export class ExcelComponent implements OnInit {
-  @Input() xlsxData;
+  private table;
 
-  constructor() { }
+  @Input() html;
+
+  constructor(
+    private sanitizer: DomSanitizer
+  ) { }
 
   ngOnInit() {
+    this.table = this.sanitizer.bypassSecurityTrustHtml(this.html);
   }
 
 }

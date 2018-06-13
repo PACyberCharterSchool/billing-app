@@ -9,13 +9,13 @@
   </div>
   <div class='modal-body'>
     <div class='col-md-12'>
-      <app-invoice-excel-preview [xlsxData]='xlsxData'></app-invoice-excel-preview>
+      <app-invoice-excel-preview [xlsxData]='xlsxData' [jsonData]='jsonData'></app-invoice-excel-preview>
     </div>
   </div>
   <div class='modal-footer'>
-    <div class='col-md-6 offset-md-7'>
+    <div class='col-md-4 offset-md-8'>
       <button type='button' class='btn btn-primary'>ACCEPT</button>
-      <button type='button' class='btn btn-warning'>REJECT</button>
+      <button type='button' class='btn btn-danger'>REJECT</button>
     </div>
   </div>
 </div>

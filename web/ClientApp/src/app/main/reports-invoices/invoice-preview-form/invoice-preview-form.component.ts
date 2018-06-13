@@ -9,6 +9,7 @@ import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class InvoicePreviewFormComponent implements OnInit {
   private xlsxData;
+  private jsonData;
   private currentInvoice;
   private invoiceIdx;
 
@@ -21,11 +22,16 @@ export class InvoicePreviewFormComponent implements OnInit {
   ngOnInit() {
     if (this.invoices) {
       this.xlsxData = this.invoices[0].xlsx;
+      this.jsonData = this.invoices[0].data;
       this.invoiceIdx = 0;
     }
   }
 
   approveInvoice() {
     this.invoices[this.invoiceIdx++].approved = true;
+  }
+
+  rejectInvoice() {
+    this.invoiceIdx++;
   }
 }

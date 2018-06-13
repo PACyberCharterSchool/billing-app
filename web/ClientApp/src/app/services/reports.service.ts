@@ -19,7 +19,7 @@ const reportsMeta: Report[] = [
     name: 'Mars School SD',
     approved: true,
     created: new Date('2018-05-09'),
-    data: null,
+    data: '{ "DAY": [ { "FIELD2": "DATE", "FIELD3": "SCHOOL DAY", "FIELD4": "MEMBERSHIP" } ], "Wednesday": [ { "FIELD2": "8/30/2017", "FIELD3": "1", "FIELD4": "180" }, { "FIELD2": "9/6/2017", "FIELD3": "5", "FIELD4": "176" }, { "FIELD2": "9/13/2017", "FIELD3": "10", "FIELD4": "171" }, { "FIELD2": "9/20/2017", "FIELD3": "15", "FIELD4": "166" }, { "FIELD2": "9/27/2017", "FIELD3": "20", "FIELD4": "161" }, { "FIELD2": "10/4/2017", "FIELD3": "25", "FIELD4": "156" }] }',
     xlsx: null
   },
   {
@@ -29,7 +29,7 @@ const reportsMeta: Report[] = [
     name: 'Seneca Valley SD',
     approved: false,
     created: new Date('2018-06-09'),
-    data: null,
+    data: '{ "DAY": { "FIELD2": "DATE", "FIELD3": "SCHOOL DAY", "FIELD4": "MEMBERSHIP" }, "Nonceday": { "FIELD2": "8/30/2017", "FIELD3": "1", "FIELD4": "180" } }',
     xlsx: null
   },
   {
@@ -39,7 +39,7 @@ const reportsMeta: Report[] = [
     name: 'Montour Run SD',
     approved: true,
     created: new Date('2018-04-09'),
-    data: null,
+    data: '[{ "Day": "Day" }, { "Night": "Night" }]',
     xlsx: null
   }
 ];

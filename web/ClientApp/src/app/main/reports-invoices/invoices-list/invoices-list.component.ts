@@ -130,6 +130,21 @@ export class InvoicesListComponent implements OnInit {
     );
   }
 
+  previewInvoice(invoice: Report) {
+    const modal = this.ngbModal.open(InvoicePreviewFormComponent, { centered: true, size: 'lg' });
+    modal.componentInstance.invoices = [invoice];
+    modal.result.then(
+      (result) => {
+      },
+      (reason) => {
+      }
+    )
+  }
+
+  downloadInvoice(invoice: Report) {
+  }
+
+
   downloadInvoices(bulkDownloadContent) {
     this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' }).result.then(
       (result) => {
@@ -140,12 +155,6 @@ export class InvoicesListComponent implements OnInit {
   }
 
   doDownload() {
-  }
-
-  previewInvoice(invoice: Report) {
-  }
-
-  downloadInvoice(invoice: Report) {
   }
 
   private getUnapprovedInvoices(): Report[] {
