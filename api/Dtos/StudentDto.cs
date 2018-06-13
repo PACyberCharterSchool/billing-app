@@ -29,7 +29,7 @@ namespace api.Dtos
 		public DateTime LastUpdated { get; set; }
 		public SchoolDistrictDto SchoolDistrict { get; set; }
 
-		public StudentDto(models.Student model)
+		public StudentDto(Student model)
 		{
 			this.Id = model.Id;
 			this.PACyberId = model.PACyberId;
@@ -52,7 +52,9 @@ namespace api.Dtos
 			this.EndDate = model.EndDate;
 			this.Created = model.Created;
 			this.LastUpdated = model.LastUpdated;
-			this.SchoolDistrict = new SchoolDistrictDto(model.SchoolDistrict);
+
+			if (model.SchoolDistrict != null)
+				this.SchoolDistrict = new SchoolDistrictDto(model.SchoolDistrict);
 		}
 	}
 }
