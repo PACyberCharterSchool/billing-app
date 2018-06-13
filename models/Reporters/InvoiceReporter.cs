@@ -46,7 +46,7 @@ namespace models.Reporters
 	public class InvoiceTransaction
 	{
 		public InvoicePayment Payment { get; set; }
-		public decimal Refund { get; set; }
+		public decimal? Refund { get; set; }
 	}
 
 	public class InvoiceTransactions
@@ -245,8 +245,7 @@ namespace models.Reporters
 						AND SchoolYear = @SchoolYear
 						AND (Date >= @StartDate AND Date <= @EndDate)",
 						args).SingleOrDefault(),
-					// TODO(Erik): nullable
-					Refund = _conn.Query<decimal>(@"
+					Refund = _conn.Query<decimal?>(@"
 						SELECT Amount
 						From Refunds
 						WHERE SchoolDistrictId = @SchoolDistrictId

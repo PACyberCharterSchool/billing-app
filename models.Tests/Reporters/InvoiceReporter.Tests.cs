@@ -236,7 +236,7 @@ namespace models.Tests.Reporters
 
 					Assert.That(transaction, Is.Not.Null);
 					Assert.That(transaction.Payment, Is.Null);
-					Assert.That(transaction.Refund, Is.EqualTo(0m));
+					Assert.That(transaction.Refund, Is.Null);
 				}
 
 				// August
@@ -249,7 +249,7 @@ namespace models.Tests.Reporters
 					Assert.That(payment.CheckAmount, Is.EqualTo(payments[0].Amount));
 					Assert.That(payment.CheckNumber, Is.EqualTo(payments[0].ExternalId));
 					Assert.That(payment.Date, Is.EqualTo(payments[0].Date));
-					Assert.That(month.Refund, Is.EqualTo(0m));
+					Assert.That(month.Refund, Is.Null);
 				}
 
 				// October
