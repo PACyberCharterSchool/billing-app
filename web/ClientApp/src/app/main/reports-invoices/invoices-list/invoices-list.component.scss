@@ -5,6 +5,17 @@
   h4 {
     color: #58a917;
   }
+
+  div {
+    display: flex;
+    align-items: center;
+
+    input[type='text'] {
+      padding: 6px 2px;
+      line-height: 14px;
+      width: 70%;
+    }
+  }
 }
 
 .invoices-action-row {
@@ -14,6 +25,16 @@
   div.col-md-12 {
     display: inline-flex;
     align-items: center;
+
+    div.col-md-6 {
+      display: inline-flex;
+      align-items: center;
+
+      div.col-md-6 {
+        display: inline-flex;
+        align-items: center;
+      }
+    }
   }
 }
 

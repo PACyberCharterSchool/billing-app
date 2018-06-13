@@ -25,6 +25,10 @@ export class InvoicesListComponent implements OnInit {
   private direction: number;
   private isDescending: boolean;
   private searchText: string;
+  private statuses: string[] = [
+    'Approved',
+    'Disapproved'
+  ];
 
   constructor(
     private globals: Globals,
@@ -86,6 +90,11 @@ export class InvoicesListComponent implements OnInit {
     return this.utilitiesService.objectValues(selected);
   }
 
+  getSchoolYears(): string[] {
+    const years = this.allReports.filter((v, i, s) => s.indexOf(v) === i).map((i) => i.schoolYear);
+    return years;
+  }
+
   createInvoices() {
     const modal = this.ngbModal.open(InvoiceCreateFormComponent, { centered: true });
     modal.result.then(
@@ -109,6 +118,9 @@ export class InvoicesListComponent implements OnInit {
         console.log('InvoicesListComponent.previewInvoices(): reason is ', reason);
       }
     );
+  }
+
+  downloadInvoices() {
   }
 
   private getUnapprovedInvoices(): Report[] {

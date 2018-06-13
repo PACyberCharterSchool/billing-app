@@ -1,18 +1,41 @@
 <div class='row invoices-title-row'>
-  <div class='col-md-4'><h4>Invoices</h4></div>
+  <div class='col-md-2'><h4>Invoices</h4></div>
+  <div class='col-md-4'>
+    <input type='text' [(ngModel)]='searchText' />
+    <button type='button' class='btn btn-primary' (click)='filterInvoices()'>SEARCH</button>
+    <button type='button' class='btn btn-outline-primary' (click)='resetInvoices()'>RESET</button>
+  </div>
+  <div class='col-md-6'>
+    <div class='col-md-3 offset-md-4'>
+      <button type='button' class='btn btn-outline-primary' (click)='approveInvoices()'>BULK APPROVE</button>
+    </div>
+    <div class='col-md-3'>
+      <button type='button' class='btn btn-outline-primary' (click)='downloadInvoices()'>BULK DOWNLOAD</button>
+    </div>
+  </div>
 </div>
 <div class='row invoices-action-row'>
   <div class='col-md-12'>
-    <div class='col-md-1 create-invoice-col'>
+    <div class='col-md-6'>
+      <div class='col-md-6'>
+       <div ngbDropdown class="d-inline-block">
+          <button class="btn btn-outline-primary" id="dropdownSchoolYear" ngbDropdownToggle>School Year</button>
+          <div ngbDropdownMenu aria-labelledby="dropdownSchoolYear">
+            <button class='dropdown-item' *ngFor='let year of getSchoolYears()'>{{year}}</button>
+          </div>
+        </div>
+      </div>
+      <div class='col-md-6'>
+        <div ngbDropdown class="d-inline-block">
+          <button class="btn btn-outline-primary" id="dropdownStatus" ngbDropdownToggle>Status</button>
+          <div ngbDropdownMenu aria-labelledby="dropdownStatus">
+            <button class='dropdown-item' *ngFor='let status of statuses'>{{status}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='col-md-6 create-invoice-col'>
       <button type='button' class='btn btn-primary' (click)='createInvoices()'>BULK CREATE</button>
-    </div>
-    <div class='col-md-1'>
-      <button type='button' class='btn btn-primary' (click)='approveInvoices()'>BULK APPROVE</button>
-    </div>
-    <div class='col-md-5 offset-md-7 search-invoice-col'>
-      <input type='text' [(ngModel)]='searchText' />
-      <button type='button' class='btn btn-primary' (click)='filterInvoices()'>SEARCH</button>
-      <button type='button' class='btn btn-outline-primary' (click)='resetInvoices()'>RESET</button>
     </div>
   </div>
 </div>
