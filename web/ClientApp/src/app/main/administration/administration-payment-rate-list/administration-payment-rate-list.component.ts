@@ -97,7 +97,17 @@ export class AdministrationPaymentRateListComponent implements OnInit {
   listDisplayableFields(): Object[] {
     if (this.schoolDistricts) {
       const fields = this.utilitiesService.objectKeys(this.schoolDistricts[0]);
-      return fields;
+      const rejected = ['id'];
+      return fields.filter((i) => !rejected.includes(i));
+    }
+  }
+
+  listDisplayableValues(sd: SchoolDistrict): Object[] {
+    if (sd) {
+      const vkeys = this.listDisplayableFields();
+      const selected = this.utilitiesService.pick(sd, vkeys);
+
+      return this.utilitiesService.objectValues(selected);
     }
   }
 

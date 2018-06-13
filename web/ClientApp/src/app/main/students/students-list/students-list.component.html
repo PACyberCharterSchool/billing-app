@@ -13,7 +13,7 @@
   </div>
   <div class='col-md-5 base-date-search-tools-col'>
     <div class='col-md-5'><app-student-datepicker iconSize='fa-2x' [(date)]='startDate' (dateSelected)='dateSelectedStartDateHandler($event)'></app-student-datepicker></div>
-    <div class='col-md-6'><app-student-datepicker iconSize='fa-2x' [(date)]='endDate' (dateSelected)='dateSelectedEndDateHandler($event)'></app-student-datepicker></div>
+    <div class='col-md-5'><app-student-datepicker iconSize='fa-2x' [(date)]='endDate' (dateSelected)='dateSelectedEndDateHandler($event)'></app-student-datepicker></div>
   </div>
   <div class='col-md-1'>
     <button class='btn btn-primary reset-button' (click)='resetStudentList()'>Reset</button>

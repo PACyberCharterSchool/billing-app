@@ -134,6 +134,7 @@ export class StudentsListComponent implements OnInit {
         console.log('StudentsListComponent.resetStudentList(): error is ', error);
       }
     );
+    this.searchText = '';
   }
 
   filterStudentListByNameOrId() {
