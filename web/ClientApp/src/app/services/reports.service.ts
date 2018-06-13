@@ -64,18 +64,23 @@ export class ReportsService {
   }
 
   public getReportsByType(type: string, skip: number): Observable<Report[]> {
-    // const url = this.apiReportsUrl + `${type}`;
+    // const url = this.apiReportsUrl + `/${type}`;
     // return this.httpClient.get<Report[]>(url, this.headers);
     return Observable.of(reportsMeta);
   }
 
   public getReport(id: number): Observable<Report> {
-    const url = this.apiReportsUrl + `${id}`;
+    const url = this.apiReportsUrl + `/${id}`;
+    return this.httpClient.get<Report>(url, this.headers);
+  }
+
+  public getReportByName(name: string): Observable<Report> {
+    const url = this.apiReportsUrl + `/${name}`;
     return this.httpClient.get<Report>(url, this.headers);
   }
 
   public createReports(reportInfo: Report): Observable<Report[]> {
-    const url = this.apiReportsUrl;
+    const url = this.apiReportsUrl + '/many';
     return this.httpClient.post<Report[]>(url, reportInfo, this.headers);
   }
 }

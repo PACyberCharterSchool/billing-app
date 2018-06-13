@@ -29,6 +29,8 @@ export class InvoicesListComponent implements OnInit {
     'Approved',
     'Disapproved'
   ];
+  private downloadSchoolYear: string;
+  private downloadStatus: string;
 
   constructor(
     private globals: Globals,
@@ -90,6 +92,14 @@ export class InvoicesListComponent implements OnInit {
     return this.utilitiesService.objectValues(selected);
   }
 
+  filterBySchoolYear(year: string) {
+    this.reports = this.allReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year));
+  }
+
+  filterByApprovedStatus(status: string) {
+    this.reports = this.allReports.filter((r) => (r.type === ReportType.Invoice && r.approved === (status === 'Approved' ? true : false)));
+  }
+
   getSchoolYears(): string[] {
     const years = this.allReports.filter((v, i, s) => s.indexOf(v) === i).map((i) => i.schoolYear);
     return years;
@@ -120,10 +130,37 @@ export class InvoicesListComponent implements OnInit {
     );
   }
 
-  downloadInvoices() {
+  downloadInvoices(bulkDownloadContent) {
+    this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' }).result.then(
+      (result) => {
+      },
+      (reason) => {
+      }
+    )
+  }
+
+  doDownload() {
+  }
+
+  previewInvoice(invoice: Report) {
+  }
+
+  downloadInvoice(invoice: Report) {
   }
 
   private getUnapprovedInvoices(): Report[] {
     return this.allReports.filter((r) => (r.type === ReportType.Invoice && !r.approved));
+  }
+
+  private getApprovedInvoices(): Report[] {
+    return this.allReports.filter((r) => (r.type === ReportType.Invoice && r.approved));
+  }
+
+  private getInvoicesForSchoolYear(year: string): Report[] {
+    return this.allReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year));
+  }
+
+  private getInvoicesBySchoolYearAndStatus(year: string, status: boolean): Report[] {
+    return this.allReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year && r.approved == status));
   }
 }
