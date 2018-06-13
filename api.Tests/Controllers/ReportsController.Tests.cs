@@ -182,27 +182,17 @@ namespace api.Tests.Controllers
 						Refund = 50m,
 					}
 				},
-				Students = new List<InvoiceStudent> // TODO(Erik): 9? students
+				Students = new List<InvoiceStudent> // trigger sheet cloning
 				{
-					new InvoiceStudent
-					{
-						PASecuredID = 1234567890,
-						FirstName = "Alice",
-						MiddleInitial = "B",
-						LastName = "Chester",
-						Street1 = "Here St",
-						Street2 = "Apt None",
-						City = "Somewhere",
-						State = "PA",
-						ZipCode = "15000",
-						DateOfBirth = time.Date.AddYears(-10),
-						Grade = "3",
-						FirstDay = time.Date.AddMonths(-6),
-						LastDay = time.Date.AddMonths(-1),
-						IsSpecialEducation = true,
-						CurrentIep = time.Date.AddMonths(-6),
-						FormerIep = time.Date.AddMonths(-9),
-					},
+					new InvoiceStudent(),
+					new InvoiceStudent(),
+					new InvoiceStudent(),
+					new InvoiceStudent(),
+					new InvoiceStudent(),
+					new InvoiceStudent(),
+					new InvoiceStudent(),
+					new InvoiceStudent(),
+					new InvoiceStudent(),
 				},
 			};
 			reporter.Setup(r => r.GenerateReport(It.Is<InvoiceReporter.Config>(c =>
@@ -233,7 +223,7 @@ namespace api.Tests.Controllers
 			// generate xlsx
 			XSSFWorkbook xlsx = null;
 			_exporter.Setup(ex => ex.Export(
-				It.Is<XSSFWorkbook>(wb => MatchWorkbook(wb, 2)),
+				It.Is<XSSFWorkbook>(wb => MatchWorkbook(wb, 3)),
 				It.IsAny<JObject>()
 			)).Returns<XSSFWorkbook, dynamic>((wb, _) =>
 			{
