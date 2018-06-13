@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -18,6 +19,15 @@ namespace api.Tests.Util
 					})),
 				},
 			};
+		}
+
+		public static void SetHeader(this Controller controller, string key, StringValues values)
+		{
+			controller.ControllerContext = new ControllerContext
+			{
+				HttpContext = new DefaultHttpContext(),
+			};
+			controller.HttpContext.Request.Headers.Add(key, values);
 		}
 	}
 }

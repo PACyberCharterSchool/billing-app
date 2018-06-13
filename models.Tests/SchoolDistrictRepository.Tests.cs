@@ -18,11 +18,16 @@ namespace models.Tests
 
 		private SchoolDistrictRepository _uut;
 
+		private static PacBillContext NewContext()
+		{
+			return new PacBillContext(new DbContextOptionsBuilder<PacBillContext>().
+				UseInMemoryDatabase("school_districts").Options);
+		}
+
 		[SetUp]
 		public void SetUp()
 		{
-			_context = new PacBillContext(new DbContextOptionsBuilder<PacBillContext>().
-				UseInMemoryDatabase("school_districts").Options);
+			_context = NewContext();
 			_logger = new TestLogger<SchoolDistrictRepository>();
 
 			_uut = new SchoolDistrictRepository(_context, _logger);
@@ -110,6 +115,38 @@ namespace models.Tests
 			Assert.That(actual[0].Id, Is.EqualTo(districts[1].Id));
 			Assert.That(actual[1].Id, Is.EqualTo(districts[2].Id));
 			Assert.That(actual[2].Id, Is.EqualTo(districts[0].Id));
+		}
+
+		[Test]
+		public void GetManyAunsReturnsAllAuns()
+		{
+			var districts = new[] {
+				new SchoolDistrict {
+					Aun = 1234567890,
+				},
+				new SchoolDistrict {
+					Aun = 234567890,
+				},
+				new SchoolDistrict {
+					Aun = 345678901,
+				},
+			};
+			using (var ctx = NewContext())
+				ctx.SaveChanges(() => ctx.AddRange(districts));
+
+			var actuals = _uut.GetManyAuns();
+			Assert.That(actuals, Has.Count.EqualTo(districts.Length));
+
+			Assert.That(actuals[0], Is.EqualTo(districts[1].Aun));
+			Assert.That(actuals[1], Is.EqualTo(districts[2].Aun));
+			Assert.That(actuals[2], Is.EqualTo(districts[0].Aun));
+		}
+
+		[Test]
+		public void GetManyAunsReturnEmptyList()
+		{
+			var actuals = _uut.GetManyAuns();
+			Assert.That(actuals, Is.Empty);
 		}
 
 		[Test]

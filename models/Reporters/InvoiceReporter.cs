@@ -9,11 +9,6 @@ using Dapper;
 
 namespace models.Reporters
 {
-	public interface IReporter<T, U>
-	{
-		T GenerateReport(U config);
-	}
-
 	public class InvoiceSchoolDistrict
 	{
 		public int Id { get; set; }
@@ -43,7 +38,7 @@ namespace models.Reporters
 	{
 		public string Type { get; set; }
 		public string CheckNumber { get; set; }
-		public decimal Amount { get; set; }
+		public decimal Amount { get; set; } // TODO(Erik): CheckAmount / UniPayAmount
 		public DateTime Date { get; set; }
 	}
 
@@ -92,11 +87,13 @@ namespace models.Reporters
 
 	public class Invoice
 	{
-		public string Number { get; set; }
+		public string Number { get; set; } // TODO(Erik): auto-increment
 		public string SchoolYear { get; set; }
 		public int FirstYear => int.Parse(SchoolYear.Split("-")[0]);
 		public int SecondYear => int.Parse(SchoolYear.Split("-")[1]);
 		public DateTime AsOf { get; set; }
+		public string AsOfMonth => AsOf.ToString("MMMM");
+		public int AsOfYear => AsOf.Year;
 		public DateTime Prepared { get; set; }
 		public DateTime ToSchoolDistrict { get; set; }
 		public DateTime ToPDE { get; set; }
@@ -229,6 +226,8 @@ namespace models.Reporters
 
 				property.SetValue(transactions, new InvoiceTransaction
 				{
+					// TODO(Erik): CheckAmount/PdeAmount
+					// TODO(Erik): ExternalId == PDE UNIPAY?
 					Payment = _conn.Query<InvoicePayment>(@"
 						SELECT Type, ExternalId AS CheckNumber, Amount, Date
 						FROM Payments

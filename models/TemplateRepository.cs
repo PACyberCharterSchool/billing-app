@@ -12,6 +12,7 @@ namespace models
 	{
 		Template CreateOrUpdate(DateTime time, Template update);
 		Template CreateOrUpdate(Template update);
+		Template Get(int id);
 		Template Get(ReportType type, string year);
 		IList<TemplateMetadata> GetManyMetadata(ReportType type = null, string year = null);
 	}
@@ -56,6 +57,8 @@ namespace models
 		}
 
 		public Template CreateOrUpdate(Template update) => CreateOrUpdate(DateTime.Now, update);
+
+		public Template Get(int id) => _templates.SingleOrDefault(t => t.Id == id);
 
 		public Template Get(ReportType type, string year) =>
 			_templates.SingleOrDefault(t => t.ReportType == type && t.SchoolYear == year);
