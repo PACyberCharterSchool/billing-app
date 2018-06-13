@@ -1,5 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { RouterTestingModule } from '@angular/router/testing';
+
 import { ReportsInvoicesHomeComponent } from './reports-invoices-home.component';
 
 describe('ReportsInvoicesHomeComponent', () => {
@@ -8,7 +10,8 @@ describe('ReportsInvoicesHomeComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ReportsInvoicesHomeComponent ]
+      declarations: [ ReportsInvoicesHomeComponent ],
+      imports: [ RouterTestingModule ]
     })
     .compileComponents();
   }));

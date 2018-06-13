@@ -71,7 +71,10 @@ namespace api.Tests.Controllers
 			Assert.That(actual.Created, Is.EqualTo(student.Created));
 			Assert.That(actual.LastUpdated, Is.EqualTo(student.LastUpdated));
 
-			AssertSchoolDistrict(actual.SchoolDistrict, student.SchoolDistrict);
+			if (actual.SchoolDistrict != null && student.SchoolDistrict != null)
+				AssertSchoolDistrict(actual.SchoolDistrict, student.SchoolDistrict);
+			else
+				Assert.IsTrue(actual.SchoolDistrict == null && student.SchoolDistrict == null);
 		}
 
 		[Test]
@@ -109,6 +112,7 @@ namespace api.Tests.Controllers
 				{
 					SchoolDistrict = new SchoolDistrict(),
 				},
+				new Student(),
 			};
 			_students.Setup(s => s.GetMany(sort, dir, skip, take, null)).Returns(students);
 

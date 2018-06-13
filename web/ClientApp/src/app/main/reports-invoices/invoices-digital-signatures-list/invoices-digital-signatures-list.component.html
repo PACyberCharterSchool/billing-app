@@ -1,0 +1,66 @@
+<div class='row digital-signatures-title-row'>
+  <div class='col-md-12'>
+    <h4>Digital Signatures</h4>
+  </div>
+</div>
+<div class='row digital-signatures-action-row'>
+  <div class='col-md-12'>
+    <div class='col-md-6'>
+      <button class='btn btn-primary' type='button' (click)='createDigitalSignature()'>
+        CREATE
+      </button>
+    </div>
+    <div class='col-md-6'>
+      <div class='col-md-7 offset-md-5 search-digital-signature-col'>
+        <div class='col-md-12'>
+          <input type='text' [(ngModel)]='searchText' />
+          <button type='button' class='btn btn-primary' (click)='filterDigitalSignatures()'>SEARCH</button>
+          <button type='button' class='btn btn-outline-primary' (click)='resetDigitalSignatures()'>RESET</button>
+       </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class='row digital-signatures-list-row'>
+  <div class='col-md-12'>
+    <table class='table table-striped'>
+      <thead>
+        <tr>
+          <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
+            {{k | normalizeFieldName}}
+            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+          </th>
+          <th>Edit</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor='let ds of signatures | orderBy: {property: property, direction: direction}'>
+          <td *ngFor='let v of listDisplayableValues(ds)'>{{v | normalizeFieldValue}}</td>
+          <td (click)='editDigitalSignature(ds)'>
+            <i class='fa fa-pencil'></i>
+          </td>
+          <td (click)='deleteDigitalSignature(deleteSignatureContent, ds)'>
+            <i class='fa fa-remove'></i>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<ng-template #deleteSignatureContent let-c="close" let-d="dismiss">
+  <div class='modal-header'>
+    <h4 class='modal-title'>Delete signature?</h4>
+    <button type='button' class='close' aria-label='Close' (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class='modal-body' style='text-align: center'>
+    <p>Are you sure you wish to delete this digital signature?</p>
+    <p>This action cannot be reversed.</p>
+  </div>
+  <div class='modal-footer'>
+    <button type='button' class='btn btn-outline-dark' (click)='c("No click")'>NO</button>
+    <button type='button' class='btn btn-primary' (click)='c("Yes click")'>YES</button>
+  </div>
+</ng-template>

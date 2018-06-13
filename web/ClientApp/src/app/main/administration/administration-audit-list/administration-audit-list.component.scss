@@ -1,0 +1,29 @@
+.audits-title-row {
+  height: 40px;
+
+  h4 {
+    color: #57a918;
+  }
+}
+
+.audits-filter-row {
+  height: 40px;
+}
+
+.audits-list-row {
+  height: calc(100% - 40px);
+
+  div.col-md-12 {
+    height: 100%;
+
+    table {
+      thead {
+        height: 60px;
+      }
+
+      tbody {
+        height: calc(100% - 60px);
+      }
+    }
+  }
+}

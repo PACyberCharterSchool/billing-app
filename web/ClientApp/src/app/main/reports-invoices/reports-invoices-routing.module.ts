@@ -5,6 +5,7 @@ import { MainComponent } from '../main.component';
 
 import { ReportsInvoicesHomeComponent } from './reports-invoices-home/reports-invoices-home.component';
 import { ReportsInvoicesComponent } from './reports-invoices.component';
+import { InvoicesDigitalSignaturesListComponent } from './invoices-digital-signatures-list/invoices-digital-signatures-list.component';
 
 import { AuthenticationGuardService } from '../../services/authentication-guard.service';
 
@@ -23,6 +24,12 @@ const reportsInvoicesRoutes: Routes = [
       {
         path: 'home',
         component: ReportsInvoicesHomeComponent,
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
+      },
+      {
+        path: 'digital-signatures',
+        component: InvoicesDigitalSignaturesListComponent,
         outlet: 'action',
         canActivate: [ AuthenticationGuardService ]
       }

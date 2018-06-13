@@ -1,5 +1,5 @@
 .reports-invoices-home-title-row {
-  height: 25%;
+  height: 15%;
 
   h3 {
     color: #58a719;
@@ -7,7 +7,7 @@
 }
 
 .reports-invoices-home-content-row {
-  height: 75%;
+  height: 85%;
 
   div.col-md-3 {
     align-items: center;
@@ -99,6 +99,15 @@
         display: block;
         object-fit: none;
         object-position: -900px -210px;
+        height: 180px;
+      }
+    }
+
+    button#digital-signatures-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -405px -205px;
         height: 180px;
       }
     }
