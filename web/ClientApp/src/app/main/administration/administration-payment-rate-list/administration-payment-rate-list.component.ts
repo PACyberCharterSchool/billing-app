@@ -52,7 +52,6 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
-
   filterSchoolDistrictRecords() {
     this.schoolDistricts = this.allSchoolDistricts.filter(
       (i) => {
@@ -74,6 +73,7 @@ export class AdministrationPaymentRateListComponent implements OnInit {
 
   resetSchoolDistrictRecords() {
     this.schoolDistricts = this.allSchoolDistricts;
+    this.searchText = '';
   }
 
   getAdditionalSchoolDistricts($event) {
