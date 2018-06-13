@@ -29,6 +29,7 @@ import { DigitalSignaturesService } from './services/digital-signatures.service'
 import { AuditRecordsService } from './services/audit-records.service';
 import { ReportsService } from './services/reports.service';
 import { TemplatesService } from './services/templates.service';
+import { SpreadsheetService } from './services/spreadsheet.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
@@ -76,7 +77,8 @@ const pacbillProviders = [
   tokenInterceptor,
   UtilitiesService,
   ReportsService,
-  TemplatesService
+  TemplatesService,
+  SpreadsheetService
 ];
 
 @NgModule({

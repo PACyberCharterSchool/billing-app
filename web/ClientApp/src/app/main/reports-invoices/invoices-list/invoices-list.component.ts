@@ -99,7 +99,7 @@ export class InvoicesListComponent implements OnInit {
   }
 
   approveInvoices() {
-    const modal = this.ngbModal.open(InvoicePreviewFormComponent, { centered: true });
+    const modal = this.ngbModal.open(InvoicePreviewFormComponent, { centered: true, size: 'lg' });
     modal.componentInstance.invoices = this.getUnapprovedInvoices();
     modal.result.then(
       (result) => {

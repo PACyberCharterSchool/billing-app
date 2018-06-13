@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-invoice-excel-preview',
@@ -6,6 +6,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./invoice-excel-preview.component.scss']
 })
 export class InvoiceExcelPreviewComponent implements OnInit {
+
+  @Input() xlsxData;
 
   constructor() { }
 

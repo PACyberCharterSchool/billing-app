@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-excel',
@@ -6,6 +8,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./excel.component.scss']
 })
 export class ExcelComponent implements OnInit {
+  @Input() xlsxData;
 
   constructor() { }
 

@@ -8,6 +8,35 @@
 
 .audits-filter-row {
   height: 40px;
+
+  div.col-md-6 {
+    height: 100%;
+    padding-bottom: 4px;
+
+    div.col-md-12 {
+      height: 100%;
+
+      input[type='text'] {
+        width: 70%;
+        height: 100%;
+        line-height: 16px;
+      }
+
+      button.btn-primary {
+        height: 100%;
+        position: relative;
+        top: -2px;
+        left: -4px;
+      }
+
+      button.btn-outline-primary {
+        height: 100%;
+        position: relative;
+        top: -1px;
+      }
+    }
+  }
+
 }
 
 .audits-list-row {

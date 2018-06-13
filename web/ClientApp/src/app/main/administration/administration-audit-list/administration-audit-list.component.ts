@@ -79,6 +79,7 @@ export class AdministrationAuditListComponent implements OnInit {
 
   resetAuditRecords() {
     this.audits = this.allAudits;
+    this.searchText = '';
   }
 
   listDisplayableFields() {

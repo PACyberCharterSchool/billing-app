@@ -1,11 +1,16 @@
-<table>
-  <tr><th></th>
-    <th *ngFor="let col of columns">{{ col }}</th>
-  </tr>
-  <tr *ngFor="let row of rows">
-    <th>{{ row }}</th>
-    <td *ngFor="let col of columns">
-        <app-cell [id]="col+row" [attr.id]="col+row"></app-cell>
+<table class='sjs-table'>
+  <tr *ngFor='let row of xlsxData'>
+    <td *ngFor='let val of row'>
+      {{val}}
     </td>
   </tr>
+  <!-- <tr><th></th> -->
+  <!--   <th *ngFor="let col of columns">{{ col }}</th> -->
+  <!-- </tr> -->
+  <!-- <tr *ngFor="let row of rows"> -->
+  <!--   <th>{{ row }}</th> -->
+  <!--   <td *ngFor="let col of columns"> -->
+  <!--       <app-cell [id]="col+row" [attr.id]="col+row"></app-cell> -->
+  <!--   </td> -->
+  <!-- </tr> -->
 </table>
