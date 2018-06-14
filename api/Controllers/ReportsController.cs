@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -25,7 +26,6 @@ using models.Reporters.Exporters;
 
 namespace api.Controllers
 {
-	// TODO(Erik): auth!
 	[Route("api/[controller]")]
 	public class ReportsController : Controller
 	{
@@ -216,6 +216,7 @@ namespace api.Controllers
 		private Report CreateInvoice(CreateReport create) => CreateInvoice(DateTime.Now, create);
 
 		[HttpPost]
+		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportResponse), 200)]
 		[ProducesResponseType(typeof(ErrorsResponse), 400)]
 		[ProducesResponseType(409)]
@@ -325,6 +326,7 @@ namespace api.Controllers
 		private static readonly object _lock = new object();
 
 		[HttpPost("many")]
+		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportsResponse), 200)]
 		[ProducesResponseType(typeof(ErrorsResponse), 400)]
 		[ProducesResponseType(409)]
@@ -392,6 +394,7 @@ namespace api.Controllers
 		}
 
 		[HttpGet("{name}")]
+		[Authorize(Policy = "PAY+")]
 		[Produces(ContentTypes.XLSX)]
 		[ProducesResponseType(404)]
 		[ProducesResponseType(406)]
@@ -431,6 +434,7 @@ namespace api.Controllers
 		}
 
 		[HttpGet("zip")]
+		[Authorize(Policy = "PAY+")]
 		[Produces(ContentTypes.ZIP)]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(typeof(ErrorsResponse), 400)]
@@ -485,6 +489,7 @@ namespace api.Controllers
 		}
 
 		[HttpGet]
+		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportsResponse), 200)]
 		[ProducesResponseType(typeof(ErrorsResponse), 400)]
 		public async Task<IActionResult> GetManyMetadata([FromQuery]GetManyArgs args)
@@ -509,6 +514,7 @@ namespace api.Controllers
 
 
 		[HttpPost("{name}/approve")]
+		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> Approve(string name)
@@ -526,6 +532,7 @@ namespace api.Controllers
 		}
 
 		[HttpPost("{name}/reject")]
+		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> Reject(string name)
 		{
