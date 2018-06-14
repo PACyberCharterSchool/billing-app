@@ -25,6 +25,7 @@ using models.Reporters.Exporters;
 
 namespace api.Controllers
 {
+	// TODO(Erik): auth!
 	[Route("api/[controller]")]
 	public class ReportsController : Controller
 	{
@@ -110,6 +111,8 @@ namespace api.Controllers
 					for (var c = row.FirstCellNum; c < row.LastCellNum; c++)
 					{
 						var cell = row.GetCell(c);
+						if (cell == null)
+							continue;
 
 						if (r == 12 && c == 1) // Number column
 						{
@@ -139,6 +142,7 @@ namespace api.Controllers
 			}
 		}
 
+		// TODO(Erik): page # in footer
 		private Report CreateInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
 		{
 			// get reporter
