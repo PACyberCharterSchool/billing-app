@@ -65,7 +65,7 @@ namespace models.Tests.Reporters.Exporters
 			Assert.That(sheet.GetRow(3).GetCell(0).NumericCellValue,
 				Is.EqualTo(data.Array[1].Integer));
 			Assert.That(sheet.GetRow(5).GetCell(0).StringCellValue,
-				Is.EqualTo(data.Object.Deeper.Boolean ? "YES" : "NO"));
+				Is.EqualTo(data.Object.Deeper.Boolean ? "Yes" : "No"));
 			Assert.That(sheet.GetRow(6).GetCell(0).StringCellValue,
 				Is.EqualTo("Please replace me!"));
 			Assert.That(sheet.GetRow(7).GetCell(0).CellType, Is.EqualTo(CellType.Blank));
