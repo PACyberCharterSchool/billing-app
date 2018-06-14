@@ -114,7 +114,7 @@ namespace api.Controllers
 						if (cell == null)
 							continue;
 
-						if (r == 12 && c == 1) // Number column
+						if (r == 13 && c == 1) // Number column
 						{
 							cell.SetCellValue(((s + 1) * per) + 1);
 							continue;
@@ -142,7 +142,6 @@ namespace api.Controllers
 			}
 		}
 
-		// TODO(Erik): page # in footer
 		private Report CreateInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
 		{
 			// get reporter
