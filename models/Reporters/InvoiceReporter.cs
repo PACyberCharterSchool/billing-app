@@ -68,17 +68,19 @@ namespace models.Reporters
 	public class InvoiceStudent
 	{
 		// TODO(Erik): what do we display if null?
-		// TODO(Erik): FullName
-		// TODO(Erik): Address1/2
 		public ulong? PASecuredID { get; set; }
 		public string FirstName { get; set; }
 		public string MiddleInitial { get; set; }
 		public string LastName { get; set; }
+		public string FullName =>
+			$"{LastName}, {FirstName}{(string.IsNullOrEmpty(MiddleInitial) ? "" : $" {MiddleInitial}")}";
 		public string Street1 { get; set; }
 		public string Street2 { get; set; }
+		public string Address1 => $"{Street1}{(string.IsNullOrEmpty(Street2) ? "" : $" {Street2}")}";
 		public string City { get; set; }
 		public string State { get; set; }
 		public string ZipCode { get; set; }
+		public string Address2 => $"{City}, {State} {ZipCode}";
 		public DateTime DateOfBirth { get; set; }
 		public string Grade { get; set; }
 		public DateTime FirstDay { get; set; }
