@@ -14,6 +14,11 @@ namespace models
 		Report Create(DateTime time, Report create);
 		Report Create(Report create);
 		Report Get(string name);
+		IEnumerable<Report> GetMany(
+			string name = null,
+			ReportType type = null,
+			string year = null,
+			bool? approved = null);
 		IList<ReportMetadata> GetManyMetadata( // TODO(Erik): skip take
 			string name = null,
 			ReportType type = null,
@@ -60,22 +65,13 @@ namespace models
 
 		public Report Get(string name) => _reports.SingleOrDefault(r => r.Name == name);
 
-		// TODO(Erik): filter by report data?
-		public IList<ReportMetadata> GetManyMetadata(
+		public IEnumerable<Report> GetMany(
 			string name = null,
 			ReportType type = null,
 			string year = null,
 			bool? approved = null)
 		{
-			var reports = _reports.Select(r => new ReportMetadata
-			{
-				Id = r.Id,
-				Type = r.Type,
-				SchoolYear = r.SchoolYear,
-				Name = r.Name,
-				Approved = r.Approved,
-				Created = r.Created,
-			});
+			var reports = _reports.AsQueryable();
 
 			if (name != null)
 				reports = reports.Where(r => r.Name == name);
@@ -89,7 +85,25 @@ namespace models
 			if (approved != null)
 				reports = reports.Where(r => r.Approved == approved);
 
-			return reports.ToList();
+			return reports;
+		}
+
+		// TODO(Erik): filter by report data?
+		public IList<ReportMetadata> GetManyMetadata(
+			string name = null,
+			ReportType type = null,
+			string year = null,
+			bool? approved = null)
+		{
+			return GetMany(name, type, year, approved).Select(r => new ReportMetadata
+			{
+				Id = r.Id,
+				Type = r.Type,
+				SchoolYear = r.SchoolYear,
+				Name = r.Name,
+				Approved = r.Approved,
+				Created = r.Created,
+			}).ToList();
 		}
 
 		public void Reject(string name)

@@ -38,14 +38,15 @@ namespace models.Reporters
 	{
 		public string Type { get; set; }
 		public string CheckNumber { get; set; }
-		public decimal Amount { get; set; } // TODO(Erik): CheckAmount / UniPayAmount
+		public decimal? CheckAmount { get; set; }
+		public decimal? UniPayAmount { get; set; }
 		public DateTime Date { get; set; }
 	}
 
 	public class InvoiceTransaction
 	{
 		public InvoicePayment Payment { get; set; }
-		public decimal Refund { get; set; }
+		public decimal? Refund { get; set; }
 	}
 
 	public class InvoiceTransactions
@@ -71,11 +72,15 @@ namespace models.Reporters
 		public string FirstName { get; set; }
 		public string MiddleInitial { get; set; }
 		public string LastName { get; set; }
+		public string FullName =>
+			$"{LastName}, {FirstName}{(string.IsNullOrEmpty(MiddleInitial) ? "" : $" {MiddleInitial}")}";
 		public string Street1 { get; set; }
 		public string Street2 { get; set; }
+		public string Address1 => $"{Street1}{(string.IsNullOrEmpty(Street2) ? "" : $" {Street2}")}";
 		public string City { get; set; }
 		public string State { get; set; }
 		public string ZipCode { get; set; }
+		public string Address2 => $"{City}, {State} {ZipCode}";
 		public DateTime DateOfBirth { get; set; }
 		public string Grade { get; set; }
 		public DateTime FirstDay { get; set; }
@@ -226,16 +231,25 @@ namespace models.Reporters
 
 				property.SetValue(transactions, new InvoiceTransaction
 				{
-					// TODO(Erik): CheckAmount/PdeAmount
-					// TODO(Erik): ExternalId == PDE UNIPAY?
-					Payment = _conn.Query<InvoicePayment>(@"
-						SELECT Type, ExternalId AS CheckNumber, Amount, Date
+					Payment = _conn.Query<InvoicePayment>($@"
+						SELECT
+							Type,
+							ExternalId AS CheckNumber,
+							CASE Type
+								WHEN '{PaymentType.Check.Value}' THEN Amount
+								ELSE NULL
+							END AS CheckAmount,
+							CASE Type
+								WHEN '{PaymentType.UniPay.Value}' THEN Amount
+								ELSE NULL
+							END	AS UniPayAmount,
+							Date
 						FROM Payments
 						WHERE SchoolDistrictId = @SchoolDistrictId
 						AND SchoolYear = @SchoolYear
 						AND (Date >= @StartDate AND Date <= @EndDate)",
 						args).SingleOrDefault(),
-					Refund = _conn.Query<decimal>(@"
+					Refund = _conn.Query<decimal?>(@"
 						SELECT Amount
 						From Refunds
 						WHERE SchoolDistrictId = @SchoolDistrictId

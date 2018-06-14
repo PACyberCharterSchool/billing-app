@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -6,6 +7,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.IO;
+using System.IO.Compression;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +26,6 @@ using models.Reporters.Exporters;
 
 namespace api.Controllers
 {
-	// TODO(Erik): bulk download; zip up all reports (filtered)
 	[Route("api/[controller]")]
 	public class ReportsController : Controller
 	{
@@ -109,8 +111,10 @@ namespace api.Controllers
 					for (var c = row.FirstCellNum; c < row.LastCellNum; c++)
 					{
 						var cell = row.GetCell(c);
+						if (cell == null)
+							continue;
 
-						if (r == 12 && c == 1) // Number column
+						if (r == 13 && c == 1) // Number column
 						{
 							cell.SetCellValue(((s + 1) * per) + 1);
 							continue;
@@ -211,6 +215,7 @@ namespace api.Controllers
 		private Report CreateInvoice(CreateReport create) => CreateInvoice(DateTime.Now, create);
 
 		[HttpPost]
+		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportResponse), 200)]
 		[ProducesResponseType(typeof(ErrorsResponse), 400)]
 		[ProducesResponseType(409)]
@@ -320,6 +325,7 @@ namespace api.Controllers
 		private static readonly object _lock = new object();
 
 		[HttpPost("many")]
+		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportsResponse), 200)]
 		[ProducesResponseType(typeof(ErrorsResponse), 400)]
 		[ProducesResponseType(409)]
@@ -387,6 +393,7 @@ namespace api.Controllers
 		}
 
 		[HttpGet("{name}")]
+		[Authorize(Policy = "PAY+")]
 		[Produces(ContentTypes.XLSX)]
 		[ProducesResponseType(404)]
 		[ProducesResponseType(406)]
@@ -425,10 +432,66 @@ namespace api.Controllers
 			public IList<ReportDto> Reports { get; set; }
 		}
 
+		[HttpGet("zip")]
+		[Authorize(Policy = "PAY+")]
+		[Produces(ContentTypes.ZIP)]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(typeof(ErrorsResponse), 400)]
+		public async Task<IActionResult> GetZip([FromQuery]GetManyArgs args)
+		{
+			if (!ModelState.IsValid)
+				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
+
+			var reports = await Task.Run(() => _reports.GetMany(
+				name: args.Name,
+				type: args.Type == null ? null : ReportType.FromString(args.Type),
+				year: args.SchoolYear,
+				approved: args.Approved
+			));
+			if (reports == null)
+				return NoContent();
+
+			var content = false; // avoids using .Count(), which executes the IEnumerable
+			var zipStream = new MemoryStream();
+			using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, leaveOpen: true))
+			{
+				foreach (var report in reports)
+				{
+					content = true;
+					var entry = archive.CreateEntry($"{report.Name}.xlsx");
+					using (var entryStream = entry.Open())
+						entryStream.Write(report.Xlsx, 0, report.Xlsx.Length);
+				}
+			}
+			zipStream.Position = 0;
+
+			if (!content)
+				return NoContent();
+
+			var name = new StringBuilder("Reports");
+			if (!string.IsNullOrWhiteSpace(args.SchoolYear))
+				name.Append($"-{args.SchoolYear}");
+
+			if (!string.IsNullOrEmpty(args.Type))
+				name.Append($"-{args.Type}");
+
+			if (!string.IsNullOrWhiteSpace(args.Name))
+				name.Append($"-{args.Name}");
+
+			if (args.Approved.HasValue)
+				name.Append(args.Approved.Value ? "-Approved" : "-Pending");
+
+			return new FileStreamResult(zipStream, ContentTypes.ZIP)
+			{
+				FileDownloadName = name.ToString(),
+			};
+		}
+
 		[HttpGet]
+		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportsResponse), 200)]
 		[ProducesResponseType(typeof(ErrorsResponse), 400)]
-		public async Task<IActionResult> GetMany([FromQuery]GetManyArgs args)
+		public async Task<IActionResult> GetManyMetadata([FromQuery]GetManyArgs args)
 		{
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
@@ -450,6 +513,7 @@ namespace api.Controllers
 
 
 		[HttpPost("{name}/approve")]
+		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> Approve(string name)
@@ -467,6 +531,7 @@ namespace api.Controllers
 		}
 
 		[HttpPost("{name}/reject")]
+		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> Reject(string name)
 		{

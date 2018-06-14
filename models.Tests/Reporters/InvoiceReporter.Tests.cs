@@ -77,7 +77,6 @@ namespace models.Tests.Reporters
 					StudentPaSecuredId = 2345678901,
 					SchoolDistrictId = aun,
 					StudentFirstName = "Bob",
-					StudentMiddleInitial = "C",
 					StudentLastName = "Doug",
 					StudentStreet1 = "Not",
 					StudentStreet2 = "There",
@@ -236,7 +235,7 @@ namespace models.Tests.Reporters
 
 					Assert.That(transaction, Is.Not.Null);
 					Assert.That(transaction.Payment, Is.Null);
-					Assert.That(transaction.Refund, Is.EqualTo(0m));
+					Assert.That(transaction.Refund, Is.Null);
 				}
 
 				// August
@@ -246,10 +245,10 @@ namespace models.Tests.Reporters
 					Assert.That(month.Payment, Is.Not.Null);
 					var payment = month.Payment;
 					Assert.That(payment.Type, Is.EqualTo(payments[0].Type.Value));
-					Assert.That(payment.Amount, Is.EqualTo(payments[0].Amount));
+					Assert.That(payment.CheckAmount, Is.EqualTo(payments[0].Amount));
 					Assert.That(payment.CheckNumber, Is.EqualTo(payments[0].ExternalId));
 					Assert.That(payment.Date, Is.EqualTo(payments[0].Date));
-					Assert.That(month.Refund, Is.EqualTo(0m));
+					Assert.That(month.Refund, Is.Null);
 				}
 
 				// October
@@ -267,7 +266,7 @@ namespace models.Tests.Reporters
 					Assert.That(month.Payment, Is.Not.Null);
 					var payment = month.Payment;
 					Assert.That(payment.Type, Is.EqualTo(payments[1].Type.Value));
-					Assert.That(payment.Amount, Is.EqualTo(payments[1].Amount));
+					Assert.That(payment.UniPayAmount, Is.EqualTo(payments[1].Amount));
 					Assert.That(payment.CheckNumber, Is.EqualTo(payments[1].ExternalId));
 					Assert.That(payment.Date, Is.EqualTo(payments[1].Date));
 					Assert.That(month.Refund, Is.EqualTo(refunds[1].Amount));
@@ -288,11 +287,23 @@ namespace models.Tests.Reporters
 					Assert.That(student.FirstName, Is.EqualTo(status.StudentFirstName));
 					Assert.That(student.MiddleInitial, Is.EqualTo(status.StudentMiddleInitial));
 					Assert.That(student.LastName, Is.EqualTo(status.StudentLastName));
+					if (string.IsNullOrEmpty(student.MiddleInitial))
+						Assert.That(student.FullName,
+							Is.EqualTo($"{status.StudentLastName}, {status.StudentFirstName}"));
+					else
+						Assert.That(student.FullName,
+							Is.EqualTo($"{status.StudentLastName}, {status.StudentFirstName} {status.StudentMiddleInitial}"));
 					Assert.That(student.Street1, Is.EqualTo(status.StudentStreet1));
 					Assert.That(student.Street2, Is.EqualTo(status.StudentStreet2));
+					if (string.IsNullOrEmpty(student.Street2))
+						Assert.That(student.Address1, Is.EqualTo($"{status.StudentStreet1}"));
+					else
+						Assert.That(student.Address1, Is.EqualTo($"{status.StudentStreet1} {status.StudentStreet2}"));
 					Assert.That(student.City, Is.EqualTo(status.StudentCity));
 					Assert.That(student.State, Is.EqualTo(status.StudentState));
 					Assert.That(student.ZipCode, Is.EqualTo(status.StudentZipCode));
+					Assert.That(student.Address2,
+						Is.EqualTo($"{status.StudentCity}, {status.StudentState} {status.StudentZipCode}"));
 					Assert.That(student.DateOfBirth, Is.EqualTo(status.StudentDateOfBirth));
 					Assert.That(student.Grade, Is.EqualTo(status.StudentGradeLevel));
 					Assert.That(student.FirstDay, Is.EqualTo(status.StudentEnrollmentDate));
