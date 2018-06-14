@@ -195,6 +195,151 @@ namespace models.Tests
 		}
 
 		[Test]
+		public void GetManyReturnsAll()
+		{
+			var reports = new[] {
+				new Report {
+					Type = ReportType.Invoice,
+					SchoolYear = "2017-2018",
+					Name = "invoice1",
+					Data = "hello",
+					Xlsx = new byte[] {1, 2, 3},
+				},
+				new Report {
+					Type = ReportType.Invoice,
+					SchoolYear = "2017-2018",
+					Name = "invoice2",
+					Data = "hello",
+					Xlsx = new byte[] {1, 2, 3},
+				},
+			};
+			using (var ctx = NewContext())
+				ctx.SaveChanges(() => ctx.AddRange(reports));
+
+			var actuals = _uut.GetMany().ToList();
+			Assert.That(actuals, Has.Count.EqualTo(reports.Length));
+			for (var i = 0; i < actuals.Count; i++)
+				AssertReport(actuals[i], reports[i]);
+		}
+
+		[Test]
+		public void GetManyReturnsEmptyList()
+		{
+			var actuals = _uut.GetMany().ToList();
+			Assert.That(actuals, Is.Empty);
+		}
+
+		[Test]
+		public void GetManyFiltersByName()
+		{
+			var reports = new[] {
+				new Report {
+					Type = ReportType.Invoice,
+					SchoolYear = "2017-2018",
+					Name = "invoice1",
+					Data = "hello",
+					Xlsx = new byte[] {1, 2, 3},
+				},
+				new Report {
+					Type = ReportType.Invoice,
+					SchoolYear = "2017-2018",
+					Name = "invoice2",
+					Data = "hello",
+					Xlsx = new byte[] {1, 2, 3},
+				},
+			};
+			using (var ctx = NewContext())
+				ctx.SaveChanges(() => ctx.AddRange(reports));
+
+			var actuals = _uut.GetMany(name: "invoice2").ToList();
+			Assert.That(actuals, Has.Count.EqualTo(1));
+			AssertReport(actuals[0], reports[1]);
+		}
+
+		[Test]
+		public void GetManyFiltersByReportType()
+		{
+			var reports = new[] {
+				new Report {
+					Type = ReportType.Invoice,
+					SchoolYear = "2017-2018",
+					Name = "invoice",
+					Data = "hello",
+					Xlsx = new byte[] {1, 2, 3},
+				},
+				new Report {
+					Type = ReportType.StudentInformation,
+					SchoolYear = "2017-2018",
+					Name = "student-info",
+					Data = "hello",
+					Xlsx = new byte[] {1, 2, 3},
+				},
+			};
+			using (var ctx = NewContext())
+				ctx.SaveChanges(() => ctx.AddRange(reports));
+
+			var actuals = _uut.GetMany(type: ReportType.StudentInformation).ToList();
+			Assert.That(actuals, Has.Count.EqualTo(1));
+			AssertReport(actuals[0], reports[1]);
+
+		}
+
+		[Test]
+		public void GetManyFiltersBySchoolYear()
+		{
+			var reports = new[] {
+				new Report {
+					Type = ReportType.Invoice,
+					SchoolYear = "2017-2018",
+					Name = "invoice1",
+					Data = "hello",
+					Xlsx = new byte[] {1, 2, 3},
+				},
+				new Report {
+					Type = ReportType.Invoice,
+					SchoolYear = "2018-2019",
+					Name = "invoice2",
+					Data = "hello",
+					Xlsx = new byte[] {1, 2, 3},
+				},
+			};
+			using (var ctx = NewContext())
+				ctx.SaveChanges(() => ctx.AddRange(reports));
+
+			var actuals = _uut.GetMany(year: "2018-2019").ToList();
+			Assert.That(actuals, Has.Count.EqualTo(1));
+			AssertReport(actuals[0], reports[1]);
+		}
+
+		[Test]
+		public void GetManyFiltersByApproved()
+		{
+			var reports = new[] {
+				new Report {
+					Type = ReportType.Invoice,
+					SchoolYear = "2017-2018",
+					Name = "invoice1",
+					Data = "hello",
+					Xlsx = new byte[] {1, 2, 3},
+				},
+				new Report {
+					Type = ReportType.Invoice,
+					SchoolYear = "2017-2018",
+					Name = "invoice2",
+					Data = "hello",
+					Approved = true,
+					Xlsx = new byte[] {1, 2, 3},
+				},
+			};
+			using (var ctx = NewContext())
+				ctx.SaveChanges(() => ctx.AddRange(reports));
+
+			var actuals = _uut.GetMany(approved: true).ToList();
+			Assert.That(actuals, Has.Count.EqualTo(1));
+			AssertReport(actuals[0], reports[1]);
+		}
+
+		[Test]
 		public void GetManyMetadataReturnsAll()
 		{
 			var reports = new[] {

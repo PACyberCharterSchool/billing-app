@@ -68,6 +68,8 @@ namespace models.Reporters
 	public class InvoiceStudent
 	{
 		// TODO(Erik): what do we display if null?
+		// TODO(Erik): FullName
+		// TODO(Erik): Address1/2
 		public ulong? PASecuredID { get; set; }
 		public string FirstName { get; set; }
 		public string MiddleInitial { get; set; }

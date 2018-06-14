@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.IO;
+using System.IO.Compression;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,7 +25,6 @@ using models.Reporters.Exporters;
 
 namespace api.Controllers
 {
-	// TODO(Erik): bulk download; zip up all reports (filtered)
 	[Route("api/[controller]")]
 	public class ReportsController : Controller
 	{
@@ -425,10 +426,64 @@ namespace api.Controllers
 			public IList<ReportDto> Reports { get; set; }
 		}
 
+		[HttpGet("zip")]
+		[Produces(ContentTypes.ZIP)]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(typeof(ErrorsResponse), 400)]
+		public async Task<IActionResult> GetZip([FromQuery]GetManyArgs args)
+		{
+			if (!ModelState.IsValid)
+				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
+
+			var reports = await Task.Run(() => _reports.GetMany(
+				name: args.Name,
+				type: args.Type == null ? null : ReportType.FromString(args.Type),
+				year: args.SchoolYear,
+				approved: args.Approved
+			));
+			if (reports == null)
+				return NoContent();
+
+			var content = false; // avoids using .Count(), which executes the IEnumerable
+			var zipStream = new MemoryStream();
+			using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, leaveOpen: true))
+			{
+				foreach (var report in reports)
+				{
+					content = true;
+					var entry = archive.CreateEntry($"{report.Name}.xlsx");
+					using (var entryStream = entry.Open())
+						entryStream.Write(report.Xlsx, 0, report.Xlsx.Length);
+				}
+			}
+			zipStream.Position = 0;
+
+			if (!content)
+				return NoContent();
+
+			var name = new StringBuilder("Reports");
+			if (!string.IsNullOrWhiteSpace(args.SchoolYear))
+				name.Append($"-{args.SchoolYear}");
+
+			if (!string.IsNullOrEmpty(args.Type))
+				name.Append($"-{args.Type}");
+
+			if (!string.IsNullOrWhiteSpace(args.Name))
+				name.Append($"-{args.Name}");
+
+			if (args.Approved.HasValue)
+				name.Append(args.Approved.Value ? "-Approved" : "-Pending");
+
+			return new FileStreamResult(zipStream, ContentTypes.ZIP)
+			{
+				FileDownloadName = name.ToString(),
+			};
+		}
+
 		[HttpGet]
 		[ProducesResponseType(typeof(ReportsResponse), 200)]
 		[ProducesResponseType(typeof(ErrorsResponse), 400)]
-		public async Task<IActionResult> GetMany([FromQuery]GetManyArgs args)
+		public async Task<IActionResult> GetManyMetadata([FromQuery]GetManyArgs args)
 		{
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));

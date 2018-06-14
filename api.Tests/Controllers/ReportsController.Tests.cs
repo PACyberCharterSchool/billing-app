@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -715,7 +716,7 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async Task GetManyNoArgsReturnsList()
+		public async Task GetManyMetadataNoArgsReturnsList()
 		{
 			var reports = new[] {
 				new Report {
@@ -731,7 +732,7 @@ namespace api.Tests.Controllers
 			};
 			_reports.Setup(rs => rs.GetManyMetadata(null, null, null, null)).Returns(reports);
 
-			var result = await _uut.GetMany(new ReportsController.GetManyArgs());
+			var result = await _uut.GetManyMetadata(new ReportsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
@@ -744,7 +745,7 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async Task GetManyAllArgsReturnsList()
+		public async Task GetManyMetadataAllArgsReturnsList()
 		{
 			var name = "invoice";
 			var type = ReportType.Invoice;
@@ -766,7 +767,7 @@ namespace api.Tests.Controllers
 			};
 			_reports.Setup(rs => rs.GetManyMetadata(name, type, year, approved)).Returns(reports);
 
-			var result = await _uut.GetMany(new ReportsController.GetManyArgs
+			var result = await _uut.GetManyMetadata(new ReportsController.GetManyArgs
 			{
 				Name = name,
 				Type = type.Value,
@@ -785,13 +786,13 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async Task GetManyReturnsBadRequestWhenModelStateInvalid()
+		public async Task GetManyMetadataReturnsBadRequestWhenModelStateInvalid()
 		{
 			var key = "err";
 			var msg = "borked";
 			_uut.ModelState.AddModelError(key, msg);
 
-			var result = await _uut.GetMany(new ReportsController.GetManyArgs());
+			var result = await _uut.GetManyMetadata(new ReportsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
 			var value = ((BadRequestObjectResult)result).Value;
 
@@ -802,11 +803,11 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async Task GetManyReturnsEmptyListWhenEmpty()
+		public async Task GetManyMetadataReturnsEmptyListWhenEmpty()
 		{
 			_reports.Setup(rs => rs.GetManyMetadata(null, null, null, null)).Returns(new List<ReportMetadata>());
 
-			var result = await _uut.GetMany(new ReportsController.GetManyArgs());
+			var result = await _uut.GetManyMetadata(new ReportsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
@@ -817,11 +818,11 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-		public async Task GetManyReturnsEmptyListWhenNull()
+		public async Task GetManyMetadataReturnsEmptyListWhenNull()
 		{
 			_reports.Setup(rs => rs.GetManyMetadata(null, null, null, null)).Returns<List<ReportMetadata>>(null);
 
-			var result = await _uut.GetMany(new ReportsController.GetManyArgs());
+			var result = await _uut.GetManyMetadata(new ReportsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<ObjectResult>());
 			var value = ((ObjectResult)result).Value;
 
@@ -829,6 +830,144 @@ namespace api.Tests.Controllers
 			var actuals = ((ReportsController.ReportsResponse)value).Reports;
 
 			Assert.That(actuals, Is.Empty);
+		}
+
+		private static void AssertContains(byte[] actual, byte[] expected)
+		{
+			var e = 0;
+			for (var a = 0; a < actual.Length; a++)
+			{
+				if (actual[a] == expected[e])
+				{
+					if (e == expected.Length - 1)
+					{
+						Assert.Pass();
+						return;
+					}
+
+					e++;
+					continue;
+				}
+
+				e = 0;
+			}
+
+			Assert.Fail("Actual sequence did not contain expected sequence.");
+		}
+
+		[Test]
+		public async Task GetZipNoArgsReturnsZip()
+		{
+			var reports = new[] {
+				new Report {
+					Name = "invoice",
+					Xlsx = Encoding.UTF8.GetBytes("hello"),
+				},
+			};
+			_reports.Setup(rs => rs.GetMany(null, null, null, null)).Returns(reports);
+
+			var result = await _uut.GetZip(new ReportsController.GetManyArgs());
+			Assert.That(result, Is.TypeOf<FileStreamResult>());
+			var file = (FileStreamResult)result;
+
+			Assert.That(file.ContentType, Is.EqualTo(ContentTypes.ZIP));
+			Assert.That(file.FileDownloadName, Is.EqualTo("Reports"));
+
+			using (var ms = new MemoryStream())
+			{
+				file.FileStream.CopyTo(ms);
+				var archive = new ZipArchive(ms);
+				Assert.That(archive.Entries, Has.Count.EqualTo(reports.Length));
+				for (var i = 0; i < archive.Entries.Count; i++)
+				{
+					using (var entryStream = new MemoryStream())
+					{
+						archive.Entries[i].Open().CopyTo(ms);
+						Console.WriteLine($"entry: {Encoding.UTF8.GetString(ms.ToArray())}");
+						AssertContains(ms.ToArray(), reports[i].Xlsx);
+					}
+				}
+			}
+		}
+
+		[Test]
+		public async Task GetZipAllArgsReturnsZip()
+		{
+			var reports = new[] {
+				new Report {
+					Name = "invoice",
+					Xlsx = Encoding.UTF8.GetBytes("hello"),
+				},
+			};
+
+			var name = "bob";
+			var type = ReportType.Invoice;
+			var schoolYear = "2017-2018";
+			var approved = true;
+			_reports.Setup(rs => rs.GetMany(name, type, schoolYear, approved)).Returns(reports);
+
+			var result = await _uut.GetZip(new ReportsController.GetManyArgs
+			{
+				Name = name,
+				Type = type.Value,
+				SchoolYear = schoolYear,
+				Approved = approved,
+			});
+			Assert.That(result, Is.TypeOf<FileStreamResult>());
+			var file = (FileStreamResult)result;
+
+			Assert.That(file.ContentType, Is.EqualTo(ContentTypes.ZIP));
+			Assert.That(file.FileDownloadName, Is.EqualTo($"Reports-{schoolYear}-{type}-{name}-Approved"));
+
+			using (var ms = new MemoryStream())
+			{
+				file.FileStream.CopyTo(ms);
+				var archive = new ZipArchive(ms);
+				Assert.That(archive.Entries, Has.Count.EqualTo(reports.Length));
+				for (var i = 0; i < archive.Entries.Count; i++)
+				{
+					using (var entryStream = new MemoryStream())
+					{
+						archive.Entries[i].Open().CopyTo(ms);
+						AssertContains(ms.ToArray(), reports[i].Xlsx);
+					}
+				}
+			}
+		}
+
+		[Test]
+		public async Task GetZipReturnsNoContentWhenNull()
+		{
+			_reports.Setup(rs => rs.GetMany(null, null, null, null)).Returns<IEnumerable<Report>>(null);
+
+			var result = await _uut.GetZip(new ReportsController.GetManyArgs());
+			Assert.That(result, Is.TypeOf<NoContentResult>());
+		}
+
+		[Test]
+		public async Task GetZipReturnsNoContentWhenEmpty()
+		{
+			_reports.Setup(rs => rs.GetMany(null, null, null, null)).Returns(new Report[] { });
+
+			var result = await _uut.GetZip(new ReportsController.GetManyArgs());
+			Assert.That(result, Is.TypeOf<NoContentResult>());
+		}
+
+		[Test]
+		public async Task GetZipReturnBadRequestWhenModelStateInvalid()
+		{
+			var key = "err";
+			var msg = "borked";
+			_uut.ModelState.AddModelError(key, msg);
+
+			var result = await _uut.GetZip(new ReportsController.GetManyArgs());
+			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+			var value = ((BadRequestObjectResult)result).Value;
+
+			Assert.That(value, Is.TypeOf<ErrorsResponse>());
+			var actuals = ((ErrorsResponse)value).Errors;
+
+			Assert.That(actuals[0], Is.EqualTo(msg));
 		}
 
 		[Test]
