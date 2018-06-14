@@ -17,6 +17,7 @@ import { ExcelComponent } from './excel/excel.component';
 import { CellComponent } from './cell/cell.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { HotTableModule, HotTableRegisterer } from '@handsontable/angular';
 
 import { SharedModule } from '../../shared/shared.module';
 
@@ -39,9 +40,10 @@ import { SharedModule } from '../../shared/shared.module';
     ReactiveFormsModule,
     ReportsInvoicesRoutingModule,
     NgbModule,
+    HotTableModule,
     SharedModule
   ],
-  providers: [ ],
+  providers: [ HotTableRegisterer ],
   entryComponents: [
     DigitalSignatureUpsertFormComponent,
     InvoiceCreateFormComponent,

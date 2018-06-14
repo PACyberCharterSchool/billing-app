@@ -86,7 +86,17 @@ export class RefundsListComponent implements OnInit {
   listDisplayableFields() {
     if (this.allRefunds) {
       const fields = this.utilitiesService.objectKeys(this.allRefunds[0]);
-      return fields;
+      const rejected = ['id'];
+      return fields.filter((i) => !rejected.includes(i));
+    }
+  }
+
+  listDisplayableValues(refund: Refund) {
+    if (refund) {
+      const vkeys = this.listDisplayableFields();
+      const selected = this.utilitiesService.pick(refund, vkeys);
+
+      return this.utilitiesService.objectValues(selected);
     }
   }
 

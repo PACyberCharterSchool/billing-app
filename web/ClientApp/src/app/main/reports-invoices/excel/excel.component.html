@@ -1,19 +1,11 @@
-<!-- <table class='sjs-table'> -->
-<!--   <tr *ngFor='let row of worksheet'> -->
-<!--     <td *ngFor='let val of row'> -->
-<!--       {{val}} -->
-<!--     </td> -->
-<!--   </tr> -->
-<!--   <tr><th></th> -->
-<!--     <th *ngFor="let col of columns">{{ col }}</th> -->
-<!--   </tr> -->
-<!--   <tr *ngFor="let row of rows"> -->
-<!--     <th>{{ row }}</th> -->
-<!--     <td *ngFor="let col of columns"> -->
-<!--         <app-cell [id]="col+row" [attr.id]="col+row"></app-cell> -->
-<!--     </td> -->
-<!--   </tr> -->
-<!-- </table> -->
-<div class='col-md-12'>
-  <div [innerHtml]='table'></div>
+<div id='spreadsheetContainer'class='col-md-12'>
+  <!-- <div *ngIf='isHTMLContent()' [innerHtml]='data'></div> -->
+  <!-- <div *ngIf='isWorksheetContent()'> -->
+  <!--   <hot-table -->
+  <!--     [hotId]='spreadsheetTable' -->
+  <!--     [settings]='settings' -->
+  <!--     [colHeaders]='true' -->
+  <!--     [rowHeaders]='true' -->
+  <!--     [data]='data'></hot-table> -->
+  <!-- </div> --> 
 </div>

@@ -6,11 +6,13 @@ import { Report, ReportType } from '../../../models/report.model';
 
 import { ReportsService } from '../../../services/reports.service';
 import { UtilitiesService } from '../../../services/utilities.service';
+import { ExcelService } from '../../../services/excel.service';
 
 import { Globals } from '../../../globals';
 
 import { InvoiceCreateFormComponent } from '../invoice-create-form/invoice-create-form.component';
 import { InvoicePreviewFormComponent } from '../invoice-preview-form/invoice-preview-form.component';
+
 
 @Component({
   selector: 'app-invoices-list',
@@ -36,6 +38,7 @@ export class InvoicesListComponent implements OnInit {
     private globals: Globals,
     private reportsService: ReportsService,
     private utilitiesService: UtilitiesService,
+    private excelService: ExcelService,
     private ngbModal: NgbModal
   ) { }
 
@@ -142,6 +145,8 @@ export class InvoicesListComponent implements OnInit {
   }
 
   downloadInvoice(invoice: Report) {
+    // this.excelService.saveInvoiceAsExcelFile(invoice);
+    this.excelService.saveInvoiceAsCSVFile(invoice);
   }
 
 

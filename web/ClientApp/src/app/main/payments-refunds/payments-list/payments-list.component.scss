@@ -1,63 +1,44 @@
-.payments-list-row {
-  display: flex;
-  align-items: center;
-  height: 100%;
+.payments-title-row {
+  height: 40px;
 
-  div { // col-md-12
-    .create-payment-col {
-      display: inline-block;
-      height: 60px;
+  .create-payment-col {
+    display: flex;
+    height: 100%;
 
-      div {
-        display: inline-block;
-        margin: 0;
-        padding: 0;
+    div.col-md-4 {
+      display: flex;
+      align-items: center;
 
-        h3 {
-          color: #58a917;
-          display: inline-block;
-        }
-
-        input {
-          height: 40px;
-          margin-left: 20px;
-          margin-right: 0;
-          width: 55%;
-        }
-
-        button {
-          height: 40px;
-        }
+      h4 {
+        color: #58a917;
       }
     }
 
-    .search-payment-col {
+    div.col-md-2 {
+      display: flex;
       align-items: center;
-      display: inline-flex;
-      height: 60px;
-      justify-content: center;
-      padding: 0;
-      margin: 0;
-
-      div {
-        height: 100%;
-        display: flex;
-        align-items:center;
-
-        input {
-          height: 55%;
-          width: 65%;
-        }
-
-        button {
-          height: 55%;
-        }
-      }
     }
   }
 
+  .search-payment-col {
+    display: flex;
+    height: 100%;
+
+    input[type='text'] {
+      width: 70%;
+      padding: 6px 2px;
+      line-height: 14px;
+    }
+  }
+}
+
+.payments-list-row {
+  display: flex;
+  align-items: center;
+  height: calc(100% - 80px);
+
   .payment-list-col {
-    height: calc(100% - 125px);
+    height: 100%;
 
     table {
       thead {
@@ -65,8 +46,13 @@
       }
     }
   }
+}
+
+.payments-footer-row {
+  height: 40px;
 
   .payment-action-col {
     margin-top: 10px;
   }
+
 }
