@@ -1,7 +1,8 @@
 <div class='col-md-12'>
   <div class='modal-header'>
     <div class='modal-title'>
-      <h4>Create Invoices</h4>
+      <div class='col-md-12' *ngIf='isMany()'><h4>Create Invoices</h4></div>
+      <div class='col-md-12' *ngIf='!isMany()'><h4>Create Invoice</h4></div>
     </div>
     <button type='button' class='close' aria-label='Close' (click)='ngbActiveModal.dismiss("Cross click")'>
       <span aria-hidden='true'>&times;</span>
@@ -9,7 +10,7 @@
   </div>
   <div class='modal-body'>
     <div class='col-md-12'>
-      <form #invoiceCreateForm='ngForm' (ngSubmit)='createInvoices()'>
+      <form #invoiceCreateForm='ngForm' (ngSubmit)='create()'>
         <div class='form-group col-md-12'>
           <div class='col-md-6'>
             <label>School Year</label>
@@ -53,6 +54,23 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+        <div class='form-group col-md-12' *ngIf='!isMany()'>
+          <div class='col-md-6'>
+            <label>School District Name</label>
+          </div>
+          <div class='col-md-6'>
+            <label for='typeahead-school-district'></label>
+            <input id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='schoolDistrictNameModel' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
+          </div>
+        </div>
+        <div class='form-group' *ngIf='!isMany()'>
+          <div class='col-md-6'>
+            <label>AUN#</label>
+          </div>
+          <div class='col-md-6'>
+            <span>{{selectedSchoolDistrict?.aun}}</span>
           </div>
         </div>
         <div class='form-group col-md-12'>

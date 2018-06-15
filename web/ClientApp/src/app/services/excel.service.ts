@@ -33,13 +33,16 @@ export class ExcelService {
   }
 
   public saveInvoiceAsExcelFile(invoice: Report): void {
-    const data = JSON.parse(invoice.data);
-    this.exportAsExcelFile(data, this.generateInvoiceExcelFileName(invoice));
+    const data = invoice.data;
+    // this.exportAsExcelFile(data, this.generateInvoiceExcelFileName(invoice));
+    this.saveAsExcelFile(data, this.generateInvoiceExcelFileName(invoice));
   }
 
   public saveInvoiceAsCSVFile(invoice: Report): void {
-    const data = JSON.parse(invoice.data);
-    this.exportAsCSVFile(data, this.generateInvoiceCSVFileName(invoice));
+    // const data = JSON.parse(invoice.data);
+    const data = invoice.data;
+    // this.exportAsCSVFile(data, this.generateInvoiceCSVFileName(invoice));
+    this.saveAsCSVFile(data, this.generateInvoiceCSVFileName(invoice));
   }
 
   private saveAsExcelFile(buffer: any, fileName: string): void {

@@ -11,5 +11,7 @@
 
   .action-content-col {
     padding: 5px;
+    overflow-x: hidden;
+    overflow-y: scroll;
   }
 }

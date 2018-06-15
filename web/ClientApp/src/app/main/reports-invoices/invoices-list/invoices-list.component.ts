@@ -43,10 +43,10 @@ export class InvoicesListComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.reportsService.getReportsByType(ReportType.Invoice, this.skip).subscribe(
+    this.reportsService.getReportsByType(ReportType.Invoice).subscribe(
       data => {
         console.log(`InvoicesListComponent.ngOnInit(): data is ${data}.`);
-        this.reports = this.allReports = data;
+        this.reports = this.allReports = data['reports'];
       },
       error => {
         console.log(`InvoicesListComponent.ngOnInit(): error is ${error}.`);
@@ -80,6 +80,19 @@ export class InvoicesListComponent implements OnInit {
     this.searchText = '';
   }
 
+  refreshInvoices(): void {
+    this.reportsService.getReportsByType(ReportType.Invoice).subscribe(
+      data => {
+        console.log(`InvoicesListComponent.refreshInvoices(): data is ${data}.`);
+        this.reports = this.allReports = data['reports'];
+      },
+      error => {
+        console.log(`InvoicesListComponent.refreshInvoices(): error is ${error}.`);
+      }
+    )
+
+  }
+
   listDisplayableFields() {
     if (this.allReports) {
       const fields = this.utilitiesService.objectKeys(this.allReports[0]);
@@ -104,15 +117,35 @@ export class InvoicesListComponent implements OnInit {
   }
 
   getSchoolYears(): string[] {
-    const years = this.allReports.filter((v, i, s) => s.indexOf(v) === i).map((i) => i.schoolYear);
-    return years;
+    if (this.allReports) {
+      const years = this.allReports.filter((obj, pos, arr) => {
+        return arr.map(mo => mo['schoolYear']).indexOf(obj['schoolYear']) === pos;
+      });
+      return years.map(y => y.schoolYear);
+    }
   }
 
-  createInvoices() {
+  createInvoice(): void {
     const modal = this.ngbModal.open(InvoiceCreateFormComponent, { centered: true });
+    modal.componentInstance.op == 'single';
     modal.result.then(
       (result) => {
         console.log('InvoicesListComponent.createInvoices(): result is ', result);
+        this.refreshInvoices();
+      },
+      (reason) => {
+        console.log('InvoicesListComponent.createInvoices(): reason is ', reason);
+      }
+    )
+  }
+
+  createInvoices(): void {
+    const modal = this.ngbModal.open(InvoiceCreateFormComponent, { centered: true });
+    modal.componentInstance.op = 'many';
+    modal.result.then(
+      (result) => {
+        console.log('InvoicesListComponent.createInvoices(): result is ', result);
+        this.refreshInvoices();
       },
       (reason) => {
         console.log('InvoicesListComponent.createInvoices(): reason is ', reason);
@@ -146,7 +179,17 @@ export class InvoicesListComponent implements OnInit {
 
   downloadInvoice(invoice: Report) {
     // this.excelService.saveInvoiceAsExcelFile(invoice);
-    this.excelService.saveInvoiceAsCSVFile(invoice);
+    this.reportsService.getInvoiceDataByName(invoice.name).subscribe(
+      data => {
+        console.log('InvoicesListComponent.downloadInvoice(): data is', data);
+        // this.excelService.saveInvoiceAsCSVFile(invoice);
+      },
+      error => {
+        console.log('InvoicesListComponent.downloadInvoice(): error is', error);
+        invoice.data = error.error.text;
+        this.excelService.saveInvoiceAsExcelFile(invoice);
+      }
+    );
   }
 
 

@@ -404,6 +404,8 @@ namespace api.Controllers
 				return NotFound();
 
 			var accept = Request.Headers["Accept"];
+      Console.WriteLine($"{accept}");
+
 			if (accept != ContentTypes.XLSX)
 				return StatusCode(406);
 
