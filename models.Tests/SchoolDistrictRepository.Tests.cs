@@ -112,6 +112,17 @@ namespace models.Tests
 			Assert.That(actual[2].Id, Is.EqualTo(districts[0].Id));
 		}
 
+		private static void AssertSchoolDistrict(SchoolDistrict actual, SchoolDistrict district)
+		{
+			Assert.That(actual.Aun, Is.EqualTo(actual.Aun));
+			Assert.That(actual.Name, Is.EqualTo(actual.Name));
+			Assert.That(actual.Rate, Is.EqualTo(actual.Rate));
+			Assert.That(actual.AlternateRate, Is.EqualTo(actual.AlternateRate));
+			Assert.That(actual.SpecialEducationRate, Is.EqualTo(actual.SpecialEducationRate));
+			Assert.That(actual.AlternateSpecialEducationRate, Is.EqualTo(actual.AlternateSpecialEducationRate));
+			Assert.That(actual.PaymentType, Is.EqualTo(actual.PaymentType));
+		}
+
 		[Test]
 		public void CreateOrUpdateWithNewObjectCreates()
 		{
@@ -130,11 +141,7 @@ namespace models.Tests
 			Assert.That(result, Is.EqualTo(district));
 
 			var actual = _context.SchoolDistricts.First(d => d.Id == result.Id);
-			Assert.That(actual.Name, Is.EqualTo(district.Name));
-			Assert.That(actual.Rate, Is.EqualTo(district.Rate));
-			Assert.That(actual.AlternateRate, Is.EqualTo(district.AlternateRate));
-			Assert.That(actual.SpecialEducationRate, Is.EqualTo(district.SpecialEducationRate));
-			Assert.That(actual.AlternateSpecialEducationRate, Is.EqualTo(district.AlternateSpecialEducationRate));
+			AssertSchoolDistrict(actual, district);
 			Assert.That(actual.Created, Is.EqualTo(time));
 			Assert.That(actual.LastUpdated, Is.EqualTo(time));
 		}
@@ -168,11 +175,7 @@ namespace models.Tests
 			_context.SaveChanges(() => _uut.CreateOrUpdate(district));
 
 			var actual = _context.SchoolDistricts.First(d => d.Id == id);
-			Assert.That(actual.Name, Is.EqualTo(district.Name));
-			Assert.That(actual.Rate, Is.EqualTo(district.Rate));
-			Assert.That(actual.AlternateRate, Is.EqualTo(district.AlternateRate));
-			Assert.That(actual.SpecialEducationRate, Is.EqualTo(district.SpecialEducationRate));
-			Assert.That(actual.AlternateSpecialEducationRate, Is.EqualTo(district.AlternateSpecialEducationRate));
+			AssertSchoolDistrict(actual, district);
 			Assert.That(actual.PaymentType, Is.EqualTo(district.PaymentType));
 			Assert.That(actual.LastUpdated.Date, Is.EqualTo(time.Date));
 		}
@@ -181,6 +184,7 @@ namespace models.Tests
 		public void CreateOrUpdateWithDifferentObjectUpdates()
 		{
 			var aun = 123456789;
+			var now = DateTime.Now;
 			var district = new SchoolDistrict
 			{
 				Aun = aun,
@@ -190,6 +194,8 @@ namespace models.Tests
 				SpecialEducationRate = 2.0m,
 				AlternateSpecialEducationRate = 4.0m,
 				PaymentType = SchoolDistrictPaymentType.Ach,
+				Created = now.AddDays(-1),
+				LastUpdated = now.AddDays(-1),
 			};
 			_context.Add(district);
 			_context.SaveChanges();
@@ -203,16 +209,12 @@ namespace models.Tests
 				SpecialEducationRate = 4.0m,
 				PaymentType = SchoolDistrictPaymentType.Check,
 			};
-			_context.SaveChanges(() => _uut.CreateOrUpdate(updated));
+			_context.SaveChanges(() => _uut.CreateOrUpdate(now, updated));
 
 			var actual = _context.SchoolDistricts.First(d => d.Id == district.Id);
-			Assert.That(actual.Aun, Is.EqualTo(updated.Aun));
-			Assert.That(actual.Name, Is.EqualTo(updated.Name));
-			Assert.That(actual.Rate, Is.EqualTo(updated.Rate));
-			Assert.That(actual.AlternateRate, Is.EqualTo(updated.AlternateRate));
-			Assert.That(actual.SpecialEducationRate, Is.EqualTo(updated.SpecialEducationRate));
-			Assert.That(actual.AlternateSpecialEducationRate, Is.EqualTo(updated.AlternateSpecialEducationRate));
-			Assert.That(actual.PaymentType, Is.EqualTo(updated.PaymentType));
+			AssertSchoolDistrict(actual, updated);
+			Assert.That(actual.Created, Is.EqualTo(district.Created));
+			Assert.That(actual.LastUpdated, Is.EqualTo(now));
 		}
 	}
 }
