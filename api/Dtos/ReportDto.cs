@@ -6,7 +6,7 @@ using models;
 
 namespace api.Dtos
 {
-	// TODO(Erik): return dictionary of data? ex: SchoolDistrict.Aun in Invoice
+	// TODO(Erik): return data? ex: Invoice
 	public class ReportDto
 	{
 		public int Id { get; set; }
