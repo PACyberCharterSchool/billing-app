@@ -10,8 +10,10 @@ namespace models
 {
 	public interface ISchoolDistrictRepository
 	{
-		SchoolDistrict CreateOrUpdate(SchoolDistrict district);
+		IList<SchoolDistrict> CreateOrUpdateMany(DateTime time, IList<SchoolDistrict> districts);
+		IList<SchoolDistrict> CreateOrUpdateMany(IList<SchoolDistrict> districts);
 		SchoolDistrict CreateOrUpdate(DateTime time, SchoolDistrict district);
+		SchoolDistrict CreateOrUpdate(SchoolDistrict district);
 		SchoolDistrict Get(int id);
 		SchoolDistrict GetByAun(int aun);
 		IList<SchoolDistrict> GetMany();
@@ -47,24 +49,41 @@ namespace models
 			nameof(SchoolDistrict.LastUpdated),
 		};
 
-		public SchoolDistrict CreateOrUpdate(DateTime time, SchoolDistrict update)
+		public IList<SchoolDistrict> CreateOrUpdateMany(DateTime time, IList<SchoolDistrict> updates)
 		{
-			var district = _schoolDistricts.FirstOrDefault(d => d.Aun == update.Aun);
-			if (district == null)
-			{
-				update.Created = time;
-				update.LastUpdated = time;
+			var districts = _schoolDistricts.Where(d => updates.Select(u => u.Aun).Contains(d.Aun));
+			var added = new List<SchoolDistrict>();
+			var updated = new List<SchoolDistrict>();
 
-				_schoolDistricts.Add(update);
-				return update;
+			foreach (var update in updates)
+			{
+				var district = districts.FirstOrDefault(d => d.Aun == update.Aun);
+				if (district == null)
+				{
+					update.Created = time;
+					update.LastUpdated = time;
+
+					added.Add(update);
+					continue;
+				}
+
+				MergeProperties(district, update, _excludedFields);
+				district.LastUpdated = time;
+				updated.Add(district);
 			}
 
-			MergeProperties(district, update, _excludedFields);
-			district.LastUpdated = time;
-			_schoolDistricts.Update(district);
+			_schoolDistricts.AddRange(added);
+			_schoolDistricts.UpdateRange(updated);
 
-			return district;
+			updated.AddRange(added);
+			return updated.OrderBy(u => u.Id).ToList();
 		}
+
+		public IList<SchoolDistrict> CreateOrUpdateMany(IList<SchoolDistrict> updates) =>
+			CreateOrUpdateMany(DateTime.Now, updates);
+
+		public SchoolDistrict CreateOrUpdate(DateTime time, SchoolDistrict update) =>
+			CreateOrUpdateMany(time, new[] { update })[0];
 
 		public SchoolDistrict CreateOrUpdate(SchoolDistrict update) => CreateOrUpdate(DateTime.Now, update);
 	}

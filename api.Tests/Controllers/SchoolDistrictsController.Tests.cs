@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 using Moq;
@@ -170,6 +173,88 @@ namespace api.Tests.Controllers
 
 			var result = await _uut.Update(id, new SchoolDistrictsController.SchoolDistrictUpdate());
 			Assert.That(result, Is.TypeOf<NotFoundResult>());
+		}
+
+		public static bool MatchSchoolDistrict(SchoolDistrict actual, SchoolDistrict expected)
+		{
+			return actual.Aun == expected.Aun &&
+				actual.Name == expected.Name &&
+				actual.Rate == expected.Rate &&
+				actual.AlternateRate == expected.AlternateRate &&
+				actual.SpecialEducationRate == expected.SpecialEducationRate &&
+				actual.AlternateSpecialEducationRate == expected.AlternateSpecialEducationRate;
+		}
+
+		[Test]
+		[TestCase("sample-sds.csv", "text/csv")]
+		[TestCase("sample-sds.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
+		public async Task UploadUplaods(string fileName, string contentType)
+		{
+			var formFile = new Mock<IFormFile>();
+
+			var file = File.OpenRead($"../../../TestData/{fileName}");
+			formFile.Setup(f => f.ContentType).Returns(contentType).Verifiable();
+			formFile.Setup(f => f.OpenReadStream()).Returns(file).Verifiable();
+
+			var districts = new[] {
+				new SchoolDistrict
+				{
+					Aun = 119350303,
+					Name = "First SD",
+					Rate = 100m,
+					SpecialEducationRate = 1000m,
+				},
+				new SchoolDistrict {
+					Aun = 123460302,
+					Name = "Second SD",
+					Rate = 200m,
+					SpecialEducationRate = 2000m,
+				},
+				new SchoolDistrict {
+					Aun = 101260303,
+					Name = "Third SD",
+					Rate = 300m,
+					SpecialEducationRate = 3000m,
+				},
+			};
+			_schoolDistricts.Setup(ds => ds.CreateOrUpdateMany(It.Is<IList<SchoolDistrict>>(l =>
+				l.Count == 3 &&
+				MatchSchoolDistrict(l[0], districts[0]) &&
+				MatchSchoolDistrict(l[1], districts[1]) &&
+				MatchSchoolDistrict(l[2], districts[2])
+			))).Returns<IList<SchoolDistrict>>(l => l).Verifiable();
+
+			var result = await _uut.Upload(formFile.Object);
+			Assert.That(result, Is.TypeOf<CreatedResult>());
+			Assert.That(((CreatedResult)result).Location, Is.EqualTo($"/api/schooldistricts"));
+			var value = ((CreatedResult)result).Value;
+
+			Assert.That(value, Is.TypeOf<SchoolDistrictsController.SchoolDistrictsResponse>());
+			var actuals = ((SchoolDistrictsController.SchoolDistrictsResponse)value).SchoolDistricts;
+
+			Assert.That(actuals, Has.Count.EqualTo(districts.Length));
+			for (var i = 0; i < actuals.Count; i++)
+				AssertSchoolDistrict(actuals[i], districts[i]);
+
+			formFile.Verify();
+			_schoolDistricts.Verify();
+		}
+
+		[Test]
+		public async Task UploadReturnsBadRequestWhenInvalidContentType()
+		{
+			var formFile = new Mock<IFormFile>();
+			var contentType = "bad";
+			formFile.Setup(f => f.ContentType).Returns(contentType);
+
+			var result = await _uut.Upload(formFile.Object);
+			Assert.That(result, Is.TypeOf<BadRequestObjectResult>());
+			var value = ((BadRequestObjectResult)result).Value;
+
+			Assert.That(value, Is.TypeOf<ErrorResponse>());
+			var actual = ((ErrorResponse)value).Error;
+
+			Assert.That(actual, Is.EqualTo($"Invalid file Content-Type '{contentType}'."));
 		}
 	}
 }
