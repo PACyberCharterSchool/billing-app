@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
@@ -7,8 +8,13 @@ using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
+using CsvHelper;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 
 using api.Dtos;
 using models;
@@ -122,6 +128,78 @@ namespace api.Controllers
 			};
 			await Task.Run(() => _context.SaveChanges(() => _schoolDistricts.CreateOrUpdate(district)));
 			return Ok();
+		}
+
+		private static IList<SchoolDistrict> CsvToDistricts(Stream stream)
+		{
+			using (var reader = new CsvReader(new StreamReader(stream)))
+			{
+				reader.Configuration.RegisterClassMap<SchoolDistrictClassMap>();
+				reader.Configuration.HeaderValidated = null;
+				return reader.GetRecords<SchoolDistrict>().ToList();
+			}
+		}
+
+		private static IList<SchoolDistrict> XlsxToDistricts(Stream stream)
+		{
+			var wb = new XSSFWorkbook(stream);
+			var sheet = wb.GetSheetAt(0);
+
+			var header = sheet.GetRow(0);
+			var aunIndex = header.Cells.FindIndex(c => c.StringCellValue == "AUN");
+			var nameIndex = header.Cells.FindIndex(c => c.StringCellValue == "School District");
+			var rateIndex = header.Cells.FindIndex(c => c.StringCellValue.Contains("Nonspecial"));
+			var specialRateIndex = header.Cells.FindIndex(c => c.StringCellValue.Contains("Special"));
+
+			var districts = new List<SchoolDistrict>();
+			for (var i = 1; i <= sheet.LastRowNum; i++)
+			{
+				var row = sheet.GetRow(i);
+				if (row == null || row.Cells.All(c => c.CellType == CellType.Blank))
+					continue;
+
+				districts.Add(new SchoolDistrict
+				{
+					Aun = (int)row.GetCell(aunIndex).NumericCellValue,
+					Name = row.GetCell(nameIndex).StringCellValue,
+					Rate = (decimal)row.GetCell(rateIndex).NumericCellValue,
+					SpecialEducationRate = (decimal)row.GetCell(specialRateIndex).NumericCellValue,
+				});
+			}
+
+			return districts;
+		}
+
+		private static Dictionary<string, Func<Stream, IList<SchoolDistrict>>> _parsers =
+			new Dictionary<string, Func<Stream, IList<SchoolDistrict>>>
+			{
+				{"text/csv", CsvToDistricts},
+				{"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", XlsxToDistricts},
+			};
+
+		[HttpPut]
+		[Authorize(Policy = "PAY+")]
+		[ProducesResponseType(typeof(SchoolDistrictsResponse), 201)]
+		[ProducesResponseType(typeof(ErrorResponse), 400)]
+		public async Task<IActionResult> Upload(IFormFile file)
+		{
+			if (file == null)
+				return new BadRequestObjectResult(
+					new ErrorResponse($"Could not find parameter named '{nameof(file)}'."));
+
+			if (!_parsers.ContainsKey(file.ContentType))
+				return new BadRequestObjectResult(
+					new ErrorResponse($"Invalid file Content-Type '{file.ContentType}'."));
+
+			var parse = _parsers[file.ContentType];
+			var districts = parse(file.OpenReadStream());
+
+			districts = await Task.Run(() => _context.SaveChanges(() => _schoolDistricts.CreateOrUpdateMany(districts)));
+
+			return new CreatedResult($"/api/schooldistricts", new SchoolDistrictsResponse
+			{
+				SchoolDistricts = districts.Select(d => new SchoolDistrictDto(d)).ToList(),
+			});
 		}
 	}
 }

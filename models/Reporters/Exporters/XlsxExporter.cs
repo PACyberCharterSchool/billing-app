@@ -101,7 +101,6 @@ namespace models.Reporters.Exporters
 
 		public XSSFWorkbook Export(XSSFWorkbook wb, dynamic data)
 		{
-			// Console.WriteLine($"data: {data}");
 			for (var s = 0; s < wb.NumberOfSheets; s++)
 			{
 				var sheet = wb.GetSheetAt(s);

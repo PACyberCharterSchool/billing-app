@@ -504,6 +504,38 @@
 					"response": []
 				},
 				{
+					"name": "/api/reports/zip",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/reports/zip",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"reports",
+								"zip"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "/api/reports",
 					"request": {
 						"auth": {
@@ -712,6 +744,47 @@
 								"api",
 								"schooldistricts",
 								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/schooldistricts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"value": "",
+									"description": "",
+									"type": "file"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/schooldistricts",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"schooldistricts"
 							]
 						}
 					},
