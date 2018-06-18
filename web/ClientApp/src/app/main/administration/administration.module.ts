@@ -14,6 +14,7 @@ import {
 import { AdministrationPaymentRateUpdateFormComponent } from './administration-payment-rate-update-form/administration-payment-rate-update-form.component';
 import { AdministrationSchoolCalendarComponent } from './administration-school-calendar/administration-school-calendar.component';
 import { AdministrationAuditListComponent } from './administration-audit-list/administration-audit-list.component';
+import { AdministrationTemplateListComponent } from './administration-template-list/administration-template-list.component';
 
 import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
@@ -25,7 +26,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     AdministrationImportStudentDataComponent,
     AdministrationPaymentRateUpdateFormComponent,
     AdministrationSchoolCalendarComponent,
-    AdministrationAuditListComponent
+    AdministrationAuditListComponent,
+    AdministrationTemplateListComponent
   ],
   imports: [
     CommonModule,

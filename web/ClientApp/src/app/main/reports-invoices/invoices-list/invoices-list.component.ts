@@ -178,11 +178,10 @@ export class InvoicesListComponent implements OnInit {
   }
 
   downloadInvoice(invoice: Report) {
-    // this.excelService.saveInvoiceAsExcelFile(invoice);
     this.reportsService.getInvoiceDataByName(invoice.name).subscribe(
       data => {
         console.log('InvoicesListComponent.downloadInvoice(): data is', data);
-        // this.excelService.saveInvoiceAsCSVFile(invoice);
+        this.excelService.saveInvoiceAsCSVFile(invoice);
       },
       error => {
         console.log('InvoicesListComponent.downloadInvoice(): error is', error);
@@ -191,7 +190,6 @@ export class InvoicesListComponent implements OnInit {
       }
     );
   }
-
 
   downloadInvoices(bulkDownloadContent) {
     this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' }).result.then(

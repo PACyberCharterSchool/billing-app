@@ -36,11 +36,10 @@ export class ReportsService {
 
   public getInvoiceDataByName(name: string): Observable<Report> {
     let headers = Object.assign({}, this.headers);
-    headers['responseType'] = ResponseContentType.Blob;
     headers.headers.append('Accept', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    headers.headers.delete('Content-Type');
+    headers['responseType'] = 'arrayBuffer';
     const url = this.apiReportsUrl + `/${name}`;
-    return this.httpClient.get<any>(url, this.headers);
+    return this.httpClient.get<any>(url, headers);
   }
 
   public createInvoices(invoiceInfo: Object): Observable<Report[]> {

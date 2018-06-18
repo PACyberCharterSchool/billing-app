@@ -65,5 +65,14 @@
         height: 180px;
       }
     }
+
+    button#templates-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -1460px -400px;
+        height: 180px;
+      }
+    }
   }
 }

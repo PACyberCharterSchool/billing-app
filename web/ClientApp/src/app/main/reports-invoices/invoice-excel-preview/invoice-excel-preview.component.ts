@@ -17,9 +17,15 @@ export class InvoiceExcelPreviewComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    const json = JSON.parse(this.jsonData);
-    this.worksheet = XLSX.utils.json_to_sheet(json);
-    this.html = XLSX.utils.sheet_to_html(this.worksheet);
+    if (this.jsonData) {
+      const json = JSON.parse(this.jsonData);
+      this.worksheet = XLSX.utils.json_to_sheet(json);
+      this.html = XLSX.utils.sheet_to_html(this.worksheet);
+    }
+
+    if (this.xlsxData) {
+      this.worksheet = XLSX.utils.book_new();
+    }
   }
 
 }

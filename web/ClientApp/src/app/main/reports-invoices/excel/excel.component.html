@@ -1,11 +1,11 @@
 <div id='spreadsheetContainer'class='col-md-12'>
-  <!-- <div *ngIf='isHTMLContent()' [innerHtml]='data'></div> -->
-  <!-- <div *ngIf='isWorksheetContent()'> -->
-  <!--   <hot-table -->
-  <!--     [hotId]='spreadsheetTable' -->
-  <!--     [settings]='settings' -->
-  <!--     [colHeaders]='true' -->
-  <!--     [rowHeaders]='true' -->
-  <!--     [data]='data'></hot-table> -->
-  <!-- </div> --> 
+  <div *ngIf='isHTMLContent()' [innerHtml]='data'></div>
+  <div *ngIf='isWorksheetContent()'>
+    <hot-table
+      [hotId]='spreadsheetTable'
+      [settings]='settings'
+      [colHeaders]='true'
+      [rowHeaders]='true'
+      [data]='data'></hot-table>
+  </div> 
 </div>

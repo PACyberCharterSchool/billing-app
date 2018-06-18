@@ -152,7 +152,6 @@ export class InvoicesDigitalSignaturesListComponent implements OnInit {
         else if (result === this.CloseDeleteDlgWithNo) {
           console.log('DigitalSignaturesListComponent.deleteDigitalSignature(): result is ', result);
         }
-
       },
       (reason) => {
         console.log('DigitalSignaturesListComponent.deleteDigitalSignature(): reason is ', reason);

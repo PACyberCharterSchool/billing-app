@@ -10,6 +10,7 @@ import {
 } from './administration-import-student-data/administration-import-student-data.component';
 import { AdministrationSchoolCalendarComponent } from './administration-school-calendar/administration-school-calendar.component';
 import { AdministrationAuditListComponent } from './administration-audit-list/administration-audit-list.component';
+import { AdministrationTemplateListComponent } from './administration-template-list/administration-template-list.component';
 
 import { AuthenticationGuardService } from '../../services/authentication-guard.service';
 
@@ -46,6 +47,12 @@ const adminRoutes: Routes = [
       {
         path: 'audits',
         component: AdministrationAuditListComponent,
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
+      },
+      {
+        path: 'templates',
+        component: AdministrationTemplateListComponent,
         outlet: 'action',
         canActivate: [ AuthenticationGuardService ]
       }

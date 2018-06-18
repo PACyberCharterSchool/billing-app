@@ -19,6 +19,12 @@ div.col-md-12 {
             display: flex;
             padding-left: 0;
             padding-right: 0;
+
+            input#typeahead-school-district {
+              width: 170px;
+              position: relative;
+              left: 33px;
+            }
           }
 
           .dropdown-ctrl-col, .datepicker-ctrl-col {
@@ -38,9 +44,15 @@ div.col-md-12 {
           }
         }
       }
+
+      table {
+        border: 1px solid #d4d4d4;
+      }
     }
   }
 
   div.modal-footer {
+    display: flex;
+    align-items: center;
   }
 }

@@ -6,7 +6,8 @@ enum BUTTON_IDS {
   SchoolDistrictRatesBtn = 'school-district-rates-btn',
   ImportStudentDataBtn = 'import-student-data-btn',
   SchoolCalendarBtn = 'school-calendar-btn',
-  AuditsBtn = 'audits-btn'
+  AuditsBtn = 'audits-btn',
+  TemplatesBtn = 'templates-btn'
 }
 
 @Component({
@@ -44,6 +45,9 @@ export class AdministrationHomeComponent implements OnInit {
         break;
       case BUTTON_IDS.AuditsBtn:
         this.router.navigate(['/administration', { outlets: { 'action': ['audits'] } }]);
+        break;
+      case BUTTON_IDS.TemplatesBtn:
+        this.router.navigate(['/administration', { outlets: { 'action': ['templates'] } }]);
         break;
       default:
         this.router.navigate(['/administration', { outlets: { 'action': ['home'] } }]);
