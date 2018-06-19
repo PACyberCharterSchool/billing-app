@@ -181,12 +181,12 @@ export class InvoicesListComponent implements OnInit {
     this.reportsService.getInvoiceDataByName(invoice.name).subscribe(
       data => {
         console.log('InvoicesListComponent.downloadInvoice(): data is', data);
-        this.excelService.saveInvoiceAsCSVFile(invoice);
+        invoice.xlsx = data;
+        this.excelService.saveInvoiceAsExcelFile(invoice);
       },
       error => {
         console.log('InvoicesListComponent.downloadInvoice(): error is', error);
         invoice.data = error.error.text;
-        this.excelService.saveInvoiceAsExcelFile(invoice);
       }
     );
   }

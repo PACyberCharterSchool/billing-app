@@ -36,8 +36,27 @@ export class TemplatesService {
     return this.httpClient.get<Template[]>(url, this.headers);
   }
 
-  putTemplatesByTypeAndByYear(type: string, year: string): Observable<any> {
-    const url = this.apiTemplatesUrl + `/${type}/${year}`;
-    return this.httpClient.put<Template>(url, {}, this.headers);
+  putTemplatesByTypeAndByYear(templateData: FormData): Observable<any> {
+    const reqBodyObj = this.serializeTemplateRequestBodyObject(templateData);
+    const url = this.apiTemplatesUrl +
+      `/${templateData.get('type')}/${templateData.get('year')}?content=${templateData}`;
+    return this.httpClient.put<Template>(url, reqBodyObj);
   }
+
+  private serializeTemplateRequestBodyObject(templateData: FormData): Object {
+    Object.keys(templateData).forEach(
+      k => {
+        let v = templateData[k];
+        if (typeof(v) === 'object') {
+          templateData.set(k, JSON.stringify(v));
+        }
+        else {
+          templateData.set(k, v);
+        }
+      }
+    )
+
+    return templateData;
+  }
+
 }

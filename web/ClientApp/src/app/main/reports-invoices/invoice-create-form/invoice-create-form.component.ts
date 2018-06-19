@@ -113,12 +113,6 @@ export class InvoiceCreateFormComponent implements OnInit {
     );
   }
 
-  getStudentTemplates()  {
-    if (this.templates) {
-      return this.templates.filter((t) => t.reportType === ReportType.StudentInformation);
-    }
-  }
-
   getInvoiceTemplates() {
     if (this.templates) {
       return this.templates.filter((t) => t.reportType === ReportType.Invoice);
@@ -131,10 +125,6 @@ export class InvoiceCreateFormComponent implements OnInit {
 
   setSelectedInvoiceTemplate(template: Template): void {
     this.selectedInvoiceTemplate = template;
-  }
-
-  setSelectedSchoolTemplate(template: Template): void {
-    this.selectedSchoolTemplate = template;
   }
 
   onAsOfDateChanged() {

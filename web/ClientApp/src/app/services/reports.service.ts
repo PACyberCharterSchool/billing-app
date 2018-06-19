@@ -34,10 +34,14 @@ export class ReportsService {
     return this.getReportsByType('Invoice');
   }
 
-  public getInvoiceDataByName(name: string): Observable<Report> {
-    let headers = Object.assign({}, this.headers);
-    headers.headers.append('Accept', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  public getInvoiceDataByName(name: string): Observable<any> {
+    let headers = {};
     headers['responseType'] = 'arrayBuffer';
+    headers['headers'] = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+
     const url = this.apiReportsUrl + `/${name}`;
     return this.httpClient.get<any>(url, headers);
   }

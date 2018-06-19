@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { UtilitiesService } from '../../../services/utilities.service';
 import { TemplatesService } from '../../../services/templates.service';
+import { AcademicYearsService } from '../../../services/academic-years.service';
 
 import { Globals } from '../../../globals';
 
@@ -22,11 +23,14 @@ export class AdministrationTemplateListComponent implements OnInit {
   private skip: number;
   private templates: Template[];
   private allTemplates: Template[];
+  private selectedTemplateFile;
+  private selectedSchoolYear;
 
   constructor(
     private globals: Globals,
     private utilitiesService: UtilitiesService,
     private templatesService: TemplatesService,
+    private academeicYearsService: AcademicYearsService,
     private ngbModal: NgbModal
   ) {
     this.property = 'name';
@@ -38,6 +42,7 @@ export class AdministrationTemplateListComponent implements OnInit {
     this.templatesService.getTemplates(this.skip).subscribe(
       data => {
         console.log('AdministrationTemplateListComponent.ngOnInit():  data is ', data);
+        this.templates = this.allTemplates = data['templates'];
       },
       error => {
         console.log('AdministrationTemplateListComponent.ngOnInit():  error is ', error);
@@ -71,6 +76,18 @@ export class AdministrationTemplateListComponent implements OnInit {
     this.searchText = '';
   }
 
+  refreshTemplateList(): void {
+    this.templatesService.getTemplates(this.skip).subscribe(
+      data => {
+        console.log('AdministrationTemplateListComponent.ngOnInit():  data is ', data);
+        this.templates = this.allTemplates = data['templates'];
+      },
+      error => {
+        console.log('AdministrationTemplateListComponent.ngOnInit():  error is ', error);
+      }
+    );
+  }
+
   listDisplayableFields(): Object[] {
     if (this.templates) {
       const fields = this.utilitiesService.objectKeys(this.templates[0]);
@@ -89,19 +106,16 @@ export class AdministrationTemplateListComponent implements OnInit {
   }
 
   getSchoolYears(): string[] {
-    if (this.allTemplates) {
-      const years = this.allTemplates.filter((obj, pos, arr) => {
-        return arr.map(mo => mo['schoolYear']).indexOf(obj['schoolYear']) === pos;
-      });
-      return years.map(y => y.schoolYear);
-    }
+    return this.academeicYearsService.getAcademicYears();
   }
 
   importTemplate(importTemplateContent): void {
-    this.ngbModal.open(importTemplateContent).result.then(
+    this.ngbModal.open(importTemplateContent, { centered: true, size: 'lg' }).result.then(
       (result) => {
+        this.refreshTemplateList();
       },
       (reason) => {
+        console.log('AdministrationTemplateListComponent.importTemplate():  reason is ', reason);
       }
     );
   }
@@ -109,17 +123,29 @@ export class AdministrationTemplateListComponent implements OnInit {
   setExcelTemplateUrl($event): void {
     if ($event) {
       if ($event.target.files && $event.target.files.length > 0) {
-        const files = $event.target.files;
-        const formData = new FormData();
-
-        formData.append('file', files[0], files[0].name);
-        this.templatesService.putTemplatesByTypeAndByYear('Invoice', files[0].name).subscribe(
-          data => {
-          },
-          error => {
-          }
-        );
+        this.selectedTemplateFile = $event.target.files;
       }
+    }
+  }
+
+  setSelectedSchoolYear(year: string): void {
+    this.selectedSchoolYear = year;
+  }
+
+  doImport(): void {
+    if (this.selectedTemplateFile) {
+      const formData = new FormData();
+      formData.append('content', this.selectedTemplateFile[0], this.selectedTemplateFile[0].name);
+      formData.append('type', 'Invoice');
+      formData.append('year', this.selectedSchoolYear);
+      this.templatesService.putTemplatesByTypeAndByYear(formData).subscribe(
+        data => {
+          console.log('ApplicationTemplateListComponent.doImport():  data is ', data['template']);
+        },
+        error => {
+          console.log('ApplicationTemplateListComponent.doImport():  error is ', error);
+        }
+      );
     }
   }
 }

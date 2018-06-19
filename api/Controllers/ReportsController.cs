@@ -324,6 +324,19 @@ namespace api.Controllers
 
 		private static readonly object _lock = new object();
 
+    [HttpGet("many")]
+    [Authorize(Policy = "PAY+")]
+		[Produces(ContentTypes.XLSX)]
+		[ProducesResponseType(404)]
+		[ProducesResponseType(406)]
+    public IActionResult GetManyBulk()
+    {
+			if (!ModelState.IsValid)
+				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
+
+      return NotFound();
+    }
+
 		[HttpPost("many")]
 		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportsResponse), 200)]
@@ -416,7 +429,25 @@ namespace api.Controllers
 			};
 		}
 
-		public class GetManyArgs
+    [HttpGet("activity")]
+    [Authorize(Policy = "PAY+")]
+    [Produces(ContentTypes.XLSX)]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(typeof(ErrorsResponse), 400)]
+    public async Task<IActionResult> GetActivity([FromQuery]GetActivityArgs args)
+    {
+    }
+
+    [HttpGet("activity")]
+    [Authorize(Policy = "PAY+")]
+    [Produces(ContentTypes.XLSX)]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(typeof(ErrorsResponse), 400)]
+    public async Task<IActionResult> GetBulkActivity([FromQuery]GetActivityArgs args)
+    {
+    }
+
+    public class GetManyArgs
 		{
 			public string Name { get; set; }
 
@@ -512,7 +543,6 @@ namespace api.Controllers
 				Reports = reports.Select(r => new ReportDto(r)).ToList(),
 			});
 		}
-
 
 		[HttpPost("{name}/approve")]
 		[Authorize(Policy = "PAY+")]

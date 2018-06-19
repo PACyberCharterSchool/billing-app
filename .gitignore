@@ -246,3 +246,6 @@ appsettings.Development.json
 
 # dotenv
 .env
+
+# ctags
+tags

@@ -1,0 +1,40 @@
+.template-filter-row {
+  height: 40px;
+
+  h4 {
+    color: #58a917;
+  }
+}
+
+.template-action-row {
+  height: 40px;
+}
+
+.template-list-row {
+  height: calc(100% - 120px);
+  table {
+    thead {
+      height: 60px;
+    }
+  }
+}
+
+.template-footer-row {
+  height: 40px;
+}
+
+.modal-title {
+  color: #58a917;
+}
+
+.form-group {
+  div.col-md-12 {
+    display: flex;
+    align-items: center;
+  }
+}
+
+#dropdownSelectSchoolYear + div.dropdown-menu {
+  height: 240px;
+  overflow: scroll;
+}
