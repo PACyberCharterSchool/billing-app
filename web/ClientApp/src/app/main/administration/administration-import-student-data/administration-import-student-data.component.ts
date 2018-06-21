@@ -44,6 +44,8 @@ export class AdministrationImportStudentDataComponent implements OnInit {
         } else {
           this.lastUpdatedDate = '?';
         }
+      },
+      error => {
       }
     );
     this.spinnerService.hide();
@@ -72,6 +74,8 @@ export class AdministrationImportStudentDataComponent implements OnInit {
       data => {
         this.updateScrollingSkip();
         this.pendingStudentStatusRecords = this.pendingStudentStatusRecords.concat(data['studentStatusRecords']);
+      },
+      error => {
       }
     );
   }

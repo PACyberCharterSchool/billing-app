@@ -8,6 +8,8 @@ import { InvoiceCreateFormComponent } from './invoice-create-form.component';
 
 import { NgbModule, NgbTypeahead, NgbTypeaheadConfig, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
+import{ NgxSpinnerModule } from 'ngx-spinner';
+
 import { Globals } from '../../../globals';
 
 import { ReportsService } from '../../../services/reports.service';
@@ -25,7 +27,8 @@ describe('InvoiceCreateFormComponent', () => {
       declarations: [ InvoiceCreateFormComponent ],
       imports: [
         FormsModule,
-        NgbModule.forRoot()
+        NgbModule.forRoot(),
+        NgxSpinnerModule
       ],
       providers: [
         NgbTypeahead,
