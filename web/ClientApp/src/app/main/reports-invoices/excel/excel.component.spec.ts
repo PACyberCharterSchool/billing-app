@@ -2,13 +2,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ExcelComponent } from './excel.component';
 
-describe('ExcelComponent', () => {
+import { HotTableModule, HotTableRegisterer } from '@handsontable/angular';
+
+xdescribe('ExcelComponent', () => {
   let component: ExcelComponent;
   let fixture: ComponentFixture<ExcelComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ExcelComponent ]
+      declarations: [ ExcelComponent ],
+      imports: [
+        HotTableModule
+      ],
+      providers: [
+        HotTableRegisterer
+      ]
     })
     .compileComponents();
   }));

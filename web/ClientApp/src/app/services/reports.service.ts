@@ -34,7 +34,7 @@ export class ReportsService {
     return this.getReportsByType('Invoice');
   }
 
-  public getInvoiceDataByName(name: string): Observable<any> {
+  public getInvoiceByName(name: string): Observable<any> {
     let headers = {};
     headers['responseType'] = 'arrayBuffer';
     headers['headers'] = new HttpHeaders({
@@ -43,6 +43,18 @@ export class ReportsService {
     });
 
     const url = this.apiReportsUrl + `/${name}`;
+    return this.httpClient.get<any>(url, headers);
+  }
+
+  public getInvoiceActivityDataByName(name: string): Observable<any> {
+    let headers = {};
+    headers['responseType'] = 'arrayBuffer';
+    headers['headers'] = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+
+    const url = this.apiReportsUrl + `/activity/${name}`;
     return this.httpClient.get<any>(url, headers);
   }
 

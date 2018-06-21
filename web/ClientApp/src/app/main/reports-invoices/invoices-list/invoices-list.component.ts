@@ -178,7 +178,7 @@ export class InvoicesListComponent implements OnInit {
   }
 
   downloadInvoice(invoice: Report) {
-    this.reportsService.getInvoiceDataByName(invoice.name).subscribe(
+    this.reportsService.getInvoiceByName(invoice.name).subscribe(
       data => {
         console.log('InvoicesListComponent.downloadInvoice(): data is', data);
         invoice.xlsx = data;

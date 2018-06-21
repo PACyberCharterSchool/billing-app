@@ -1,14 +1,44 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InvoicePreviewFormComponent } from './invoice-preview-form.component';
+import { HttpClient, HttpHandler } from '@angular/common/http';
 
-describe('InvoicePreviewFormComponent', () => {
+import { InvoicePreviewFormComponent } from './invoice-preview-form.component';
+import { InvoiceExcelPreviewComponent } from '../invoice-excel-preview/invoice-excel-preview.component';
+import { ExcelComponent } from '../excel/excel.component';
+
+import { HotTableModule, HotTableRegisterer } from '@handsontable/angular';
+
+import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+
+import { ReportsService } from '../../../services/reports.service';
+import { ExcelService } from '../../../services/excel.service';
+
+import { Globals } from '../../../globals';
+
+xdescribe('InvoicePreviewFormComponent', () => {
   let component: InvoicePreviewFormComponent;
   let fixture: ComponentFixture<InvoicePreviewFormComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ InvoicePreviewFormComponent ]
+      declarations: [
+        InvoicePreviewFormComponent,
+        InvoiceExcelPreviewComponent,
+        ExcelComponent
+      ],
+      imports: [
+        HotTableModule,
+        NgbModule.forRoot()
+      ],
+      providers: [
+        HotTableRegisterer,
+        NgbActiveModal,
+        ReportsService,
+        ExcelService,
+        Globals,
+        HttpClient,
+        HttpHandler
+      ]
     })
     .compileComponents();
   }));

@@ -30,15 +30,16 @@ export class InvoicePreviewFormComponent implements OnInit {
     if (this.invoices) {
       this.invoiceIdx = 0;
       this.currentInvoice = this.invoices[this.invoiceIdx];
-      this.getCurrentInvoiceData();
     }
   }
 
-  getCurrentInvoiceData(): void {
-    this.reportsService.getInvoiceDataByName(this.currentInvoice.name).subscribe(
+  downloadStudentActivityData(): void {
+    this.reportsService.getInvoiceActivityDataByName(this.currentInvoice.name).subscribe(
       data => {
         console.log('InvoicePreviewFormComponent.getCurrentInvoiceData(): data is ', data);
-        this.currentInvoice.xlsx = data['report'];
+        this.currentInvoice.xlsx = data;
+        this.excelService.saveStudentActivityAsExcelFile(this.currentInvoice);
+        this.ngbActiveModal.close("Successful download");
       },
       error => {
         console.log('InvoicePreviewFormComponent.getCurrentInvoiceData(): error is ', error);
@@ -52,9 +53,5 @@ export class InvoicePreviewFormComponent implements OnInit {
 
   rejectInvoice(): void {
     this.invoiceIdx++;
-  }
-
-  downloadStudentData(): void {
-    this.excelService.saveInvoiceAsExcelFile(this.currentInvoice);
   }
 }

@@ -55,7 +55,7 @@
           <th>Download</th>
         </tr>
       </thead>
-      <tbody infiniteScroll>
+      <tbody>
         <tr *ngFor='let report of reports | orderBy: {property: property, direction: direction}'>
           <td *ngFor='let v of listDisplayableValues(report)'>{{v | normalizeFieldValue}}</td>
           <td><button type='button' class='btn btn-primary' (click)='previewInvoice(report)'>Preview</button></td>

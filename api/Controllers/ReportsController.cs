@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Linq;
 using System.IO;
 using System.IO.Compression;
@@ -16,9 +17,11 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using NPOI.HSSF.UserModel;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 using api.Common;
+using api.Common.Utils;
 using api.Dtos;
 using models;
 using models.Reporters;
@@ -324,18 +327,72 @@ namespace api.Controllers
 
 		private static readonly object _lock = new object();
 
-    [HttpGet("many")]
-    [Authorize(Policy = "PAY+")]
+		private void MergeInvoiceActivityData(XSSFSheet sheet, XSSFWorkbook wb, int idx)
+		{
+      if (wb != null) {
+        if (sheet != null) {
+          XSSFSheet destSheet = (XSSFSheet)wb.CreateSheet(sheet.SheetName);
+          NPOIHelper.CopySheets(destSheet, sheet);
+        }
+      }
+		}
+
+		private bool IsActivityWorksheet(XSSFSheet sheet)
+		{
+			if (sheet != null) {
+				const string pattern = @"^Individual Student Inform.*";
+				var matches = Regex.Matches(sheet.SheetName, pattern);
+				if (matches.Count > 0)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		private byte[] GetInvoiceActivityData(Report invoice)
+		{
+			// compose workbook
+			try {
+				var wb = new XSSFWorkbook(new MemoryStream(invoice.Xlsx));
+        var activityWb = new XSSFWorkbook();
+
+				// traverse through the worksheets within the source workbook and extract the relevant ones...
+				for (int i = 0; i < wb.NumberOfSheets; i++) {
+          _logger.LogInformation($"ReportsController#GetInvoiceActivityData():  evaluating sheet {i}.");
+					XSSFSheet sheet = (XSSFSheet)wb.GetSheetAt(i);
+					if (IsActivityWorksheet(sheet)) {
+            _logger.LogInformation($"Merging invoice activity sheet: {sheet.SheetName}.");
+            MergeInvoiceActivityData(sheet, activityWb, i);
+					}
+				}
+
+        using (MemoryStream ms = new MemoryStream())
+        {
+          activityWb.Write(ms);// write mySheet table in xlsx document and save it
+          return ms.ToArray();
+        }
+			}
+			catch (Exception e) {
+				_logger.LogInformation($"GetInvoiceActivityData(): exception is {e.ToString()}.");
+			}
+
+			return null;
+		}
+
+		[HttpGet("many")]
+		[Authorize(Policy = "PAY+")]
 		[Produces(ContentTypes.XLSX)]
 		[ProducesResponseType(404)]
 		[ProducesResponseType(406)]
-    public IActionResult GetManyBulk()
-    {
+		public IActionResult GetManyBulk()
+		{
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
-      return NotFound();
-    }
+			return NotFound();
+		}
 
 		[HttpPost("many")]
 		[Authorize(Policy = "PAY+")]
@@ -417,7 +474,7 @@ namespace api.Controllers
 				return NotFound();
 
 			var accept = Request.Headers["Accept"];
-      Console.WriteLine($"{accept}");
+			Console.WriteLine($"{accept}");
 
 			if (accept != ContentTypes.XLSX)
 				return StatusCode(406);
@@ -429,13 +486,43 @@ namespace api.Controllers
 			};
 		}
 
-    [HttpGet("activity")]
+    public class GetActivityArgs
+	{
+		public string Name { get; set; }
+
+		[EnumerationValidation(typeof(ReportType))]
+		public string Type { get; set; }
+
+		[RegularExpression(@"^\d{4}\-\d{4}$")]
+		public string SchoolYear { get; set; }
+
+		public bool? Approved { get; set; }
+	}
+
+    [HttpGet("activity/{name}")]
     [Authorize(Policy = "PAY+")]
     [Produces(ContentTypes.XLSX)]
     [ProducesResponseType(204)]
     [ProducesResponseType(typeof(ErrorsResponse), 400)]
-    public async Task<IActionResult> GetActivity([FromQuery]GetActivityArgs args)
+    public async Task<IActionResult> GetActivity(string name)
     {
+      var report = await Task.Run(() => _reports.Get(name));
+      if (report == null)
+        return NotFound();
+
+      var accept = Request.Headers["Accept"];
+      Console.WriteLine($"{accept}");
+
+      if (accept != ContentTypes.XLSX)
+        return StatusCode(406);
+
+      var data = GetInvoiceActivityData(report);
+      _logger.LogInformation($"GetActivity(): data is {data}.  name is {name}.");
+      var stream = new MemoryStream(data);
+      return new FileStreamResult(stream, ContentTypes.XLSX)
+      {
+        FileDownloadName = report.Name,
+      };
     }
 
     [HttpGet("activity")]
@@ -445,6 +532,7 @@ namespace api.Controllers
     [ProducesResponseType(typeof(ErrorsResponse), 400)]
     public async Task<IActionResult> GetBulkActivity([FromQuery]GetActivityArgs args)
     {
+      return Ok();
     }
 
     public class GetManyArgs
