@@ -21,6 +21,8 @@ import { HotTableModule, HotTableRegisterer } from '@handsontable/angular';
 
 import { SharedModule } from '../../shared/shared.module';
 
+import { NgxSpinnerModule } from 'ngx-spinner';
+
 @NgModule({
   declarations: [
     ReportsInvoicesComponent,
@@ -41,7 +43,8 @@ import { SharedModule } from '../../shared/shared.module';
     ReportsInvoicesRoutingModule,
     NgbModule,
     HotTableModule,
-    SharedModule
+    SharedModule,
+    NgxSpinnerModule
   ],
   providers: [ HotTableRegisterer ],
   entryComponents: [

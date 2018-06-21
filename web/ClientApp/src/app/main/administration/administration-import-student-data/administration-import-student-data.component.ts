@@ -19,7 +19,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 })
 export class AdministrationImportStudentDataComponent implements OnInit {
 
-  studentStatusRecords: PendingStudentStatusRecord[] = [];
+  pendingStudentStatusRecords: PendingStudentStatusRecord[] = [];
   private skip;
   lastUpdatedDate: string;
 
@@ -37,10 +37,10 @@ export class AdministrationImportStudentDataComponent implements OnInit {
     this.ssrImportService.getPending(this.skip).subscribe(
       data => {
         this.updateScrollingSkip();
-        this.studentStatusRecords = data['studentStatusRecords'];
-        console.log('AdministrationImportStudentDataComponent.ngOnInit():  sample status record ', this.studentStatusRecords[0]);
-        if (this.studentStatusRecords.length > 0) {
-          this.lastUpdatedDate = this.studentStatusRecords[0].batchTime;
+        this.pendingStudentStatusRecords = data['studentStatusRecords'];
+        console.log('AdministrationImportStudentDataComponent.ngOnInit():  sample status record ', this.pendingStudentStatusRecords[0]);
+        if (this.pendingStudentStatusRecords.length > 0) {
+          this.lastUpdatedDate = this.pendingStudentStatusRecords[0].batchTime;
         } else {
           this.lastUpdatedDate = '?';
         }
@@ -58,8 +58,8 @@ export class AdministrationImportStudentDataComponent implements OnInit {
     this.ssrImportService.postStudentData().subscribe(
       response => {
         this.spinnerService.hide();
-        this.lastUpdatedDate = this.studentStatusRecords[0].batchTime;
-        this.studentStatusRecords = [];
+        this.lastUpdatedDate = this.pendingStudentStatusRecords[0].batchTime;
+        this.pendingStudentStatusRecords = [];
       },
       error => {
         this.spinnerService.hide();
@@ -71,7 +71,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
     this.ssrImportService.getPending(this.skip).subscribe(
       data => {
         this.updateScrollingSkip();
-        this.studentStatusRecords = this.studentStatusRecords.concat(data['studentStatusRecords']);
+        this.pendingStudentStatusRecords = this.pendingStudentStatusRecords.concat(data['studentStatusRecords']);
       }
     );
   }
@@ -85,7 +85,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
   }
 
   listDisplayableFields() {
-    const fields = this.utilitiesService.objectKeys(this.studentStatusRecords[0]);
+    const fields = this.utilitiesService.objectKeys(this.pendingStudentStatusRecords[0]);
     const rejected = ['batchHash', 'batchTime', 'batchFilename'];
 
     if (fields) {
