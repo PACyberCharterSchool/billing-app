@@ -16,8 +16,10 @@ namespace models
 		SchoolDistrict CreateOrUpdate(SchoolDistrict district);
 		SchoolDistrict Get(int id);
 		SchoolDistrict GetByAun(int aun);
+    SchoolDistrict GetByName(string name);
 		IList<SchoolDistrict> GetMany();
 		IList<int> GetManyAuns();
+    IList<string> GetManyNames();
 	}
 
 	public class SchoolDistrictRepository : ISchoolDistrictRepository
@@ -37,9 +39,13 @@ namespace models
 
 		public SchoolDistrict GetByAun(int aun) => _schoolDistricts.SingleOrDefault(d => d.Aun == aun);
 
+    public SchoolDistrict GetByName(string name) => _schoolDistricts.SingleOrDefault(d => d.Name == name);
+
 		public IList<SchoolDistrict> GetMany() => _schoolDistricts.OrderBy(d => d.Id).ToList();
 
 		public IList<int> GetManyAuns() => _schoolDistricts.OrderBy(d => d.Aun).Select(d => d.Aun).ToList();
+
+    public IList<string> GetManyNames() => _schoolDistricts.OrderBy(d => d.Name).Select(d => d.Name).ToList();
 
 		private IList<string> _excludedFields = new List<string>
 		{

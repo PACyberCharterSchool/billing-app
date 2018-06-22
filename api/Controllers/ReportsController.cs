@@ -302,25 +302,29 @@ namespace api.Controllers
 				throw new MissingTemplateException(create.TemplateId);
 
 			var reports = new List<Report>();
-
 			var now = DateTime.Now;
-			var auns = _districts.GetManyAuns();
-			foreach (var aun in auns)
-				reports.Add(CreateInvoice(now, invoiceTemplate, new CreateReport
-				{
-					ReportType = create.ReportType,
-					Name = $"{create.SchoolYear}_{aun}_{now.ToSecondsFromEpoch()}",
-					SchoolYear = create.SchoolYear,
-					TemplateId = create.TemplateId,
+      var names = _districts.GetManyNames();
+      foreach (var name in names) {
+        var sd = _districts.GetByName(name);
+        if (sd != null) {
+          var month = create.Invoice.AsOf.ToString("MMMM");
+          reports.Add(CreateInvoice(now, invoiceTemplate, new CreateReport
+          {
+            ReportType = create.ReportType,
+            Name = $"{create.SchoolYear}_{sd.Name}_{month}-{create.Invoice.AsOf.Year}",
+            SchoolYear = create.SchoolYear,
+            TemplateId = create.TemplateId,
 
-					Invoice = new CreateInvoiceReport
-					{
-						AsOf = create.Invoice.AsOf,
-						ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
-						ToPDE = create.Invoice.ToPDE,
-						SchoolDistrictAun = aun,
-					},
-				}));
+            Invoice = new CreateInvoiceReport
+            {
+              AsOf = create.Invoice.AsOf,
+              ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
+              ToPDE = create.Invoice.ToPDE,
+              SchoolDistrictAun = sd.Aun,
+            }
+          }));
+        }
+      }
 
 			return reports;
 		}
@@ -381,18 +385,6 @@ namespace api.Controllers
 			return null;
 		}
 
-		[HttpGet("many")]
-		[Authorize(Policy = "PAY+")]
-		[Produces(ContentTypes.XLSX)]
-		[ProducesResponseType(404)]
-		[ProducesResponseType(406)]
-		public IActionResult GetManyBulk()
-		{
-			if (!ModelState.IsValid)
-				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
-
-			return NotFound();
-		}
 
 		[HttpPost("many")]
 		[Authorize(Policy = "PAY+")]
@@ -517,7 +509,6 @@ namespace api.Controllers
         return StatusCode(406);
 
       var data = GetInvoiceActivityData(report);
-      _logger.LogInformation($"GetActivity(): data is {data}.  name is {name}.");
       var stream = new MemoryStream(data);
       return new FileStreamResult(stream, ContentTypes.XLSX)
       {

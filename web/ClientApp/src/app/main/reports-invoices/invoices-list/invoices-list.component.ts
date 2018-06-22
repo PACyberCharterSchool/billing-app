@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Report, ReportType } from '../../../models/report.model';
 
@@ -39,17 +39,18 @@ export class InvoicesListComponent implements OnInit {
     private reportsService: ReportsService,
     private utilitiesService: UtilitiesService,
     private excelService: ExcelService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private ngbActiveModal: NgbActiveModal
   ) { }
 
   ngOnInit() {
-    this.reportsService.getReportsByType(ReportType.Invoice).subscribe(
+    this.reportsService.getReportsByInfo({'Type': ReportType.Invoice, 'Name': '', 'Approved': null, 'SchoolYear': null}).subscribe(
       data => {
-        console.log(`InvoicesListComponent.ngOnInit(): data is ${data}.`);
+        console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
         this.reports = this.allReports = data['reports'];
       },
       error => {
-        console.log(`InvoicesListComponent.ngOnInit(): error is ${error}.`);
+        console.log('InvoicesListComponent.ngOnInit(): error is ', error);
       }
     )
   }
@@ -81,7 +82,7 @@ export class InvoicesListComponent implements OnInit {
   }
 
   refreshInvoices(): void {
-    this.reportsService.getReportsByType(ReportType.Invoice).subscribe(
+    this.reportsService.getReportsByInfo({'Type': ReportType.Invoice, 'Name': '', 'Approved': null, 'SchoolYear': null}).subscribe(
       data => {
         console.log(`InvoicesListComponent.refreshInvoices(): data is ${data}.`);
         this.reports = this.allReports = data['reports'];
@@ -89,8 +90,7 @@ export class InvoicesListComponent implements OnInit {
       error => {
         console.log(`InvoicesListComponent.refreshInvoices(): error is ${error}.`);
       }
-    )
-
+    );
   }
 
   listDisplayableFields() {
@@ -194,8 +194,19 @@ export class InvoicesListComponent implements OnInit {
   downloadInvoices(bulkDownloadContent) {
     this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' }).result.then(
       (result) => {
+        this.reportsService.getInvoicesBySchoolYearAndStatus(this.downloadSchoolYear, this.downloadStatus).subscribe(
+          data => {
+            console.log(`AdministrationInvoiceListComponent.downloadInvoices(): data is ${data}.`);
+            this.ngbActiveModal.close('download successful');
+          },
+          error => {
+            console.log(`AdministrationInvoiceListComponent.downloadInvoices(): error is ${error}.`);
+            this.ngbActiveModal.close('download error');
+          }
+        );
       },
       (reason) => {
+        this.ngbActiveModal.close(reason.toString());
       }
     )
   }
