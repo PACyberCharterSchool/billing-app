@@ -90,7 +90,14 @@ export class AdministrationImportStudentDataComponent implements OnInit {
 
   listDisplayableFields() {
     const fields = this.utilitiesService.objectKeys(this.pendingStudentStatusRecords[0]);
-    const rejected = ['batchHash', 'batchTime', 'batchFilename'];
+    const rejected = [
+      'batchHash',
+      'batchTime',
+      'batchFilename',
+      'id',
+      'lazyLoader',
+      'studentMiddleInitial'
+    ];
 
     if (fields) {
       const filtered = fields.filter((i) => !rejected.includes(i));
