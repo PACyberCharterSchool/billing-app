@@ -35,8 +35,14 @@
   }
 }
 
+.school-district-action-row {
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+
 .school-district-list-row {
-  height: calc(100% - 80px);
+  height: calc(100% - 120px);
   margin-bottom: 10px;
 
   div.col-md-12 {

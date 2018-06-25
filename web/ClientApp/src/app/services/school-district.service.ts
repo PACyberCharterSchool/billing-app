@@ -42,6 +42,11 @@ export class SchoolDistrictService {
     }
   }
 
+  public updateSchoolDistricts(schoolDistrictData: FormData): Observable<SchoolDistrict[]> {
+    const url = this.apiSchoolDistrictsUrl + `?file=${schoolDistrictData}`;
+    return this.httpClient.put<any>(url, this.serializeSchoolDistrictRequestBodyObject(schoolDistrictData));
+  }
+
   private buildRequestBodyObject(sd: SchoolDistrict): Object {
     const reqBodyObj = Object.assign({}, {
       aun: sd.aun,
@@ -54,4 +59,21 @@ export class SchoolDistrictService {
 
     return reqBodyObj;
   }
+
+  private serializeSchoolDistrictRequestBodyObject(schoolDistrictData: FormData): Object {
+    Object.keys(schoolDistrictData).forEach(
+      k => {
+        let v = schoolDistrictData[k];
+        if (typeof(v) === 'object') {
+          schoolDistrictData.set(k, JSON.stringify(v));
+        }
+        else {
+          schoolDistrictData.set(k, v);
+        }
+      }
+    )
+
+    return schoolDistrictData;
+  }
+
 }

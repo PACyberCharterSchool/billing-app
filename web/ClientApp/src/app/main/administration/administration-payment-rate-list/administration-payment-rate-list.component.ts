@@ -7,7 +7,7 @@ import { UtilitiesService } from '../../../services/utilities.service';
 
 import { Globals } from '../../../globals';
 
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbActiveModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 import { AdministrationPaymentRateUpdateFormComponent } from '../administration-payment-rate-update-form/administration-payment-rate-update-form.component';
 
@@ -23,6 +23,7 @@ export class AdministrationPaymentRateListComponent implements OnInit {
   private isDescending: boolean;
   private direction: number;
   private searchText: string;
+  private selectedBulkImportFile;
 
   model;
 
@@ -30,7 +31,8 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     private globals: Globals,
     private schoolDistrictService: SchoolDistrictService,
     private utilitiesService: UtilitiesService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private ngbActiveModal: NgbActiveModal
   ) {
     this.model  = new SchoolDistrict();
     this.property = 'name';
@@ -80,10 +82,10 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
         this.schoolDistricts = this.schoolDistricts.concat(data['schoolDistricts']);
-        console.log('PaymentsListComponent.getPayments():  school districts are ', this.schoolDistricts);
+        console.log('AdministrationPaymentRateListComponent.getPayments():  school districts are ', this.schoolDistricts);
       },
       error => {
-        console.log('PaymentsListComponent.getPayments():  error is ', error);
+        console.log('AdministrationPaymentRateListComponent.getPayments():  error is ', error);
       }
     );
   }
@@ -142,6 +144,49 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     );
   }
 
+  doImport(): void {
+    if (this.selectedBulkImportFile) {
+      const importData = new FormData();
+
+      importData.append(
+        'file',
+        this.selectedBulkImportFile[0],
+        this.selectedBulkImportFile[0].name
+      );
+
+      this.schoolDistrictService.updateSchoolDistricts(importData).subscribe(
+        data => {
+          console.log('AdministrationPaymentRateListComponent.bulkImportSchoolDistricts():  ', data['schoolDistricts']);
+          this.schoolDistricts = this.allSchoolDistricts = data['schoolDistricts'];
+          this.ngbActiveModal.close('Update successful');
+        },
+        error => {
+          console.log('AdministrationPaymentRateListComponent.bulkImportSchoolDistricts():  ', error);
+          this.ngbActiveModal.dismiss('Updated failed');
+        }
+      );
+    }
+  }
+
+  setImportSchoolDistrictsUrl($event): void {
+    if ($event) {
+      if ($event.target.files && $event.target.files.length > 0) {
+        this.selectedBulkImportFile = $event.target.files;
+      }
+    }
+  }
+
+  importSchoolDistricts(importSchoolDistrictsContent): void {
+    this.ngbModal.open(importSchoolDistrictsContent, { centered: true, size: 'lg' }).result.then(
+      (result) => {
+        this.refreshSchoolDistrictList();
+      },
+      (reason) => {
+        console.log('AdministrationTemplateListComponent.importTemplate():  reason is ', reason);
+      }
+    );
+  }
+
   private getDismissReasons(reason: any) {
     if (reason === ModalDismissReasons.ESC) {
         return 'by pressing ESC';
@@ -151,5 +196,4 @@ export class AdministrationPaymentRateListComponent implements OnInit {
         return `with ${reason}.`;
     }
   }
-
 }

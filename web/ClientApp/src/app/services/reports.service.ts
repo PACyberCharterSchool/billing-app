@@ -31,9 +31,8 @@ export class ReportsService {
   }
 
   public getInvoices(name: string, year: string, approved: boolean): Observable<Report[]> {
-    let reportInfo: Object;
+    let reportInfo: Object = Object.assign({}, {'Type': ReportType.Invoice});
 
-    reportInfo['Type'] = ReportType.Invoice;
     if (name) reportInfo['Name'] = name;
     if (year) reportInfo['SchoolYear'] = year;
     if (approved != null) reportInfo['Appoved'] = approved;

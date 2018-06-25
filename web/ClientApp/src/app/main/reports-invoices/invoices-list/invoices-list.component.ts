@@ -44,7 +44,7 @@ export class InvoicesListComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.reportsService.getReportsByInfo({'Type': ReportType.Invoice, 'Name': '', 'Approved': null, 'SchoolYear': null}).subscribe(
+    this.reportsService.getInvoices(null, null, null).subscribe(
       data => {
         console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
         this.reports = this.allReports = data['reports'];
