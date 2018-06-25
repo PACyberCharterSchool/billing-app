@@ -18,7 +18,7 @@ import { ReportsService } from '../../../services/reports.service';
 import { UtilitiesService } from '../../../services/utilities.service';
 import { ExcelService } from '../../../services/excel.service';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 describe('InvoicesListComponent', () => {
   let component: InvoicesListComponent;
@@ -43,7 +43,8 @@ describe('InvoicesListComponent', () => {
         UtilitiesService,
         ExcelService,
         HttpHandler,
-        HttpClient
+        HttpClient,
+        NgbActiveModal
       ]
     })
     .compileComponents();
