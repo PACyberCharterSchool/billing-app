@@ -6,13 +6,16 @@
     <button type='button' class='btn btn-outline-primary' (click)='resetInvoices()'>RESET</button>
   </div>
   <div class='col-md-6'>
-    <div class='col-md-3 offset-md-4'>
+    <div class='col-md-4'>
       <button type='button' class='btn btn-outline-primary' (click)='approveInvoices()'>
-        BULK APPROVE
+        BULK APPROVE INVOICES
       </button>
     </div>
-    <div class='col-md-3'>
-      <button type='button' class='btn btn-outline-primary' (click)='downloadInvoices(bulkDownloadContent)'>BULK DOWNLOAD</button>
+    <div class='col-md-4'>
+      <button type='button' class='btn btn-outline-primary' (click)='downloadInvoices(bulkDownloadContent)'>BULK DOWNLOAD INVOICES</button>
+    </div>
+    <div class='col-md-4'>
+      <button type='button' class='btn btn-outline-primary' (click)='downloadStudentActivity(bulkDownloadContent)'>BULK DOWNLOAD ACTIVITY</button>
     </div>
   </div>
 </div>
@@ -82,17 +85,17 @@
       <form #downloadForm (ngSubmit)='doDownload()'>
         <div class='form-group'>
           <div ngbDropdown class="d-inline-block">
-            <button class="btn btn-outline-primary" id="dropdownDownloadSchoolYear" ngbDropdownToggle>School Year</button>
+            <button type='button' class="btn btn-outline-primary" id="dropdownDownloadSchoolYear" ngbDropdownToggle>School Year</button>
             <div ngbDropdownMenu aria-labelledby="dropdownDownloadSchoolYear">
-              <button class='dropdown-item' *ngFor='let year of getSchoolYears()' [(ngModel)]='downloadSchoolYear'>{{year}}</button>
+              <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='selectSchoolYear(year)'>{{year}}</button>
             </div>
           </div>
         </div>
         <div class='form-group'>
           <div ngbDropdown class="d-inline-block">
-            <button class="btn btn-outline-primary" id="dropdownDownloadStatus" ngbDropdownToggle>Status</button>
+            <button type='button' class="btn btn-outline-primary" id="dropdownDownloadStatus" ngbDropdownToggle>Status</button>
             <div ngbDropdownMenu aria-labelledby="dropdownDownloadStatus">
-              <button class='dropdown-item' *ngFor='let status of statuses' [(ngModel)]='downloadStatus'>{{status}}</button>
+              <button type='button' class='dropdown-item' *ngFor='let status of statuses' (click)='selectDownloadStatus(status)'>{{status}}</button>
             </div>
           </div>
         </div>

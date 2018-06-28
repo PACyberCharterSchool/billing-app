@@ -15,6 +15,8 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using NPOI.HSSF.UserModel;
@@ -355,36 +357,73 @@ namespace api.Controllers
 			return false;
 		}
 
-		private byte[] GetInvoiceActivityData(Report invoice)
+		private DataTable BuildStudentActivityDataTable(IEnumerable<Report> invoices)
 		{
-			// compose workbook
-			try {
-				var wb = new XSSFWorkbook(new MemoryStream(invoice.Xlsx));
-        var activityWb = new XSSFWorkbook();
+      DataTable studentActivityDataTable = new DataTable();
 
-				// traverse through the worksheets within the source workbook and extract the relevant ones...
-				for (int i = 0; i < wb.NumberOfSheets; i++) {
-          _logger.LogInformation($"ReportsController#GetInvoiceActivityData():  evaluating sheet {i}.");
-					XSSFSheet sheet = (XSSFSheet)wb.GetSheetAt(i);
-					if (IsActivityWorksheet(sheet)) {
-            _logger.LogInformation($"Merging invoice activity sheet: {sheet.SheetName}.");
-            MergeInvoiceActivityData(sheet, activityWb, i);
-					}
-				}
+      AddColumnsToStudentActivityDataTable(studentActivityDataTable);
+      foreach (var invoice in invoices) {
+        var students = JObject.Parse(invoice.Data)["Students"];
+        var schoolDistrict = JObject.Parse(invoice.Data)["SchoolDistrict"];
+        var studentsJSONStr = JsonConvert.SerializeObject(students);
+        DataTable dt = GetDataTableFromJsonString(studentsJSONStr);
 
-        using (MemoryStream ms = new MemoryStream())
-        {
-          activityWb.Write(ms);// write mySheet table in xlsx document and save it
-          return ms.ToArray();
-        }
-			}
-			catch (Exception e) {
-				_logger.LogInformation($"GetInvoiceActivityData(): exception is {e.ToString()}.");
-			}
+        // we only want the student data...
+        AddRowsToStudentActivityDataTable(studentActivityDataTable, dt, (JObject)schoolDistrict);
+      }
 
-			return null;
+      return studentActivityDataTable;
 		}
 
+    private void AddColumnsToStudentActivityDataTable(DataTable dt)
+    {
+      dt.Columns.Add("Number", typeof(uint));
+      dt.Columns.Add("SchoolDistrict", typeof(string));
+      dt.Columns.Add("StudentName", typeof(string));
+      dt.Columns.Add("Address", typeof(string));
+      dt.Columns.Add("CityStateZip", typeof(string));
+      dt.Columns.Add("BirthDate", typeof(string));
+      dt.Columns.Add("GradeLevel", typeof(string));
+      dt.Columns.Add("FirstDateEducated", typeof(string));
+      dt.Columns.Add("LastDateEducated", typeof(string));
+      dt.Columns.Add("SPED", typeof(string));
+      dt.Columns.Add("CurrentIEP", typeof(string));
+      dt.Columns.Add("PriorIEP", typeof(string));
+      dt.AcceptChanges();
+    }
+
+    private void AddRowsToStudentActivityDataTable(DataTable dtDest, DataTable dt, JObject schoolDistrict)
+    {
+      int i = 0;
+      _logger.LogInformation($"ReportsController.AddRowsToStudentActivityDataTable():  schoolDistrict is " + schoolDistrict["Name"]);
+      foreach (var row in dt.Rows) {
+        AddRowToStudentActivityDataTable(dtDest, (DataRow)row, schoolDistrict, ++i);
+      }
+    }
+
+    private void AddRowToStudentActivityDataTable(DataTable dtDest, DataRow row, JObject schoolDistrict, int index)
+    {
+      DataRow newRow = dtDest.NewRow();
+      newRow["Number"] = index;
+      newRow["SchoolDistrict"] = schoolDistrict["Name"];
+      newRow["StudentName"] = row["LastName"] + ", " + row["FirstName"] + " " + row["MiddleInitial"];
+      newRow["Address"] = row["Address1"];
+      newRow["CityStateZip"] = row["Address2"];
+      newRow["BirthDate"] = row["DateOfBirth"];
+      newRow["GradeLevel"] = row["Grade"];
+      newRow["FirstDateEducated"] = row["FirstDay"];
+      newRow["LastDateEducated"] = row["LastDay"];
+      newRow["SPED"] = row["IsSpecialEducation"];
+      newRow["CurrentIEP"] = row["CurrentIep"];
+      newRow["PriorIEP"] = row["FormerIep"];
+
+      dtDest.Rows.Add(newRow);
+    }
+
+    private DataTable GetDataTableFromJsonString(string json)
+    {
+      return JsonConvert.DeserializeObject<DataTable>(json);
+    }
 
 		[HttpPost("many")]
 		[Authorize(Policy = "PAY+")]
@@ -479,19 +518,19 @@ namespace api.Controllers
 		}
 
     public class GetActivityArgs
-	{
-		public string Name { get; set; }
+    {
+      public string Name { get; set; }
 
-		[EnumerationValidation(typeof(ReportType))]
-		public string Type { get; set; }
+      [EnumerationValidation(typeof(ReportType))]
+      public string Type { get; set; }
 
-		[RegularExpression(@"^\d{4}\-\d{4}$")]
-		public string SchoolYear { get; set; }
+      [RegularExpression(@"^\d{4}\-\d{4}$")]
+      public string SchoolYear { get; set; }
 
-		public bool? Approved { get; set; }
-	}
+      public bool? Approved { get; set; }
+    }
 
-    [HttpGet("activity/{name}")]
+    [HttpGet("activity/name/{name}")]
     [Authorize(Policy = "PAY+")]
     [Produces(ContentTypes.XLSX)]
     [ProducesResponseType(204)]
@@ -508,8 +547,12 @@ namespace api.Controllers
       if (accept != ContentTypes.XLSX)
         return StatusCode(406);
 
-      var data = GetInvoiceActivityData(report);
-      var stream = new MemoryStream(data);
+      List<Report> reports = new List<Report>();
+      reports.Add(report);
+      var data = BuildStudentActivityDataTable(reports);
+      XSSFWorkbook wb = NPOIHelper.BuildExcelWorkbookFromDataTable(data, name);
+      var stream = new MemoryStream();
+      wb.Write(stream);
       return new FileStreamResult(stream, ContentTypes.XLSX)
       {
         FileDownloadName = report.Name,
@@ -523,7 +566,36 @@ namespace api.Controllers
     [ProducesResponseType(typeof(ErrorsResponse), 400)]
     public async Task<IActionResult> GetBulkActivity([FromQuery]GetActivityArgs args)
     {
-      return Ok();
+      var accept = Request.Headers["Accept"];
+      Console.WriteLine($"{accept}");
+
+      if (accept != ContentTypes.XLSX)
+        return StatusCode(406);
+
+      var reports = await Task.Run(() => _reports.GetMany(
+				type: args.Type == null ? null : ReportType.FromString(args.Type),
+				year: args.SchoolYear,
+				approved: args.Approved
+      ));
+
+      if (reports == null)
+        return NotFound();
+
+      var data = BuildStudentActivityDataTable(reports);
+      string name = args.SchoolYear + "Student Activity";
+      XSSFWorkbook wb = NPOIHelper.BuildExcelWorkbookFromDataTable(data, name);
+
+
+      using (var stream = new MemoryStream())
+      {
+        wb.Write(stream);
+
+        _logger.LogInformation($"ReportsController.GetBulkActivity():  workbook is {stream.ToArray()}.");
+        return new FileStreamResult(new MemoryStream(stream.ToArray()), ContentTypes.XLSX)
+        {
+          FileDownloadName = name
+        };
+      }
     }
 
     public class GetManyArgs
@@ -598,6 +670,75 @@ namespace api.Controllers
 				FileDownloadName = name.ToString(),
 			};
 		}
+
+    public class GetBulkArgs
+		{
+			[EnumerationValidation(typeof(ReportType))]
+			public string Type { get; set; }
+
+			[RegularExpression(@"^\d{4}\-\d{4}$")]
+			public string SchoolYear { get; set; }
+
+			public bool? Approved { get; set; }
+		}
+
+    private byte[] CreateMergedInvoicesWorkbook(IEnumerable<Report> reports)
+    {
+      XSSFWorkbook wb = new XSSFWorkbook();
+      wb.CreateSheet();
+      foreach (var report in reports)
+      {
+        // all data for the bulk invoice spreadsheet are on a single worksheet
+        MemoryStream ms = new MemoryStream(report.Xlsx);
+        _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  report {report.Name} length is {ms.Length}.");
+        XSSFWorkbook wb1 = new XSSFWorkbook(new MemoryStream(report.Xlsx));
+        for (int i = 0; i < wb1.NumberOfSheets; i++) {
+          if (IsActivityWorksheet((XSSFSheet)wb1.GetSheetAt(i))) {
+            NPOIHelper.MergeSheets((XSSFSheet)wb.GetSheetAt(0), (XSSFSheet)wb1.GetSheetAt(i));
+          }
+        }
+      }
+
+      var data = new MemoryStream();
+      wb.Write(data);
+
+      return data.ToArray();
+    }
+
+    [HttpGet("bulk")]
+    [Authorize(Policy = "PAY+")]
+    [Produces(ContentTypes.XLSX)]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(typeof(ErrorsResponse), 400)]
+		public async Task<IActionResult> GetBulkInvoice([FromQuery]GetBulkArgs args)
+    {
+			if (!ModelState.IsValid)
+				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
+
+      var accept = Request.Headers["Accept"];
+			Console.WriteLine($"{accept}");
+
+			if (accept != ContentTypes.XLSX)
+				return StatusCode(406);
+
+			var reports = await Task.Run(() => _reports.GetMany(
+				type: args.Type == null ? null : ReportType.FromString(args.Type),
+				year: args.SchoolYear,
+				approved: args.Approved
+			));
+
+			if (reports == null)
+				return NoContent();
+
+      byte[] invoice = CreateMergedInvoicesWorkbook(reports);
+      _logger.LogInformation($"ReportsController.GetBulkInvoice():  length of merged invoices is {invoice.Length}.");
+      var stream = new MemoryStream(invoice);
+      
+			return new FileStreamResult(stream, ContentTypes.XLSX)
+			{
+				FileDownloadName = $"{args.SchoolYear}_{args.Type}",
+			};
+    }
 
 		[HttpGet]
 		[Authorize(Policy = "PAY+")]

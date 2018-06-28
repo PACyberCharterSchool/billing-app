@@ -35,7 +35,7 @@ export class ReportsService {
 
     if (name) reportInfo['Name'] = name;
     if (year) reportInfo['SchoolYear'] = year;
-    if (approved != null) reportInfo['Appoved'] = approved;
+    if (approved != null) reportInfo['Approved'] = approved;
 
     return this.getReportsByInfo(reportInfo);
   }
@@ -43,6 +43,15 @@ export class ReportsService {
   public getInvoicesZipped(name: string, year: string, approved: boolean): Observable<any> {
     const url = this.apiReportsUrl + '/zip';
     return this.httpClient.get<any>(url, this.headers);
+  }
+
+  public getInvoicesBulk(year: string, approved: boolean): Observable<any> {
+    let reportInfo: Object = Object.assign({}, {'Type': ReportType.Invoice});
+
+    if (year) reportInfo['SchoolYear'] = year;
+    if (approved != null) reportInfo['Approved'] = approved;
+
+    return this.getInvoiceBulkByInfo(reportInfo);
   }
 
   public getInvoiceByName(name: string): Observable<any> {
@@ -62,7 +71,16 @@ export class ReportsService {
     return this.httpClient.get<Report[]>(url, this.headers);
   }
 
-  public getInvoiceActivityDataByName(name: string): Observable<any> {
+  public getInvoiceStudentActivityDataBulk(year: string, approved: boolean): Observable<any> {
+    let reportInfo: Object = Object.assign({}, {'Type': ReportType.Invoice});
+
+    if (year) reportInfo['SchoolYear'] = year;
+    if (approved != null) reportInfo['Approved'] = approved;
+
+    return this.getInvoiceStudentActivityDataBulkByInfo(reportInfo);
+  }
+
+  public getInvoiceStudentActivityDataByName(name: string): Observable<any> {
     let headers = {};
     headers['responseType'] = 'arrayBuffer';
     headers['headers'] = new HttpHeaders({
@@ -70,7 +88,39 @@ export class ReportsService {
       'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });
 
-    const url = this.apiReportsUrl + `/activity/${name}`;
+    const url = this.apiReportsUrl + `/activity/name/${name}`;
+    return this.httpClient.get<any>(url, headers);
+  }
+
+  public getInvoiceBulkByInfo(reportInfo: Object): Observable<any> {
+    let url = this.apiReportsUrl + '/bulk';
+    let headers = {};
+    headers['responseType'] = 'arrayBuffer';
+    headers['headers'] = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+
+    url += '?Type=Invoice';
+    if (reportInfo['SchoolYear']) url += `&SchoolYear=${reportInfo['SchoolYear']}`;
+    url += reportInfo['Approved'] ? `&Approved=true` : `&Approved=false`;
+
+    return this.httpClient.get<any>(url, headers);
+  }
+
+  public getInvoiceStudentActivityDataBulkByInfo(reportInfo: Object): Observable<any> {
+    let url = this.apiReportsUrl + '/activity';
+    let headers = {};
+    headers['responseType'] = 'arrayBuffer';
+    headers['headers'] = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+
+    url += '?Type=Invoice';
+    if (reportInfo['SchoolYear']) url += `&SchoolYear=${reportInfo['SchoolYear']}`;
+    url += reportInfo['Approved'] ? `&Approved=true` : `&Approved=false`;
+
     return this.httpClient.get<any>(url, headers);
   }
 

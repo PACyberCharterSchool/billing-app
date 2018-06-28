@@ -34,7 +34,7 @@ export class InvoicePreviewFormComponent implements OnInit {
   }
 
   downloadStudentActivityData(): void {
-    this.reportsService.getInvoiceActivityDataByName(this.currentInvoice.name).subscribe(
+    this.reportsService.getInvoiceStudentActivityDataByName(this.currentInvoice.name).subscribe(
       data => {
         console.log('InvoicePreviewFormComponent.getCurrentInvoiceData(): data is ', data);
         this.currentInvoice.xlsx = data;

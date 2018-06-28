@@ -26,6 +26,10 @@ export class ExcelService {
     this.saveAsExcelFile(data, this.generateStudentActivityExcelFileName(report));
   }
 
+  public saveDataAsExcelFile(buffer: any, fileName: string): void {
+    this.saveAsExcelFile(buffer, fileName);
+  }
+
   private saveAsExcelFile(buffer: any, fileName: string): void {
     const data: Blob = new Blob([buffer], {
       type: EXCEL_TYPE

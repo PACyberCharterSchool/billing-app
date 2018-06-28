@@ -19,6 +19,49 @@ namespace api.Common.Utils
 {
   public class NPOIHelper
   {
+    /// <param name="dt">the C# DataTable to build the workbook from</param>
+    public static XSSFWorkbook BuildExcelWorkbookFromDataTable(DataTable dt, string sheetName)
+    {
+      XSSFWorkbook wb = new XSSFWorkbook();
+      ISheet sheet = wb.CreateSheet(sheetName);
+
+      // make the header row
+      IRow row = sheet.CreateRow(0);
+      for (int j = 0; j < dt.Columns.Count; j++) {
+        ICell cell = row.CreateCell(j);
+        string columnName = dt.Columns[j].ToString();
+        cell.SetCellValue(columnName);
+      }
+
+      // now add in the data rows
+      for (int i = 0; i < dt.Rows.Count; i++) {
+        row = sheet.CreateRow(i + 1);
+        for (int j = 0; j < dt.Columns.Count; j++) {
+          ICell cell = row.CreateCell(j);
+          string columnName = dt.Columns[j].ToString();
+          cell.SetCellValue(dt.Rows[i][columnName].ToString());
+        }
+      }
+
+      return wb;
+    }
+
+    /// <param name="destSheet"> the sheet to create from the copy. </param>
+    /// <param name="newSheet"> the sheet to copy. </param>
+    /// <param name="copyStyle"> true copy the style. </param>
+    public static void MergeSheets(XSSFSheet destSheet, XSSFSheet newSheet)
+    {
+      MergeSheets(destSheet, newSheet, true);
+    }
+
+    /// <param name="destSheet"> the sheet being copied/merged. </param>
+    /// <param name="newSheet"> the destination sheet being copied/merged into. </param>
+    /// <param name="copyStyle"> true copy the style. </param>
+    private static void MergeSheets(XSSFSheet destSheet, XSSFSheet newSheet, bool copyStyle)
+    {
+      CopySheets(newSheet, destSheet, copyStyle);
+    }
+
     /// <param name="newSheet"> the sheet to create from the copy. </param>
     /// <param name="sheet"> the sheet to copy. </param>
     public static void CopySheets(XSSFSheet newSheet, XSSFSheet sheet)

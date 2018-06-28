@@ -13,6 +13,7 @@ import { Globals } from '../../../globals';
 import { InvoiceCreateFormComponent } from '../invoice-create-form/invoice-create-form.component';
 import { InvoicePreviewFormComponent } from '../invoice-preview-form/invoice-preview-form.component';
 
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-invoices-list',
@@ -33,6 +34,7 @@ export class InvoicesListComponent implements OnInit {
   ];
   private downloadSchoolYear: string;
   private downloadStatus: string;
+  private downloadType: string;
 
   constructor(
     private globals: Globals,
@@ -192,7 +194,10 @@ export class InvoicesListComponent implements OnInit {
   }
 
   downloadInvoices(bulkDownloadContent) {
-    this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' }).result.then(
+    const modal = this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' });
+    this.downloadType = 'invoices';
+
+    modal.result.then(
       (result) => {
         this.reportsService.getInvoicesBySchoolYearAndStatus(this.downloadSchoolYear, this.downloadStatus).subscribe(
           data => {
@@ -201,17 +206,78 @@ export class InvoicesListComponent implements OnInit {
           },
           error => {
             console.log(`AdministrationInvoiceListComponent.downloadInvoices(): error is ${error}.`);
-            this.ngbActiveModal.close('download error');
+            this.ngbActiveModal.dismiss('download error');
           }
         );
       },
       (reason) => {
-        this.ngbActiveModal.close(reason.toString());
+        this.ngbActiveModal.dismiss(reason.toString());
+      }
+    )
+  }
+
+  downloadStudentActivity(bulkDownloadContent) {
+    const modal = this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' });
+    this.downloadType = 'students';
+
+    modal.result.then(
+      (result) => {
+        this.reportsService.getInvoiceStudentActivityDataBulk(
+          this.downloadSchoolYear,
+          this.downloadStatus === 'Approved').subscribe(
+          data => {
+            console.log('InvoiceListComponent.downloadStudentActivity():  data is ', data);
+          },
+          error => {
+            console.log('InvoiceListComponent.downloadStudentActivity():  error is ', error);
+          }
+        )
+      },
+      (reason) => {
+        console.log('InvoiceListComponent.downloadStudentActivity(): reason is ', reason);
       }
     )
   }
 
   doDownload() {
+    if (this.downloadType === 'invoices') {
+      this.reportsService.getInvoicesBulk(
+        this.downloadSchoolYear,
+        this.downloadStatus === 'Approved' ? true : false).subscribe(
+        data => {
+          console.log('InvoicesListComponent.doDownload(): data is ', data);
+          this.excelService.saveDataAsExcelFile(data, 'bulk_invoices');
+          this.ngbActiveModal.close('download successful');
+        },
+        error => {
+          console.log('InvoicesListComponent.doDownload(): error is ', error);
+          this.ngbActiveModal.dismiss('download failed');
+        }
+      );
+    }
+    else {
+      this.reportsService.getInvoiceStudentActivityDataBulk(
+        this.downloadSchoolYear,
+        this.downloadStatus === 'Approved' ? true : false).subscribe(
+        data => {
+          console.log('InvoicesListComponent.doDownload(): data is ', data);
+          this.excelService.saveDataAsExcelFile(data, 'bulk_invoices');
+          this.ngbActiveModal.close('download successful');
+        },
+        error => {
+          console.log('InvoicesListComponent.doDownload(): error is ', error);
+          this.ngbActiveModal.dismiss('download failed');
+        }
+      );
+    }
+  }
+
+  private selectSchoolYear(year: string) {
+    this.downloadSchoolYear = year;
+  }
+
+  private selectDownloadStatus(status: string) {
+    this.downloadStatus = status;
   }
 
   private getUnapprovedInvoices(): Report[] {
