@@ -32,8 +32,8 @@ export class InvoicesListComponent implements OnInit {
     'Approved',
     'Disapproved'
   ];
-  private downloadSchoolYear: string;
-  private downloadStatus: string;
+  private selectedDownloadSchoolYear: string;
+  private selectedDownloadStatus: string;
   private downloadType: string;
 
   constructor(
@@ -196,10 +196,12 @@ export class InvoicesListComponent implements OnInit {
   downloadInvoices(bulkDownloadContent) {
     const modal = this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' });
     this.downloadType = 'invoices';
+    this.selectedDownloadSchoolYear = 'Select School Year';
+    this.selectedDownloadStatus = 'Approval Status';
 
     modal.result.then(
       (result) => {
-        this.reportsService.getInvoicesBySchoolYearAndStatus(this.downloadSchoolYear, this.downloadStatus).subscribe(
+        this.reportsService.getInvoicesBySchoolYearAndStatus(this.selectedDownloadSchoolYear, this.selectedDownloadStatus).subscribe(
           data => {
             console.log(`AdministrationInvoiceListComponent.downloadInvoices(): data is ${data}.`);
             this.ngbActiveModal.close('download successful');
@@ -219,12 +221,14 @@ export class InvoicesListComponent implements OnInit {
   downloadStudentActivity(bulkDownloadContent) {
     const modal = this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' });
     this.downloadType = 'students';
+    this.selectedDownloadSchoolYear = 'Select School Year';
+    this.selectedDownloadStatus = 'Approval Status';
 
     modal.result.then(
       (result) => {
         this.reportsService.getInvoiceStudentActivityDataBulk(
-          this.downloadSchoolYear,
-          this.downloadStatus === 'Approved').subscribe(
+          this.selectedDownloadSchoolYear,
+          this.selectedDownloadStatus === 'Approved').subscribe(
           data => {
             console.log('InvoiceListComponent.downloadStudentActivity():  data is ', data);
           },
@@ -242,8 +246,8 @@ export class InvoicesListComponent implements OnInit {
   doDownload() {
     if (this.downloadType === 'invoices') {
       this.reportsService.getInvoicesBulk(
-        this.downloadSchoolYear,
-        this.downloadStatus === 'Approved' ? true : false).subscribe(
+        this.selectedDownloadSchoolYear,
+        this.selectedDownloadStatus === 'Approved' ? true : false).subscribe(
         data => {
           console.log('InvoicesListComponent.doDownload(): data is ', data);
           this.excelService.saveDataAsExcelFile(data, 'bulk_invoices');
@@ -257,8 +261,8 @@ export class InvoicesListComponent implements OnInit {
     }
     else {
       this.reportsService.getInvoiceStudentActivityDataBulk(
-        this.downloadSchoolYear,
-        this.downloadStatus === 'Approved' ? true : false).subscribe(
+        this.selectedDownloadSchoolYear,
+        this.selectedDownloadStatus === 'Approved' ? true : false).subscribe(
         data => {
           console.log('InvoicesListComponent.doDownload(): data is ', data);
           this.excelService.saveDataAsExcelFile(data, 'bulk_invoices');
@@ -273,11 +277,11 @@ export class InvoicesListComponent implements OnInit {
   }
 
   private selectSchoolYear(year: string) {
-    this.downloadSchoolYear = year;
+    this.selectedDownloadSchoolYear = year;
   }
 
   private selectDownloadStatus(status: string) {
-    this.downloadStatus = status;
+    this.selectedDownloadStatus = status;
   }
 
   private getUnapprovedInvoices(): Report[] {

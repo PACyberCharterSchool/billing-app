@@ -333,6 +333,46 @@ namespace api.Controllers
 
 		private static readonly object _lock = new object();
 
+    public delegate string HeaderMapper(string key);
+
+    public static string MapStudentActivityHeaderKeyToValue(string key)
+    {
+      Dictionary<string, string> _labels = new Dictionary<string, string>
+      {
+        { "Number", "Number" },
+        { "SchoolDistrict","School District" },
+        { "StudentName","Student Name" },
+        { "Address", "Address" },
+        { "CityStateZip", "City, State Zip" },
+        { "BirthDate", "Birth Date" },
+        { "GradeLevel", "Grade Level" },
+        { "FirstDateEducated", "First Date Educated" },
+        { "LastDateEducated", "Last Date Educated" },
+        { "SPED", "SPED" },
+        { "CurrentIEP", "Current IEP" },
+        { "PriorIEP", "Prior IEP" }
+      };
+
+      string value;
+      if (_labels.TryGetValue(key, out value))
+      {
+        return value;
+      }
+
+      return null;
+    }
+
+    private List<string> GetStudentActivityHeaders(DataTable dt, HeaderMapper headerMapper)
+    {
+      List<string> headers = new List<string>();
+
+      foreach (DataColumn column in dt.Columns) {
+        headers.Add(headerMapper(column.ColumnName));
+      }
+
+      return headers;
+    }
+
 		private void MergeInvoiceActivityData(XSSFSheet sheet, XSSFWorkbook wb, int idx)
 		{
       if (wb != null) {
@@ -362,6 +402,7 @@ namespace api.Controllers
       DataTable studentActivityDataTable = new DataTable();
 
       AddColumnsToStudentActivityDataTable(studentActivityDataTable);
+
       foreach (var invoice in invoices) {
         var students = JObject.Parse(invoice.Data)["Students"];
         var schoolDistrict = JObject.Parse(invoice.Data)["SchoolDistrict"];
@@ -382,20 +423,19 @@ namespace api.Controllers
       dt.Columns.Add("StudentName", typeof(string));
       dt.Columns.Add("Address", typeof(string));
       dt.Columns.Add("CityStateZip", typeof(string));
-      dt.Columns.Add("BirthDate", typeof(string));
+      dt.Columns.Add("BirthDate", typeof(DateTime));
       dt.Columns.Add("GradeLevel", typeof(string));
-      dt.Columns.Add("FirstDateEducated", typeof(string));
-      dt.Columns.Add("LastDateEducated", typeof(string));
+      dt.Columns.Add("FirstDateEducated", typeof(DateTime));
+      dt.Columns.Add("LastDateEducated", typeof(DateTime));
       dt.Columns.Add("SPED", typeof(string));
-      dt.Columns.Add("CurrentIEP", typeof(string));
-      dt.Columns.Add("PriorIEP", typeof(string));
+      dt.Columns.Add("CurrentIEP", typeof(DateTime));
+      dt.Columns.Add("PriorIEP", typeof(DateTime));
       dt.AcceptChanges();
     }
 
     private void AddRowsToStudentActivityDataTable(DataTable dtDest, DataTable dt, JObject schoolDistrict)
     {
       int i = 0;
-      _logger.LogInformation($"ReportsController.AddRowsToStudentActivityDataTable():  schoolDistrict is " + schoolDistrict["Name"]);
       foreach (var row in dt.Rows) {
         AddRowToStudentActivityDataTable(dtDest, (DataRow)row, schoolDistrict, ++i);
       }
@@ -404,6 +444,7 @@ namespace api.Controllers
     private void AddRowToStudentActivityDataTable(DataTable dtDest, DataRow row, JObject schoolDistrict, int index)
     {
       DataRow newRow = dtDest.NewRow();
+
       newRow["Number"] = index;
       newRow["SchoolDistrict"] = schoolDistrict["Name"];
       newRow["StudentName"] = row["LastName"] + ", " + row["FirstName"] + " " + row["MiddleInitial"];
@@ -413,7 +454,7 @@ namespace api.Controllers
       newRow["GradeLevel"] = row["Grade"];
       newRow["FirstDateEducated"] = row["FirstDay"];
       newRow["LastDateEducated"] = row["LastDay"];
-      newRow["SPED"] = row["IsSpecialEducation"];
+      newRow["SPED"] = row["IsSpecialEducation"].ToString() == "True" ? "Y" : "N";
       newRow["CurrentIEP"] = row["CurrentIep"];
       newRow["PriorIEP"] = row["FormerIep"];
 
@@ -550,7 +591,8 @@ namespace api.Controllers
       List<Report> reports = new List<Report>();
       reports.Add(report);
       var data = BuildStudentActivityDataTable(reports);
-      XSSFWorkbook wb = NPOIHelper.BuildExcelWorkbookFromDataTable(data, name);
+      List<string> headers = new List<string>();
+      XSSFWorkbook wb = NPOIHelper.BuildExcelWorkbookFromDataTable(data, headers, name);
       var stream = new MemoryStream();
       wb.Write(stream);
       return new FileStreamResult(stream, ContentTypes.XLSX)
@@ -583,14 +625,14 @@ namespace api.Controllers
 
       var data = BuildStudentActivityDataTable(reports);
       string name = args.SchoolYear + "Student Activity";
-      XSSFWorkbook wb = NPOIHelper.BuildExcelWorkbookFromDataTable(data, name);
+      List<string> headers = GetStudentActivityHeaders(data, MapStudentActivityHeaderKeyToValue); 
+      XSSFWorkbook wb = NPOIHelper.BuildExcelWorkbookFromDataTable(data, headers, name);
 
 
       using (var stream = new MemoryStream())
       {
         wb.Write(stream);
 
-        _logger.LogInformation($"ReportsController.GetBulkActivity():  workbook is {stream.ToArray()}.");
         return new FileStreamResult(new MemoryStream(stream.ToArray()), ContentTypes.XLSX)
         {
           FileDownloadName = name
@@ -690,7 +732,6 @@ namespace api.Controllers
       {
         // all data for the bulk invoice spreadsheet are on a single worksheet
         MemoryStream ms = new MemoryStream(report.Xlsx);
-        _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  report {report.Name} length is {ms.Length}.");
         XSSFWorkbook wb1 = new XSSFWorkbook(new MemoryStream(report.Xlsx));
         for (int i = 0; i < wb1.NumberOfSheets; i++) {
           if (IsActivityWorksheet((XSSFSheet)wb1.GetSheetAt(i))) {
@@ -731,7 +772,6 @@ namespace api.Controllers
 				return NoContent();
 
       byte[] invoice = CreateMergedInvoicesWorkbook(reports);
-      _logger.LogInformation($"ReportsController.GetBulkInvoice():  length of merged invoices is {invoice.Length}.");
       var stream = new MemoryStream(invoice);
       
 			return new FileStreamResult(stream, ContentTypes.XLSX)

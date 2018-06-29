@@ -20,18 +20,30 @@ namespace api.Common.Utils
   public class NPOIHelper
   {
     /// <param name="dt">the C# DataTable to build the workbook from</param>
-    public static XSSFWorkbook BuildExcelWorkbookFromDataTable(DataTable dt, string sheetName)
+    public static XSSFWorkbook BuildExcelWorkbookFromDataTable(DataTable dt, List<string> headers, string sheetName)
     {
       XSSFWorkbook wb = new XSSFWorkbook();
       ISheet sheet = wb.CreateSheet(sheetName);
-
+      IFont font = wb.CreateFont();
+      ICellStyle cs = wb.CreateCellStyle();
+  
+      font.FontHeightInPoints = (short)14;
+      font.Boldweight = (short)FontBoldWeight.Bold;
+      cs.SetFont(font);
+      
       // make the header row
       IRow row = sheet.CreateRow(0);
       for (int j = 0; j < dt.Columns.Count; j++) {
         ICell cell = row.CreateCell(j);
         string columnName = dt.Columns[j].ToString();
-        cell.SetCellValue(columnName);
+        string columnLabel = headers[j];
+        cell.SetCellValue(columnLabel);
+        cell.CellStyle = cs;
       }
+
+      font.Boldweight = (short)FontBoldWeight.Normal;
+      font.FontHeightInPoints = (short)12;
+      cs.SetFont(font);
 
       // now add in the data rows
       for (int i = 0; i < dt.Rows.Count; i++) {
@@ -40,6 +52,7 @@ namespace api.Common.Utils
           ICell cell = row.CreateCell(j);
           string columnName = dt.Columns[j].ToString();
           cell.SetCellValue(dt.Rows[i][columnName].ToString());
+          cell.CellStyle = cs;
         }
       }
 

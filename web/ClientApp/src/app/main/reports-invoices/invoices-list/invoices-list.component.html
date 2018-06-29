@@ -85,7 +85,7 @@
       <form #downloadForm (ngSubmit)='doDownload()'>
         <div class='form-group'>
           <div ngbDropdown class="d-inline-block">
-            <button type='button' class="btn btn-outline-primary" id="dropdownDownloadSchoolYear" ngbDropdownToggle>School Year</button>
+            <button type='button' class="btn btn-outline-primary" id="dropdownDownloadSchoolYear" ngbDropdownToggle>{{selectedDownloadSchoolYear}}</button>
             <div ngbDropdownMenu aria-labelledby="dropdownDownloadSchoolYear">
               <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='selectSchoolYear(year)'>{{year}}</button>
             </div>
@@ -93,7 +93,7 @@
         </div>
         <div class='form-group'>
           <div ngbDropdown class="d-inline-block">
-            <button type='button' class="btn btn-outline-primary" id="dropdownDownloadStatus" ngbDropdownToggle>Status</button>
+            <button type='button' class="btn btn-outline-primary" id="dropdownDownloadStatus" ngbDropdownToggle>{{selectedDownloadStatus}}</button>
             <div ngbDropdownMenu aria-labelledby="dropdownDownloadStatus">
               <button type='button' class='dropdown-item' *ngFor='let status of statuses' (click)='selectDownloadStatus(status)'>{{status}}</button>
             </div>
