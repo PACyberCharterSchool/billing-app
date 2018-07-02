@@ -38,7 +38,7 @@ export class ExcelService {
   }
 
   private generateInvoiceExcelFileName(invoice: Report): string {
-    return invoice.name + invoice.schoolYear + INVOICE + EXCEL_EXTENSION;
+    return invoice.name + INVOICE + EXCEL_EXTENSION;
   }
 
   private generateStudentActivityExcelFileName(invoice: Report): string {
