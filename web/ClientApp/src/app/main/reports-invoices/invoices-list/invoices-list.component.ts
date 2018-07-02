@@ -168,15 +168,28 @@ export class InvoicesListComponent implements OnInit {
     );
   }
 
-  previewInvoice(invoice: Report) {
-    const modal = this.ngbModal.open(InvoicePreviewFormComponent, { centered: true, size: 'lg' });
-    modal.componentInstance.invoices = [invoice];
-    modal.result.then(
-      (result) => {
+  downloadInvoiceStudentActivity(invoice: Report) {
+    // WDM - 07/02/2018
+    // this defines a modal dialog that was designed to present the Excel spreadsheet as a preview.
+    // current time constraints preclude implementation, but we eventually want to come back to this.
+    // const modal = this.ngbModal.open(InvoicePreviewFormComponent, { centered: true, size: 'lg' });
+    // modal.componentInstance.invoices = [invoice];
+    // modal.result.then(
+    //   (result) => {
+    //   },
+    //   (reason) => {
+    //   }
+    // )
+    this.reportsService.getInvoiceStudentActivityDataByName(invoice.name).subscribe(
+      data => {
+        console.log("InvoiceListComponent().downloadInvoiceStudentActivity():  data is ", data);
+        this.excelService.saveStudentActivityAsExcelFile(data, invoice);
       },
-      (reason) => {
+      error => {
+        console.log("InvoiceListComponent().downloadInvoiceStudentActivity():  error is ", error);
       }
-    )
+    );
+
   }
 
   downloadInvoice(invoice: Report) {
@@ -250,12 +263,10 @@ export class InvoicesListComponent implements OnInit {
         this.selectedDownloadStatus === 'Approved' ? true : false).subscribe(
         data => {
           console.log('InvoicesListComponent.doDownload(): data is ', data);
-          this.excelService.saveDataAsExcelFile(data, 'bulk_invoices');
-          this.ngbActiveModal.close('download successful');
+          this.excelService.saveDataAsExcelFile(data, 'BulkInvoices');
         },
         error => {
           console.log('InvoicesListComponent.doDownload(): error is ', error);
-          this.ngbActiveModal.dismiss('download failed');
         }
       );
     }
@@ -265,12 +276,10 @@ export class InvoicesListComponent implements OnInit {
         this.selectedDownloadStatus === 'Approved' ? true : false).subscribe(
         data => {
           console.log('InvoicesListComponent.doDownload(): data is ', data);
-          this.excelService.saveDataAsExcelFile(data, 'bulk_invoices');
-          this.ngbActiveModal.close('download successful');
+          this.excelService.saveDataAsExcelFile(data, 'BulkStudentActivity');
         },
         error => {
           console.log('InvoicesListComponent.doDownload(): error is ', error);
-          this.ngbActiveModal.dismiss('download failed');
         }
       );
     }

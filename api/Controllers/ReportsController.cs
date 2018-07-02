@@ -591,13 +591,17 @@ namespace api.Controllers
       List<Report> reports = new List<Report>();
       reports.Add(report);
       var data = BuildStudentActivityDataTable(reports);
-      List<string> headers = new List<string>();
+      List<string> headers = GetStudentActivityHeaders(data, MapStudentActivityHeaderKeyToValue); 
       XSSFWorkbook wb = NPOIHelper.BuildExcelWorkbookFromDataTable(data, headers, name);
-      var stream = new MemoryStream();
-      wb.Write(stream);
-      return new FileStreamResult(stream, ContentTypes.XLSX)
+
+      using (var stream = new MemoryStream())
       {
-        FileDownloadName = report.Name,
+        wb.Write(stream);
+
+        return new FileStreamResult(new MemoryStream(stream.ToArray()), ContentTypes.XLSX)
+        {
+          FileDownloadName = name
+        };
       };
     }
 
@@ -628,7 +632,6 @@ namespace api.Controllers
       List<string> headers = GetStudentActivityHeaders(data, MapStudentActivityHeaderKeyToValue); 
       XSSFWorkbook wb = NPOIHelper.BuildExcelWorkbookFromDataTable(data, headers, name);
 
-
       using (var stream = new MemoryStream())
       {
         wb.Write(stream);
@@ -637,7 +640,7 @@ namespace api.Controllers
         {
           FileDownloadName = name
         };
-      }
+      };
     }
 
     public class GetManyArgs

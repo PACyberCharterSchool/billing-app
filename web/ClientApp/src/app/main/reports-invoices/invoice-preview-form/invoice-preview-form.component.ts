@@ -38,7 +38,7 @@ export class InvoicePreviewFormComponent implements OnInit {
       data => {
         console.log('InvoicePreviewFormComponent.getCurrentInvoiceData(): data is ', data);
         this.currentInvoice.xlsx = data;
-        this.excelService.saveStudentActivityAsExcelFile(this.currentInvoice);
+        this.excelService.saveStudentActivityAsExcelFile(data, this.currentInvoice);
         this.ngbActiveModal.close("Successful download");
       },
       error => {

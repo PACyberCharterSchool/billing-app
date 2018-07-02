@@ -21,9 +21,8 @@ export class ExcelService {
     this.saveAsExcelFile(data, this.generateInvoiceExcelFileName(invoice));
   }
 
-  public saveStudentActivityAsExcelFile(report: Report): void {
-    const data = report.xlsx;
-    this.saveAsExcelFile(data, this.generateStudentActivityExcelFileName(report));
+  public saveStudentActivityAsExcelFile(buffer: any, invoice: Report): void {
+    this.saveAsExcelFile(buffer, this.generateStudentActivityExcelFileName(invoice));
   }
 
   public saveDataAsExcelFile(buffer: any, fileName: string): void {
@@ -43,7 +42,7 @@ export class ExcelService {
   }
 
   private generateStudentActivityExcelFileName(invoice: Report): string {
-    return invoice.name + invoice.schoolYear + STUDENT_ACTIVITY + EXCEL_EXTENSION;
+    return invoice.name  + STUDENT_ACTIVITY + EXCEL_EXTENSION;
   }
 
   /* generate a download */

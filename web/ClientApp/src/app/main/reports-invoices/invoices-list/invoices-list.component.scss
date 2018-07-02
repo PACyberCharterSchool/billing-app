@@ -1,4 +1,6 @@
 .invoices-title-row {
+  display: flex;
+  align-items: center;
   height: 40px;
   padding-bottom: 5px;
 
@@ -15,10 +17,18 @@
       line-height: 14px;
       width: 70%;
     }
+
+    div.col-md-7 {
+      div.col-md-4 {
+        padding: 0;
+      }
+    }
   }
 }
 
 .invoices-action-row {
+  display: flex;
+  align-items: center;
   height: 40px;
   padding-bottom: 5px;
 
@@ -39,11 +49,10 @@
 }
 
 .invoices-list-row {
-  height: calc(100% - 80px);
+  height: calc(100% - 120px);
+  padding-bottom: 5px;
 
   .invoices-list-col {
-    height: calc(100% - 60px);
-
     table {
       height: 100%;
 
@@ -56,10 +65,13 @@
       }
     }
   }
+}
 
-  .invoices-back-col {
-    height: 40px;
-  }
+.invoices-footer-row {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding-bottom: 5px;
 }
 
 .modal-title {
