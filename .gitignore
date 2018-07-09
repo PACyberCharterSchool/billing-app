@@ -249,3 +249,10 @@ appsettings.Development.json
 
 # ctags
 tags
+
+# Test data
+api.Tests/TestData/
+
+# import application data
+import/*.csv
+import/GeniusSISData/
