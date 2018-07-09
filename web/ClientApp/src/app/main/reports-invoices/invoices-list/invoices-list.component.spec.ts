@@ -20,6 +20,8 @@ import { ExcelService } from '../../../services/excel.service';
 
 import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
+import { NgxSpinnerModule } from 'ngx-spinner';
+
 describe('InvoicesListComponent', () => {
   let component: InvoicesListComponent;
   let fixture: ComponentFixture<InvoicesListComponent>;
@@ -35,6 +37,7 @@ describe('InvoicesListComponent', () => {
       imports: [
         FormsModule,
         RouterTestingModule,
+        NgxSpinnerModule,
         NgbModule.forRoot()
       ],
       providers: [

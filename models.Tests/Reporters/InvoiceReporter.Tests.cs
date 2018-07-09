@@ -381,8 +381,8 @@ namespace models.Tests.Reporters
 					StudentZipCode = "15000",
 					StudentGradeLevel = "K",
 					StudentDateOfBirth = new DateTime(2012, 7, 1),
-					StudentEnrollmentDate = new DateTime(2017, 7, 1),
-					StudentWithdrawalDate = new DateTime(2017, 7, 1),
+					StudentEnrollmentDate = new DateTime(2017, 6, 1),
+					StudentWithdrawalDate = new DateTime(2017, 6, 1),
 					StudentIsSpecialEducation = false,
 				}
 			};
