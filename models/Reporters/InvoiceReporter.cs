@@ -164,7 +164,7 @@ namespace models.Reporters
 					AND (
 						StudentWithdrawalDate IS NULL
 						OR (
-							StudentEnrollmentDate <= StudentWithdrawalDate
+							StudentEnrollmentDate < StudentWithdrawalDate
 							AND StudentWithdrawalDate >= @{month}
 						)
 					)";
@@ -291,7 +291,7 @@ namespace models.Reporters
 				AND (
 					StudentWithdrawalDate IS NULL
 					OR (
-						StudentWithdrawalDate >= StudentEnrollmentDate
+						StudentWithdrawalDate > StudentEnrollmentDate
 						AND StudentWithdrawalDate >= @Start
 					)
 				)
