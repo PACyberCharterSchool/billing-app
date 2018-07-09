@@ -51,7 +51,7 @@ export class ReportsService {
     if (year) reportInfo['SchoolYear'] = year;
     if (approved != null) reportInfo['Approved'] = approved;
 
-    return this.getInvoiceBulkByInfo(reportInfo);
+    return this.getInvoiceByInfoBulk(reportInfo);
   }
 
   public getInvoiceByName(name: string): Observable<any> {
@@ -92,7 +92,7 @@ export class ReportsService {
     return this.httpClient.get<any>(url, headers);
   }
 
-  public getInvoiceBulkByInfo(reportInfo: Object): Observable<any> {
+  public getInvoiceByInfoBulk(reportInfo: Object): Observable<any> {
     let url = this.apiReportsUrl + '/bulk';
     let headers = {};
     headers['responseType'] = 'arrayBuffer';

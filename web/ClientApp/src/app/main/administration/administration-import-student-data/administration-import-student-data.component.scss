@@ -1,4 +1,5 @@
 .import-student-data-title-row {
+  height: 62px;
   width: 100%;
   div {
     display: inline-block;
@@ -10,7 +11,7 @@
 }
 
 .import-student-data-content-row {
-  height: 100%;
+  height: calc(100% - 62px);
   overflow: hidden;
 
   div {

@@ -97,7 +97,7 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         break;
       case 'middleInitial':
       case 'studentMiddleInitial':
-        fieldName = 'Middle Initial';
+        fieldName = 'Middle Init.';
         break;
       case 'currentIep':
       case 'studentCurrentIep':

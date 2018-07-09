@@ -1,32 +1,31 @@
-<div class='row base-search-tools-row'>
-  <div class='col-md-4' style='padding-right: 0;'>
+<div class='row base-search-tools-row align-items-center'>
+  <div class='col-auto'>
     <h4>Students</h4>
     <input type='text' placeholder='Search ID, student name...' [(ngModel)]='searchText' />
     <button class='btn-primary search-button' (click)='filterStudentListByNameOrId()'>SEARCH</button>
   </div>
-  <div class='col-md-2 advanced-search-tools-control-col'>
+  <div class='col-auto advanced-search-tools-control-col align-items-center'>
     <h5>More Filters</h5>
     <button mat-icon-button class='advanced-search-tools-toggle-btn' (click)='toggleAdvancedSearchTools()'>
       <i class='fa fa-bars' *ngIf='!advancedSearchEnabled'></i>
       <i class='fa fa-angle-down fa-bold' *ngIf='advancedSearchEnabled'></i>
     </button>
   </div>
-  <div class='col-md-5 base-date-search-tools-col'>
-    <div class='col-md-5'><app-student-datepicker iconSize='fa-2x' [(date)]='startDate' (dateSelected)='dateSelectedStartDateHandler($event)'></app-student-datepicker></div>
-    <div class='col-md-5'><app-student-datepicker iconSize='fa-2x' [(date)]='endDate' (dateSelected)='dateSelectedEndDateHandler($event)'></app-student-datepicker></div>
+  <div class='col-md-auto base-date-search-tools-col'>
+    <div class='col-md-auto'><app-student-datepicker iconSize='fa-2x' [(date)]='startDate' (dateSelected)='dateSelectedStartDateHandler($event)'></app-student-datepicker></div>
+    <div class='col-md-auto'><app-student-datepicker iconSize='fa-2x' [(date)]='endDate' (dateSelected)='dateSelectedEndDateHandler($event)'></app-student-datepicker></div>
   </div>
-  <div class='col-md-1'>
+  <div class='col-md-auto'>
     <button class='btn btn-primary reset-button' (click)='resetStudentList()'>Reset</button>
   </div>
 </div>
-<div class='row advanced-search-tools-row' *ngIf="advancedSearchEnabled">
-  <div class='col-md-10'>
+<div class='row advanced-search-tools-row align-items-center' *ngIf="advancedSearchEnabled">
+  <!-- <div class='col-auto'> -->
     <app-student-advanced-filter [schoolDistricts]='schoolDistricts' (studentsUpdated)='studentsUpdatedHandler($event)'></app-student-advanced-filter>
-  </div>
-  <div class='col-md-2'></div>
+  <!-- </div> -->
 </div>
 <div class='row student-list-view-row'>
-  <div class='col-md-12'>
+  <div class='col-12'>
     <table class='table table-fixed table-striped'>
       <thead>
         <tr>
@@ -39,7 +38,7 @@
             <i class="fa" [ngClass]="{'fa-sort': column != 'firstName', 'fa-sort-asc': (column == 'firstName' && isDescending), 'fa-sort-desc': (column == 'firstName' && !isDescending) }" aria-hidden="true"></i>
           </th>
           <th (click)="sort('middleInitial')">
-            Middle Initial
+            Middle Init.
             <i class="fa" [ngClass]="{'fa-sort': column != 'middleInitial', 'fa-sort-asc': (column == 'middleInitial' && isDescending), 'fa-sort-desc': (column == 'middleInitial' && !isDescending) }" aria-hidden="true"></i>
           </th>
           <th (click)="sort('lastName')">

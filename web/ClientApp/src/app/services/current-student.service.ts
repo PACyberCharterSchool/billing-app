@@ -13,5 +13,6 @@ export class CurrentStudentService {
 
   changeStudent(student: Student) {
     this.studentSource.next(student);
+    console.log('CurrentStudentService.changeStudent():  student is ', student);
   }
 }

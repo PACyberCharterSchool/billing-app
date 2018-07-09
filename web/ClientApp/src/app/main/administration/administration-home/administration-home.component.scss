@@ -1,5 +1,5 @@
 .administration-home-title-row {
-  height: 15%;
+  height: 75px;
 
   h3 {
     color: #58a719;
@@ -7,13 +7,9 @@
 }
 
 .administration-home-content-row {
-  height: 85%;
+  height: calc(100% - 75px);
 
-  div.col-md-3 {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-
+  div.col {
     button {
       background-color: #ffffff;
       border: 1px solid #dddddd;

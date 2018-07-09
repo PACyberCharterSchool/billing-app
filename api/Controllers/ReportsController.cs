@@ -738,6 +738,7 @@ namespace api.Controllers
         XSSFWorkbook wb1 = new XSSFWorkbook(new MemoryStream(report.Xlsx));
         for (int i = 0; i < wb1.NumberOfSheets; i++) {
           if (IsActivityWorksheet((XSSFSheet)wb1.GetSheetAt(i))) {
+            _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  processing invoice {report.Name}.");
             NPOIHelper.MergeSheets((XSSFSheet)wb.GetSheetAt(0), (XSSFSheet)wb1.GetSheetAt(i));
           }
         }
@@ -775,6 +776,7 @@ namespace api.Controllers
 				return NoContent();
 
       byte[] invoice = CreateMergedInvoicesWorkbook(reports);
+      _logger.LogInformation($"ReportsController.GetBulkInvoice():  length of bulk invoice is {invoice.Length}.");
       var stream = new MemoryStream(invoice);
       
 			return new FileStreamResult(stream, ContentTypes.XLSX)

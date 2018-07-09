@@ -7,6 +7,7 @@ import { Report, ReportType } from '../../../models/report.model';
 import { ReportsService } from '../../../services/reports.service';
 import { UtilitiesService } from '../../../services/utilities.service';
 import { ExcelService } from '../../../services/excel.service';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 import { Globals } from '../../../globals';
 
@@ -35,12 +36,14 @@ export class InvoicesListComponent implements OnInit {
   private selectedDownloadSchoolYear: string;
   private selectedDownloadStatus: string;
   private downloadType: string;
+  private spinnerMsg: string;
 
   constructor(
     private globals: Globals,
     private reportsService: ReportsService,
     private utilitiesService: UtilitiesService,
     private excelService: ExcelService,
+    private ngxSpinnerService: NgxSpinnerService,
     private ngbModal: NgbModal,
     private ngbActiveModal: NgbActiveModal
   ) { }
@@ -189,7 +192,6 @@ export class InvoicesListComponent implements OnInit {
         console.log("InvoiceListComponent().downloadInvoiceStudentActivity():  error is ", error);
       }
     );
-
   }
 
   downloadInvoice(invoice: Report) {
@@ -214,6 +216,9 @@ export class InvoicesListComponent implements OnInit {
 
     modal.result.then(
       (result) => {
+        this.spinnerMsg = 'Generating invoices in bulk.  Please wait...';
+        this.ngxSpinnerService.show();
+
         this.reportsService.getInvoicesBySchoolYearAndStatus(this.selectedDownloadSchoolYear, this.selectedDownloadStatus).subscribe(
           data => {
             console.log(`AdministrationInvoiceListComponent.downloadInvoices(): data is ${data}.`);
@@ -239,14 +244,19 @@ export class InvoicesListComponent implements OnInit {
 
     modal.result.then(
       (result) => {
+        this.spinnerMsg = 'Generating student activity data.  Please wait...';
+        this.ngxSpinnerService.show();
+
         this.reportsService.getInvoiceStudentActivityDataBulk(
           this.selectedDownloadSchoolYear,
           this.selectedDownloadStatus === 'Approved').subscribe(
           data => {
             console.log('InvoiceListComponent.downloadStudentActivity():  data is ', data);
+            this.ngxSpinnerService.hide();
           },
           error => {
             console.log('InvoiceListComponent.downloadStudentActivity():  error is ', error);
+            this.ngxSpinnerService.hide();
           }
         )
       },
@@ -263,10 +273,12 @@ export class InvoicesListComponent implements OnInit {
         this.selectedDownloadStatus === 'Approved' ? true : false).subscribe(
         data => {
           console.log('InvoicesListComponent.doDownload(): data is ', data);
+          this.ngxSpinnerService.hide();
           this.excelService.saveDataAsExcelFile(data, 'BulkInvoices');
         },
         error => {
           console.log('InvoicesListComponent.doDownload(): error is ', error);
+          this.ngxSpinnerService.hide();
         }
       );
     }
@@ -276,10 +288,12 @@ export class InvoicesListComponent implements OnInit {
         this.selectedDownloadStatus === 'Approved' ? true : false).subscribe(
         data => {
           console.log('InvoicesListComponent.doDownload(): data is ', data);
+          this.ngxSpinnerService.hide();
           this.excelService.saveDataAsExcelFile(data, 'BulkStudentActivity');
         },
         error => {
           console.log('InvoicesListComponent.doDownload(): error is ', error);
+          this.ngxSpinnerService.hide();
         }
       );
     }

@@ -1,8 +1,22 @@
 .template-filter-row {
-  height: 40px;
+  height: 62px;
 
   h4 {
     color: #58a917;
+  }
+
+  .search-template-col {
+    input[type='text'] {
+      padding: 6px 2px;
+      line-height: 14px;
+      width: 50%;
+    }
+
+    button {
+      position: relative;
+      left: -4px;
+      top: -2px;
+    }
   }
 }
 
@@ -11,10 +25,22 @@
 }
 
 .template-list-row {
-  height: calc(100% - 120px);
-  table {
-    thead {
-      height: 60px;
+  height: calc(100% - 142px);
+
+  div.col {
+    table {
+      thead {
+        height: 60px;
+      }
+
+      tbody {
+        height: calc(100% - 60px);
+      }
+    }
+
+    p {
+      font-size: 48px;
+      color: #58a917;
     }
   }
 }
@@ -25,13 +51,6 @@
 
 .modal-title {
   color: #58a917;
-}
-
-.form-group {
-  div.col-md-12 {
-    display: flex;
-    align-items: center;
-  }
 }
 
 #dropdownSelectSchoolYear + div.dropdown-menu {

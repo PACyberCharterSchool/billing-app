@@ -1,19 +1,19 @@
-<div class='row payments-title-row'>
-  <div class='col-md-6 create-payment-col'>
-    <div class='col-md-4'><h4>Payments</h4></div>
-    <div class='col-md-2'>
-      <button type='button' class='btn btn-primary' (click)='createPayment()'>ADD NEW</button>
-    </div>
-  </div>
-  <div class='col-md-6 search-payment-col'>
+<div class='row payments-title-row align-items-center'>
+  <div class='col-2'><h4>Payments</h4></div>
+  <div class='col-6'>
     <input type='text' [(ngModel)]='searchText' />
     <button type='button' class='btn btn-primary' (click)='filterPaymentRecords()'>SEARCH</button>
     <button type='button' class='btn btn-outline-primary' (click)='resetPaymentRecords()'>RESET</button>
   </div>
 </div>
-<div class='row payments-list-row'>
-  <div class='col-md-12 payment-list-col'>
-    <table class='table table-fixed table-striped'>
+<div class='row payments-action-row align-items-center'>
+  <div class='col-6 create-payment-col'>
+    <button type='button' class='btn btn-primary' (click)='createPayment()'>ADD NEW</button>
+  </div>
+</div>
+<div class='row payments-list-row align-items-center justify-content-center'>
+  <div class='col-12 payment-list-col'>
+    <table class='table table-fixed table-striped' *ngIf='payments?.length > 0'>
       <thead>
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
@@ -28,10 +28,11 @@
         </tr>
       </tbody>
     </table>
+    <p *ngIf='payments?.length <= 0'>No payments have been submitted.</p> 
   </div>
 </div>
-<div class='row payment-footer-row'>
-  <div class='col-md-12 payment-action-col'>
+<div class='row payment-footer-row align-items-center'>
+  <div class='col-12 payment-action-col'>
     <a class='btn btn-primary' [routerLink]='["/payments-refunds", { outlets: { "action": ["home"] } }]' (click)='collapse()'>
       <span class='fa'></span> Back to Payments & Refunds
     </a>

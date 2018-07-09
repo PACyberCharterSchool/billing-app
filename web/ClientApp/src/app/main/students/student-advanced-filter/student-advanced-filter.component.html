@@ -1,4 +1,4 @@
-<div class='col-md-2 advanced-school-district-col'>
+<div class='col-auto advanced-school-district-col'>
   <h6>School District</h6>
   <div ngbDropdown class='d-inline-block'>
     <button ngbDropdownToggle class='btn btn-outline-primary' id='schoolDistrictDropdown'>Select</button>
@@ -7,7 +7,7 @@
     </div>
   </div>
 </div>
-<div class='col-md-1 advanced-grade-col'>
+<div class='col-auto advanced-grade-col'>
   <h6>Grade</h6>
   <div ngbDropdown class='d-inline-block'>
     <button class='btn btn-outline-primary' id='gradeDropdown' ngbDropdownToggle>Grade</button>
@@ -16,11 +16,11 @@
     </div>
   </div>
 </div>
-<div class='col-md-3 advanced-dob-col'>
+<div class='col-auto advanced-dob-col'>
   <h6>Date of Birth</h6>
   <app-student-datepicker [(date)]='date' (dateSelected)='dateSelectedDOBDateHandler($event)' iconSize="fa-2x"></app-student-datepicker>
 </div>
-<div class='col-md-2 advanced-iep-col'>
+<div class='col-auto advanced-iep-col'>
   <h6>IEP</h6>
   <div ngbDropdown class='d-inline-block'>
     <button class='btn btn-outline-primary' id='iepDropdown' ngbDropdownToggle>IEP</button>

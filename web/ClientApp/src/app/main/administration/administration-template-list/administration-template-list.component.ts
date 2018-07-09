@@ -110,7 +110,7 @@ export class AdministrationTemplateListComponent implements OnInit {
   }
 
   importTemplate(importTemplateContent): void {
-    this.ngbModal.open(importTemplateContent, { centered: true, size: 'lg' }).result.then(
+    this.ngbModal.open(importTemplateContent, { centered: true }).result.then(
       (result) => {
         this.refreshTemplateList();
       },

@@ -1,8 +1,15 @@
-<div class='row calendar-filter-row'>
-  <div class='col-md-3 calendar-title-col'>
+<div class='row calendar-title-row align-items-center'>
+  <div class='col-auto calendar-title-col'>
     <h4>{{academicYear}} School Calendar</h4>
   </div>
-  <div class='col-md-4 calendar-import-col'>
+  <div class='col-6 calendar-search-col'>
+    <input type='text' [(ngModel)]='searchText' />
+    <button type='button' class='btn btn-primary' (click)='filterDays()'>SEARCH</button>
+    <button type='button' class='btn btn-outline-primary' (click)='resetDays()'>RESET</button>
+  </div>
+</div>
+<div class='row calendar-select-row align-items-center'>
+  <div class='col-auto calendar-import-col'>
     <label for='calendar-file-selector'>Select calendar file:</label>
     <span class='btn btn-primary btn-file'>
       <input
@@ -13,17 +20,10 @@
         (change)='handleFileSelection($event)' />
     </span>
   </div>
-  <div class='col-md-5 calendar-search-col'>
-    <div class='col-md-7 offset-md-5'>
-      <input type='text' [(ngModel)]='searchText' />
-      <button type='button' class='btn btn-primary' (click)='filterDays()'>SEARCH</button>
-      <button type='button' class='btn btn-outline-primary' (click)='resetDays()'>RESET</button>
-   </div>
-  </div>
 </div>
-<div class='row calendar-list-row'>
-  <div class='col-md-12'>
-    <table class='table table-fixed table-striped'>
+<div class='row calendar-list-row align-items-center justify-content-center'>
+  <div class='col-12'>
+    <table class='table table-fixed table-striped' *ngIf='days?.length > 0'>
       <thead>
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
@@ -38,5 +38,6 @@
         </tr>
       </tbody>
     </table>
+    <p *ngIf='days?.length <= 0'>No school calendars are imported.</p>
   </div>
 </div>

@@ -1,9 +1,9 @@
-<div class='row template-filter-row'>
-  <div class='col-md-6 title-template-col'>
+<div class='row template-filter-row align-items-center justify-content-start'>
+  <div class='col-2 title-template-col'>
     <h4>Templates</h4>
   </div>
-  <div class='col-md-6 search-template-col'>
-    <div class='col-md-12'>
+  <div class='col search-template-col'>
+    <div class='col'>
       <input type='text' [(ngModel)]='searchText' />
       <button type='button' class='btn btn-primary' (click)='filterTemplateRecords()'>SEARCH</button>
       <button type='button' class='btn btn-outline-primary' (click)='resetTemplateRecords()'>RESET</button>
@@ -11,13 +11,13 @@
   </div>
 </div>
 <div class='row template-action-row'>
-  <div class='col-md-12'>
+  <div class='col'>
     <button type='button' class='btn btn-primary' (click)='importTemplate(importTemplateContent)'>IMPORT TEMPLATE</button>
   </div>
 </div>
 <div class='row template-list-row'>
-  <div class='col-md-12'>
-    <table class='table table-static table-striped'>
+  <div class='col'>
+    <table class='table table-static table-striped' *ngIf='templates && templates.length > 0'>
       <thead>
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
@@ -32,64 +32,51 @@
         </tr>
       </tbody>
     </table>
+    <p *ngIf='templates?.length === 0'>No templates have been imported.</p>
   </div>
 </div>
 <div class='row template-footer-row'>
-  <div class='col-md-12 back-to-admin-col'>
+  <div class='col back-to-admin-col'>
     <a class='btn btn-primary' [routerLink]='["/administration", { outlets: { "action": ["home"] } }]' (click)='collapse()'>
       <span class='fa'></span> Back to Administration
     </a>
   </div>
 </div>
 <ng-template #importTemplateContent let-c='close' let-d='dismiss'>
-  <div class='col-md-12'>
-    <div class='modal-header'>
-      <h4 class='modal-title'>Import Template</h4>
-      <button type='button' class='close' aria-label='Close' (click)="d('Cross click')">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class='modal-body'>
-      <form #templateFileSelection (ngSubmit)='doImport()'>
-        <div class='form-group'>
-          <div class='col-md-12'>
-            <div class='col-md-6'>
-              <label>Select template file:</label>
-            </div>
-            <div class='col-md-6'>
-              <input type='file'
-                [(ngModel)]='fileName'
-                [ngModelOptions]='{standalone: true}'
-                accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                (change)='setExcelTemplateUrl($event)'
-                />
-            </div>
+  <div class='modal-header'>
+    <h4 class='modal-title'>Import Template</h4>
+    <button type='button' class='close' aria-label='Close' (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class='modal-body'>
+    <form #templateFileSelection (ngSubmit)='doImport()'>
+      <div class='form-group'>
+        <label>Select template file:</label>
+        <input type='file'
+          [(ngModel)]='fileName'
+          [ngModelOptions]='{standalone: true}'
+          accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          (change)='setExcelTemplateUrl($event)'
+          />
+      </div>
+      <div class='form-group'>
+        <label>Select academic year:</label>
+        <div ngbDropdown class="d-inline-block">
+          <button type='button' class="btn btn-outline-primary" id="dropdownSelectSchoolYear" ngbDropdownToggle>School Year</button>
+          <div ngbDropdownMenu aria-labelledby="dropdownSelectSchoolYear">
+            <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='setSelectedSchoolYear(year)'>{{year}}</button>
           </div>
         </div>
-        <div class='form-group'>
-          <div class='col-md-12'>
-            <div class='col-md-6'>
-              <label>Select academic year:</label>
-            </div>
-            <div class='col-md-6'>
-              <div ngbDropdown class="d-inline-block">
-                <button type='button' class="btn btn-outline-primary" id="dropdownSelectSchoolYear" ngbDropdownToggle>School Year</button>
-                <div ngbDropdownMenu aria-labelledby="dropdownSelectSchoolYear">
-                  <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='setSelectedSchoolYear(year)'>{{year}}</button>
-                </div>
-              </div>
-            </div>
-          </div>
+      </div>
+      <div class='form-group'>
+        <div class='col offset-7'>
+          <button type='button' class='btn btn-outline' (click)='d("Cancel")'>CANCEL</button>
+          <button type='submit' class='btn btn-primary'>IMPORT</button>
         </div>
-        <div class='form-group'>
-          <div class='col-md-4 offset-md-8'>
-            <button type='button' class='btn btn-outline' (click)='d("Cancel")'>CANCEL</button>
-            <button type='submit' class='btn btn-primary'>IMPORT</button>
-          </div>
-        </div>
-      </form>
-    </div>
-    <div class='modal-footer'>
-    </div>
+      </div>
+    </form>
+  </div>
+  <div class='modal-footer'>
   </div>
 </ng-template>

@@ -96,7 +96,9 @@ export class AdministrationImportStudentDataComponent implements OnInit {
       'batchFilename',
       'id',
       'lazyLoader',
-      'studentMiddleInitial'
+      'studentMiddleInitial',
+      'studentState',
+      'studentNorep'
     ];
 
     if (fields) {

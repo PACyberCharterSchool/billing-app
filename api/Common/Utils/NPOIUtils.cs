@@ -62,17 +62,17 @@ namespace api.Common.Utils
     /// <param name="destSheet"> the sheet to create from the copy. </param>
     /// <param name="newSheet"> the sheet to copy. </param>
     /// <param name="copyStyle"> true copy the style. </param>
-    public static void MergeSheets(XSSFSheet destSheet, XSSFSheet newSheet)
+    public static void MergeSheets(XSSFSheet destSheet, XSSFSheet srcSheet)
     {
-      MergeSheets(destSheet, newSheet, true);
+      MergeSheets(destSheet, srcSheet, true);
     }
 
     /// <param name="destSheet"> the sheet being copied/merged. </param>
     /// <param name="newSheet"> the destination sheet being copied/merged into. </param>
     /// <param name="copyStyle"> true copy the style. </param>
-    private static void MergeSheets(XSSFSheet destSheet, XSSFSheet newSheet, bool copyStyle)
+    private static void MergeSheets(XSSFSheet destSheet, XSSFSheet srcSheet, bool copyStyle)
     {
-      CopySheets(newSheet, destSheet, copyStyle);
+      CopySheets(destSheet, srcSheet, copyStyle);
     }
 
     /// <param name="newSheet"> the sheet to create from the copy. </param>
@@ -87,14 +87,17 @@ namespace api.Common.Utils
     /// <param name="copyStyle"> true copy the style. </param>
     private static void CopySheets(XSSFSheet newSheet, XSSFSheet sheet, bool copyStyle)
     {
+      Console.WriteLine($"NPOIUtils.CopySheets(XSSFSheet, XSSFSheet, bool): sheet name is {sheet.SheetName}.  Number of rows is {sheet.LastRowNum}.");
       int maxColumnNum = 0;
       IDictionary<int?, ICellStyle> styleMap = (copyStyle) ? new Dictionary<int?, ICellStyle>() : null;
       for (int i = sheet.FirstRowNum; i <= sheet.LastRowNum; i++)
       {
         IRow srcRow = sheet.GetRow(i);
         IRow destRow = newSheet.CreateRow(i);
+        Console.WriteLine($"NPOIUtils.CopySheets(XSSFSheet, XSSFSheet, bool): srcRow is {srcRow}.");
         if (srcRow != null)
         {
+          Console.WriteLine($"NPOIUtils.CopySheets(XSSFSheet, XSSFSheet, bool):  copying row {i} from {sheet.SheetName} to {newSheet.SheetName}.");
           CopyRow(sheet, newSheet, srcRow, destRow, styleMap);
           if (srcRow.LastCellNum > maxColumnNum)
           {
@@ -196,25 +199,31 @@ namespace api.Common.Utils
       switch (oldCell.CellType)
       {
         case CellType.String:
-          /* Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value is {oldCell.ToString()}."); */
+          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value is {oldCell.ToString()}.");
           newCell.SetCellValue(oldCell.ToString());
           break;
         case CellType.Numeric:
+          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value is {oldCell.NumericCellValue}.");
           newCell.SetCellValue(oldCell.NumericCellValue);
           break;
         case CellType.Blank:
+          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value is blank.");
           newCell.SetCellType(CellType.Blank);
           break;
         case CellType.Boolean:
+          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value is {oldCell.BooleanCellValue}.");
           newCell.SetCellValue(oldCell.BooleanCellValue);
           break;
         case CellType.Error:
+          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value is {oldCell.ErrorCellValue}.");
           newCell.SetCellErrorValue(oldCell.ErrorCellValue);
           break;
         case CellType.Formula:
+          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value is {oldCell.CellFormula}.");
           newCell.SetCellFormula(oldCell.CellFormula);
           break;
         default:
+          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value type could not be determined.");
           break;
       }
     }

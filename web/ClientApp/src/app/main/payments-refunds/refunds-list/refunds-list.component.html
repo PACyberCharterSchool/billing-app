@@ -1,18 +1,18 @@
-<div class='row refunds-title-row'>
-  <div class='col-md-6 create-refund-col'>
-    <div class='col-md-4'><h4>Refunds</h4></div>
-    <div class='col-md-2'>
-      <button type='button' class='btn btn-primary' (click)='createRefund()'>ADD NEW</button>
-    </div>
-  </div>
-  <div class='col-md-6 search-refund-col'>
+<div class='row refunds-title-row align-items-center'>
+  <div class='col-1'><h4>Refunds</h4></div>
+  <div class='col-11 search-refund-col'>
     <input type='text' [(ngModel)]='searchText' />
     <button type='button' class='btn btn-primary' (click)='filterRefundRecords()'>SEARCH</button>
     <button type='button' class='btn btn-outline-primary' (click)='resetRefundRecords()'>RESET</button>
   </div>
 </div>
-<div class='row refunds-list-row'>
-  <div class='col-md-12 refund-list-col'>
+<div class='row refunds-action-row align-items-center'>
+  <div class='col'>
+    <button type='button' class='btn btn-primary' (click)='createRefund()'>ADD NEW</button>
+  </div>
+</div>
+<div class='row refunds-list-row align-items-center'>
+  <div class='col-12 refund-list-col'>
     <table class='table table-fixed table-striped'>
       <thead>
         <tr>
@@ -30,8 +30,8 @@
     </table>
   </div>
 </div>
-<div class='row refunds-footer-row'>
-  <div class='col-md-12 refund-action-col'>
+<div class='row refunds-footer-row align-items-center'>
+  <div class='col-12 refund-action-col'>
     <a class='btn btn-primary' [routerLink]='["/payments-refunds", { outlets: { "action": ["home"] } }]' (click)='collapse()'>
       <span class='fa'></span> Back to Payments & Refunds
     </a>

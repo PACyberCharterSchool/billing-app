@@ -1,7 +1,5 @@
 .invoices-title-row {
-  display: flex;
-  align-items: center;
-  height: 40px;
+  height: 62px;
   padding-bottom: 5px;
 
   h4 {
@@ -9,50 +7,39 @@
   }
 
   div {
-    display: flex;
-    align-items: center;
-
     input[type='text'] {
       padding: 6px 2px;
       line-height: 14px;
       width: 70%;
     }
 
-    div.col-md-7 {
-      div.col-md-4 {
-        padding: 0;
-      }
+    input[type='text'] + button {
+      height: 2.37rem;
+      position: relative;
+      top: -2px;
+      left: -4px;
+    }
+
+    button.btn-outline-primary {
+      position: relative;
+      top: -2px;
+      left: -4px;
     }
   }
 }
 
 .invoices-action-row {
-  display: flex;
-  align-items: center;
   height: 40px;
   padding-bottom: 5px;
-
-  div.col-md-12 {
-    display: inline-flex;
-    align-items: center;
-
-    div.col-md-6 {
-      display: inline-flex;
-      align-items: center;
-
-      div.col-md-6 {
-        display: inline-flex;
-        align-items: center;
-      }
-    }
-  }
 }
 
 .invoices-list-row {
-  height: calc(100% - 120px);
+  height: calc(100% - 164px);
   padding-bottom: 5px;
 
   .invoices-list-col {
+    height: 100%;
+
     table {
       height: 100%;
 
@@ -68,10 +55,7 @@
 }
 
 .invoices-footer-row {
-  display: flex;
-  align-items: center;
-  height: 40px;
-  padding-bottom: 5px;
+  height: 62px;
 }
 
 .modal-title {
