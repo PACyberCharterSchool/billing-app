@@ -2,18 +2,16 @@
   height: 62px;
   padding-bottom: 10px;
 
-  div.col-1 {
+  div.col-2 {
     h4 {
       color: #58a917;
     }
   }
 
-  .search-refund-col {
-    height: 100%;
-
+  div.col-6 {
     input[type='text'] {
-      padding: 6px 2px;
       line-height: 14px;
+      padding: 6px 2px;
       width: 70%;
     }
 
@@ -23,23 +21,33 @@
       top: -2px;
       left: -4px;
     }
+
+    button.btn-outline-primary {
+      position: relative;
+      top: -2px;
+      left: -4px;
+    }
   }
 }
 
 .refunds-action-row {
-
+  height: 40px;
 }
 
 .refunds-list-row {
-  height: calc(100% - 80px);
+  height: calc(100% - 142px);
 
   .refund-list-col {
-    height: calc(100% - 120px);
-
     table {
       thead {
         height: 60px;
       }
+    }
+
+    p {
+      font-size: 36px;
+      color: #4d4d4d;
+      text-align: center;
     }
   }
 }

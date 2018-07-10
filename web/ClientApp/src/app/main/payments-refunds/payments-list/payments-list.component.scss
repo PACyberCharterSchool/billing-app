@@ -1,5 +1,6 @@
 .payments-title-row {
   height: 62px;
+  padding-bottom: 10px;
 
   div.col-2 {
     color: #58a917;
@@ -7,12 +8,13 @@
 
   div.col-6 {
     input[type='text'] {
-      width: 70%;
-      padding: 6px 2px;
       line-height: 14px;
+      padding: 6px 2px;
+      width: 70%;
     }
 
     input[type='text'] + button {
+      height: 2.25rem;
       position: relative;
       top: -2px;
       left: -4px;
@@ -28,8 +30,6 @@
 
 .payments-action-row {
   height: 40px;
-  .create-payment-col {
-  }
 }
 
 .payments-list-row {
@@ -52,8 +52,4 @@
 
 .payments-footer-row {
   height: 40px;
-
-  .payment-action-col {
-    margin-top: 10px;
-  }
 }
