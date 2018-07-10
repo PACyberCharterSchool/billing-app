@@ -35,7 +35,7 @@
           <div class='col-md-6 dropdown-ctrl-col'>
             <div class='col-md-11 offset-md-1'>
               <div ngbDropdown class='d-inline-block'>
-                <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='invoiceTemplateDropdown'>{{selectedInvoiceTemplate}}</button>
+                <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='invoiceTemplateDropdown'>{{selectedInvoiceTemplate.name}}</button>
                 <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='invoiceTemplateDropdown'>
                   <button type='button' class='dropdown-item' *ngFor='let t of getInvoiceTemplates()' (click)='setSelectedInvoiceTemplate(t)'>{{t.name}}</button>
                 </div>
