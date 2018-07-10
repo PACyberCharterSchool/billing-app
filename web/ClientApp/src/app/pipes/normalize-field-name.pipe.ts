@@ -190,6 +190,9 @@ export class NormalizeFieldNamePipe implements PipeTransform {
       case 'paymentType':
         fieldName = 'PMT Type';
         break;
+      case 'reportType':
+        fieldName = 'Report Type';
+        break;
       case 'dayOfWeek':
         fieldName = 'Day of Week';
         break;
