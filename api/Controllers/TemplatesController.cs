@@ -82,10 +82,9 @@ namespace api.Controllers
 				type: args.ReportType == null ? null : ReportType.FromString(args.ReportType),
 				year: args.SchoolYear
 			));
-			if (templates == null)
-				return NotFound();
 
-			templates = new List<TemplateMetadata>();
+      if (templates == null)
+        templates = new List<TemplateMetadata>();
 
 			return new ObjectResult(new TemplatesResponse
 			{
