@@ -1,29 +1,25 @@
-<div class='row digital-signatures-title-row'>
-  <div class='col-md-12'>
+<div class='row digital-signatures-title-row align-items-center'>
+  <div class='col-3'>
     <h4>Digital Signatures</h4>
   </div>
+  <div class='col-7 search-digital-signature-col'>
+    <input type='text' [(ngModel)]='searchText' />
+    <button type='button' class='btn btn-primary' (click)='filterDigitalSignatures()'>SEARCH</button>
+    <button type='button' class='btn btn-outline-primary' (click)='resetDigitalSignatures()'>RESET</button>
+  </div>
 </div>
-<div class='row digital-signatures-action-row'>
-  <div class='col-md-12'>
-    <div class='col-md-6'>
+<div class='row digital-signatures-action-row align-items-center'>
+  <div class='col-12'>
+    <div class='col-6'>
       <button class='btn btn-primary' type='button' (click)='createDigitalSignature()'>
         CREATE
       </button>
     </div>
-    <div class='col-md-6'>
-      <div class='col-md-7 offset-md-5 search-digital-signature-col'>
-        <div class='col-md-12'>
-          <input type='text' [(ngModel)]='searchText' />
-          <button type='button' class='btn btn-primary' (click)='filterDigitalSignatures()'>SEARCH</button>
-          <button type='button' class='btn btn-outline-primary' (click)='resetDigitalSignatures()'>RESET</button>
-       </div>
-      </div>
-    </div>
   </div>
 </div>
-<div class='row digital-signatures-list-row'>
-  <div class='col-md-12'>
-    <table class='table table-striped'>
+<div class='row digital-signatures-list-row align-items-center'>
+  <div class='col-12'>
+    <table class='table table-striped' *ngIf='signatures?.length > 0'>
       <thead>
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
@@ -46,6 +42,7 @@
         </tr>
       </tbody>
     </table>
+    <p *ngIf='signatures?.length == 0'>No digital signatures have been created.</p>
   </div>
 </div>
 <ng-template #deleteSignatureContent let-c="close" let-d="dismiss">

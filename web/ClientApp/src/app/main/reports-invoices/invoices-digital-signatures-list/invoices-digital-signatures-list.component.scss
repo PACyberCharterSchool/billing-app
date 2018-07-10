@@ -1,28 +1,46 @@
 .digital-signatures-title-row {
-  height: 40px;
-  
-  h4 {
-    color: #58a917;
+  height: 62px;
+
+  div.col-3 {
+    h4 {
+      color: #58a917;
+    }
+  }
+ 
+  div.col-7 {
+    input[type='text'] {
+      line-height: 14px;
+      padding: 6px 2px;
+      width: 70%;
+    }
+
+    input[type='text'] + button {
+      height: 2.25rem;
+      position: relative;
+      top: -2px;
+      left: -4px;
+    }
+
+    button.btn-outline-primary {
+      position: relative;
+      top: -2px;
+      left: -4px;
+    }
   }
 }
 
 .digital-signatures-action-row {
-  height: 60px;
+  height: 40px;
 
-  div.col-md-12 {
-    display: inline-flex;
-    align-items: center;
-
-    div.col-md-6 {
+  div.col-12 {
+    div.col-6 {
       padding: 0;
     }
   }
 }
 
 .digital-signatures-list-row {
-  height: calc(100% - 100px);
-
-  div.col-md-12 {
+  div.col-12 {
     table {
       thead {
         height: 60px;
@@ -32,5 +50,15 @@
         height: calc(100% - 60px);
       }
     }
+
+    p {
+      font-size: 36px;
+      color: #4d4d4d;
+      text-align: center;
+    }
   }
+}
+
+.digital-signatures-footer-row {
+  height: 40px;
 }
