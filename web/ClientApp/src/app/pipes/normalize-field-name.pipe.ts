@@ -179,16 +179,16 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         fieldName = 'Rate';
         break;
       case 'alternateRate':
-        fieldName = 'Alt. Rate';
+        fieldName = 'Alt Rate';
         break;
       case 'specialEducationRate':
-        fieldName = 'Sp.Ed. Rate';
+        fieldName = 'SPED Rate';
         break;
       case 'alternateSpecialEducationRate':
-        fieldName = 'Sp.Ed. Alt. Rate';
+        fieldName = 'SPED Alt Rate';
         break;
       case 'paymentType':
-        fieldName = 'Payment Type';
+        fieldName = 'PMT Type';
         break;
       case 'dayOfWeek':
         fieldName = 'Day of Week';

@@ -1,8 +1,8 @@
-<div class='row school-district-filter-row'>
-  <div class='col-md-3 create-payment-col'>
+<div class='row school-district-title-row align-items-center'>
+  <div class='col-3 create-payment-col'>
     <h3>School Districts</h3>
   </div>
-  <div class='col-md-9 search-payment-col'>
+  <div class='col-9 search-payment-col'>
     <div class='col-md-12'>
       <input type='text' [(ngModel)]='searchText' />
       <button type='button' class='btn btn-primary' (click)='filterSchoolDistrictRecords()'>SEARCH</button>
@@ -10,14 +10,14 @@
     </div>
   </div>
 </div>
-<div class='row school-district-action-row'>
-  <div class='col-md-2 offset-md-10'>
+<div class='row school-district-action-row align-items-center'>
+  <div class='col-2 offset-10'>
     <button type='button' class='btn btn-primary' (click)='importSchoolDistricts(importSchoolDistrictsContent)'>BULK IMPORT</button>
   </div>
 </div>
-<div class='row school-district-list-row'>
-  <div class='col-md-12'>
-    <table class='table table-static table-striped' infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]='false'>
+<div class='row school-district-list-row align-items-center'>
+  <div class='col-12'>
+    <table class='table table-static table-striped' infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]='false' *ngIf='schoolDistricts?.length > 0'>
       <thead>
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
@@ -32,10 +32,11 @@
         </tr>
       </tbody>
     </table>
+    <p *ngIf='schoolDistricts?.length == 0'>No school district records have been imported.</p>
   </div>
 </div>
-<div class='row'>
-  <div class='col-md-12 school-district-rates-action-col'>
+<div class='row school-district-footer-row align-items-center'>
+  <div class='col-12 school-district-rates-action-col'>
     <a class='btn btn-primary' [routerLink]='["/administration", { outlets: { "action": ["home"] } }]' (click)='collapse()'>
       <span class='fa'></span> Back to Administration
     </a>
