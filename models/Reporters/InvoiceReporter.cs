@@ -164,7 +164,7 @@ namespace models.Reporters
 					AND (
 						StudentWithdrawalDate IS NULL
 						OR (
-							StudentEnrollmentDate < StudentWithdrawalDate
+							StudentEnrollmentDate != StudentWithdrawalDate
 							AND StudentWithdrawalDate >= @{month}
 						)
 					)";
@@ -189,7 +189,14 @@ namespace models.Reporters
 
 				var year = month.Number >= 7 ? firstYear : secondYear;
 				var startDate = new DateTime(year, month.Number, 1);
-				var endDate = EndOfMonth(year, month.Number);
+
+				DateTime endDate;
+				if (new[] {7, 8}.Contains(month.Number)) {
+					endDate = EndOfMonth(year, 9);
+				}
+				else {
+					endDate = EndOfMonth(year, month.Number);
+				}
 
 				args.Add(month.Name, startDate);
 				args.Add($"End{month.Name}", endDate);
@@ -267,6 +274,10 @@ namespace models.Reporters
 			DateTime start,
 			DateTime end)
 		{
+			if (new[] {7, 8}.Contains(end.Month)) {
+				end = new DateTime(end.Year, 9, end.Day);
+			}
+
 			return _conn.Query<InvoiceStudent>($@"
 				SELECT
 					StudentPASecuredId AS PASecuredId,

@@ -83,7 +83,9 @@ namespace api.Controllers
 				year: args.SchoolYear
 			));
 			if (templates == null)
-				templates = new List<TemplateMetadata>();
+				return NotFound();
+
+			templates = new List<TemplateMetadata>();
 
 			return new ObjectResult(new TemplatesResponse
 			{

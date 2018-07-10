@@ -27,7 +27,9 @@
 .template-list-row {
   height: calc(100% - 142px);
 
-  div.col {
+  div.col-12 {
+    height: 100%;
+
     table {
       thead {
         height: 60px;
@@ -39,8 +41,9 @@
     }
 
     p {
-      font-size: 48px;
-      color: #58a917;
+      color: #4d4d4d;
+      font-size: 36px;
+      text-align: center;
     }
   }
 }
