@@ -13,12 +13,34 @@ using System.Threading.Tasks;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
+using NPOI.XSSF.UserModel.Extensions;
+using NPOI.XSSF.Model;
 using NPOI.HSSF.UserModel;
 
 namespace api.Common.Utils
 {
   public class NPOIHelper
   {
+    public static void CloneWorkbookFormatInfo(IWorkbook destWorkbook, IWorkbook srcWorkbook)
+    {
+      // you have to clone many of the items associated with formatting at the workbook level in
+      // order to have resource for the cell styles, etc.
+      StylesTable srcStyles = ((XSSFWorkbook)srcWorkbook).GetStylesSource();
+      StylesTable destStyles = ((XSSFWorkbook)destWorkbook).GetStylesSource();
+      
+      foreach (var font in srcStyles.GetFonts()) {
+        destStyles.PutFont(font, true);
+      }
+
+      foreach (var fill in srcStyles.GetFills()) {
+        /* destStyles.PutFill(new XSSFCellFill(fill.GetCTFill())); */
+      }
+
+      foreach (var border in srcStyles.GetBorders()) {
+        destStyles.PutBorder(new XSSFCellBorder(border.GetCTBorder()));
+      }
+    }
+
     /// <param name="dt">the C# DataTable to build the workbook from</param>
     public static XSSFWorkbook BuildExcelWorkbookFromDataTable(DataTable dt, List<string> headers, string sheetName)
     {
@@ -72,7 +94,36 @@ namespace api.Common.Utils
     /// <param name="copyStyle"> true copy the style. </param>
     private static void MergeSheets(XSSFSheet destSheet, XSSFSheet srcSheet, bool copyStyle)
     {
-      CopySheets(destSheet, srcSheet, copyStyle);
+      AppendSheet(destSheet, srcSheet, copyStyle);
+    }
+
+    /// <param name="destSheet"> the sheet being copied/merged. </param>
+    /// <param name="newSheet"> the destination sheet being copied/merged into. </param>
+    /// <param name="copyStyle"> true copy the style. </param>
+    private static void AppendSheet(XSSFSheet destSheet, XSSFSheet srcSheet, bool copyStyle)
+    {
+      int maxColumnNum = 0;
+      IDictionary<int?, ICellStyle> styleMap = copyStyle ? new Dictionary<int?, ICellStyle>() : null;
+
+      int numRowsSrcSheet = GetLastRowWithData(srcSheet); 
+      Console.WriteLine($"NPOIHelper.AppendSheet():  destination sheet {destSheet.SheetName} has {numRowsSrcSheet} rows.");
+      for (int i = srcSheet.FirstRowNum, j = destSheet.LastRowNum; i <= numRowsSrcSheet; i++, j++) {
+        IRow srcRow = srcSheet.GetRow(i);
+        IRow destRow = destSheet.CreateRow(j);
+
+        Console.WriteLine($"NPOIHelper.AppendSheet():  copying row {i} of sheet {srcSheet.SheetName}.");
+        if (srcRow != null) {
+          CopyRow(srcSheet, destSheet, srcRow, destRow, styleMap);
+          if (srcRow.LastCellNum > maxColumnNum) {
+            maxColumnNum = srcRow.LastCellNum;
+          }
+        }
+      }
+
+      for (int i = 0; i <= maxColumnNum; i++)
+      {
+        destSheet.SetColumnWidth(i, srcSheet.GetColumnWidth(i));
+      }
     }
 
     /// <param name="newSheet"> the sheet to create from the copy. </param>
@@ -87,17 +138,14 @@ namespace api.Common.Utils
     /// <param name="copyStyle"> true copy the style. </param>
     private static void CopySheets(XSSFSheet newSheet, XSSFSheet sheet, bool copyStyle)
     {
-      Console.WriteLine($"NPOIUtils.CopySheets(XSSFSheet, XSSFSheet, bool): sheet name is {sheet.SheetName}.  Number of rows is {sheet.LastRowNum}.");
       int maxColumnNum = 0;
       IDictionary<int?, ICellStyle> styleMap = (copyStyle) ? new Dictionary<int?, ICellStyle>() : null;
       for (int i = sheet.FirstRowNum; i <= sheet.LastRowNum; i++)
       {
         IRow srcRow = sheet.GetRow(i);
         IRow destRow = newSheet.CreateRow(i);
-        Console.WriteLine($"NPOIUtils.CopySheets(XSSFSheet, XSSFSheet, bool): srcRow is {srcRow}.");
         if (srcRow != null)
         {
-          Console.WriteLine($"NPOIUtils.CopySheets(XSSFSheet, XSSFSheet, bool):  copying row {i} from {sheet.SheetName} to {newSheet.SheetName}.");
           CopyRow(sheet, newSheet, srcRow, destRow, styleMap);
           if (srcRow.LastCellNum > maxColumnNum)
           {
@@ -126,11 +174,8 @@ namespace api.Common.Utils
       // reckoning delta rows
       int deltaRows = destRow.RowNum - srcRow.RowNum;
       // pour chaque row
-      int j = srcRow.FirstCellNum;
-      if (j < 0)
-      {
-        j = 0;
-      }
+      int j = srcRow.FirstCellNum < 0 ? 0 : srcRow.FirstCellNum;
+      
       for (; j <= srcRow.LastCellNum; j++)
       {
         ICell oldCell = srcRow.GetCell(j); // ancienne cell
@@ -162,7 +207,7 @@ namespace api.Common.Utils
         }
       }
     }
- 
+
     /// <param name="oldCell"> </param>
     /// <param name="newCell"> </param>
     /// <param name="styleMap"> </param>
@@ -177,7 +222,7 @@ namespace api.Common.Utils
         else
         {
           int stHashCode = oldCell.CellStyle.GetHashCode();
-          ICellStyle newCellStyle; // = styleMap.ContainsKey(stHashCode) ? styleMap[stHashCode] : null;
+          ICellStyle newCellStyle;
           if (!styleMap.ContainsKey(stHashCode))
           {
             newCellStyle = newCell.Sheet.Workbook.CreateCellStyle();
@@ -185,8 +230,13 @@ namespace api.Common.Utils
             newCellStyle.VerticalAlignment = oldCell.CellStyle.VerticalAlignment;
             newCellStyle.WrapText = oldCell.CellStyle.WrapText;
             newCellStyle.DataFormat = oldCell.CellStyle.DataFormat;
-            //newCellStyle.CloneStyleFrom(oldCell.CellStyle);
+            newCellStyle.CloneStyleFrom(oldCell.CellStyle);
+            newCellStyle.SetFont(oldCell.CellStyle.GetFont(oldCell.Sheet.Workbook));
+            newCellStyle.FillForegroundColor = oldCell.CellStyle.FillForegroundColor;
+            newCellStyle.FillBackgroundColor = oldCell.CellStyle.FillBackgroundColor;
             styleMap.Add(stHashCode, newCellStyle);
+
+            Console.WriteLine($"Adding cell style to styleMap.  Hash is {stHashCode}, CellStyle is {newCellStyle}.");
           }
           else
           {
@@ -199,35 +249,105 @@ namespace api.Common.Utils
       switch (oldCell.CellType)
       {
         case CellType.String:
-          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value is {oldCell.ToString()}.");
           newCell.SetCellValue(oldCell.ToString());
           break;
         case CellType.Numeric:
-          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value is {oldCell.NumericCellValue}.");
           newCell.SetCellValue(oldCell.NumericCellValue);
           break;
         case CellType.Blank:
-          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value is blank.");
           newCell.SetCellType(CellType.Blank);
           break;
         case CellType.Boolean:
-          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value is {oldCell.BooleanCellValue}.");
           newCell.SetCellValue(oldCell.BooleanCellValue);
           break;
         case CellType.Error:
-          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value is {oldCell.ErrorCellValue}.");
           newCell.SetCellErrorValue(oldCell.ErrorCellValue);
           break;
         case CellType.Formula:
-          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value is {oldCell.CellFormula}.");
           newCell.SetCellFormula(oldCell.CellFormula);
           break;
         default:
-          Console.WriteLine($"NPOIHelper.CopyCell():  oldCell value type could not be determined.");
           break;
       }
     }
- 
+
+    /// <summary>
+    /// Get the index value of the last row with actual data in it from the specified sheet.
+    /// </summary>
+    /// <param name="sheet"> the sheet containing the data. </param>
+    /// <returns> index of the last row with actual data in it.</returns>
+    private static int GetLastRowWithData(ISheet sheet)
+    {
+      IFormulaEvaluator evaluator = sheet.Workbook.GetCreationHelper().CreateFormulaEvaluator();
+      DataFormatter formatter = new DataFormatter( true );
+
+      int lastRowIndex = -1;
+      if( sheet.PhysicalNumberOfRows > 0 )
+      {
+          // getLastRowNum() actually returns an index, not a row number
+          lastRowIndex = sheet.LastRowNum;
+
+          // now, start at end of spreadsheet and work our way backwards until we find a row having data
+          for( ; lastRowIndex >= 0; lastRowIndex-- )
+          {
+              IRow row = sheet.GetRow( lastRowIndex );
+              if( !IsRowEmpty( row, evaluator, formatter ) )
+              {
+                  break;
+              }
+          }
+      }
+      return lastRowIndex;
+    }
+
+    /// <summary>
+    /// Get the index value of the last row with actual data in it from the specified sheet.
+    /// </summary>
+    /// <param name="sheet"> the sheet containing the data. </param>
+    /// <returns> bool indicating whether it contains any actual data in it.</returns>
+    private static bool IsRowEmpty(IRow row, IFormulaEvaluator evaluator, DataFormatter formatter)
+    {
+      if( row == null ) {
+        return true;
+      }
+
+      int cellCount = row.LastCellNum + 1;
+      for( int i = 0; i < cellCount; i++ ){
+        string cellValue = GetCellValue(row, i, evaluator, formatter);
+        if (cellValue != null && cellValue.Length > 0) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    /// <summary>
+    /// Get the formatted value of the specified cell.
+    /// </summary>
+    /// <param name="row"> the row containing the relevant cell.</param>
+    /// <param name="columnIndex"> the index value for the cell in the row.</param>
+    private static string GetCellValue(IRow row, int columnIndex, IFormulaEvaluator evaluator, DataFormatter formatter)
+    {
+      string cellValue;
+      ICell cell = row.GetCell( columnIndex );
+
+      if( cell == null ){
+        // no data in this cell
+        cellValue = null;
+      }
+      else{
+        if( cell.CellType != CellType.Formula){
+            // cell has a value, so format it into a string
+            cellValue = formatter.FormatCellValue( cell );
+        }
+        else {
+            // cell has a formula, so evaluate it
+            cellValue = formatter.FormatCellValue( cell, evaluator );
+        }
+      }
+      return cellValue;
+    }
+
     /// <summary>
     /// Récupère les informations de fusion des cellules dans la sheet source pour les appliquer
     /// à la sheet destination...

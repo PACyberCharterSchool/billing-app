@@ -60,11 +60,10 @@ export class AdministrationPaymentRateListComponent implements OnInit {
         const re = new RegExp(this.searchText, 'gi');
         if (i &&
           i.aun.toString().search(re) !== -1 ||
-          i.name.search(re) !== -1 ||
-          i.paymentType.search(re) !== -1 ||
-          i.rate.toString().search(re) !== -1 ||
-          (i.alternateRate && i.alternateRate.toString().search(re) !== -1)
-        ) {
+          (i.name && i.name.search(re) !== -1) ||
+          (i.paymentType && i.paymentType.search(re) !== -1) ||
+          (i.rate && i.rate.toString().search(re) !== -1) ||
+          (i.alternateRate && i.alternateRate && i.alternateRate.toString().search(re) !== -1)) {
           return true;
         }
         return false;

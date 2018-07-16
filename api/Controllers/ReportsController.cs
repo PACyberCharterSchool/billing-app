@@ -373,16 +373,6 @@ namespace api.Controllers
       return headers;
     }
 
-		private void MergeInvoiceActivityData(XSSFSheet sheet, XSSFWorkbook wb, int idx)
-		{
-      if (wb != null) {
-        if (sheet != null) {
-          XSSFSheet destSheet = (XSSFSheet)wb.CreateSheet(sheet.SheetName);
-          NPOIHelper.CopySheets(destSheet, sheet);
-        }
-      }
-		}
-
 		private bool IsActivityWorksheet(XSSFSheet sheet)
 		{
 			if (sheet != null) {
@@ -727,20 +717,21 @@ namespace api.Controllers
 			public bool? Approved { get; set; }
 		}
 
-    private byte[] CreateMergedInvoicesWorkbook(IEnumerable<Report> reports)
+    private byte[] CreateMergedInvoicesWorkbook(IEnumerable<Report> reports, string academicYear)
     {
       XSSFWorkbook wb = new XSSFWorkbook();
-      wb.CreateSheet();
+      wb.CreateSheet($"Bulk Invoices - {academicYear}");
       foreach (var report in reports)
       {
         // all data for the bulk invoice spreadsheet are on a single worksheet
-        MemoryStream ms = new MemoryStream(report.Xlsx);
         XSSFWorkbook wb1 = new XSSFWorkbook(new MemoryStream(report.Xlsx));
+        // Clone all of the formatting artifacts.
+        NPOIHelper.CloneWorkbookFormatInfo(wb, wb1);
         for (int i = 0; i < wb1.NumberOfSheets; i++) {
-          if (IsActivityWorksheet((XSSFSheet)wb1.GetSheetAt(i))) {
-            _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  processing invoice {report.Name}.");
-            NPOIHelper.MergeSheets((XSSFSheet)wb.GetSheetAt(0), (XSSFSheet)wb1.GetSheetAt(i));
-          }
+          _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  processing invoice {report.Name}.");
+          _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  this workbook has {wb1.NumCellStyles} cell styles.");
+          _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  sheet name is {((XSSFSheet)wb1.GetSheetAt(i)).SheetName}.");
+          NPOIHelper.MergeSheets((XSSFSheet)wb.GetSheetAt(0), (XSSFSheet)wb1.GetSheetAt(i));
         }
       }
 
@@ -775,7 +766,7 @@ namespace api.Controllers
 			if (reports == null)
 				return NoContent();
 
-      byte[] invoice = CreateMergedInvoicesWorkbook(reports);
+      byte[] invoice = CreateMergedInvoicesWorkbook(reports, args.SchoolYear);
       _logger.LogInformation($"ReportsController.GetBulkInvoice():  length of bulk invoice is {invoice.Length}.");
       var stream = new MemoryStream(invoice);
       
