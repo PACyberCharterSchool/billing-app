@@ -24,7 +24,7 @@ namespace api.Common.Utils
     public static void CloneWorkbookFormatInfo(IWorkbook destWorkbook, IWorkbook srcWorkbook)
     {
       // you have to clone many of the items associated with formatting at the workbook level in
-      // order to have resource for the cell styles, etc.
+      // order to have the resource avaliable for the cell styles, etc.
       StylesTable srcStyles = ((XSSFWorkbook)srcWorkbook).GetStylesSource();
       StylesTable destStyles = ((XSSFWorkbook)destWorkbook).GetStylesSource();
       
@@ -33,7 +33,32 @@ namespace api.Common.Utils
       }
 
       foreach (var fill in srcStyles.GetFills()) {
-        /* destStyles.PutFill(new XSSFCellFill(fill.GetCTFill())); */
+        XSSFCellFill newFill = new XSSFCellFill();
+        XSSFColor foregroundColor = fill.GetFillForegroundColor();
+        XSSFColor backgroundColor = fill.GetFillBackgroundColor();
+
+        if (newFill != null) {
+          if (foregroundColor != null) {
+            Console.WriteLine($"creating fill.  foregroundColor is {foregroundColor}.");
+            newFill.SetFillForegroundColor(foregroundColor);
+          }
+          else {
+            Console.WriteLine($"Whoops!  foregroundColor is {foregroundColor}.");
+          }
+
+          if (backgroundColor != null) {
+            Console.WriteLine($"creating fill.  backgroundColor is {backgroundColor}.");
+            newFill.SetFillBackgroundColor(backgroundColor);
+          }
+          else {
+            Console.WriteLine($"Whoops!  backgroundColor is {backgroundColor}.");
+          }
+
+          destStyles.PutFill(newFill);
+        }
+        else {
+          Console.WriteLine($"Whoops! newFill was not created!");
+        }
       }
 
       foreach (var border in srcStyles.GetBorders()) {
@@ -123,6 +148,18 @@ namespace api.Common.Utils
       for (int i = 0; i <= maxColumnNum; i++)
       {
         destSheet.SetColumnWidth(i, srcSheet.GetColumnWidth(i));
+      }
+    }
+
+    /// <param name="wb"> the workbook to append the rows onto </param>
+    /// <returns> void </returns>
+    public static void AddBreakRows(XSSFSheet sheet, int numTotalRows, int numRowsToAdd, int lastCellNum)
+    {
+      for (int i = 0; i < numRowsToAdd; i++) {
+        IRow row = sheet.CreateRow(numTotalRows + i);
+        for (int j = 0; j < lastCellNum; j++) {
+          row.CreateCell(j);
+        }
       }
     }
 

@@ -717,22 +717,29 @@ namespace api.Controllers
 			public bool? Approved { get; set; }
 		}
 
-    private byte[] CreateMergedInvoicesWorkbook(IEnumerable<Report> reports, string academicYear)
+    private byte[] CreateMergedInvoicesWorkbook(IList<Report> reports, string academicYear)
     {
       XSSFWorkbook wb = new XSSFWorkbook();
       wb.CreateSheet($"Bulk Invoices - {academicYear}");
-      foreach (var report in reports)
+      for (int i = 0; i < reports.Count; i++)
       {
+        var report = reports[i];
+
         // all data for the bulk invoice spreadsheet are on a single worksheet
         XSSFWorkbook wb1 = new XSSFWorkbook(new MemoryStream(report.Xlsx));
-        // Clone all of the formatting artifacts.
-        NPOIHelper.CloneWorkbookFormatInfo(wb, wb1);
-        for (int i = 0; i < wb1.NumberOfSheets; i++) {
+
+        if (i == 0) {
+          NPOIHelper.CloneWorkbookFormatInfo(wb, wb1);
+        }
+
+        for (int j = 0; j < wb1.NumberOfSheets; j++) {
           _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  processing invoice {report.Name}.");
           _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  this workbook has {wb1.NumCellStyles} cell styles.");
-          _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  sheet name is {((XSSFSheet)wb1.GetSheetAt(i)).SheetName}.");
-          NPOIHelper.MergeSheets((XSSFSheet)wb.GetSheetAt(0), (XSSFSheet)wb1.GetSheetAt(i));
+          _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  sheet name is {((XSSFSheet)wb1.GetSheetAt(j)).SheetName}.");
+          NPOIHelper.MergeSheets((XSSFSheet)wb.GetSheetAt(0), (XSSFSheet)wb1.GetSheetAt(j));
         }
+
+        NPOIHelper.AddBreakRows((XSSFSheet)wb.GetSheetAt(0), wb.GetSheetAt(0).LastRowNum, 2, wb1.GetSheetAt(0).GetRow(0).LastCellNum);
       }
 
       var data = new MemoryStream();
@@ -766,7 +773,7 @@ namespace api.Controllers
 			if (reports == null)
 				return NoContent();
 
-      byte[] invoice = CreateMergedInvoicesWorkbook(reports, args.SchoolYear);
+      byte[] invoice = CreateMergedInvoicesWorkbook(reports.ToList(), args.SchoolYear);
       _logger.LogInformation($"ReportsController.GetBulkInvoice():  length of bulk invoice is {invoice.Length}.");
       var stream = new MemoryStream(invoice);
       
