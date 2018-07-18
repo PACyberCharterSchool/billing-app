@@ -51,7 +51,7 @@
       </button>
     </div>
     <div class='modal-body'>
-      <form #selectSchoolDistrictsForm (ngSubmit)='doImport()'>
+      <form #selectSchoolDistrictsForm (ngSubmit)='c("Import clicked."); doImport()'>
         <div class='form-group col-md-12'>
           <div class='col-md-6'>
             <label>Select school district data file:</label>

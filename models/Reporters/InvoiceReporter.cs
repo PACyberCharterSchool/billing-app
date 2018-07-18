@@ -167,6 +167,20 @@ namespace models.Reporters
 							StudentEnrollmentDate != StudentWithdrawalDate
 							AND StudentWithdrawalDate >= @{month}
 						)
+            OR (
+              StudentCurrentIep IS NOT NULL
+              AND
+              DATEPART(month, StudentCurrentIep) = DATEPART(month, StudentEnrollmentDate)
+              AND
+              DATEPART(day, StudentCurrentIep) = DATEPART(day, StudentEnrollmentDate)
+            )
+            OR (
+              StudentIsSpecialEducation = 0
+              AND
+              (
+                  DATEPART(month, StudentEnrollmentDate) = DATEPART(month, StudentWithdrawalDate)
+              )
+            )
 					)";
 
 			var sb = new StringBuilder();
@@ -191,7 +205,7 @@ namespace models.Reporters
 				var startDate = new DateTime(year, month.Number, 1);
 
 				DateTime endDate;
-				if (new[] {7, 8}.Contains(month.Number)) {
+				if (new[] {7, 8, 9}.Contains(month.Number)) {
 					endDate = EndOfMonth(year, 9);
 				}
 				else {
@@ -330,7 +344,7 @@ namespace models.Reporters
 			DateTime start,
 			DateTime end)
 		{
-			if (new[] {7, 8}.Contains(end.Month)) {
+			if (new[] {7, 8, 9}.Contains(end.Month)) {
 				end = new DateTime(end.Year, 9, end.Day);
 			}
 
@@ -364,15 +378,15 @@ namespace models.Reporters
           OR (
               StudentCurrentIep IS NOT NULL
               AND
-              datepart(month, StudentCurrentIep) = datepart(month, StudentEnrollmentDate)
+              DATEPART(month, StudentCurrentIep) = DATEPART(month, StudentEnrollmentDate)
               AND
-              datepart(day, StudentCurrentIep) = datepart(day, StudentEnrollmentDate)
+              DATEPART(day, StudentCurrentIep) = DATEPART(day, StudentEnrollmentDate)
           )
           OR (
               StudentIsSpecialEducation = 0
               AND
               (
-                  datepart(month, StudentEnrollmentDate) = datepart(month, StudentWithdrawalDate)
+                  DATEPART(month, StudentEnrollmentDate) = DATEPART(month, StudentWithdrawalDate)
               )
           )
 				)
