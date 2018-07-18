@@ -69,6 +69,7 @@ export class PaymentsListComponent implements OnInit {
         if (
           i.externalId.toString().search(re) !== -1 ||
           i.schoolDistrict.aun.toString().search(re) !== -1 ||
+          i.schoolDistrict.name.search(re) !== -1 ||
           i.type.search(re) !== -1 ||
           i.paymentId.search(re) !== -1
         ) {
@@ -82,6 +83,7 @@ export class PaymentsListComponent implements OnInit {
 
   resetPaymentRecords() {
     this.payments = this.allPayments;
+    this.searchText = '';
   }
 
   refreshPaymentList() {

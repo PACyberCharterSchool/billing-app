@@ -36,9 +36,15 @@
   height: calc(100% - 142px);
 
   .payment-list-col {
+    height: 100%;
+
     table {
       thead {
-        height: 95px;
+        height: 130px;
+      }
+
+      tbody {
+        height: calc(100% - 130px);
       }
     }
 
