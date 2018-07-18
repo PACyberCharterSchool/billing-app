@@ -269,6 +269,62 @@ namespace models.Reporters
 			return transactions;
 		}
 
+    private InvoiceStudent GetStudentInvoiceEntryWithLatestWithdrawalDate(List<InvoiceStudent> list, ulong studentID)
+    {
+      int index = list.FindIndex(i => i.LastDay == null);
+
+      if (index >= 0) {
+        return list[index];
+      }
+
+      List<InvoiceStudent> sorted = list.OrderBy(i => i.LastDay.Value).ToList();
+
+      return list[list.Count - 1];
+    }
+
+    private IList<InvoiceStudent> FilterByActivityDatesAndEnrollmentStatus(IList<InvoiceStudent>studentList)
+    {
+      List<InvoiceStudent> newList = new List<InvoiceStudent>();
+
+      // if the list of students are all unique, then we don't need to do the filter
+      if (!studentList.GroupBy(i => i.PASecuredID).Any(c => c.Count() > 1)) {
+        return studentList;
+      }
+
+      foreach (var invoiceStudent in studentList) {
+        IList<InvoiceStudent> subList = studentList.Where(s => s.PASecuredID == invoiceStudent.PASecuredID).ToList();
+        if (subList.Count > 1) {
+          // check whether student is special education and whether the month value for enrollment and withdrawal are
+          // the same
+          IList<InvoiceStudent> subSubList = subList.Where(s => {
+            if (!s.LastDay.HasValue) {
+              return true;
+            }
+
+            // you can't dereference anything from a nullable variable type...
+            DateTime d = s.LastDay ?? DateTime.Now;
+            if (s.IsSpecialEducation == invoiceStudent.IsSpecialEducation && s.FirstDay.Month == d.Month) {
+              return true;
+            }
+            return false;
+          }).ToList();
+
+          if (subSubList.Count == subList.Count) {
+            int index = newList.FindIndex(i => i.PASecuredID == invoiceStudent.PASecuredID);
+            if (index < 0 && invoiceStudent.PASecuredID.HasValue) {
+              newList.Add(GetStudentInvoiceEntryWithLatestWithdrawalDate(subSubList.ToList(), invoiceStudent.PASecuredID.Value));
+            }
+          }
+        }
+        else {
+          newList.Add(invoiceStudent);
+          continue;
+        }
+      }
+
+      return newList;
+    }
+
 		private IList<InvoiceStudent> GetStudents(
 			int aun,
 			DateTime start,
@@ -278,7 +334,7 @@ namespace models.Reporters
 				end = new DateTime(end.Year, 9, end.Day);
 			}
 
-			return _conn.Query<InvoiceStudent>($@"
+      IList<InvoiceStudent> studentList = _conn.Query<InvoiceStudent>($@"
 				SELECT
 					StudentPASecuredId AS PASecuredId,
 					StudentFirstName AS FirstName,
@@ -305,6 +361,20 @@ namespace models.Reporters
 						StudentWithdrawalDate > StudentEnrollmentDate
 						AND StudentWithdrawalDate >= @Start
 					)
+          OR (
+              StudentCurrentIep IS NOT NULL
+              AND
+              datepart(month, StudentCurrentIep) = datepart(month, StudentEnrollmentDate)
+              AND
+              datepart(day, StudentCurrentIep) = datepart(day, StudentEnrollmentDate)
+          )
+          OR (
+              StudentIsSpecialEducation = 0
+              AND
+              (
+                  datepart(month, StudentEnrollmentDate) = datepart(month, StudentWithdrawalDate)
+              )
+          )
 				)
 				ORDER BY StudentLastName, StudentFirstName, StudentMiddleInitial",
 				new
@@ -313,6 +383,9 @@ namespace models.Reporters
 					Start = start,
 					End = end,
 				}).ToList();
+
+			/* return FilterByActivityDatesAndEnrollmentStatus(studentList); */
+      return studentList;
 		}
 
 		public class Config

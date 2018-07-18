@@ -734,7 +734,6 @@ namespace api.Controllers
 
         for (int j = 0; j < wb1.NumberOfSheets; j++) {
           _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  processing invoice {report.Name}.");
-          _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  this workbook has {wb1.NumCellStyles} cell styles.");
           _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  sheet name is {((XSSFSheet)wb1.GetSheetAt(j)).SheetName}.");
           NPOIHelper.MergeSheets((XSSFSheet)wb.GetSheetAt(0), (XSSFSheet)wb1.GetSheetAt(j));
         }
