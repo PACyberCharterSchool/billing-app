@@ -251,7 +251,7 @@ appsettings.Development.json
 tags
 
 # Test data
-api.Tests/TestData/
+# api.Tests/TestData/
 
 # import application data
 import/*.csv
