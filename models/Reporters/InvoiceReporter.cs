@@ -167,20 +167,6 @@ namespace models.Reporters
 							StudentEnrollmentDate != StudentWithdrawalDate
 							AND StudentWithdrawalDate >= @{month}
 						)
-            OR (
-              StudentCurrentIep IS NOT NULL
-              AND
-              DATEPART(month, StudentCurrentIep) = DATEPART(month, StudentEnrollmentDate)
-              AND
-              DATEPART(day, StudentCurrentIep) = DATEPART(day, StudentEnrollmentDate)
-            )
-            OR (
-              StudentIsSpecialEducation = 0
-              AND
-              (
-                  DATEPART(month, StudentEnrollmentDate) = DATEPART(month, StudentWithdrawalDate)
-              )
-            )
 					)";
 
 			var sb = new StringBuilder();
@@ -296,8 +282,83 @@ namespace models.Reporters
       return list[list.Count - 1];
     }
 
+		private IList<InvoiceStudent> FilterForAdditionalTraits(IList<InvoiceStudent>studentList)
+		{
+			List<InvoiceStudent> newList = new List<InvoiceStudent>();
+
+			// when a student record has an enrollment date that matches the withdrawal date, and
+			// the IEP enrollment month and day match the month and day of the enrollment and
+			// withdrawal dates, the record should be counted.
+			newList = studentList.Where(s => {
+				if (s.FirstDay == s.LastDay) {
+					if (s.CurrentIep.Value.Month == s.FirstDay.Month &&
+						s.CurrentIep.Value.Month == s.LastDay.Value.Month &&
+						s.CurrentIep.Value.Day == s.FirstDay.Day &&
+						s.CurrentIep.Value.Day == s.LastDay.Value.Day) {
+						return true;
+					}
+					else {
+						return false;
+					}
+				}
+
+				return true;
+			}).ToList();
+
+			newList = FilterByActivityDatesAndSPEDStatus(newList).ToList();
+
+			// newList = FilterByActivityDatesAndEnrollmentStatus(newList).ToList();
+
+			return newList;	
+		}
+
+		private IList<InvoiceStudent> FilterByActivityDatesAndSPEDStatus(IList<InvoiceStudent>list)
+		{
+			// when a student has multiple record entries, and the records have enrollment
+			// dates or withdrawal dates in the same month, only count the record if the SPED
+			// column has the value of "NO"
+
+			List<InvoiceStudent> newList = new List<InvoiceStudent>();
+
+      // if the list of students are all unique, then we don't need to do the filter
+      if (!list.GroupBy(i => i.PASecuredID).Any(c => c.Count() > 1)) {
+        return list;
+      }
+
+			var result = list.GroupBy(i => i.PASecuredID);
+			foreach (var group in result) {
+				if (group.Count() > 1) {
+					IEnumerable<InvoiceStudent> results = group.Where(i => {
+						if (i.LastDay.HasValue) {
+							if (i.FirstDay.Month == i.LastDay.Value.Month && i.IsSpecialEducation == false) {
+								return true;
+							}
+						}
+						else {
+							return true;
+						}
+						return false;
+					});
+
+					foreach (var i in results) {
+						newList.Add(i);
+					}
+				}
+				else {
+					// there's only one record for this given student with the relevant PASecuredID.  just pass it through.
+					newList.Add(group.First());
+				}
+			}
+
+			return newList;
+		}
+
     private IList<InvoiceStudent> FilterByActivityDatesAndEnrollmentStatus(IList<InvoiceStudent>studentList)
     {
+			// when a student has multiple record entries, and the enrollment and withdrawal
+			// dates are in the same month, and the SPED values of the records are the same
+			// value (i.e. both "YES" or both "NO"), then those records should only be counted as 1 
+
       List<InvoiceStudent> newList = new List<InvoiceStudent>();
 
       // if the list of students are all unique, then we don't need to do the filter
@@ -316,8 +377,8 @@ namespace models.Reporters
             }
 
             // you can't dereference anything from a nullable variable type...
-            DateTime d = s.LastDay ?? DateTime.Now;
-            if (s.IsSpecialEducation == invoiceStudent.IsSpecialEducation && s.FirstDay.Month == d.Month) {
+            /* DateTime d = s.LastDay ?? DateTime.Now; */
+            if (s.IsSpecialEducation == invoiceStudent.IsSpecialEducation && s.FirstDay.Month == s.LastDay.Value.Month) {
               return true;
             }
             return false;
@@ -372,23 +433,9 @@ namespace models.Reporters
 				AND (
 					StudentWithdrawalDate IS NULL
 					OR (
-						StudentWithdrawalDate > StudentEnrollmentDate
-						AND StudentWithdrawalDate >= @Start
+						StudentWithdrawaldate >= @Start
+						AND StudentWithdrawalDate >= StudentEnrollmentDate
 					)
-          OR (
-              StudentCurrentIep IS NOT NULL
-              AND
-              DATEPART(month, StudentCurrentIep) = DATEPART(month, StudentEnrollmentDate)
-              AND
-              DATEPART(day, StudentCurrentIep) = DATEPART(day, StudentEnrollmentDate)
-          )
-          OR (
-              StudentIsSpecialEducation = 0
-              AND
-              (
-                  DATEPART(month, StudentEnrollmentDate) = DATEPART(month, StudentWithdrawalDate)
-              )
-          )
 				)
 				ORDER BY StudentLastName, StudentFirstName, StudentMiddleInitial",
 				new
@@ -398,7 +445,7 @@ namespace models.Reporters
 					End = end,
 				}).ToList();
 
-			/* return FilterByActivityDatesAndEnrollmentStatus(studentList); */
+			// return FilterForAdditionalTraits(studentList);
       return studentList;
 		}
 
