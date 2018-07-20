@@ -164,11 +164,11 @@ namespace api.Tests.Controllers
 				},
 				RegularEnrollments = new InvoiceEnrollments
 				{
-					July = 3,
+					// July = 3,
 				},
 				SpecialEnrollments = new InvoiceEnrollments
 				{
-					July = 3,
+					// July = 3,
 				},
 				Transactions = new InvoiceTransactions
 				{
