@@ -81,7 +81,7 @@ export class PaymentUpsertFormComponent implements OnInit {
     this.selectedAcademicYear = this.paymentRecord.schoolYear;
     this.selectedAcademicYearSplit = this.paymentRecord.schoolYearSplit;
     this.paymentTypeId = this.paymentRecord.paymentId;
-    this.paymentTypeModel = this.paymentType === 'Check' ? { 'check': true, 'unipay': false } : { 'check': false, 'unipay': true };
+    this.paymentTypeModel = this.paymentType === 'SD' ? { 'check': true, 'unipay': false } : { 'check': false, 'unipay': true };
     this.isSplit = this.paymentRecord.split === 2 ? true : false ;
   }
 

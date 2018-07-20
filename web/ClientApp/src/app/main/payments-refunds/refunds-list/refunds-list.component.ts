@@ -47,7 +47,7 @@ export class RefundsListComponent implements OnInit {
     this.refundsService.getRefunds(this.skip).subscribe(
       data => {
         this.allRefunds = this.refunds = data['refunds'];
-        console.log('RefundsListComponent.ngOnInit(): mocked data is ', this.allRefunds);
+        console.log('RefundsListComponent.ngOnInit(): data is ', this.allRefunds);
       },
       error => {
         console.log('RefundsListComponent.ngOnInit(): error is ', error);

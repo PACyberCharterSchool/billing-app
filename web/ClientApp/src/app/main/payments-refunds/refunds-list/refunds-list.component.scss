@@ -38,9 +38,14 @@
   height: calc(100% - 142px);
 
   .refund-list-col {
+    height: 100%;
+
     table {
       thead {
-        height: 60px;
+        height: 85px;
+      }
+      tbody: {
+        height: calc(100% - 85px);
       }
     }
 

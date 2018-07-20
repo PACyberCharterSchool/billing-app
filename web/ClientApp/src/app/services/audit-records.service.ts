@@ -42,8 +42,8 @@ let auditRecords: AuditRecord[] = [
     activity: 'Template Invoice Change',
     type: AuditRecordType.InvoiceTemplates,
     timestamp: new Date('Thu May 24 13:31:28 EDT 2018'),
-    oldValue: 'Individual UniPay 2017-2018',
-    newValue: 'Individual UniPay 2018-2019'
+    oldValue: 'Individual PDE 2017-2018',
+    newValue: 'Individual PDE 2018-2019'
   },
   {
     id: 5,

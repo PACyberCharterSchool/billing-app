@@ -18,21 +18,7 @@ namespace models.Reporters
 		public decimal SpecialRate { get; set; }
 	}
 
-	public class InvoiceEnrollments
-	{
-		public int July { get; set; }
-		public int August { get; set; }
-		public int September { get; set; }
-		public int October { get; set; }
-		public int November { get; set; }
-		public int December { get; set; }
-		public int January { get; set; }
-		public int February { get; set; }
-		public int March { get; set; }
-		public int April { get; set; }
-		public int May { get; set; }
-		public int June { get; set; }
-	}
+	public class InvoiceEnrollments : Dictionary<string, int> {}
 
 	public class InvoicePayment
 	{
@@ -148,63 +134,55 @@ namespace models.Reporters
 		private static DateTime EndOfMonth(int year, int month) =>
 			new DateTime(year, month, DateTime.DaysInMonth(year, month));
 
-		private InvoiceEnrollments GetEnrollments(
-			DateTime asOf,
-			int aun,
+		private (InvoiceEnrollments regular, InvoiceEnrollments special) GetEnrollments(
+			IList<InvoiceStudent> students,
 			int firstYear,
-			int secondYear,
-			bool isSpecial)
+			int secondYear)
 		{
-			string EnrollmentCount(string month) =>
-				$@"SELECT COUNT(*)
-					FROM CommittedStudentStatusRecords
-					WHERE SchoolDistrictId = @Aun
-					AND StudentIsSpecialEducation = @IsSpecial
-					AND StudentEnrollmentDate <= @End{month}
-					AND (
-						StudentWithdrawalDate IS NULL
-						OR (
-							StudentEnrollmentDate != StudentWithdrawalDate
-							AND StudentWithdrawalDate >= @{month}
-						)
-					)";
+			var regularEnrollments = new InvoiceEnrollments();
+			var specialEnrollments = new InvoiceEnrollments();
 
-			var sb = new StringBuilder();
-			sb.AppendLine("SELECT ");
-
-			var args = new Dictionary<string, object> {
-				{"Aun", aun},
-				{"IsSpecial", isSpecial},
-			};
-
-			foreach (var month in _months)
-			{
-				if (!IsBeforeAsOf(asOf, month.Number))
-				{
-					sb.AppendLine($"0 AS {month.Name}, ");
-					continue;
-				}
-
-				sb.AppendLine($"({EnrollmentCount(month.Name)}) AS {month.Name}, ");
+			foreach (var month in _months) {
+				var regular = 0;
+				var special = 0;
 
 				var year = month.Number >= 7 ? firstYear : secondYear;
-				var startDate = new DateTime(year, month.Number, 1);
+				var start = new DateTime(year, month.Number, 1);
+				DateTime end;
+				if (new[] {7,8,9}.Contains(month.Number))
+					end = EndOfMonth(year, 9);
+				else
+					end = EndOfMonth(year, month.Number);
 
-				DateTime endDate;
-				if (new[] {7, 8, 9}.Contains(month.Number)) {
-					endDate = EndOfMonth(year, 9);
-				}
-				else {
-					endDate = EndOfMonth(year, month.Number);
+				var groups = students.
+					Where(s => s.FirstDay <= end && (s.LastDay == null || s.LastDay >= start)).
+					GroupBy(s => s.PASecuredID);
+				foreach (var group in groups) {
+					if (group.Count() == 1) {
+						if (group.Single().IsSpecialEducation)
+							special++;
+						else
+							regular++;
+
+						continue;
+					}
+
+					if (group.All(s => s.IsSpecialEducation)) {
+						special++;
+						continue;
+					} 
+					
+					regular++;
 				}
 
-				args.Add(month.Name, startDate);
-				args.Add($"End{month.Name}", endDate);
+				regularEnrollments[month.Name] = regular;
+				specialEnrollments[month.Name] = special;
 			}
 
-			var query = sb.ToString().Trim().TrimEnd(',');
-
-			return _conn.Query<InvoiceEnrollments>(query, args).SingleOrDefault();
+			return (
+				regular: regularEnrollments,
+				special: specialEnrollments
+			);
 		}
 
 		private InvoiceTransactions GetTransactions(
@@ -269,147 +247,6 @@ namespace models.Reporters
 			return transactions;
 		}
 
-    private InvoiceStudent GetStudentInvoiceEntryWithLatestWithdrawalDate(List<InvoiceStudent> list, ulong studentID)
-    {
-      int index = list.FindIndex(i => i.LastDay == null);
-
-      if (index >= 0) {
-        return list[index];
-      }
-
-      List<InvoiceStudent> sorted = list.OrderBy(i => i.LastDay.Value).ToList();
-
-      return list[list.Count - 1];
-    }
-
-		private IList<InvoiceStudent> FilterForAdditionalTraits(IList<InvoiceStudent>studentList)
-		{
-			List<InvoiceStudent> newList = new List<InvoiceStudent>();
-
-			// when a student record has an enrollment date that matches the withdrawal date, and
-			// the IEP enrollment month and day match the month and day of the enrollment and
-			// withdrawal dates, the record should be counted.
-			newList = studentList.Where(s => {
-				if (s.LastDay.HasValue) {
-					return true;
-				}
-				else if (s.FirstDay == s.LastDay) {
-					if (s.CurrentIep.Value.Month == s.FirstDay.Month &&
-						s.CurrentIep.Value.Month == s.LastDay.Value.Month &&
-						s.CurrentIep.Value.Day == s.FirstDay.Day &&
-						s.CurrentIep.Value.Day == s.LastDay.Value.Day) {
-						return true;
-					}
-					else {
-						return false;
-					}
-				}
-
-				return true;
-			}).ToList();
-
-			newList = FilterByActivityDatesAndSPEDStatus(newList).ToList();
-
-			// newList = FilterByActivityDatesAndEnrollmentStatus(newList).ToList();
-
-			return newList;	
-		}
-
-		private IList<InvoiceStudent> FilterByActivityDatesAndSPEDStatus(IList<InvoiceStudent>list)
-		{
-			// when a student has multiple record entries, and the records have enrollment
-			// dates or withdrawal dates in the same month, only count the record if the SPED
-			// column has the value of "NO"
-
-			List<InvoiceStudent> newList = new List<InvoiceStudent>();
-
-      // if the list of students are all unique, then we don't need to do the filter
-      if (!list.GroupBy(i => i.PASecuredID).Any(c => c.Count() > 1)) {
-        return list;
-      }
-
-			var result = list.GroupBy(i => i.PASecuredID);
-			foreach (var group in result) {
-				if (group.Count() > 1) {
-					// multiple records for the student with the PASecuredID
-					var item = group.ToList().Find(i => !i.IsSpecialEducation);
-					if (item == null) {
-						// no special education status, so we should just add all of the records to the new list
-						newList.AddRange(group.ToList());
-					}
-					else {
-						foreach (var i in group) {
-							if (!i.LastDay.HasValue) {
-								newList.Add(i);
-								continue;
-							}
-
-							if (i.FirstDay.Month == i.LastDay.Value.Month && !i.IsSpecialEducation) {
-								newList.Add(i);
-							}
-							else if (i.FirstDay.Month != i.LastDay.Value.Month) {
-								newList.Add(i);
-							}
-						}
-					}
-				}
-				else {
-					// there's only one record for this given student with the relevant PASecuredID.  just pass it through.
-					newList.Add(group.First());
-				}
-			}
-
-			return newList.OrderBy(i => i.LastName).ToList();
-		}
-
-    private IList<InvoiceStudent> FilterByActivityDatesAndEnrollmentStatus(IList<InvoiceStudent>studentList)
-    {
-			// when a student has multiple record entries, and the enrollment and withdrawal
-			// dates are in the same month, and the SPED values of the records are the same
-			// value (i.e. both "YES" or both "NO"), then those records should only be counted as 1 
-
-      List<InvoiceStudent> newList = new List<InvoiceStudent>();
-
-      // if the list of students are all unique, then we don't need to do the filter
-      if (!studentList.GroupBy(i => i.PASecuredID).Any(c => c.Count() > 1)) {
-        return studentList;
-      }
-
-      foreach (var invoiceStudent in studentList) {
-        IList<InvoiceStudent> subList = studentList.Where(s => s.PASecuredID == invoiceStudent.PASecuredID).ToList();
-        if (subList.Count > 1) {
-          // check whether student is special education and whether the month value for enrollment and withdrawal are
-          // the same
-
-          IList<InvoiceStudent> subSubList = subList.Where(s => {
-            if (!s.LastDay.HasValue) {
-              return true;
-            }
-
-            // you can't dereference anything from a nullable variable type...
-            /* DateTime d = s.LastDay ?? DateTime.Now; */
-            if (s.IsSpecialEducation == invoiceStudent.IsSpecialEducation && s.FirstDay.Month == s.LastDay.Value.Month) {
-              return true;
-            }
-            return false;
-          }).ToList();
-
-          if (subSubList.Count == subList.Count) {
-            int index = newList.FindIndex(i => i.PASecuredID == invoiceStudent.PASecuredID);
-            if (index < 0 && invoiceStudent.PASecuredID.HasValue) {
-              newList.Add(GetStudentInvoiceEntryWithLatestWithdrawalDate(subSubList.ToList(), invoiceStudent.PASecuredID.Value));
-            }
-          }
-        }
-        else {
-          newList.Add(invoiceStudent);
-          continue;
-        }
-      }
-
-      return newList;
-    }
-
 		private IList<InvoiceStudent> GetStudents(
 			int aun,
 			DateTime start,
@@ -443,11 +280,18 @@ namespace models.Reporters
 				AND (
 					StudentWithdrawalDate IS NULL
 					OR (
-						StudentWithdrawaldate >= @Start
-						AND StudentWithdrawalDate >= StudentEnrollmentDate
+							StudentWithdrawalDate >= @Start AND
+							(
+									StudentWithdrawalDate != StudentEnrollmentDate OR
+									(
+											StudentWithdrawalDate = StudentEnrollmentDate AND
+											DATEPART(month, StudentCurrentIep) = DATEPART(month, StudentEnrollmentDate) AND
+											DATEPART(day, StudentCurrentIep) = DATEPART(day, StudentEnrollmentDate)
+									)
+							)
 					)
 				)
-				ORDER BY StudentLastName, StudentFirstName, StudentMiddleInitial",
+				ORDER BY StudentLastName, StudentFirstName, StudentMiddleInitial, StudentEnrollmentDate, StudentWithdrawalDate",
 				new
 				{
 					Aun = aun,
@@ -455,8 +299,7 @@ namespace models.Reporters
 					End = end,
 				}).ToList();
 
-			return FilterForAdditionalTraits(studentList);
-      // return studentList;
+      return studentList;
 		}
 
 		public class Config
@@ -485,18 +328,14 @@ namespace models.Reporters
 
 			invoice.SchoolDistrict = GetSchoolDistrict(config.SchoolDistrictAun);
 
-			invoice.RegularEnrollments = GetEnrollments(
-				config.AsOf,
+			invoice.Students = GetStudents(
 				config.SchoolDistrictAun,
-				invoice.FirstYear,
-				invoice.SecondYear,
-				isSpecial: false);
-			invoice.SpecialEnrollments = GetEnrollments(
-				config.AsOf,
-				config.SchoolDistrictAun,
-				invoice.FirstYear,
-				invoice.SecondYear,
-				isSpecial: true);
+				new DateTime(invoice.FirstYear, 7, 1),
+				EndOfMonth(config.AsOf.Year, config.AsOf.Month));
+
+			var enrollments = GetEnrollments(invoice.Students, invoice.FirstYear, invoice.SecondYear);
+			invoice.RegularEnrollments = enrollments.regular;
+			invoice.SpecialEnrollments = enrollments.special;
 
 			invoice.Transactions = GetTransactions(
 				config.AsOf,
@@ -504,11 +343,6 @@ namespace models.Reporters
 				config.SchoolYear,
 				invoice.FirstYear,
 				invoice.SecondYear);
-
-			invoice.Students = GetStudents(
-				config.SchoolDistrictAun,
-				new DateTime(invoice.FirstYear, 7, 1),
-				EndOfMonth(config.AsOf.Year, config.AsOf.Month));
 
 			return invoice;
 		}

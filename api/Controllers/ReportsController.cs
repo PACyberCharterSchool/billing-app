@@ -736,6 +736,7 @@ namespace api.Controllers
           _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  processing invoice {report.Name}.");
           _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  sheet name is {((XSSFSheet)wb1.GetSheetAt(j)).SheetName}.");
           NPOIHelper.MergeSheets((XSSFSheet)wb.GetSheetAt(0), (XSSFSheet)wb1.GetSheetAt(j));
+					NPOIHelper.AddBreakRows((XSSFSheet)wb.GetSheetAt(0), wb.GetSheetAt(0).LastRowNum, 1, wb1.GetSheetAt(j).GetRow(0).LastCellNum);
         }
 
         NPOIHelper.AddBreakRows((XSSFSheet)wb.GetSheetAt(0), wb.GetSheetAt(0).LastRowNum, 2, wb1.GetSheetAt(0).GetRow(0).LastCellNum);
