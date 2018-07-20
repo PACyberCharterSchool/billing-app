@@ -290,7 +290,10 @@ namespace models.Reporters
 			// the IEP enrollment month and day match the month and day of the enrollment and
 			// withdrawal dates, the record should be counted.
 			newList = studentList.Where(s => {
-				if (s.FirstDay == s.LastDay) {
+				if (s.LastDay.HasValue) {
+					return true;
+				}
+				else if (s.FirstDay == s.LastDay) {
 					if (s.CurrentIep.Value.Month == s.FirstDay.Month &&
 						s.CurrentIep.Value.Month == s.LastDay.Value.Month &&
 						s.CurrentIep.Value.Day == s.FirstDay.Day &&
@@ -328,20 +331,26 @@ namespace models.Reporters
 			var result = list.GroupBy(i => i.PASecuredID);
 			foreach (var group in result) {
 				if (group.Count() > 1) {
-					IEnumerable<InvoiceStudent> results = group.Where(i => {
-						if (i.LastDay.HasValue) {
-							if (i.FirstDay.Month == i.LastDay.Value.Month && i.IsSpecialEducation == false) {
-								return true;
+					// multiple records for the student with the PASecuredID
+					var item = group.ToList().Find(i => !i.IsSpecialEducation);
+					if (item == null) {
+						// no special education status, so we should just add all of the records to the new list
+						newList.AddRange(group.ToList());
+					}
+					else {
+						foreach (var i in group) {
+							if (!i.LastDay.HasValue) {
+								newList.Add(i);
+								continue;
+							}
+
+							if (i.FirstDay.Month == i.LastDay.Value.Month && !i.IsSpecialEducation) {
+								newList.Add(i);
+							}
+							else if (i.FirstDay.Month != i.LastDay.Value.Month) {
+								newList.Add(i);
 							}
 						}
-						else {
-							return true;
-						}
-						return false;
-					});
-
-					foreach (var i in results) {
-						newList.Add(i);
 					}
 				}
 				else {
@@ -350,7 +359,7 @@ namespace models.Reporters
 				}
 			}
 
-			return newList;
+			return newList.OrderBy(i => i.LastName).ToList();
 		}
 
     private IList<InvoiceStudent> FilterByActivityDatesAndEnrollmentStatus(IList<InvoiceStudent>studentList)
@@ -371,6 +380,7 @@ namespace models.Reporters
         if (subList.Count > 1) {
           // check whether student is special education and whether the month value for enrollment and withdrawal are
           // the same
+
           IList<InvoiceStudent> subSubList = subList.Where(s => {
             if (!s.LastDay.HasValue) {
               return true;
@@ -445,8 +455,8 @@ namespace models.Reporters
 					End = end,
 				}).ToList();
 
-			// return FilterForAdditionalTraits(studentList);
-      return studentList;
+			return FilterForAdditionalTraits(studentList);
+      // return studentList;
 		}
 
 		public class Config

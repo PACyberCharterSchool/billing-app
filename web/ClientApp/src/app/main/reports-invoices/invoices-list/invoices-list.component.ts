@@ -185,11 +185,11 @@ export class InvoicesListComponent implements OnInit {
     // )
     this.reportsService.getInvoiceStudentActivityDataByName(invoice.name).subscribe(
       data => {
-        console.log("InvoiceListComponent().downloadInvoiceStudentActivity():  data is ", data);
+        console.log('InvoiceListComponent().downloadInvoiceStudentActivity():  data is ', data);
         this.excelService.saveStudentActivityAsExcelFile(data, invoice);
       },
       error => {
-        console.log("InvoiceListComponent().downloadInvoiceStudentActivity():  error is ", error);
+        console.log('InvoiceListComponent().downloadInvoiceStudentActivity():  error is ', error);
       }
     );
   }
@@ -233,7 +233,7 @@ export class InvoicesListComponent implements OnInit {
       (reason) => {
         this.ngbActiveModal.dismiss(reason.toString());
       }
-    )
+    );
   }
 
   downloadStudentActivity(bulkDownloadContent) {
@@ -258,12 +258,12 @@ export class InvoicesListComponent implements OnInit {
             console.log('InvoiceListComponent.downloadStudentActivity():  error is ', error);
             this.ngxSpinnerService.hide();
           }
-        )
+        );
       },
       (reason) => {
         console.log('InvoiceListComponent.downloadStudentActivity(): reason is ', reason);
       }
-    )
+    );
   }
 
   doDownload() {
@@ -281,8 +281,7 @@ export class InvoicesListComponent implements OnInit {
           this.ngxSpinnerService.hide();
         }
       );
-    }
-    else {
+    } else {
       this.reportsService.getInvoiceStudentActivityDataBulk(
         this.selectedDownloadSchoolYear,
         this.selectedDownloadStatus === 'Approved' ? true : false).subscribe(

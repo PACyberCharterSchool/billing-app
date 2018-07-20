@@ -18,8 +18,6 @@ import { Globals } from '../../../globals';
 import { Observable } from 'rxjs/Observable';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 
-import { NgxSpinnerService } from 'ngx-spinner';
-
 @Component({
   selector: 'app-invoice-create-form',
   templateUrl: './invoice-create-form.component.html',
@@ -51,7 +49,6 @@ export class InvoiceCreateFormComponent implements OnInit {
     private academicYearsService: AcademicYearsService,
     private templatesService: TemplatesService,
     private schoolDistrictService: SchoolDistrictService,
-    private ngxSpinnerService: NgxSpinnerService,
     private ngbActiveModal: NgbActiveModal
   ) { }
 
@@ -76,16 +73,12 @@ export class InvoiceCreateFormComponent implements OnInit {
         console.log(`InvoiceCreateFormComponent.ngOnInit(): error is ${error}.`);
       }
     );
-
-    this.ngxSpinnerService.hide();
   }
 
   create(): void {
-    this.ngxSpinnerService.show();
     if (this.isMany()) {
       this.createInvoices();
-    }
-    else {
+    } else {
       this.createInvoice();
     }
   }
@@ -95,11 +88,9 @@ export class InvoiceCreateFormComponent implements OnInit {
     this.reportsService.createInvoice(this.buildInvoiceCreationInfo()).subscribe(
       data => {
         console.log(`InvoiceCreateFormComponent.createInvoice(): data is ${data}.`);
-        this.ngxSpinnerService.hide();
         this.ngbActiveModal.close('Invoices created');
       },
       error => {
-        this.ngxSpinnerService.hide();
         console.log(`InvoiceCreateFormComponent.createInvoice(): error is ${error}.`);
         this.ngbActiveModal.dismiss('Invoices creation failed');
       }
@@ -111,11 +102,9 @@ export class InvoiceCreateFormComponent implements OnInit {
     this.reportsService.createInvoices(this.buildInvoicesCreationInfo()).subscribe(
       data => {
         console.log(`InvoiceCreateFormComponent.createInvoices(): data is ${data}.`);
-        this.ngxSpinnerService.hide();
         this.ngbActiveModal.close('Invoices created');
       },
       error => {
-        this.ngxSpinnerService.hide();
         console.log(`InvoiceCreateFormComponent.createInvoices(): error is ${error}.`);
         this.ngbActiveModal.dismiss('Invoices creation failed');
       }
