@@ -34,27 +34,27 @@ namespace api.Common.Utils
 
       foreach (var fill in srcStyles.GetFills()) {
         XSSFCellFill newFill = new XSSFCellFill();
-        XSSFColor foregroundColor = fill.GetFillForegroundColor();
-        XSSFColor backgroundColor = fill.GetFillBackgroundColor();
+        XSSFColor foregroundColor = ((XSSFCellFill)fill).GetFillForegroundColor();
+        XSSFColor backgroundColor = ((XSSFCellFill)fill).GetFillBackgroundColor();
 
         if (newFill != null) {
-          if (foregroundColor != null) {
-            Console.WriteLine($"creating fill.  foregroundColor is {foregroundColor}.");
-            newFill.SetFillForegroundColor(foregroundColor);
-          }
-          else {
-            Console.WriteLine($"Whoops!  foregroundColor is {foregroundColor}.");
-          }
+          // if (foregroundColor != null) {
+          //   Console.WriteLine($"creating fill.  foregroundColor is {foregroundColor}.");
+          //   newFill.SetFillForegroundColor(foregroundColor);
+          // }
+          // else {
+          //   Console.WriteLine($"Whoops!  foregroundColor is {foregroundColor}.");
+          // }
 
-          if (backgroundColor != null) {
-            Console.WriteLine($"creating fill.  backgroundColor is {backgroundColor}.");
-            newFill.SetFillBackgroundColor(backgroundColor);
-          }
-          else {
-            Console.WriteLine($"Whoops!  backgroundColor is {backgroundColor}.");
-          }
-
-          destStyles.PutFill(newFill);
+          // if (backgroundColor != null) {
+          //   Console.WriteLine($"creating fill.  backgroundColor is {backgroundColor}.");
+          //   newFill.SetFillBackgroundColor(backgroundColor);
+          // }
+          // else {
+          //   Console.WriteLine($"Whoops!  backgroundColor is {backgroundColor}.");
+          // }
+          // destStyles.PutFill(newFill);
+          destStyles.PutFill(fill);
         }
         else {
           Console.WriteLine($"Whoops! newFill was not created!");
@@ -205,6 +205,7 @@ namespace api.Common.Utils
     private static void CopyRow(ISheet srcSheet, ISheet destSheet, IRow srcRow, IRow destRow,
                                 IDictionary<int?, ICellStyle> styleMap)
     {
+
       // manage a list of merged zone in order to not insert two times a merged zone
       SortedSet<CellRangeAddressWrapper> mergedRegions = new SortedSet<CellRangeAddressWrapper>();
       destRow.Height = srcRow.Height;
@@ -289,7 +290,18 @@ namespace api.Common.Utils
           newCell.SetCellValue(oldCell.ToString());
           break;
         case CellType.Numeric:
-          newCell.SetCellValue(oldCell.NumericCellValue);
+          if (DateUtil.IsCellDateFormatted(oldCell))
+          {
+              DateTime date = oldCell.DateCellValue;
+              ICellStyle style = oldCell.CellStyle;
+              // Excel uses lowercase m for month whereas .Net uses uppercase
+              string format = style.GetDataFormatString().Replace('m', 'M');
+              newCell.SetCellValue(date.ToString(format));
+          }
+          else
+          {
+            newCell.SetCellValue(oldCell.NumericCellValue);
+          }
           break;
         case CellType.Blank:
           newCell.SetCellType(CellType.Blank);
