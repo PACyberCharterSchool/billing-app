@@ -148,14 +148,37 @@ namespace models.Reporters
 
 				var year = month.Number >= 7 ? firstYear : secondYear;
 				var start = new DateTime(year, month.Number, 1);
+				// start is 2017-09-01
 				DateTime end;
 				if (new[] {7,8,9}.Contains(month.Number))
 					end = EndOfMonth(year, 9);
 				else
 					end = EndOfMonth(year, month.Number);
+				// end is 2017-09-30
+				// if (end.Month == 9 && s.LastDay.Value.Month != 9) {
+				// 	return false;
+				// }
+				// else {
+				// 	return true;
+				// }
 
 				var groups = students.
-					Where(s => s.FirstDay <= end && (s.LastDay == null || s.LastDay >= start)).
+					Where(s => {
+						if (s.FirstDay <= end && (s.LastDay == null || s.LastDay >= start)) {
+							if (end.Month == 9) {
+								if (!s.LastDay.HasValue) {
+									return true;
+								}
+
+								if (s.LastDay.HasValue && s.LastDay.Value.Month < 9) {
+									return false;
+								}
+							}
+							return true;
+						}
+
+						return false;
+					}).
 					GroupBy(s => s.PASecuredID);
 				foreach (var group in groups) {
 					if (group.Count() == 1) {

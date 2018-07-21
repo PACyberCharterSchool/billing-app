@@ -19,6 +19,8 @@ export class AcademicYearsService {
       this.academicYears.push(`${currentYear.toString()} - ${(currentYear + 1).toString()}`);
       currentYear++;
     }
+
+    this.academicYears.sort((a, b) => (a > b ? -1 : 1));
   }
 
   getAcademicYears(): string[] {

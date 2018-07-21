@@ -30,6 +30,7 @@ export class StudentsListComponent implements OnInit {
   private endDate: Date;
   private selectedStudent: Student;
   private skip: number;
+  private retrievingStudents: boolean;
 
   constructor(
     private globals: Globals,
@@ -42,16 +43,20 @@ export class StudentsListComponent implements OnInit {
       this.property = 'paCyberId';
       this.direction = 1;
       this.skip = 0;
+      this.students = [];
     }
 
   ngOnInit() {
+    this.retrievingStudents = true;
     this.studentsService.getStudents(this.skip).subscribe(
       data => {
         this.updateScrollingSkip();
-        this.students = data['students'];
+        this.students = this.students.concat(data['students']);
+        this.retrievingStudents = false;
         console.log('StudentsListComponent.ngOnInit():  students are ', this.students);
       },
       error => {
+        this.retrievingStudents = false;
         console.log('StudentsListComponent.ngOnInit():  error is ', error);
       }
     );
@@ -152,7 +157,9 @@ export class StudentsListComponent implements OnInit {
   }
 
   onScroll($event) {
-    this.getStudents($event);
+    if (!this.retrievingStudents) {
+      this.getStudents($event);
+    }
   }
 
   private updateScrollingSkip() {
