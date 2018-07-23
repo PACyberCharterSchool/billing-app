@@ -17,6 +17,7 @@ import { Globals } from '../../../globals';
 import { ReportsService } from '../../../services/reports.service';
 import { UtilitiesService } from '../../../services/utilities.service';
 import { ExcelService } from '../../../services/excel.service';
+import { TemplatesService } from '../../../services/templates.service';
 
 import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -45,6 +46,7 @@ describe('InvoicesListComponent', () => {
         ReportsService,
         UtilitiesService,
         ExcelService,
+        TemplatesService,
         HttpHandler,
         HttpClient,
         NgbActiveModal
