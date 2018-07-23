@@ -8,6 +8,7 @@ import { Observable } from 'rxjs/Observable';
 import { environment } from '../../environments/environment';
 
 import { Report, ReportType } from '../models/report.model';
+import { Template } from '../models/template.model';
 
 import { Globals } from '../globals';
 
@@ -33,9 +34,9 @@ export class ReportsService {
   public getInvoices(name: string, year: string, approved: boolean): Observable<Report[]> {
     let reportInfo: Object = Object.assign({}, {'Type': ReportType.Invoice});
 
-    if (name) reportInfo['Name'] = name;
-    if (year) reportInfo['SchoolYear'] = year;
-    if (approved != null) reportInfo['Approved'] = approved;
+    if (name) { reportInfo['Name'] = name; }
+    if (year) { reportInfo['SchoolYear'] = year; }
+    if (approved != null) { reportInfo['Approved'] = approved; }
 
     return this.getReportsByInfo(reportInfo);
   }
@@ -45,11 +46,12 @@ export class ReportsService {
     return this.httpClient.get<any>(url, this.headers);
   }
 
-  public getInvoicesBulk(year: string, approved: boolean): Observable<any> {
-    let reportInfo: Object = Object.assign({}, {'Type': ReportType.Invoice});
+  public getInvoicesBulk(year: string, approved: boolean, template: Template): Observable<any> {
+    let reportInfo: Object = Object.assign({}, {'Type': ReportType.BulkInvoice});
 
-    if (year) reportInfo['SchoolYear'] = year;
-    if (approved != null) reportInfo['Approved'] = approved;
+    if (year) { reportInfo['SchoolYear'] = year; }
+    if (approved != null) { reportInfo['Approved'] = approved; }
+    if (template != null) { reportInfo['templateId'] = template.id; }
 
     return this.getInvoiceByInfoBulk(reportInfo);
   }
@@ -74,8 +76,8 @@ export class ReportsService {
   public getInvoiceStudentActivityDataBulk(year: string, approved: boolean): Observable<any> {
     let reportInfo: Object = Object.assign({}, {'Type': ReportType.Invoice});
 
-    if (year) reportInfo['SchoolYear'] = year;
-    if (approved != null) reportInfo['Approved'] = approved;
+    if (year) { reportInfo['SchoolYear'] = year; }
+    if (approved != null) { reportInfo['Approved'] = approved; }
 
     return this.getInvoiceStudentActivityDataBulkByInfo(reportInfo);
   }
@@ -101,8 +103,8 @@ export class ReportsService {
       'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     });
 
-    url += '?Type=Invoice';
-    if (reportInfo['SchoolYear']) url += `&SchoolYear=${reportInfo['SchoolYear']}`;
+    url += `?TemplateId=${reportInfo['templateId']}`;
+    if (reportInfo['SchoolYear']) { url += `&SchoolYear=${reportInfo['SchoolYear']}`; }
     url += reportInfo['Approved'] ? `&Approved=true` : `&Approved=false`;
 
     return this.httpClient.get<any>(url, headers);
@@ -118,7 +120,7 @@ export class ReportsService {
     });
 
     url += '?Type=Invoice';
-    if (reportInfo['SchoolYear']) url += `&SchoolYear=${reportInfo['SchoolYear']}`;
+    if (reportInfo['SchoolYear']) { url += `&SchoolYear=${reportInfo['SchoolYear']}`; }
     url += reportInfo['Approved'] ? `&Approved=true` : `&Approved=false`;
 
     return this.httpClient.get<any>(url, headers);
@@ -136,10 +138,10 @@ export class ReportsService {
 
   public getReportsByInfo(reportInfo: Object): Observable<Report[]> {
     let url = this.apiReportsUrl;
-    if (reportInfo['Type']) url +=  `?Type=${reportInfo['Type']}`;
-    if (reportInfo['Name']) url += `&Name=${reportInfo['Name']}`;
-    if (reportInfo['SchoolYear']) url += `&SchoolYear=${reportInfo['SchoolYear']}`;
-    if (reportInfo['Approved']) url += `&Approved=${reportInfo['Approved']}`;
+    if (reportInfo['Type']) { url +=  `?Type=${reportInfo['Type']}`; }
+    if (reportInfo['Name']) { url += `&Name=${reportInfo['Name']}`; }
+    if (reportInfo['SchoolYear']) { url += `&SchoolYear=${reportInfo['SchoolYear']}`; }
+    if (reportInfo['Approved']) { url += `&Approved=${reportInfo['Approved']}`; }
     return this.httpClient.get<Report[]>(url, this.headers);
   }
 

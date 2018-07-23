@@ -25,12 +25,13 @@ export class AdministrationTemplateListComponent implements OnInit {
   private allTemplates: Template[];
   private selectedTemplateFile;
   private selectedSchoolYear;
+  private selectedTemplateType;
 
   constructor(
     private globals: Globals,
     private utilitiesService: UtilitiesService,
     private templatesService: TemplatesService,
-    private academeicYearsService: AcademicYearsService,
+    private academicYearsService: AcademicYearsService,
     private ngbModal: NgbModal
   ) {
     this.property = 'name';
@@ -106,7 +107,7 @@ export class AdministrationTemplateListComponent implements OnInit {
   }
 
   getSchoolYears(): string[] {
-    return this.academeicYearsService.getAcademicYears();
+    return this.academicYearsService.getAcademicYears();
   }
 
   importTemplate(importTemplateContent): void {
@@ -132,11 +133,23 @@ export class AdministrationTemplateListComponent implements OnInit {
     this.selectedSchoolYear = year;
   }
 
+  getTemplateTypes(): Object[] {
+    return [
+      { type: 'Invoice', label: 'Invoice'},
+      { type: 'StudentInformation', label: 'Student Information' },
+      { type: 'BulkInvoice', label: 'Bulk Invoice' }
+    ];
+  }
+
+  setSelectedTemplateType(selectedType: Object): void {
+    this.selectedTemplateType = selectedType;
+  }
+
   doImport(): void {
     if (this.selectedTemplateFile) {
       const formData = new FormData();
       formData.append('content', this.selectedTemplateFile[0], this.selectedTemplateFile[0].name);
-      formData.append('type', 'Invoice');
+      formData.append('type', this.selectedTemplateType.type);
       formData.append('year', this.selectedSchoolYear);
       this.templatesService.putTemplatesByTypeAndByYear(formData).subscribe(
         data => {

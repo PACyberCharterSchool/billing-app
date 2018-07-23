@@ -27,7 +27,7 @@ export class AdministrationPaymentRateUpdateFormComponent implements OnInit {
     console.log('AdministrationPaymentRateUpdateComponent.onSubmit():  schoolDistrict is ', this.schoolDistrict);
     this.schoolDistrict['aun'] = this.schoolDistrict.aun;
     this.schoolDistrict['name'] = this.schoolDistrict.name;
-    this.schoolDistrict['paymentType'] = this.schoolDistrict.paymentType;
+    this.schoolDistrict['paymentType'] = this.schoolDistrict.paymentType === 'SD' ? 'Check' : 'UniPay';
     this.schoolDistrictService.updateSchoolDistrict(this.schoolDistrict).subscribe(
       val => {
         this.ngbActiveModal.close('success');

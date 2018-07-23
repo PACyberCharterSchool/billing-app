@@ -107,6 +107,9 @@ namespace api.Controllers
 				wb.CloneSheet(1);
 
 				var sheet = wb.GetSheetAt(s + 2);
+				sheet.PrintSetup.HeaderMargin = 0.25;
+				sheet.PrintSetup.FooterMargin = 0.10;
+
 				for (var r = sheet.FirstRowNum; r < sheet.LastRowNum; r++)
 				{
 					var row = sheet.GetRow(r);
@@ -330,6 +333,7 @@ namespace api.Controllers
 
 			return reports;
 		}
+
 
 		private static readonly object _lock = new object();
 
@@ -706,41 +710,59 @@ namespace api.Controllers
 			};
 		}
 
-    public class GetBulkArgs
+    public class GetBulkInvoiceParams
 		{
-			[EnumerationValidation(typeof(ReportType))]
-			public string Type { get; set; }
-
 			[RegularExpression(@"^\d{4}\-\d{4}$")]
 			public string SchoolYear { get; set; }
+
+			[Required]
+			[Range(1, int.MaxValue)]
+			public int TemplateId { get; set; }
 
 			public bool? Approved { get; set; }
 		}
 
-    private byte[] CreateMergedInvoicesWorkbook(IList<Report> reports, string academicYear)
+		private void AppendSummaryAndStudentItemizationsToSheet(XSSFWorkbook wb, Report report)
+		{
+			AppendSummaryInvoiceSectionToSheet((XSSFSheet)wb.GetSheetAt(0));
+			AppendStudentItemizationSectionToSheet((XSSFSheet)wb.GetSheetAt(0), report);
+		}
+
+		private void AppendSummaryInvoiceSectionToSheet(XSSFSheet sheet)
+		{
+			const int RowCount = 43;
+			int CurrentRowCount = NPOIHelper.GetLastRowWithData(sheet);
+
+			for (int j = 0; j < RowCount; j++) {
+				NPOIHelper.CopyRowInSameSheet((XSSFSheet)sheet, j, CurrentRowCount + j, true);
+			}
+		}
+
+		private void AppendStudentItemizationSectionToSheet(XSSFSheet sheet, Report report)
+		{
+			int CurrentRowCount = NPOIHelper.GetLastRowWithData(sheet);
+			const int RowCount = 45;
+			const int per = 8;
+			// var numSheets = (int)count / per + (count % per == 0 ? 0 : 1);
+
+			// for (int i = 0; i < report.Count; i++) {
+			// 	for (int j = 0; j < RowCount; j++) {
+			// 		NPOIHelper.CopyRowInSameSheet((XSSFSheet)sheet, RowCount + j, CurrentRowCount + j, true);					
+			// 	}
+			// }
+		}
+    private byte[] CreateMergedInvoicesWorkbook(IList<Report> reports, Template invoiceTemplate, string academicYear)
     {
-      XSSFWorkbook wb = new XSSFWorkbook();
-      wb.CreateSheet($"Bulk Invoices - {academicYear}");
+			// compose workbook
+			var wb = new XSSFWorkbook(new MemoryStream(invoiceTemplate.Content));
+
+      wb.SetSheetName(0, $"Bulk Invoices - {academicYear}");
+
       for (int i = 0; i < reports.Count; i++)
       {
         var report = reports[i];
 
-        // all data for the bulk invoice spreadsheet are on a single worksheet
-        XSSFWorkbook wb1 = new XSSFWorkbook(new MemoryStream(report.Xlsx));
-
-        // if (i == 0) {
-        //   NPOIHelper.CloneWorkbookFormatInfo(wb, wb1);
-        // }
-
-        for (int j = 0; j < wb1.NumberOfSheets; j++) {
-          _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  processing invoice {report.Name}.");
-          _logger.LogInformation($"ReportsController.CreateMergedInvoicesWorkbook():  sheet name is {((XSSFSheet)wb1.GetSheetAt(j)).SheetName}.");
-					NPOIHelper.CloneWorkbookFormatInfo(wb, wb1);
-          NPOIHelper.MergeSheets((XSSFSheet)wb.GetSheetAt(0), (XSSFSheet)wb1.GetSheetAt(j));
-					NPOIHelper.AddBreakRows((XSSFSheet)wb.GetSheetAt(0), wb.GetSheetAt(0).LastRowNum, 2, wb1.GetSheetAt(0).GetRow(0).LastCellNum);
-        }
-
-        NPOIHelper.AddBreakRows((XSSFSheet)wb.GetSheetAt(0), wb.GetSheetAt(0).LastRowNum, 2, wb1.GetSheetAt(0).GetRow(0).LastCellNum);
+				AppendSummaryAndStudentItemizationsToSheet(wb, report);
       }
 
       var data = new MemoryStream();
@@ -754,7 +776,7 @@ namespace api.Controllers
     [Produces(ContentTypes.XLSX)]
 		[ProducesResponseType(204)]
 		[ProducesResponseType(typeof(ErrorsResponse), 400)]
-		public async Task<IActionResult> GetBulkInvoice([FromQuery]GetBulkArgs args)
+		public async Task<IActionResult> GetBulkInvoice([FromQuery]GetBulkInvoiceParams get)
     {
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
@@ -766,21 +788,26 @@ namespace api.Controllers
 				return StatusCode(406);
 
 			var reports = await Task.Run(() => _reports.GetMany(
-				type: args.Type == null ? null : ReportType.FromString(args.Type),
-				year: args.SchoolYear,
-				approved: args.Approved
+				type: ReportType.Invoice,
+				year: get.SchoolYear,
+				approved: get.Approved
 			));
 
 			if (reports == null)
 				return NoContent();
 
-      byte[] invoice = CreateMergedInvoicesWorkbook(reports.ToList(), args.SchoolYear);
+			// get template
+			var invoiceTemplate = _templates.Get(get.TemplateId);
+			if (invoiceTemplate == null)
+				throw new MissingTemplateException(get.TemplateId);
+
+      byte[] invoice = CreateMergedInvoicesWorkbook(reports.ToList(), invoiceTemplate, get.SchoolYear);
       _logger.LogInformation($"ReportsController.GetBulkInvoice():  length of bulk invoice is {invoice.Length}.");
       var stream = new MemoryStream(invoice);
       
 			return new FileStreamResult(stream, ContentTypes.XLSX)
 			{
-				FileDownloadName = $"{args.SchoolYear}_{args.Type}",
+				FileDownloadName = $"{get.SchoolYear}_Bulk_Invoice",
 			};
     }
 

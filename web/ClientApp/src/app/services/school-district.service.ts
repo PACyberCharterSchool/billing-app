@@ -63,15 +63,14 @@ export class SchoolDistrictService {
   private serializeSchoolDistrictRequestBodyObject(schoolDistrictData: FormData): Object {
     Object.keys(schoolDistrictData).forEach(
       k => {
-        let v = schoolDistrictData[k];
+        const v = schoolDistrictData[k];
         if (typeof(v) === 'object') {
           schoolDistrictData.set(k, JSON.stringify(v));
-        }
-        else {
+        } else {
           schoolDistrictData.set(k, v);
         }
       }
-    )
+    );
 
     return schoolDistrictData;
   }

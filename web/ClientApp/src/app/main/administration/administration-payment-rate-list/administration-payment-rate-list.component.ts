@@ -9,7 +9,9 @@ import { Globals } from '../../../globals';
 
 import { NgbModal, NgbActiveModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
-import { AdministrationPaymentRateUpdateFormComponent } from '../administration-payment-rate-update-form/administration-payment-rate-update-form.component';
+import {
+  AdministrationPaymentRateUpdateFormComponent
+} from '../administration-payment-rate-update-form/administration-payment-rate-update-form.component';
 
 @Component({
   selector: 'app-administration-payment-rate-list',
@@ -119,13 +121,13 @@ export class AdministrationPaymentRateListComponent implements OnInit {
   refreshSchoolDistrictList() {
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
-        this.allSchoolDistricts = data['schoolDistricts'];
+        this.schoolDistricts = this.allSchoolDistricts = data['schoolDistricts'];
         console.log('success');
       },
       error => {
         console.log('error: ', error);
       }
-    )
+    );
   }
 
   editSchoolDistrictPaymentRate(sd: SchoolDistrict) {
@@ -135,9 +137,11 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     modal.componentInstance.schoolDistrict = sd;
     modal.result.then(
        (result) => {
+         this.refreshSchoolDistrictList();
          console.log(`Closed with: ${result}.`);
        },
        (reason) => {
+         this.refreshSchoolDistrictList();
          console.log(`Dismissed: ${this.getDismissReasons(reason)}.`);
        }
     );
@@ -161,6 +165,7 @@ export class AdministrationPaymentRateListComponent implements OnInit {
         },
         error => {
           console.log('AdministrationPaymentRateListComponent.bulkImportSchoolDistricts():  ', error);
+          this.refreshSchoolDistrictList();
           this.ngbActiveModal.dismiss('Updated failed');
         }
       );

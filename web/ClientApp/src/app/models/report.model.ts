@@ -1,6 +1,7 @@
 export enum ReportType {
   Invoice = 'Invoice',
-  StudentInformation = 'StudentInformation'
+  StudentInformation = 'StudentInformation',
+  BulkInvoice = 'BulkInvoice'
 }
 
 class ReportMetadata {

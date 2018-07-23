@@ -134,6 +134,18 @@ namespace models.Reporters
 		private static DateTime EndOfMonth(int year, int month) =>
 			new DateTime(year, month, DateTime.DaysInMonth(year, month));
 
+		bool AreEnrollmentAndWithdrawalInSameMonth(IGrouping<ulong?, InvoiceStudent> group)
+		{
+			// this assumes to never run in a group where there is a single entry...
+			var activityDates = group.OrderBy(s => s.FirstDay).Select(s => new { s.FirstDay, s.LastDay }).ToList();
+			for (int i = 1; i < activityDates.Count(); i++) {
+				if (activityDates[i].FirstDay.Month == activityDates[i - 1].LastDay.Value.Month) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 		private (InvoiceEnrollments regular, InvoiceEnrollments special) GetEnrollments(
 			IList<InvoiceStudent> students,
 			int firstYear,
@@ -159,7 +171,7 @@ namespace models.Reporters
 						if (s.FirstDay <= end && (s.LastDay == null || s.LastDay >= start)) {
 							return true;
 						}
-						else if (s.FirstDay <= end && (start.Month == 9 && (s.LastDay == null || (s.LastDay.Value.Month >= 7 || s.LastDay.Value.Month < 9)))) {
+						else if (s.FirstDay <= end && (start.Month == 9 && (s.LastDay == null || (s.LastDay.Value.Month >= 7 || s.LastDay.Value.Month <= 9)))) {
 							return true;
 						}
 
@@ -168,16 +180,20 @@ namespace models.Reporters
 					GroupBy(s => s.PASecuredID);
 				foreach (var group in groups) {
 					if (group.Count() == 1) {
-						if (group.Single().IsSpecialEducation)
+						if (group.Single().IsSpecialEducation) {
 							special++;
-						else
+						}
+						else {
 							regular++;
+						}
 
 						continue;
 					}
 
 					if (group.All(s => s.IsSpecialEducation)) {
-						special++;
+						if (!AreEnrollmentAndWithdrawalInSameMonth(group)) {
+							special++;
+						}
 						continue;
 					} 
 					

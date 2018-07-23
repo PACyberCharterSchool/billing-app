@@ -117,6 +117,22 @@ namespace api.Common.Utils
     /// <param name="destSheet"> the sheet being copied/merged. </param>
     /// <param name="newSheet"> the destination sheet being copied/merged into. </param>
     /// <param name="copyStyle"> true copy the style. </param>
+    public static void CopyRowInSameSheet(XSSFSheet destSheet, int srcRowIndex, int destRowIndex, bool copyStyle)
+    {
+      IDictionary<int?, ICellStyle> styleMap = copyStyle ? new Dictionary<int?, ICellStyle>() : null;
+      IRow srcRow = destSheet.GetRow(srcRowIndex);
+      IRow destRow = destSheet.GetRow(destRowIndex);
+      int maxColumnNum = 0;
+
+      CopyRow(destSheet, destSheet, srcRow, destRow, styleMap);
+      if (srcRow.LastCellNum > maxColumnNum) {
+        maxColumnNum = srcRow.LastCellNum;
+      }
+    }
+
+    /// <param name="destSheet"> the sheet being copied/merged. </param>
+    /// <param name="newSheet"> the destination sheet being copied/merged into. </param>
+    /// <param name="copyStyle"> true copy the style. </param>
     private static void MergeSheets(XSSFSheet destSheet, XSSFSheet srcSheet, bool copyStyle)
     {
       AppendSheet(destSheet, srcSheet, copyStyle);
@@ -272,6 +288,14 @@ namespace api.Common.Utils
             newCellStyle.SetFont(oldCell.CellStyle.GetFont(oldCell.Sheet.Workbook));
             newCellStyle.FillForegroundColor = oldCell.CellStyle.FillForegroundColor;
             newCellStyle.FillBackgroundColor = oldCell.CellStyle.FillBackgroundColor;
+            newCellStyle.BorderBottom = oldCell.CellStyle.BorderBottom;
+            newCellStyle.BottomBorderColor = oldCell.CellStyle.BottomBorderColor;
+            newCellStyle.BorderTop = oldCell.CellStyle.BorderTop;
+            newCellStyle.TopBorderColor = oldCell.CellStyle.TopBorderColor;
+            newCellStyle.BorderLeft = oldCell.CellStyle.BorderLeft;
+            newCellStyle.LeftBorderColor = oldCell.CellStyle.LeftBorderColor;
+            newCellStyle.BorderRight = oldCell.CellStyle.BorderRight;
+            newCellStyle.RightBorderColor = oldCell.CellStyle.RightBorderColor;
             styleMap.Add(stHashCode, newCellStyle);
 
             Console.WriteLine($"Adding cell style to styleMap.  Hash is {stHashCode}, CellStyle is {newCellStyle}.");
@@ -325,7 +349,7 @@ namespace api.Common.Utils
     /// </summary>
     /// <param name="sheet"> the sheet containing the data. </param>
     /// <returns> index of the last row with actual data in it.</returns>
-    private static int GetLastRowWithData(ISheet sheet)
+    public static int GetLastRowWithData(ISheet sheet)
     {
       IFormulaEvaluator evaluator = sheet.Workbook.GetCreationHelper().CreateFormulaEvaluator();
       DataFormatter formatter = new DataFormatter( true );

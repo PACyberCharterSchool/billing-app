@@ -3,11 +3,13 @@ import { Component, OnInit } from '@angular/core';
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { Report, ReportType } from '../../../models/report.model';
+import { Template } from '../../../models/template.model';
 
 import { ReportsService } from '../../../services/reports.service';
 import { UtilitiesService } from '../../../services/utilities.service';
 import { ExcelService } from '../../../services/excel.service';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { TemplatesService } from '../../../services/templates.service';
 
 import { Globals } from '../../../globals';
 
@@ -35,14 +37,18 @@ export class InvoicesListComponent implements OnInit {
   ];
   private selectedDownloadSchoolYear: string;
   private selectedDownloadStatus: string;
+  private selectedTemplate: Template;
+  private selectedTemplateName: string;
   private downloadType: string;
   private spinnerMsg: string;
+  private templates: Template[];
 
   constructor(
     private globals: Globals,
     private reportsService: ReportsService,
     private utilitiesService: UtilitiesService,
     private excelService: ExcelService,
+    private templatesService: TemplatesService,
     private ngxSpinnerService: NgxSpinnerService,
     private ngbModal: NgbModal,
     private ngbActiveModal: NgbActiveModal
@@ -57,7 +63,17 @@ export class InvoicesListComponent implements OnInit {
       error => {
         console.log('InvoicesListComponent.ngOnInit(): error is ', error);
       }
-    )
+    );
+
+    this.templatesService.getTemplates(this.skip).subscribe(
+      data => {
+        console.log(`InvoiceCreateFormComponent.ngOnInit(): data is ${data}.`);
+        this.templates = data['templates'];
+      },
+      error => {
+        console.log(`InvoiceCreateFormComponent.ngOnInit(): error is ${error}.`);
+      }
+    );
   }
 
   sort(property) {
@@ -141,7 +157,7 @@ export class InvoicesListComponent implements OnInit {
       (reason) => {
         console.log('InvoicesListComponent.createInvoices(): reason is ', reason);
       }
-    )
+    );
   }
 
   createInvoices(): void {
@@ -155,7 +171,7 @@ export class InvoicesListComponent implements OnInit {
       (reason) => {
         console.log('InvoicesListComponent.createInvoices(): reason is ', reason);
       }
-    )
+    );
   }
 
   approveInvoices() {
@@ -213,6 +229,7 @@ export class InvoicesListComponent implements OnInit {
     this.downloadType = 'invoices';
     this.selectedDownloadSchoolYear = 'Select School Year';
     this.selectedDownloadStatus = 'Approval Status';
+    this.selectedTemplateName = 'Select Template';
 
     modal.result.then(
       (result) => {
@@ -270,7 +287,9 @@ export class InvoicesListComponent implements OnInit {
     if (this.downloadType === 'invoices') {
       this.reportsService.getInvoicesBulk(
         this.selectedDownloadSchoolYear,
-        this.selectedDownloadStatus === 'Approved' ? true : false).subscribe(
+        this.selectedDownloadStatus === 'Approved' ? true : false,
+        this.templates.find(t => t.name === this.selectedTemplate.name)
+      ).subscribe(
         data => {
           console.log('InvoicesListComponent.doDownload(): data is ', data);
           this.ngxSpinnerService.hide();
@@ -306,6 +325,11 @@ export class InvoicesListComponent implements OnInit {
     this.selectedDownloadStatus = status;
   }
 
+  private selectTemplate(template: Template) {
+    this.selectedTemplate = template;
+    this.selectedTemplateName = template.name;
+  }
+
   private getUnapprovedInvoices(): Report[] {
     return this.allReports.filter((r) => (r.type === ReportType.Invoice && !r.approved));
   }
@@ -320,5 +344,9 @@ export class InvoicesListComponent implements OnInit {
 
   private getInvoicesBySchoolYearAndStatus(year: string, status: boolean): Report[] {
     return this.allReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year && r.approved == status));
+  }
+
+  private filterNonBulkTemplates(): Template[] {
+    return this.templates.filter(r => r.reportType === ReportType.BulkInvoice);
   }
 }
