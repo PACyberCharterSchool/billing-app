@@ -11,6 +11,7 @@ namespace models
 		void Approve(string name);
 		IList<Report> CreateMany(DateTime time, IList<Report> creates);
 		IList<Report> CreateMany(IList<Report> creates);
+		Report CreateBulk(Report createBulk);
 		Report Create(DateTime time, Report create);
 		Report Create(Report create);
 		Report Get(string name);
@@ -60,6 +61,12 @@ namespace models
 		public IList<Report> CreateMany(IList<Report> creates) => CreateMany(DateTime.Now, creates);
 
 		public Report Create(DateTime time, Report create) => CreateMany(time, new[] { create })[0];
+
+		public Report CreateBulk(Report createBulk)
+		{
+			_reports.Add(createBulk);
+			return createBulk;	
+		}
 
 		public Report Create(Report create) => Create(DateTime.Now, create);
 

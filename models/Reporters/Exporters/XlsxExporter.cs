@@ -38,7 +38,7 @@ namespace models.Reporters.Exporters
 						return token.Value<DateTime>();
 
 					case JTokenType.Float:
-						return token.Value<float>();
+						return Math.Round(token.Value<float>(), 2);
 
 					case JTokenType.Integer:
 						return token.Value<int>();
