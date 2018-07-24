@@ -97,6 +97,46 @@ namespace api.Controllers
       public CreateInvoiceReport Invoice { get; set; }
     }
 
+    private void CloneInvoiceSummarySheet(XSSFWorkbook wb, int districtIndex)
+    {
+      wb.CloneSheet(0);
+      var sheet = wb.GetSheetAt(wb.NumberOfSheets - 1);
+      sheet.PrintSetup.HeaderMargin = 0.25;
+      sheet.PrintSetup.FooterMargin = 0.10;
+
+      for (var r = sheet.FirstRowNum; r < sheet.LastRowNum; r++)
+      {
+        var row = sheet.GetRow(r);
+        if (row.Cells.All(c => c.CellType == CellType.Blank))
+          continue;
+
+        for (var c = row.FirstCellNum; c < row.LastCellNum; c++)
+        {
+          var cell = row.GetCell(c);
+          if (cell == null)
+            continue;
+
+          if (!(cell.CellType == CellType.String))
+            continue;
+
+          var value = cell.StringCellValue;
+          if (!value.Contains("${Districts["))
+            continue;
+
+          const string pattern = @"Districts\[(\d+)\]";
+          var matches = Regex.Matches(value, pattern);
+          if (matches.Count > 0)
+          {
+            var match = matches[0];
+            var i = int.Parse(match.Groups[1].Value);
+
+            value = Regex.Replace(value, pattern, $"Districts[{districtIndex}]");
+            cell.SetCellValue(value);
+          }
+        }
+      }
+    }
+
     private void CloneInvoiceSheets(XSSFWorkbook wb, int count)
     {
       const int per = 8;
@@ -106,7 +146,8 @@ namespace api.Controllers
       {
         wb.CloneSheet(1);
 
-        var sheet = wb.GetSheetAt(s + 2);
+        var sheet = wb.GetSheetAt(s + wb.NumberOfSheets - 1);
+
         sheet.PrintSetup.HeaderMargin = 0.25;
         sheet.PrintSetup.FooterMargin = 0.10;
 
@@ -135,14 +176,14 @@ namespace api.Controllers
             if (!value.Contains("${Students["))
               continue;
 
-            const string pattern = @"\[(\d+)\]";
+            const string pattern = @"Students\[(\d+)\]";
             var matches = Regex.Matches(value, pattern);
             if (matches.Count > 0)
             {
               var match = matches[0];
               var i = int.Parse(match.Groups[1].Value);
 
-              value = Regex.Replace(value, pattern, $"[{(i + ((s + 1) * per))}]");
+              value = Regex.Replace(value, pattern, $"Students[{(i + ((s + 1) * per))}]");
               cell.SetCellValue(value);
             }
           }
@@ -722,8 +763,14 @@ namespace api.Controllers
       [Required]
       [Range(1, int.MaxValue)]
       public int TemplateId { get; set; }
+     // public bool? Approved { get; set; }
+     public DateTime AsOf { get; set; }
 
-      public bool? Approved { get; set; }
+     public DateTime ToSchoolDistrict { get; set; }
+
+     public DateTime ToPDE { get; set; }
+
+     public bool Approved { get; set; }
     }
 
     private void AppendSummaryAndStudentItemizationsToSheet(XSSFWorkbook wb, Report report)
@@ -758,25 +805,43 @@ namespace api.Controllers
 
     private Report CreateBulkInvoice(DateTime time, IList<Report> reports, Template invoiceTemplate, CreateBulkReport create)
     {
-      // build config
-      var config = new InvoiceReporter.Config
-      {
-        InvoiceNumber = create.Name,
-        SchoolYear = create.SchoolYear,
-        AsOf = create.Invoice.AsOf,
-        Prepared = time,
-        ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
-        ToPDE = create.Invoice.ToPDE,
-      };
+      var invoices = reports.Select(r => JsonConvert.DeserializeObject<Invoice>(r.Data)).ToList();
 
       // compose workbook
       var wb = new XSSFWorkbook(new MemoryStream(invoiceTemplate.Content));
+      for (int i = 0; i < invoices.Count; i++) {
+        var invoice = invoices[i];
+        if (i > 0) {
+          CloneInvoiceSummarySheet(wb, i);
+        }
 
-      wb.SetSheetName(0, $"Bulk Invoices - {create.SchoolYear}");
+        if (invoice.Students.Count > 0)
+          CloneInvoiceSheets(wb, invoice.Students.Count);
+      }
 
+      if (invoices[0].Students.Count == 0) {
+        wb.RemoveSheetAt(1);
+      }
       // generate xlsx
-      // var data = JsonConvert.SerializeObject(invoice);
-      // wb = _exporter.Export(wb, JsonConvert.DeserializeObject(data));
+      
+      var data = new {
+				SchoolYear = create.SchoolYear,
+				AsOf = create.AsOf,
+				Prepared = time,
+				ToSchoolDistrict = create.ToSchoolDistrict,
+				ToPDE = create.ToPDE,
+        Districts = invoices.Select(i => new {
+          Number = i.Number,
+          SchoolDistrict = i.SchoolDistrict,
+          Students = i.Students,
+          RegularEnrollments = i.RegularEnrollments,
+          SpecialEnrollments = i.SpecialEnrollments,
+          Transactions = i.Transactions
+         })
+      };
+
+      var json = JsonConvert.SerializeObject(data);
+      wb = _exporter.Export(wb, json);
 
       // create report
       Report report;
@@ -786,12 +851,12 @@ namespace api.Controllers
 
         report = new Report
         {
-          Type = ReportType.Invoice,
+          Type = ReportType.BulkInvoice,
           SchoolYear = create.SchoolYear,
           Name = create.Name,
-          Approved = false,
+          Approved = true,
           Created = time,
-          // Data = data,
+          Data = json,
           Xlsx = ms.ToArray(),
         };
       }
@@ -814,21 +879,26 @@ namespace api.Controllers
       if (accept != ContentTypes.XLSX)
         return StatusCode(406);
 
-      var reports = await Task.Run(() => _reports.GetMany(
-        type: ReportType.Invoice,
-        year: create.SchoolYear,
-        approved: create.Approved
-      ));
+      var report = await Task.Run(()  => _reports.Get(create.Name));
 
-      if (reports == null)
-        return NoContent();
+      if (report == null) {
+        var reports = await Task.Run(() => _reports.GetMany(
+          type: ReportType.Invoice,
+          year: create.SchoolYear,
+          approved: create.Approved
+        ));
 
-      // get template
-      var invoiceTemplate = _templates.Get(create.TemplateId);
-      if (invoiceTemplate == null)
-        throw new MissingTemplateException(create.TemplateId);
+        if (reports == null)
+          return NoContent();
 
-      var report = CreateBulkInvoice(DateTime.Now, reports.ToList(), invoiceTemplate, create);
+        // get template
+        var invoiceTemplate = _templates.Get(create.TemplateId);
+        if (invoiceTemplate == null)
+          throw new MissingTemplateException(create.TemplateId);
+
+        report = CreateBulkInvoice(DateTime.Now, reports.ToList(), invoiceTemplate, create);
+      }
+
       var stream = new MemoryStream(report.Xlsx);
       
       return new FileStreamResult(stream, ContentTypes.XLSX)
