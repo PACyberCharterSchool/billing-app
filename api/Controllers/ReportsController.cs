@@ -101,9 +101,11 @@ namespace api.Controllers
     {
       wb.CloneSheet(0);
       var sheet = wb.GetSheetAt(wb.NumberOfSheets - 1);
+
       sheet.PrintSetup.HeaderMargin = 0.25;
       sheet.PrintSetup.FooterMargin = 0.10;
 
+      Console.WriteLine($"ReportsController.CloneInvoiceSummarySheet(): cloned.");
       for (var r = sheet.FirstRowNum; r < sheet.LastRowNum; r++)
       {
         var row = sheet.GetRow(r);
@@ -120,8 +122,6 @@ namespace api.Controllers
             continue;
 
           var value = cell.StringCellValue;
-          if (!value.Contains("${Districts["))
-            continue;
 
           const string pattern = @"Districts\[(\d+)\]";
           var matches = Regex.Matches(value, pattern);
@@ -137,6 +137,77 @@ namespace api.Controllers
       }
     }
 
+    private void CloneBulkInvoiceSheets(XSSFWorkbook wb, int count, int districtIndex)
+    {
+      const int per = 8;
+
+      var numSheets = (int)count / per + (count % per == 0 ? 0 : 1);
+      var adj = districtIndex == 0 ? 1 : 0;
+
+      Console.WriteLine($"ReportsController.CloneBulkInvoiceSheets():  cloning {numSheets} sheets.");
+      for (var s = 0; s < numSheets - adj; s++)
+      {
+        wb.CloneSheet(1);
+
+        var sheet = wb.GetSheetAt(wb.NumberOfSheets - 1);
+
+        sheet.PrintSetup.HeaderMargin = 0.25;
+        sheet.PrintSetup.FooterMargin = 0.10;
+
+        Console.WriteLine($"ReportsController.CloneBulkInvoiceSheets():  cloning {sheet.LastRowNum} rows.");
+        for (var r = sheet.FirstRowNum; r < sheet.LastRowNum; r++)
+        {
+          var row = sheet.GetRow(r);
+          if (row.Cells.All(c => c.CellType == CellType.Blank))
+            continue;
+
+          for (var c = row.FirstCellNum; c < row.LastCellNum; c++)
+          {
+            var cell = row.GetCell(c);;
+            if (cell == null)
+              continue;
+
+            if (r == 13 && c == 1) // Number column
+            {
+              cell.SetCellValue(((s + adj) * per) + 1);
+              continue;
+            }
+
+            if (!(cell.CellType == CellType.String))
+              continue;
+
+            var value = cell.StringCellValue;
+
+            {
+              const string pattern = @"Students\[(\d+)\]";
+              var matches = Regex.Matches(value, pattern);
+              if (matches.Count > 0)
+              {
+                var match = matches[0];
+                var i = int.Parse(match.Groups[1].Value);
+
+                value = Regex.Replace(value, pattern, $"Students[{(i + ((s + adj) * per))}]");
+                cell.SetCellValue(value);
+              }
+            }
+
+            {
+              const string pattern = @"Districts\[(\d+)\]";
+              var matches = Regex.Matches(value, pattern);
+              if (matches.Count > 0)
+              {
+                var match = matches[0];
+                var i = int.Parse(match.Groups[1].Value);
+
+                value = Regex.Replace(value, pattern, $"Districts[{districtIndex}]");
+                cell.SetCellValue(value);
+              }
+            }
+          }
+        }
+      }
+    }
+
     private void CloneInvoiceSheets(XSSFWorkbook wb, int count)
     {
       const int per = 8;
@@ -146,7 +217,7 @@ namespace api.Controllers
       {
         wb.CloneSheet(1);
 
-        var sheet = wb.GetSheetAt(s + wb.NumberOfSheets - 1);
+        var sheet = wb.GetSheetAt(wb.NumberOfSheets - 1);
 
         sheet.PrintSetup.HeaderMargin = 0.25;
         sheet.PrintSetup.FooterMargin = 0.10;
@@ -173,8 +244,6 @@ namespace api.Controllers
               continue;
 
             var value = cell.StringCellValue;
-            if (!value.Contains("${Students["))
-              continue;
 
             const string pattern = @"Students\[(\d+)\]";
             var matches = Regex.Matches(value, pattern);
@@ -809,14 +878,16 @@ namespace api.Controllers
 
       // compose workbook
       var wb = new XSSFWorkbook(new MemoryStream(invoiceTemplate.Content));
+      Console.WriteLine($"ReportsController.CreateBulkInvoice():  number of invoices is {invoices.Count}.");
       for (int i = 0; i < invoices.Count; i++) {
         var invoice = invoices[i];
+        Console.WriteLine($"ReportsController.CreateBulkInvoice():  processing invoice number {i}:  {invoice.SchoolDistrict.Name}");
         if (i > 0) {
           CloneInvoiceSummarySheet(wb, i);
         }
 
         if (invoice.Students.Count > 0)
-          CloneInvoiceSheets(wb, invoice.Students.Count);
+          CloneBulkInvoiceSheets(wb, invoice.Students.Count, i);
       }
 
       if (invoices[0].Students.Count == 0) {
@@ -841,7 +912,7 @@ namespace api.Controllers
       };
 
       var json = JsonConvert.SerializeObject(data);
-      wb = _exporter.Export(wb, json);
+      wb = _exporter.Export(wb, JsonConvert.DeserializeObject(json));
 
       // create report
       Report report;

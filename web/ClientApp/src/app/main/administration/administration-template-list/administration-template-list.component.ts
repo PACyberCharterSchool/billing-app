@@ -111,6 +111,8 @@ export class AdministrationTemplateListComponent implements OnInit {
   }
 
   importTemplate(importTemplateContent): void {
+    this.selectedSchoolYear = 'Select academic year';
+    this.selectedTemplateType = 'Select template type';
     this.ngbModal.open(importTemplateContent, { centered: true }).result.then(
       (result) => {
         this.refreshTemplateList();

@@ -41,7 +41,7 @@ namespace models.Reporters.Exporters
 						return Math.Round(token.Value<float>(), 2);
 
 					case JTokenType.Integer:
-						return token.Value<int>();
+						return token.Value<ulong>();
 
 					case JTokenType.String:
 						return token.Value<string>();

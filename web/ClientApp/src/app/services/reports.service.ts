@@ -107,7 +107,7 @@ export class ReportsService {
     if (reportInfo['SchoolYear']) { url += `&SchoolYear=${reportInfo['SchoolYear']}`; }
     url += reportInfo['Approved'] ? `&Approved=true` : `&Approved=false`;
 
-    return this.httpClient.get<any>(url, headers);
+    return this.httpClient.post<any>(url, null, headers);
   }
 
   public getInvoiceStudentActivityDataBulkByInfo(reportInfo: Object): Observable<any> {

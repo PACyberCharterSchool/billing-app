@@ -61,9 +61,9 @@
           />
       </div>
       <div class='form-group'>
-        <label>Select academic year:</label>
+        <label>Select template type:</label>
         <div ngbDropdown class="d-inline-block">
-          <button type='button' class="btn btn-outline-primary" id="dropdownSelectTemplateType" ngbDropdownToggle>Template Type:</button>
+          <button type='button' class="btn btn-outline-primary" id="dropdownSelectTemplateType" ngbDropdownToggle>{{selectedTemplateType}}</button>
           <div ngbDropdownMenu aria-labelledby="dropdownSelectTemplateType">
             <button type='button' class='dropdown-item' *ngFor='let type of getTemplateTypes()' (click)='setSelectedTemplateType(type)'>{{type.label}}</button>
           </div>
@@ -72,7 +72,7 @@
       <div class='form-group'>
         <label>Select academic year:</label>
         <div ngbDropdown class="d-inline-block">
-          <button type='button' class="btn btn-outline-primary" id="dropdownSelectSchoolYear" ngbDropdownToggle>School Year</button>
+          <button type='button' class="btn btn-outline-primary" id="dropdownSelectSchoolYear" ngbDropdownToggle>{{selectedSchoolYear}}</button>
           <div ngbDropdownMenu aria-labelledby="dropdownSelectSchoolYear">
             <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='setSelectedSchoolYear(year)'>{{year}}</button>
           </div>
