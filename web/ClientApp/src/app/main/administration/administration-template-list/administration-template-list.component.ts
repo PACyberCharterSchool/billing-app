@@ -115,7 +115,6 @@ export class AdministrationTemplateListComponent implements OnInit {
     this.selectedTemplateType = 'Select template type';
     this.ngbModal.open(importTemplateContent, { centered: true }).result.then(
       (result) => {
-        this.refreshTemplateList();
       },
       (reason) => {
         console.log('AdministrationTemplateListComponent.importTemplate():  reason is ', reason);
@@ -156,6 +155,7 @@ export class AdministrationTemplateListComponent implements OnInit {
       this.templatesService.putTemplatesByTypeAndByYear(formData).subscribe(
         data => {
           console.log('ApplicationTemplateListComponent.doImport():  data is ', data['template']);
+          this.refreshTemplateList();
         },
         error => {
           console.log('ApplicationTemplateListComponent.doImport():  error is ', error);
