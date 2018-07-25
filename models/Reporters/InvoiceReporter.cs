@@ -149,7 +149,8 @@ namespace models.Reporters
 		private (InvoiceEnrollments regular, InvoiceEnrollments special) GetEnrollments(
 			IList<InvoiceStudent> students,
 			int firstYear,
-			int secondYear)
+			int secondYear,
+			DateTime asOf)
 		{
 			var regularEnrollments = new InvoiceEnrollments();
 			var specialEnrollments = new InvoiceEnrollments();
@@ -165,6 +166,12 @@ namespace models.Reporters
 					end = EndOfMonth(year, 9);
 				else
 					end = EndOfMonth(year, month.Number);
+
+				if (end > EndOfMonth(asOf.Year, asOf.Month)) {
+					regularEnrollments[month.Name] = regular;
+					specialEnrollments[month.Name] = special;
+					continue;
+				}
 
 				var groups = students.
 					Where(s => {
@@ -358,7 +365,7 @@ namespace models.Reporters
 				new DateTime(invoice.FirstYear, 7, 1),
 				EndOfMonth(config.AsOf.Year, config.AsOf.Month));
 
-			var enrollments = GetEnrollments(invoice.Students, invoice.FirstYear, invoice.SecondYear);
+			var enrollments = GetEnrollments(invoice.Students, invoice.FirstYear, invoice.SecondYear, config.AsOf);
 			invoice.RegularEnrollments = enrollments.regular;
 			invoice.SpecialEnrollments = enrollments.special;
 

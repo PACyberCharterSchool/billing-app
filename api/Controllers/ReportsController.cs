@@ -842,36 +842,6 @@ namespace api.Controllers
      public bool Approved { get; set; }
     }
 
-    private void AppendSummaryAndStudentItemizationsToSheet(XSSFWorkbook wb, Report report)
-    {
-      AppendSummaryInvoiceSectionToSheet((XSSFSheet)wb.GetSheetAt(0));
-      AppendStudentItemizationSectionToSheet((XSSFSheet)wb.GetSheetAt(0), report);
-    }
-
-    private void AppendSummaryInvoiceSectionToSheet(XSSFSheet sheet)
-    {
-      const int RowCount = 43;
-      int CurrentRowCount = NPOIHelper.GetLastRowWithData(sheet);
-
-      for (int j = 0; j < RowCount; j++) {
-        NPOIHelper.CopyRowInSameSheet((XSSFSheet)sheet, j, CurrentRowCount + j, true);
-      }
-    }
-
-    private void AppendStudentItemizationSectionToSheet(XSSFSheet sheet, Report report)
-    {
-      int CurrentRowCount = NPOIHelper.GetLastRowWithData(sheet);
-      const int RowCount = 45;
-      const int per = 8;
-      // var numSheets = (int)count / per + (count % per == 0 ? 0 : 1);
-
-      // for (int i = 0; i < report.Count; i++) {
-      // 	for (int j = 0; j < RowCount; j++) {
-      // 		NPOIHelper.CopyRowInSameSheet((XSSFSheet)sheet, RowCount + j, CurrentRowCount + j, true);					
-      // 	}
-      // }
-    }
-
     private Report CreateBulkInvoice(DateTime time, IList<Report> reports, Template invoiceTemplate, CreateBulkReport create)
     {
       var invoices = reports.Select(r => JsonConvert.DeserializeObject<Invoice>(r.Data)).ToList();
