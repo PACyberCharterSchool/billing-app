@@ -76,6 +76,17 @@ namespace api.Controllers
       public int SchoolDistrictAun { get; set; }
     }
 
+    public class CreateBulkInvoiceReport
+    {
+      public DateTime AsOf { get; set; }
+
+      public DateTime ToSchoolDistrict { get; set; }
+
+      public DateTime ToPDE { get; set; }
+
+      public bool Approved { get; set; }
+    }
+
     public class CreateReport
     {
       [EnumerationValidation(typeof(ReportType))]
@@ -95,6 +106,8 @@ namespace api.Controllers
       public int TemplateId { get; set; }
 
       public CreateInvoiceReport Invoice { get; set; }
+
+      public CreateBulkInvoiceReport BulkInvoice { get; set; }
     }
 
     private void CloneInvoiceSummarySheet(XSSFWorkbook wb, int districtIndex)
@@ -330,7 +343,18 @@ namespace api.Controllers
       return CreateInvoice(time, invoiceTemplate, create);
     }
 
+    private Report CreateBulkInvoice(DateTime time, CreateReport create)
+    {
+      // get template
+      var invoiceTemplate = _templates.Get(create.TemplateId);
+      if (invoiceTemplate == null)
+        throw new MissingTemplateException(create.TemplateId);
+
+      return CreateInvoice(time, invoiceTemplate, create);
+    }
+
     private Report CreateInvoice(CreateReport create) => CreateInvoice(DateTime.Now, create);
+    private Report CreateBulkInvoice(CreateReport create) => CreateBulkInvoice(DateTime.Now, create);
 
     [HttpPost]
     [Authorize(Policy = "PAY+")]
@@ -353,6 +377,12 @@ namespace api.Controllers
             return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without 'invoice' config."));
 
           report = CreateInvoice(create);
+        }
+        else if (create.ReportType == ReportType.BulkInvoice.Value) {
+          if (create.BulkInvoice == null)
+            return new BadRequestObjectResult(new ErrorsResponse("Cannot create bulk invoice without 'invoice' config."));
+          
+          report = CreateBulkInvoice(create);
         }
         else
         {
@@ -820,29 +850,8 @@ namespace api.Controllers
       };
     }
 
-    public class CreateBulkReport
-    {
-      public string Name { get; set; }
 
-      public string ReportType { get; set; }
-
-      [RegularExpression(@"^\d{4}\-\d{4}$")]
-      public string SchoolYear { get; set; }
-
-      [Required]
-      [Range(1, int.MaxValue)]
-      public int TemplateId { get; set; }
-     // public bool? Approved { get; set; }
-     public DateTime AsOf { get; set; }
-
-     public DateTime ToSchoolDistrict { get; set; }
-
-     public DateTime ToPDE { get; set; }
-
-     public bool Approved { get; set; }
-    }
-
-    private Report CreateBulkInvoice(DateTime time, IList<Report> reports, Template invoiceTemplate, CreateBulkReport create)
+    private Report CreateBulkInvoice(DateTime time, IList<Report> reports, Template invoiceTemplate, CreateReport create)
     {
       var invoices = reports.Select(r => JsonConvert.DeserializeObject<Invoice>(r.Data)).ToList();
 
@@ -867,10 +876,10 @@ namespace api.Controllers
       
       var data = new {
 				SchoolYear = create.SchoolYear,
-				AsOf = create.AsOf,
+				AsOf = create.BulkInvoice.AsOf,
 				Prepared = time,
-				ToSchoolDistrict = create.ToSchoolDistrict,
-				ToPDE = create.ToPDE,
+				ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
+				ToPDE = create.BulkInvoice.ToPDE,
         Districts = invoices.Select(i => new {
           Number = i.Number,
           SchoolDistrict = i.SchoolDistrict,
@@ -903,49 +912,6 @@ namespace api.Controllers
       }
 
       return report;
-    }
-
-    [HttpPost("bulk")]
-    [Authorize(Policy = "PAY+")]
-    [Produces(ContentTypes.XLSX)]
-    [ProducesResponseType(204)]
-    [ProducesResponseType(typeof(ErrorsResponse), 400)]
-    public async Task<IActionResult> CreateBulk([FromQuery]CreateBulkReport create)
-    {
-      if (!ModelState.IsValid)
-        return new BadRequestObjectResult(new ErrorsResponse(ModelState));
-
-      var accept = Request.Headers["Accept"];
-
-      if (accept != ContentTypes.XLSX)
-        return StatusCode(406);
-
-      var report = await Task.Run(()  => _reports.Get(create.Name));
-
-      if (report == null) {
-        var reports = await Task.Run(() => _reports.GetMany(
-          type: ReportType.Invoice,
-          year: create.SchoolYear,
-          approved: create.Approved
-        ));
-
-        if (reports == null)
-          return NoContent();
-
-        // get template
-        var invoiceTemplate = _templates.Get(create.TemplateId);
-        if (invoiceTemplate == null)
-          throw new MissingTemplateException(create.TemplateId);
-
-        report = CreateBulkInvoice(DateTime.Now, reports.ToList(), invoiceTemplate, create);
-      }
-
-      var stream = new MemoryStream(report.Xlsx);
-      
-      return new FileStreamResult(stream, ContentTypes.XLSX)
-      {
-        FileDownloadName = $"{create.SchoolYear}_Bulk_Invoice",
-      };
     }
 
     [HttpGet]
