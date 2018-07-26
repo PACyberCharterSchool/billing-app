@@ -55,6 +55,7 @@ namespace models.Reporters
 	{
 		// TODO(Erik): what do we display if null?
 		public ulong? PASecuredID { get; set; }
+		public int PACyberID { get; set; }
 		public string FirstName { get; set; }
 		public string MiddleInitial { get; set; }
 		public string LastName { get; set; }
@@ -134,7 +135,7 @@ namespace models.Reporters
 		private static DateTime EndOfMonth(int year, int month) =>
 			new DateTime(year, month, DateTime.DaysInMonth(year, month));
 
-		bool AreEnrollmentAndWithdrawalInSameMonth(IGrouping<ulong?, InvoiceStudent> group)
+		bool AreEnrollmentAndWithdrawalInSameMonth(IGrouping<int, InvoiceStudent> group)
 		{
 			// this assumes to never run in a group where there is a single entry...
 			var activityDates = group.OrderBy(s => s.FirstDay).Select(s => new { s.FirstDay, s.LastDay }).ToList();
@@ -184,7 +185,7 @@ namespace models.Reporters
 
 						return false;
 					}).
-					GroupBy(s => s.PASecuredID);
+					GroupBy(s => s.PACyberID);
 				foreach (var group in groups) {
 					if (group.Count() == 1) {
 						if (group.Single().IsSpecialEducation) {
@@ -291,6 +292,7 @@ namespace models.Reporters
       IList<InvoiceStudent> studentList = _conn.Query<InvoiceStudent>($@"
 				SELECT
 					StudentPASecuredId AS PASecuredId,
+					StudentId AS PACyberId,
 					StudentFirstName AS FirstName,
 					StudentMiddleInitial AS MiddleInitial,
 					StudentLastName AS LastName,
