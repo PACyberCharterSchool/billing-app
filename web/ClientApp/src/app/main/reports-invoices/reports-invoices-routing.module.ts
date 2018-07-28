@@ -7,6 +7,8 @@ import { ReportsInvoicesHomeComponent } from './reports-invoices-home/reports-in
 import { ReportsInvoicesComponent } from './reports-invoices.component';
 import { InvoicesDigitalSignaturesListComponent } from './invoices-digital-signatures-list/invoices-digital-signatures-list.component';
 import { InvoicesListComponent } from './invoices-list/invoices-list.component';
+import { InvoicesMonthlyCombinedListComponent } from './invoices-monthly-combined-list/invoices-monthly-combined-list.component';
+import { StudentActivityListComponent } from './student-activity-list/student-activity-list.component';
 
 import { AuthenticationGuardService } from '../../services/authentication-guard.service';
 
@@ -37,6 +39,18 @@ const reportsInvoicesRoutes: Routes = [
       {
         path: 'invoices',
         component: InvoicesListComponent,
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
+      },
+      {
+        path: 'invoices-monthly-combined',
+        component: InvoicesMonthlyCombinedListComponent,
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
+      },
+      {
+        path: 'itemized-student-activity',
+        component: StudentActivityListComponent,
         outlet: 'action',
         canActivate: [ AuthenticationGuardService ]
       }

@@ -8,7 +8,8 @@ enum BUTTON_IDS {
   AgingReportsBtn = 'aging-reports-btn',
   AsOfDateReportsBtn = 'as-of-date-reports-btn',
   CSIUExportBtn = 'csiu-export-btn',
-  ItemizedStudentActivityBtn = 'itemized-student-activity-btn'
+  ItemizedStudentActivityBtn = 'itemized-student-activity-btn',
+  MonthlyCombinedInvoiceBtn = 'monthly-combined-invoice-btn'
 }
 
 @Component({
@@ -52,6 +53,9 @@ export class ReportsInvoicesHomeComponent implements OnInit {
         break;
       case BUTTON_IDS.ItemizedStudentActivityBtn:
         this.router.navigate(['/reports-invoices', { outlets: { 'action': ['itemized-student-activity'] } }]);
+        break;
+      case BUTTON_IDS.MonthlyCombinedInvoiceBtn:
+        this.router.navigate(['/reports-invoices', { outlets: { 'action': ['invoices-monthly-combined'] } }]);
         break;
       default:
         this.router.navigate(['/reports-invoices', { outlets: { 'action': ['home'] } }]);

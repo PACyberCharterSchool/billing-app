@@ -343,18 +343,19 @@ namespace api.Controllers
       return CreateInvoice(time, invoiceTemplate, create);
     }
 
-    private Report CreateBulkInvoice(DateTime time, CreateReport create)
+    private Report CreateBulkInvoice(DateTime time, CreateReport create, IList<Report> reports)
     {
       // get template
       var invoiceTemplate = _templates.Get(create.TemplateId);
       if (invoiceTemplate == null)
         throw new MissingTemplateException(create.TemplateId);
 
-      return CreateInvoice(time, invoiceTemplate, create);
+
+      return CreateBulkInvoice(time, reports, invoiceTemplate, create);
     }
 
     private Report CreateInvoice(CreateReport create) => CreateInvoice(DateTime.Now, create);
-    private Report CreateBulkInvoice(CreateReport create) => CreateBulkInvoice(DateTime.Now, create);
+    private Report CreateBulkInvoice(CreateReport create, IList<Report> reports) => CreateBulkInvoice(DateTime.Now, create, reports);
 
     [HttpPost]
     [Authorize(Policy = "PAY+")]
@@ -377,12 +378,6 @@ namespace api.Controllers
             return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without 'invoice' config."));
 
           report = CreateInvoice(create);
-        }
-        else if (create.ReportType == ReportType.BulkInvoice.Value) {
-          if (create.BulkInvoice == null)
-            return new BadRequestObjectResult(new ErrorsResponse("Cannot create bulk invoice without 'invoice' config."));
-          
-          report = CreateBulkInvoice(create);
         }
         else
         {
@@ -853,7 +848,7 @@ namespace api.Controllers
 
     private Report CreateBulkInvoice(DateTime time, IList<Report> reports, Template invoiceTemplate, CreateReport create)
     {
-      var invoices = reports.Select(r => JsonConvert.DeserializeObject<Invoice>(r.Data)).ToList();
+      var invoices = reports.Select(r => JsonConvert.DeserializeObject<Invoice>(r.Data)).OrderBy(i => i.SchoolDistrict.Name).ToList();
 
       // compose workbook
       var wb = new XSSFWorkbook(new MemoryStream(invoiceTemplate.Content));
@@ -912,6 +907,64 @@ namespace api.Controllers
       }
 
       return report;
+    }
+
+    [HttpPost("bulk")]
+    [Authorize(Policy = "PAY+")]
+    [ProducesResponseType(typeof(ReportResponse), 200)]
+    [ProducesResponseType(typeof(ErrorsResponse), 400)]
+    [ProducesResponseType(409)]
+    [ProducesResponseType(424)]
+    [SwaggerResponse(statusCode: 501, description: "Not Implemented")] // Swashbuckle sees this as "Server Error".
+
+    public async Task<IActionResult> CreateBulk([FromBody]CreateReport create)
+    {
+      if (!ModelState.IsValid)
+        return new BadRequestObjectResult(new ErrorsResponse(ModelState));
+
+      Report report;
+
+      try
+      {
+        if (create.ReportType == ReportType.BulkInvoice.Value)
+        {
+          if (create.BulkInvoice == null)
+            return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without 'bulk invoice' config."));
+
+          var reports = await Task.Run(() => _reports.GetMany(
+            type: ReportType.FromString("Invoice"),
+            year: create.SchoolYear,
+            approved: create.BulkInvoice.Approved
+          ));
+
+          report = CreateBulkInvoice(create, reports.ToList());
+        }
+        else
+        {
+          return StatusCode(501);
+        }
+      }
+      catch (MissingTemplateException e)
+      {
+        var result = new ObjectResult(new ErrorResponse(e.Message));
+        result.StatusCode = 424;
+        return result;
+      }
+
+      try
+      {
+        report = await Task.Run(() => _context.SaveChanges(() => _reports.Create(report)));
+      }
+      catch (DbUpdateException)
+      {
+        return StatusCode(409);
+      }
+
+      return new CreatedResult($"/api/reports/{report.Name}", new ReportResponse
+      {
+        Report = new ReportDto(report),
+      });
+
     }
 
     [HttpGet]

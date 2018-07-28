@@ -46,12 +46,10 @@ export class ReportsService {
     return this.httpClient.get<any>(url, this.headers);
   }
 
-  public getInvoicesBulk(year: string, approved: boolean, template: Template): Observable<any> {
+  public getInvoicesBulk(year: string): Observable<any> {
     let reportInfo: Object = Object.assign({}, {'Type': ReportType.BulkInvoice});
 
     if (year) { reportInfo['SchoolYear'] = year; }
-    if (approved != null) { reportInfo['Approved'] = approved; }
-    if (template != null) { reportInfo['templateId'] = template.id; }
 
     return this.getInvoiceByInfoBulk(reportInfo);
   }
@@ -95,19 +93,17 @@ export class ReportsService {
   }
 
   public getInvoiceByInfoBulk(reportInfo: Object): Observable<any> {
-    let url = this.apiReportsUrl + '/bulk';
+    let url = this.apiReportsUrl;
     let headers = {};
-    headers['responseType'] = 'arrayBuffer';
     headers['headers'] = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      'Accept': 'application/json'
     });
 
-    url += `?TemplateId=${reportInfo['templateId']}`;
+    url += '?Type=BulkInvoice';
     if (reportInfo['SchoolYear']) { url += `&SchoolYear=${reportInfo['SchoolYear']}`; }
-    url += reportInfo['Approved'] ? `&Approved=true` : `&Approved=false`;
 
-    return this.httpClient.post<any>(url, null, headers);
+    return this.httpClient.get<any>(url, headers);
   }
 
   public getInvoiceStudentActivityDataBulkByInfo(reportInfo: Object): Observable<any> {
@@ -133,6 +129,12 @@ export class ReportsService {
 
   public createInvoice(invoiceInfo: Object): Observable<Report> {
     const url = this.apiReportsUrl;
+    return this.httpClient.post<any>(url, invoiceInfo, this.headers);
+  }
+
+  public createBulkInvoice(invoiceInfo: Object): Observable<Report> {
+    invoiceInfo = Object.assign(invoiceInfo, { 'reportType': 'BulkInvoice' });
+    const url = this.apiReportsUrl + '/bulk';
     return this.httpClient.post<any>(url, invoiceInfo, this.headers);
   }
 
