@@ -28,7 +28,7 @@
       </thead>
       <tbody>
         <tr *ngFor='let sd of schoolDistricts | orderBy: {property: property, direction: direction}' (click)='editSchoolDistrictPaymentRate(sd)'>
-          <td *ngFor='let v of listDisplayableValues(sd)'>{{v | normalizeFieldValue}}</td>
+          <td *ngFor='let v of listDisplayableValues(sd)'>{{isCurrency(v) ? (v | normalizeFieldValue | currency) : (v | normalizeFieldValue)}}</td>
         </tr>
       </tbody>
     </table>

@@ -29,12 +29,12 @@ export class AdministrationPaymentRateUpdateFormComponent implements OnInit {
     this.schoolDistrict['name'] = this.schoolDistrict.name;
     this.schoolDistrict['paymentType'] = this.schoolDistrict.paymentType === 'SD' ? 'Check' : 'UniPay';
     this.schoolDistrictService.updateSchoolDistrict(this.schoolDistrict).subscribe(
-      val => {
+      data => {
         this.ngbActiveModal.close('success');
-        console.log('AdministrationPaymentRateUpdateComponent.onSubmit():  val is ', val);
+        console.log('AdministrationPaymentRateUpdateComponent.onSubmit():  data is ', data);
       },
-      response => {
-        console.log('AdministrationPaymentRateUpdateComponent.onSubmit():  response is ', response);
+      error => {
+        console.log('AdministrationPaymentRateUpdateComponent.onSubmit():  error is ', error);
         this.ngbActiveModal.dismiss('response');
       }
     );

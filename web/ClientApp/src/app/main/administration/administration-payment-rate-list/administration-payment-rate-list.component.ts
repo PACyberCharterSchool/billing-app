@@ -114,6 +114,17 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     }
   }
 
+  private isFloat(n): boolean {
+      return n === +n && n !== (n|0);
+  }
+
+  private isCurrency(v: any): boolean {
+    if (v !== null) {
+      return this.isFloat(v);
+    }
+    return false;
+  }
+
   selectSchoolDistrict(sd: SchoolDistrict) {
     this.model = sd;
   }

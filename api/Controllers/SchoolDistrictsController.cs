@@ -124,6 +124,8 @@ namespace api.Controllers
 				Name = update.Name,
 				Rate = update.Rate,
 				AlternateRate = update.AlternateRate,
+        SpecialEducationRate = update.SpecialEducationRate,
+        AlternateSpecialEducationRate = update.AlternateSpecialEducationRate,
 				PaymentType = update.PaymentType,
 			};
 			await Task.Run(() => _context.SaveChanges(() => _schoolDistricts.CreateOrUpdate(district)));

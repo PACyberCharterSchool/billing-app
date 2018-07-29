@@ -51,9 +51,10 @@ export class SchoolDistrictService {
     const reqBodyObj = Object.assign({}, {
       aun: sd.aun,
       name: sd.name,
-      rate: sd.rate,
-      alternateRate: sd.alternateRate,
-      paymentRate: sd.alternateRate,
+      rate: +sd.rate,
+      alternateRate: +sd.alternateRate,
+      specialEducationRate: +sd.specialEducationRate,
+      alternateSpecialEducationRate: +sd.alternateSpecialEducationRate,
       paymentType: sd.paymentType
     });
 
