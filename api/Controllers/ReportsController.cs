@@ -233,10 +233,16 @@ namespace api.Controllers
       switch (template.SchoolYear)
       {
         case "2017 - 2018":
-          sequenceNumberRow = 13;
+          if (template.ReportType == ReportType.Invoice)
+            sequenceNumberRow = 13;
+          else
+            sequenceNumberRow = 13;
           break;
         case "2018 - 2019":
-          sequenceNumberRow = 12;
+          if (template.ReportType == ReportType.Invoice)
+            sequenceNumberRow = 12;
+          else
+            sequenceNumberRow = 12;
           break;
         default:
           sequenceNumberRow = 13;
