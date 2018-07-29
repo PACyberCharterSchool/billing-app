@@ -221,9 +221,35 @@ namespace api.Controllers
       }
     }
 
-    private void CloneInvoiceSheets(XSSFWorkbook wb, int count)
+    private int GetRowIndexForFirstStudentItemization(Template template)
+    {
+      int sequenceNumberRow;
+
+      // What does this do you ask? Well, since we can't anticipate what the Pennsylvania
+      // Department of Education is ever going to do with the invoice templates they provide
+      // for use to cyber charter schools, we have to build logic in to find the cell that 
+      // has the index value for the first student in the student itemization.  The remainder
+      // of the index values are calculated from the first index cell.
+      switch (template.SchoolYear)
+      {
+        case "2017 - 2018":
+          sequenceNumberRow = 13;
+          break;
+        case "2018 - 2019":
+          sequenceNumberRow = 12;
+          break;
+        default:
+          sequenceNumberRow = 13;
+          break;
+      }
+
+      return sequenceNumberRow;
+    }
+
+    private void CloneInvoiceSheets(XSSFWorkbook wb, int count, Template template)
     {
       const int per = 8;
+      int sequenceNumberRow;
 
       var numSheets = (int)count / per + (count % per == 0 ? 0 : 1);
       for (var s = 0; s < numSheets - 1; s++)
@@ -247,7 +273,8 @@ namespace api.Controllers
             if (cell == null)
               continue;
 
-            if (r == 13 && c == 1) // Number column
+
+            if (r == GetRowIndexForFirstStudentItemization(template) && c == 1) // Number column
             {
               cell.SetCellValue(((s + 1) * per) + 1);
               continue;
@@ -297,7 +324,7 @@ namespace api.Controllers
       var wb = new XSSFWorkbook(new MemoryStream(invoiceTemplate.Content));
 
       if (invoice.Students.Count > 0)
-        CloneInvoiceSheets(wb, invoice.Students.Count);
+        CloneInvoiceSheets(wb, invoice.Students.Count, invoiceTemplate);
       else
         wb.RemoveSheetAt(1);
 
