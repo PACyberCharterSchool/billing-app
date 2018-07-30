@@ -24,20 +24,17 @@ export class PaymentsService {
   }
 
   public getPayments(skip: number): Observable<Payment[]> {
-    // just return some fake data for now
     const url = this.apiPaymentsUrl + `?skip=${skip}&take=${this.globals.take}`;
     return this.httpClient.get<Payment[]>(url, this.headers);
   }
 
   public createPayment(payment: Payment): Observable<Payment> {
-    // just return some fake data for now
     const url = this.apiPaymentsUrl;
     const reqBody = this.buildPaymentRequestBodyObject(payment);
     return this.httpClient.post<Payment>(url, reqBody, this.headers);
   }
 
   public updatePayment(payment: Payment): Observable<Payment> {
-    // just return some fake data for now
     const url = this.apiPaymentsUrl + `/${payment.paymentId}`;
     const reqBody = this.buildPaymentRequestBodyObject(payment);
     return this.httpClient.put<Payment>(url, reqBody, this.headers);
@@ -59,7 +56,7 @@ export class PaymentsService {
   private fillSplitsColumn(payment: Payment) {
     let splits: Object[];
 
-    splits = [{ 'amount': payment.amount, 'schoolYear': payment.schoolYear }];
+    splits = [{ 'amount': payment.amount, 'schoolYear': payment.schoolYear.replace(/\s/g, '') }];
     if (payment.splitAmount) {
       splits.push({ 'amount': payment.splitAmount, 'schoolYear': payment.schoolYearSplit });
     }
