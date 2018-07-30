@@ -13,10 +13,14 @@ export class Student {
   isSpecialEducation: boolean;
   currentIep: Date;
   formerIep: Date;
-  norep: string;
+  norepDate: string;
   state: string;
   street1: string;
   street2: string;
   zipCode: string;
   schoolDistrict: SchoolDistrict;
+  startDate: Date;
+  endDate: Date;
+  created: Date;
+  lastUpdated: Date;
 }

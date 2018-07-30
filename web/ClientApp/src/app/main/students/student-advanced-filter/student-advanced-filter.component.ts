@@ -13,11 +13,11 @@ import { Student } from '../../../models/student.model';
 })
 export class StudentAdvancedFilterComponent implements OnInit {
 
-  private grades: number[] = [
+  public grades: number[] = [
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
   ];
 
-  private date: Date;
+  public date: Date;
 
   @Input() schoolDistricts: SchoolDistrict[];
 

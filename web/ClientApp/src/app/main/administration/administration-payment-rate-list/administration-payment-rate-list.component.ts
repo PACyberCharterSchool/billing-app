@@ -19,12 +19,12 @@ import {
   styleUrls: ['./administration-payment-rate-list.component.scss']
 })
 export class AdministrationPaymentRateListComponent implements OnInit {
-  private schoolDistricts: SchoolDistrict[];
+  public schoolDistricts: SchoolDistrict[];
   private allSchoolDistricts: SchoolDistrict[];
   private property: string;
   private isDescending: boolean;
   private direction: number;
-  private searchText: string;
+  public searchText: string;
   private selectedBulkImportFile;
 
   model;

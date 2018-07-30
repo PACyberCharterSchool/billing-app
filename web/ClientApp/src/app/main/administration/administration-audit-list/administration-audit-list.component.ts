@@ -14,16 +14,18 @@ import { AuditRecord, AuditRecordType } from '../../../models/audit-record.model
 })
 export class AdministrationAuditListComponent implements OnInit {
 
-  private auditTypes;
-  private property: string;
-  private direction: number;
-  private isDescending: boolean;
+  public auditTypes;
+  public property: string;
+  public direction: number;
+  public isDescending: boolean;
   private allAudits: AuditRecord[];
-  private audits: AuditRecord[];
+  public audits: AuditRecord[];
   private skip: number;
   private collapsed: boolean;
   private selectedAuditRecord: AuditRecord;
-  private searchText: string;
+  public searchText: string;
+  public column: any;
+  public k: any;
 
   constructor(
     private globals: Globals,
@@ -58,7 +60,7 @@ export class AdministrationAuditListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
-  filterAuditRecordsBySearch(searchText: string) {
+  filterAuditRecordsBySearch() {
     this.audits= this.allAudits.filter(
       (i) => {
         const re = new RegExp(this.searchText, 'gi');

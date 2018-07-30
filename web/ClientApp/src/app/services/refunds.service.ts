@@ -24,20 +24,17 @@ export class RefundsService {
   }
 
   public getRefunds(skip: number): Observable<Refund[]> {
-    // just return some fake data for now
     const url = this.apiRefundsUrl + `?skip=${skip}&take=${this.globals.take}`;
     return this.httpClient.get<Refund[]>(url, this.headers);
   }
 
   public createRefund(refund: Refund): Observable<Refund> {
-    // just return some fake data for now
     const url = this.apiRefundsUrl;
     const reqBodyObj = this.buildRefundRequestBodyObject(refund);
     return this.httpClient.post<Refund>(url, reqBodyObj, this.headers);
   }
 
   public updateRefund(refund: Refund): Observable<Refund> {
-    // just return some fake data for now
     const url = this.apiRefundsUrl + `/${refund.id}`;
     const reqBodyObj = this.buildRefundRequestBodyObject(refund);
     return this.httpClient.put<Refund>(url, reqBodyObj, this.headers);

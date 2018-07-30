@@ -19,18 +19,19 @@ import { CurrentStudentService } from '../../../services/current-student.service
 })
 export class StudentsListComponent implements OnInit {
 
-  private students: Student[];
+  public students: Student[];
   private schoolDistricts: SchoolDistrict[];
-  private advancedSearchEnabled: boolean;
-  private searchText: string;
-  private isDescending: boolean;
-  private property: string;
-  private direction: number;
-  private startDate: Date;
-  private endDate: Date;
+  public advancedSearchEnabled: boolean;
+  public searchText: string;
+  public isDescending: boolean;
+  public property: string;
+  public direction: number;
+  public startDate: Date;
+  public endDate: Date;
   private selectedStudent: Student;
   private skip: number;
   private retrievingStudents: boolean;
+  public column: any;
 
   constructor(
     private globals: Globals,

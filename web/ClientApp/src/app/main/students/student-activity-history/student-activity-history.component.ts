@@ -13,11 +13,11 @@ import { StudentActivityRecord } from '../../../models/student-activity-record.m
   styleUrls: ['./student-activity-history.component.scss']
 })
 export class StudentActivityHistoryComponent implements OnInit {
-  private activityTypes;
-  private activities: StudentActivityRecord[];
+  public activityTypes;
+  public activities: StudentActivityRecord[];
   private allActivities: StudentActivityRecord[];
-  private property: string;
-  private direction: number;
+  public property: string;
+  public direction: number;
   private isDescending: boolean;
   private student: Student;
 

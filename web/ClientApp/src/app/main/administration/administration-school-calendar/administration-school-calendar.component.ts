@@ -15,12 +15,12 @@ import { Globals } from '../../../globals';
 })
 export class AdministrationSchoolCalendarComponent implements OnInit {
   private schoolCalendar: Calendar;
-  private academicYear: string;
+  public academicYear: string;
   private direction: number;
   private property: string;
   private isDescending: boolean;
-  private days: CalendarDay[];
-  private searchText: string;
+  public days: CalendarDay[];
+  public searchText: string;
 
   @ViewChild('calendarFileSelector') calendarFileSelector: ElementRef;
 

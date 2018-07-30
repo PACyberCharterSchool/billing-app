@@ -17,13 +17,13 @@ import { Globals } from '../../../globals';
   styleUrls: ['./invoices-digital-signatures-list.component.scss']
 })
 export class InvoicesDigitalSignaturesListComponent implements OnInit {
-  private searchText: string;
+  public searchText: string;
   private direction: number;
   private property: string;
   private isDescending: boolean;
   private skip: number;
   private allSignatures: DigitalSignature[];
-  private signatures: DigitalSignature[];
+  public signatures: DigitalSignature[];
 
   private readonly CloseDeleteDlgWithYes = 'Yes click';
   private readonly CloseDeleteDlgWithNo = 'No click';

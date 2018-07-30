@@ -19,22 +19,23 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./refund-upsert-form.component.scss']
 })
 export class RefundUpsertFormComponent implements OnInit {
-  private amount: number;
-  private selectedSchoolDistrict: SchoolDistrict;
-  private selectedAcademicYear: string;
-  private selectedSchoolDistrictName: string;
-  private dateModel: any;
-  private refundCheckNumber: string;
-  private schoolYears: string[];
+  public amount: number;
+  public selectedSchoolDistrict: SchoolDistrict;
+  public selectedAcademicYear: string;
+  public selectedSchoolDistrictName: string;
+  public dateModel: any;
+  public refundCheckNumber: string;
+  public schoolYears: string[];
   public model: any;
   private skip: number;
+  public upsertError: string;
 
   @Input() op: string;
   @Input() schoolDistricts: SchoolDistrict[];
   @Input() refundRecord: Refund;
 
   constructor(
-    private activeModal: NgbActiveModal,
+    public activeModal: NgbActiveModal,
     private refundsService: RefundsService,
     private academicYearsService: AcademicYearsService,
     private schoolDistrictService: SchoolDistrictService

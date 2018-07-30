@@ -17,7 +17,7 @@ export class AdministrationPaymentRateUpdateFormComponent implements OnInit {
 
   constructor(
     private schoolDistrictService: SchoolDistrictService,
-    private ngbActiveModal: NgbActiveModal
+    public ngbActiveModal: NgbActiveModal
   ) { }
 
   ngOnInit() {

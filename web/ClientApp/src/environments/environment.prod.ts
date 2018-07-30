@@ -1,4 +1,7 @@
+
 export const environment = {
   production: true,
-  baseAPIUrl: '/api'
+  apiHostName: "undefined",
+  apiHostPort: "undefined",
+  apiBaseUrl: "http://undefined:undefined/api"
 };

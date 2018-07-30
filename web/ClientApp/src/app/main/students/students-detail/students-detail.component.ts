@@ -13,7 +13,7 @@ import { Student } from '../../../models/student.model';
 })
 export class StudentsDetailComponent implements OnInit, OnDestroy {
 
-  private student: Student;
+  public student: Student;
   private subscription: any;
 
   constructor(
