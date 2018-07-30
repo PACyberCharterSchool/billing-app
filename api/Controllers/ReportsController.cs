@@ -162,8 +162,14 @@ namespace api.Controllers
 
         var sheet = wb.GetSheetAt(wb.NumberOfSheets - 1);
 
-        sheet.PrintSetup.HeaderMargin = 0.25;
-        sheet.PrintSetup.FooterMargin = 0.10;
+        sheet.PrintSetup.HeaderMargin = 0.0;
+        sheet.PrintSetup.FooterMargin = 0.0;
+        sheet.SetMargin(MarginType.BottomMargin, 0.0);
+        sheet.SetMargin(MarginType.TopMargin, 0.0);
+        sheet.SetMargin(MarginType.LeftMargin, 0.0);
+        sheet.SetMargin(MarginType.RightMargin, 0.0);
+        sheet.SetMargin(MarginType.HeaderMargin, 0.0);
+        sheet.SetMargin(MarginType.FooterMargin, 0.0);
 
         for (var r = sheet.FirstRowNum; r < sheet.LastRowNum; r++)
         {
@@ -260,8 +266,6 @@ namespace api.Controllers
 
         var sheet = wb.GetSheetAt(wb.NumberOfSheets - 1);
 
-        sheet.PrintSetup.HeaderMargin = 0.25;
-        sheet.PrintSetup.FooterMargin = 0.10;
 
         for (var r = sheet.FirstRowNum; r < sheet.LastRowNum; r++)
         {
@@ -324,6 +328,7 @@ namespace api.Controllers
 
       // compose workbook
       var wb = new XSSFWorkbook(new MemoryStream(invoiceTemplate.Content));
+      InitializeWorkbookSheetPrinterMargins(wb);
 
       if (invoice.Students.Count > 0)
         CloneInvoiceSheets(wb, invoice.Students.Count, invoiceTemplate);
@@ -871,13 +876,31 @@ namespace api.Controllers
       };
     }
 
-
+    private void InitializeWorkbookSheetPrinterMargins(XSSFWorkbook wb)
+    {
+      for (int i = 0; i < wb.NumberOfSheets; i++) {
+        XSSFSheet sheet = (XSSFSheet)wb.GetSheetAt(i);
+        if (sheet != null) {
+          // make certain the printer margins for each sheet are zeroed out, lest
+          // we have ugly issues when printing them out.
+          sheet.PrintSetup.HeaderMargin = 0.0;
+          sheet.PrintSetup.FooterMargin = 0.0;
+          sheet.SetMargin(MarginType.BottomMargin, 0.0);
+          sheet.SetMargin(MarginType.TopMargin, 0.0);
+          sheet.SetMargin(MarginType.LeftMargin, 0.05);
+          sheet.SetMargin(MarginType.RightMargin, 0.05);
+          sheet.SetMargin(MarginType.HeaderMargin, 0.0);
+          sheet.SetMargin(MarginType.FooterMargin, 0.0);
+        } 
+      }
+    }
     private Report CreateBulkInvoice(DateTime time, IList<Report> reports, Template invoiceTemplate, CreateReport create)
     {
       var invoices = reports.Select(r => JsonConvert.DeserializeObject<Invoice>(r.Data)).OrderBy(i => i.SchoolDistrict.Name).ToList();
 
       // compose workbook
       var wb = new XSSFWorkbook(new MemoryStream(invoiceTemplate.Content));
+      InitializeWorkbookSheetPrinterMargins(wb);
       Console.WriteLine($"ReportsController.CreateBulkInvoice():  number of invoices is {invoices.Count}.");
       for (int i = 0; i < invoices.Count; i++) {
         var invoice = invoices[i];
