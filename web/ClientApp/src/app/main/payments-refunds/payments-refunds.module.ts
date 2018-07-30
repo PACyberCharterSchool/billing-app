@@ -15,10 +15,13 @@ import { PaymentsComponent } from './payments/payments.component';
 import { PaymentsListComponent } from './payments-list/payments-list.component';
 import { PaymentUpsertFormComponent } from './payment-upsert-form/payment-upsert-form.component';
 
+import { PaymentsRefundsComponent } from './payments-refunds.component';
+
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
+    PaymentsRefundsComponent,
     PaymentsRefundsHomeComponent,
     PaymentsComponent,
     RefundsComponent,

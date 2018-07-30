@@ -8,8 +8,8 @@ import * as XLSX from 'xlsx';
   styleUrls: ['./invoice-excel-preview.component.scss']
 })
 export class InvoiceExcelPreviewComponent implements OnInit {
-  private worksheet;
-  private html;
+  public worksheet;
+  public html;
 
   @Input() xlsxData;
   @Input() jsonData;

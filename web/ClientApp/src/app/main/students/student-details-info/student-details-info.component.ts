@@ -11,7 +11,7 @@ import { CurrentStudentService } from '../../../services/current-student.service
 })
 export class StudentDetailsInfoComponent implements OnInit {
 
-  private student: Student;
+  public student: Student;
 
   constructor(private currentStudentService: CurrentStudentService) { }
 

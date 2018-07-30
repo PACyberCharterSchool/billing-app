@@ -19,26 +19,27 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./payment-upsert-form.component.scss']
 })
 export class PaymentUpsertFormComponent implements OnInit {
-  private amount: number;
-  private splitAmount: number;
-  private selectedSchoolDistrict: SchoolDistrict;
-  private selectedAcademicYear: string;
-  private selectedAcademicYearSplit: string;
+  public amount: number;
+  public splitAmount: number;
+  public selectedSchoolDistrict: SchoolDistrict;
+  public selectedAcademicYear: string;
+  public selectedAcademicYearSplit: string;
   private paymentType: string;
-  private paymentTypeId: string;
-  private schoolYears: string[];
-  private isSplit: boolean;
-  private date: Date;
+  public paymentTypeId: string;
+  public schoolYears: string[];
+  public isSplit: boolean;
+  public date: Date;
   public dateModel: any;
   public paymentTypeModel = { 'check': false, 'unipay': false };
   public schoolDistrictNameModel: string;
+  public upsertError: string;
 
   @Input() op: string;
   @Input() schoolDistricts: SchoolDistrict[];
   @Input() paymentRecord: Payment;
 
   constructor(
-    private activeModal: NgbActiveModal,
+    public activeModal: NgbActiveModal,
     private paymentsService: PaymentsService,
     private schoolDistrictService: SchoolDistrictService,
     private academicYearsService: AcademicYearsService

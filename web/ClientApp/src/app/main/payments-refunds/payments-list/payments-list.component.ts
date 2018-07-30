@@ -21,12 +21,12 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./payments-list.component.scss']
 })
 export class PaymentsListComponent implements OnInit {
-  private searchText: string;
+  public searchText: string;
   private direction: number;
   private property: string;
   private isDescending: boolean;
   private allPayments: Payment[];
-  private payments: Payment[];
+  public payments: Payment[];
   private schoolDistricts: SchoolDistrict[];
   private skip: number;
 

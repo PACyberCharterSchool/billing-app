@@ -20,12 +20,12 @@ import { Globals } from '../../../globals';
   styleUrls: ['./refunds-list.component.scss']
 })
 export class RefundsListComponent implements OnInit {
-  private searchText: string;
+  public searchText: string;
   private direction: number;
   private property: string;
   private isDescending: boolean;
   private allRefunds: Refund[];
-  private refunds: Refund[];
+  public refunds: Refund[];
   private schoolDistricts: SchoolDistrict[];
   private skip: number;
 

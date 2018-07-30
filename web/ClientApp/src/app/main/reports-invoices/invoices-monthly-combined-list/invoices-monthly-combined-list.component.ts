@@ -23,14 +23,14 @@ import { NgxSpinnerService } from 'ngx-spinner';
 export class InvoicesMonthlyCombinedListComponent implements OnInit {
   private reports: Report[];
   private allReports: Report[];
-  private bulkReports: Report[];
+  public bulkReports: Report[];
   private allBulkReports: Report[];
   private skip: number;
-  private property: string;
-  private direction: number;
+  public property: string;
+  public direction: number;
   private isDescending: boolean;
-  private searchText: string;
-  private statuses: string[] = [
+  public searchText: string;
+  public statuses: string[] = [
     'Approved',
     'Disapproved'
   ];
@@ -40,8 +40,8 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   private selectedDownloadStatus: string;
   private selectedTemplate: Template;
   private selectedTemplateName: string;
-  private selectedFilterSchoolYear: string;
-  private selectedFilterStatus: string;
+  public selectedFilterSchoolYear: string;
+  public selectedFilterStatus: string;
   private downloadType: string;
   private spinnerMsg: string;
   private templates: Template[];

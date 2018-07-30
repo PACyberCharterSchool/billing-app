@@ -28,14 +28,14 @@ import { NgxSpinnerService } from 'ngx-spinner';
 export class InvoiceCreateFormComponent implements OnInit {
   private schoolYear: string;
   private invoiceTemplate: string;
-  private asOfDate;
-  private toSchoolDistrictDate;
-  private toPDEDate;
+  public asOfDate;
+  public toSchoolDistrictDate;
+  public toPDEDate;
   private studentTemplate: string;
-  private selectedSchoolYear: string;
-  private schoolYears: string[];
+  public selectedSchoolYear: string;
+  public schoolYears: string[];
   private templates: Template[];
-  private selectedInvoiceTemplate: Template;
+  public selectedInvoiceTemplate: Template;
   private selectedSchoolTemplate: Template;
   private skip: number;
   private selectedSchoolDistrictName: string;
@@ -52,7 +52,7 @@ export class InvoiceCreateFormComponent implements OnInit {
     private templatesService: TemplatesService,
     private schoolDistrictService: SchoolDistrictService,
     private ngxSpinnerService: NgxSpinnerService,
-    private ngbActiveModal: NgbActiveModal
+    public ngbActiveModal: NgbActiveModal
   ) { }
 
   ngOnInit() {

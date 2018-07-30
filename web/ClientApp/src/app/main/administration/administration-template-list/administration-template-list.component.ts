@@ -18,10 +18,10 @@ import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 export class AdministrationTemplateListComponent implements OnInit {
   private property: string;
   private isDescending: boolean;
-  private direction: number;
-  private searchText: string;
+  public direction: number;
+  public searchText: string;
   private skip: number;
-  private templates: Template[];
+  public templates: Template[];
   private allTemplates: Template[];
   private selectedTemplateFile;
   private selectedSchoolYear;

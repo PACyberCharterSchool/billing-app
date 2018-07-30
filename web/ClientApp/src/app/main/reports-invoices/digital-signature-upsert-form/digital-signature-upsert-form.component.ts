@@ -16,18 +16,18 @@ import { Globals } from '../../../globals';
 export class DigitalSignatureUpsertFormComponent implements OnInit {
 
   private userName: string;
-  private title: string;
-  private fileName: string;
-  private imageUrl: string;
+  public title: string;
+  public fileName: string;
+  public imageUrl: string;
   private selectedFiles;
   private imgData: string;
-  private isImageAssigned: boolean;
+  public isImageAssigned: boolean;
 
   @Input() op: string;
   @Input() digitalSignature: DigitalSignature;
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
+    public ngbActiveModal: NgbActiveModal,
     private digitalSignaturesService: DigitalSignaturesService,
     private globals: Globals
   ) { }

@@ -13,15 +13,15 @@ import { ExcelService } from '../../../services/excel.service';
   styleUrls: ['./invoice-preview-form.component.scss']
 })
 export class InvoicePreviewFormComponent implements OnInit {
-  private xlsxData;
-  private jsonData;
+  public xlsxData;
+  public jsonData;
   private currentInvoice: Report;
   private invoiceIdx;
 
   @Input() invoices;
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
+    public ngbActiveModal: NgbActiveModal,
     private reportsService: ReportsService,
     private excelService: ExcelService
   ) { }
@@ -39,7 +39,7 @@ export class InvoicePreviewFormComponent implements OnInit {
         console.log('InvoicePreviewFormComponent.getCurrentInvoiceData(): data is ', data);
         this.currentInvoice.xlsx = data;
         this.excelService.saveStudentActivityAsExcelFile(data, this.currentInvoice);
-        this.ngbActiveModal.close("Successful download");
+        this.ngbActiveModal.close('Successful download');
       },
       error => {
         console.log('InvoicePreviewFormComponent.getCurrentInvoiceData(): error is ', error);
