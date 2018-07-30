@@ -118,7 +118,6 @@ namespace api.Controllers
       sheet.PrintSetup.HeaderMargin = 0.25;
       sheet.PrintSetup.FooterMargin = 0.10;
 
-      Console.WriteLine($"ReportsController.CloneInvoiceSummarySheet(): cloned.");
       for (var r = sheet.FirstRowNum; r < sheet.LastRowNum; r++)
       {
         var row = sheet.GetRow(r);
@@ -150,14 +149,13 @@ namespace api.Controllers
       }
     }
 
-    private void CloneBulkInvoiceSheets(XSSFWorkbook wb, int count, int districtIndex)
+    private void CloneBulkInvoiceSheets(XSSFWorkbook wb, int count, int districtIndex, Template template)
     {
       const int per = 8;
 
       var numSheets = (int)count / per + (count % per == 0 ? 0 : 1);
       var adj = districtIndex == 0 ? 1 : 0;
 
-      Console.WriteLine($"ReportsController.CloneBulkInvoiceSheets():  cloning {numSheets} sheets.");
       for (var s = 0; s < numSheets - adj; s++)
       {
         wb.CloneSheet(1);
@@ -167,7 +165,6 @@ namespace api.Controllers
         sheet.PrintSetup.HeaderMargin = 0.25;
         sheet.PrintSetup.FooterMargin = 0.10;
 
-        Console.WriteLine($"ReportsController.CloneBulkInvoiceSheets():  cloning {sheet.LastRowNum} rows.");
         for (var r = sheet.FirstRowNum; r < sheet.LastRowNum; r++)
         {
           var row = sheet.GetRow(r);
@@ -180,7 +177,7 @@ namespace api.Controllers
             if (cell == null)
               continue;
 
-            if (r == 13 && c == 1) // Number column
+            if (r == GetRowIndexForFirstStudentItemization(template) && c == 1) // Number column
             {
               cell.SetCellValue(((s + adj) * per) + 1);
               continue;
@@ -255,7 +252,6 @@ namespace api.Controllers
     private void CloneInvoiceSheets(XSSFWorkbook wb, int count, Template template)
     {
       const int per = 8;
-      int sequenceNumberRow;
 
       var numSheets = (int)count / per + (count % per == 0 ? 0 : 1);
       for (var s = 0; s < numSheets - 1; s++)
@@ -708,7 +704,6 @@ namespace api.Controllers
         return NotFound();
 
       var accept = Request.Headers["Accept"];
-      Console.WriteLine($"{accept}");
 
       if (accept != ContentTypes.XLSX)
         return StatusCode(406);
@@ -745,7 +740,6 @@ namespace api.Controllers
         return NotFound();
 
       var accept = Request.Headers["Accept"];
-      Console.WriteLine($"{accept}");
 
       if (accept != ContentTypes.XLSX)
         return StatusCode(406);
@@ -775,7 +769,6 @@ namespace api.Controllers
     public async Task<IActionResult> GetBulkActivity([FromQuery]GetActivityArgs args)
     {
       var accept = Request.Headers["Accept"];
-      Console.WriteLine($"{accept}");
 
       if (accept != ContentTypes.XLSX)
         return StatusCode(406);
@@ -888,13 +881,12 @@ namespace api.Controllers
       Console.WriteLine($"ReportsController.CreateBulkInvoice():  number of invoices is {invoices.Count}.");
       for (int i = 0; i < invoices.Count; i++) {
         var invoice = invoices[i];
-        Console.WriteLine($"ReportsController.CreateBulkInvoice():  processing invoice number {i}:  {invoice.SchoolDistrict.Name}");
         if (i > 0) {
           CloneInvoiceSummarySheet(wb, i);
         }
 
         if (invoice.Students.Count > 0)
-          CloneBulkInvoiceSheets(wb, invoice.Students.Count, i);
+          CloneBulkInvoiceSheets(wb, invoice.Students.Count, i, invoiceTemplate);
       }
 
       if (invoices[0].Students.Count == 0) {

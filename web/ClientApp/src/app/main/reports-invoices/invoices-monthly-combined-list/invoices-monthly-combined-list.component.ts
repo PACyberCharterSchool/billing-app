@@ -23,6 +23,8 @@ import { NgxSpinnerService } from 'ngx-spinner';
 export class InvoicesMonthlyCombinedListComponent implements OnInit {
   private reports: Report[];
   private allReports: Report[];
+  private bulkReports: Report[];
+  private allBulkReports: Report[];
   private skip: number;
   private property: string;
   private direction: number;
@@ -63,6 +65,16 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.reportsService.getInvoicesBulk(null).subscribe(
       data => {
         console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
+        this.bulkReports = this.allBulkReports = data['reports'];
+      },
+      error => {
+        console.log('InvoicesListComponent.ngOnInit(): error is ', error);
+      }
+    );
+
+    this.reportsService.getInvoices(null, null, null).subscribe(
+      data => {
+        console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
         this.reports = this.allReports = data['reports'];
       },
       error => {
@@ -91,7 +103,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   filterInvoices() {
-    this.reports = this.allReports.filter(
+    this.bulkReports = this.allBulkReports.filter(
       (i) => {
         const re = new RegExp(this.searchText, 'gi');
         if (
@@ -106,7 +118,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   resetInvoices() {
-    this.reports = this.allReports;
+    this.bulkReports = this.allBulkReports;
     this.searchText = '';
   }
 
@@ -117,7 +129,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
      'SchoolYear': null}).subscribe(
       data => {
         console.log(`InvoicesListComponent.refreshInvoices(): data is ${data}.`);
-        this.reports = this.allReports = data['reports'];
+        this.bulkReports = this.allBulkReports = data['reports'];
       },
       error => {
         console.log(`InvoicesListComponent.refreshInvoices(): error is ${error}.`);
@@ -126,8 +138,8 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   listDisplayableFields() {
-    if (this.allReports) {
-      const fields = this.utilitiesService.objectKeys(this.allReports[0]);
+    if (this.allBulkReports) {
+      const fields = this.utilitiesService.objectKeys(this.allBulkReports[0]);
       const rejected = ['data', 'xlsx', 'type', 'id'];
       return fields.filter((i) => !rejected.includes(i));
     }
@@ -142,12 +154,12 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
   filterBySchoolYear(year: string) {
     this.selectedFilterSchoolYear = year;
-    this.reports = this.allReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year));
+    this.bulkReports = this.allBulkReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year));
   }
 
   filterByApprovedStatus(status: string) {
     this.selectedFilterStatus = status;
-    this.reports = this.allReports.filter((r) => (r.type === ReportType.Invoice && r.approved === (status === 'Approved' ? true : false)));
+    this.bulkReports = this.allBulkReports.filter((r) => (r.type === ReportType.Invoice && r.approved === (status === 'Approved' ? true : false)));
   }
 
   getInvoiceBillingMonths(): string[] {
@@ -331,19 +343,19 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   private getUnapprovedInvoices(): Report[] {
-    return this.allReports.filter((r) => (r.type === ReportType.Invoice && !r.approved));
+    return this.allBulkReports.filter((r) => (r.type === ReportType.Invoice && !r.approved));
   }
 
   private getApprovedInvoices(): Report[] {
-    return this.allReports.filter((r) => (r.type === ReportType.Invoice && r.approved));
+    return this.allBulkReports.filter((r) => (r.type === ReportType.Invoice && r.approved));
   }
 
   private getInvoicesForSchoolYear(year: string): Report[] {
-    return this.allReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year));
+    return this.allBulkReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year));
   }
 
   private getInvoicesBySchoolYearAndStatus(year: string, status: boolean): Report[] {
-    return this.allReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year && r.approved == status));
+    return this.allBulkReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year && r.approved == status));
   }
 
   private filterBulkTemplates(): Template[] {
