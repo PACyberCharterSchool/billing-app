@@ -1,0 +1,120 @@
+.reports-invoices-home-title-row {
+  height: 75px;
+
+  h3 {
+    color: #58a719;
+  }
+}
+
+.reports-invoices-home-content-row {
+  height: calc(100% - 75px);
+
+  div {
+    button {
+      background-color: #ffffff;
+      border: 1px solid #dddddd;
+      border-radius: 5px;
+      height: 205px;
+      margin: 0 auto;
+      margin-bottom: 40px;
+      overflow: hidden;
+      padding: 0;
+      width: 195px;
+
+      label {
+        color: #4d4d4d;
+        white-space: normal;
+      }
+    }
+
+    button#invoices-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -1450px -200px;
+        height: 180px;
+      }
+    }
+
+    button#accounts-receivable-aging-report-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -412px 0px;
+        height: 180px;
+      }
+    }
+
+    button#accounts-receivable-aod-report-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -635px 0px;
+        height: 180px;
+      }
+    }
+
+    button#csiu-export-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -900px 10px;
+        height: 180px;
+      }
+    }
+
+    button#itemized-student-activity-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -1190px 0px;
+        height: 180px;
+      }
+    }
+
+    button#monthly-combined-invoice-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -1445px 5px;
+        height: 180px;
+      }
+    }
+
+    button#reconciliation-combined-invoice-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -405px -200px;
+        height: 180px;
+      }
+    }
+
+    button#unipay-invoice-summary-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -640px -210px;
+        height: 180px;
+      }
+    }
+
+    button#unipay-reconciliation-summary-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -900px -210px;
+        height: 180px;
+      }
+    }
+
+    button#digital-signatures-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -405px -205px;
+        height: 180px;
+      }
+    }
+  }
+}

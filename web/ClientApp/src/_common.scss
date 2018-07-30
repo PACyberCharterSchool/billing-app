@@ -1,0 +1,114 @@
+body, html {
+  background-image: url('assets/images/bg.jpg');
+  font-family: 'Museo Sans', sans-serif !important;
+  font-size: 15px !important;
+  height: 100vh;
+  line-height: 18px;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+
+  h1, h2, h3, h4, h5 {
+    font-family: 'Museo Slab';
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  table {
+    color: #4d4d4d;
+    font-family: 'Museo Sans';
+    font-size: 14px;
+    height: 100%;
+    line-height: 35px;
+    overflow: hidden;
+    width: 100%;
+
+    thead {
+      display: block;
+      height: 7%;
+
+      tr {
+        display: flex;
+        justify-content: space-evenly;
+
+        th {
+          flex-basis: 0;
+          flex-grow: 1;
+          text-align: left;
+        }
+      }
+    }
+
+    tbody {
+      display: block;
+      height: 93%;
+      overflow: scroll;
+
+      tr {
+        display: flex;
+        justify-content: space-evenly;
+
+        td {
+          flex-basis: 0;
+          flex-grow: 1;
+        }
+      }
+    }
+  }
+
+  select {
+    color: #4d4d4d;
+    font-family: 'Museo Sans';
+    font-size: 15px;
+    line-height: 18px;
+  }
+
+  .validation {
+    font-family: 'Museo Slab';
+    font-size: 22px;
+  }
+
+  .btn {
+    border-radius: 2px;
+    font-family: 'Museo Slab';
+  }
+
+  .btn-action {
+    background-color: #005a92;
+  }
+
+  .btn-active {
+    background-color: #4d4d4d;
+    color: #ffffff;
+  }
+
+  .btn-inactive {
+    background-color: #ffffff;
+    border: 1px solid #d6d6d6;
+    color: #4d4d4d;
+  }
+
+  .btn-primary {
+    background-color: #58a719;
+    border: none;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .btn-outline-primary, .btn-outline-primary:hover {
+    border-color: #58a719;
+    color: #58a719;
+  }
+
+  .btn-secondary {
+    border: 1px solid #4d4d4d;
+  }
+
+  .btn-validate {
+    background-color: #fe4848;
+    color: #ffffff;
+  }
+}

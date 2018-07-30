@@ -1,0 +1,44 @@
+.import-student-data-title-row {
+  height: 62px;
+  width: 100%;
+  div {
+    display: inline-block;
+
+    h3 {
+      color: #58a917;
+    }
+  }
+}
+
+.import-student-data-content-row {
+  height: calc(100% - 62px);
+  overflow: hidden;
+
+  div {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  table {
+
+    thead {
+      height: 128px;
+
+      tr {
+        th {
+          width: 3.5%;
+        }
+      }
+    }
+
+    tbody {
+      height: calc(100% - 128px);
+
+      tr {
+        td {
+          width: 3.5%;
+        }
+      }
+    }
+  }
+}

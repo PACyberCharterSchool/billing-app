@@ -1,0 +1,80 @@
+<div class='row school-district-title-row align-items-center'>
+  <div class='col-3 create-payment-col'>
+    <h3>School Districts</h3>
+  </div>
+  <div class='col-9 search-payment-col'>
+    <div class='col-md-12'>
+      <input type='text' [(ngModel)]='searchText' />
+      <button type='button' class='btn btn-primary' (click)='filterSchoolDistrictRecords()'>SEARCH</button>
+      <button type='button' class='btn btn-outline-primary' (click)='resetSchoolDistrictRecords()'>RESET</button>
+    </div>
+  </div>
+</div>
+<div class='row school-district-action-row align-items-center'>
+  <div class='col-2 offset-10'>
+    <button type='button' class='btn btn-primary' (click)='importSchoolDistricts(importSchoolDistrictsContent)'>BULK IMPORT</button>
+  </div>
+</div>
+<div class='row school-district-list-row align-items-center'>
+  <div class='col-12'>
+    <table class='table table-static table-striped' infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]='false' *ngIf='schoolDistricts?.length > 0'>
+      <thead>
+        <tr>
+          <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
+            {{k | normalizeFieldName}}
+            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor='let sd of schoolDistricts | orderBy: {property: property, direction: direction}' (click)='editSchoolDistrictPaymentRate(sd)'>
+          <td *ngFor='let v of listDisplayableValues(sd)'>{{isCurrency(v) ? (v | normalizeFieldValue | currency) : (v | normalizeFieldValue)}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf='schoolDistricts?.length == 0'>No school district records have been imported.</p>
+  </div>
+</div>
+<div class='row school-district-footer-row align-items-center'>
+  <div class='col-12 school-district-rates-action-col'>
+    <a class='btn btn-primary' [routerLink]='["/administration", { outlets: { "action": ["home"] } }]' (click)='collapse()'>
+      <span class='fa'></span> Back to Administration
+    </a>
+  </div>
+</div>
+<ng-template #importSchoolDistrictsContent let-c='close' let-d='dismiss'>
+  <div class='col-md-12'>
+    <div class='modal-header'>
+      <h4 class='modal-title'>Bulk Import School Districts</h4>
+      <button type='button' class='close' aria-label='Close' (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class='modal-body'>
+      <form #selectSchoolDistrictsForm (ngSubmit)='c("Import clicked."); doImport()'>
+        <div class='form-group col-md-12'>
+          <div class='col-md-6'>
+            <label>Select school district data file:</label>
+          </div>
+          <div class='col-md-6'>
+            <input type='file'
+              [(ngModel)]='fileName'
+              [ngModelOptions]='{standalone: true}'
+              accept='text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+              (change)='setImportSchoolDistrictsUrl($event)'
+              />
+          </div>
+        </div>
+        <div class='form-group col-md-12'>
+          <div class='col-md-4 offset-md-8'>
+            <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
+            <button type='submit' class='btn btn-primary'>IMPORT</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class='modal-footer'>
+    </div>
+  </div>
+</ng-template>
+

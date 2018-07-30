@@ -1,0 +1,91 @@
+<div class='row base-search-tools-row align-items-center'>
+  <div class='col-auto'>
+    <h4>Students</h4>
+    <input type='text' placeholder='Search ID, student name...' [(ngModel)]='searchText' />
+    <button class='btn-primary search-button' (click)='filterStudentListByNameOrId()'>SEARCH</button>
+  </div>
+  <div class='col-auto advanced-search-tools-control-col align-items-center'>
+    <h5>More Filters</h5>
+    <button mat-icon-button class='advanced-search-tools-toggle-btn' (click)='toggleAdvancedSearchTools()'>
+      <i class='fa fa-bars' *ngIf='!advancedSearchEnabled'></i>
+      <i class='fa fa-angle-down fa-bold' *ngIf='advancedSearchEnabled'></i>
+    </button>
+  </div>
+  <div class='col-md-auto base-date-search-tools-col'>
+    <div class='col-md-auto'><app-student-datepicker iconSize='fa-2x' [(date)]='startDate' (dateSelected)='dateSelectedStartDateHandler($event)'></app-student-datepicker></div>
+    <div class='col-md-auto'><app-student-datepicker iconSize='fa-2x' [(date)]='endDate' (dateSelected)='dateSelectedEndDateHandler($event)'></app-student-datepicker></div>
+  </div>
+  <div class='col-md-auto'>
+    <button class='btn btn-primary reset-button' (click)='resetStudentList()'>Reset</button>
+  </div>
+</div>
+<div class='row advanced-search-tools-row align-items-center' *ngIf="advancedSearchEnabled">
+  <!-- <div class='col-auto'> -->
+    <app-student-advanced-filter [schoolDistricts]='schoolDistricts' (studentsUpdated)='studentsUpdatedHandler($event)'></app-student-advanced-filter>
+  <!-- </div> -->
+</div>
+<div class='row student-list-view-row'>
+  <div class='col-12'>
+    <table class='table table-fixed table-striped'>
+      <thead>
+        <tr>
+          <th (click)="sort('paCyberId')">
+            PACyber Id
+            <i class="fa" [ngClass]="{'fa-sort': column != 'paCyberId', 'fa-sort-asc': (column == 'paCyberId' && isDescending), 'fa-sort-desc': (column == 'paCyberId' && !isDescending) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('firstName')">
+            First Name
+            <i class="fa" [ngClass]="{'fa-sort': column != 'firstName', 'fa-sort-asc': (column == 'firstName' && isDescending), 'fa-sort-desc': (column == 'firstName' && !isDescending) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('middleInitial')">
+            Middle Init.
+            <i class="fa" [ngClass]="{'fa-sort': column != 'middleInitial', 'fa-sort-asc': (column == 'middleInitial' && isDescending), 'fa-sort-desc': (column == 'middleInitial' && !isDescending) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('lastName')">
+            Last Name
+            <i class="fa" [ngClass]="{'fa-sort': column != 'lastName', 'fa-sort-asc': (column == 'lastName' && isDescending), 'fa-sort-desc': (column == 'lastName' && !isDescending) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('isSpecialEducation')">
+            IEP
+            <i class="fa" [ngClass]="{'fa-sort': column != 'isSpecialEducation', 'fa-sort-asc': (column == 'isSpecialEducation' && isDescending), 'fa-sort-desc': (column == 'isSpecialEducation' && !isDescending) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('grade')">
+            Grade
+            <i class="fa" [ngClass]="{'fa-sort': column != 'grade', 'fa-sort-asc': (column == 'grade' && isDescending), 'fa-sort-desc': (column == 'grade' && !isDescending) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('schoolDistrict')">
+            School Dist
+            <i class="fa" [ngClass]="{'fa-sort': column != 'schoolDistrict', 'fa-sort-asc': (column == 'schoolDistrict' && isDescending), 'fa-sort-desc': (column == 'schoolDistrict' && !isDescending) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('dob')">
+            DOB
+            <i class="fa" [ngClass]="{'fa-sort': column != 'dob', 'fa-sort-asc': (column == 'dob' && isDescending), 'fa-sort-desc': (column == 'dob' && !isDescending) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('startDate')">
+            Start Date
+            <i class="fa" [ngClass]="{'fa-sort': column != 'startDate', 'fa-sort-asc': (column == 'startDate' && isDescending), 'fa-sort-desc': (column == 'startDate' && !isDescending) }" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('endDate')">
+            End Date
+            <i class="fa" [ngClass]="{'fa-sort': column != 'startDate', 'fa-sort-asc': (column == 'startDate' && isDescending), 'fa-sort-desc': (column == 'startDate' && !isDescending) }" aria-hidden="true"></i>
+          </th>
+        </tr>
+      </thead>
+      <tbody infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]='false'>
+        <tr *ngFor="let student of students | orderBy: {property: property, direction: direction}" (click)="showStudentDetails(student.id)">
+          <td>{{student.paCyberId}}</td>
+          <td>{{student.firstName}}</td>
+          <td>{{student.middleInitial}}</td>
+          <td>{{student.lastName}}</td>
+          <td>{{student.isSpecialEducation | iepEnrolled}}</td>
+          <td>{{student.grade}}</td>
+          <td>{{student.schoolDistrict?.name}}</td>
+          <td>{{student.dateOfBirth | date: 'MM/dd/yyyy'}}</td>
+          <td>{{student.startDate | date: 'MM/dd/yyyy'}}</td>
+          <td>{{student.endDate | date: 'MM/dd/yyyy'}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+

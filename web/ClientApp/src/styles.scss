@@ -1,0 +1,22 @@
+/* You can add global styles to this file, and also import other style files */
+@import '~bootstrap/scss/bootstrap.scss';
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import '~handsontable/dist/handsontable.full.css';
+@import './_common.scss';
+@import './_forms.scss';
+
+/* Some custom fonts used by PACBill */
+@font-face {
+  font-family: 'Museo Sans';
+  src: url('assets/fonts/MuseoSans_500.otf');
+}
+
+@font-face {
+  font-family: 'Museo Sans Regular';
+  src: url('assets/fonts/Museo500-Regular.otf');
+}
+
+@font-face {
+  font-family: 'Museo Slab';
+  src: url('assets/fonts/Museo_Slab_500.otf');
+}

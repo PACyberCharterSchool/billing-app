@@ -1,0 +1,37 @@
+.student-meta-info-row {
+  height: 5%;
+
+  div {
+    display: inline;
+
+    h4 {
+      display: inline-block;
+
+      span {
+        color: #58a719;
+      }
+    }
+  }
+
+  div.date-updated-col {
+    text-align: right;
+    float: right;
+  }
+}
+
+.student-info-row {
+  height: 40%;
+}
+
+.student-history-info-row {
+  height: 55%;
+
+  .student-history-content-col {
+    height: 90%;
+  }
+
+  .student-history-back-col {
+    height: 10%;
+    margin-top: 10px;
+  }
+}

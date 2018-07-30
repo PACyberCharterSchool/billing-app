@@ -1,0 +1,47 @@
+.payments-refunds-home-title-row {
+  height: 75px;
+
+  h3 {
+    color: #58a719;
+  }
+}
+
+.payments-refunds-home-content-row {
+  height: calc(100% - 75px);
+
+  div {
+    button {
+      background-color: #ffffff;
+      border: 1px solid #dddddd;
+      border-radius: 5px;
+      height: 205px;
+      margin: 0 auto;
+      margin-bottom: 40px;
+      overflow: hidden;
+      padding: 0;
+      width: 195px;
+
+      label {
+        color: #4d4d4d;
+      }
+    }
+
+    button#payments-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -410px -420px;
+        height: 180px;
+      }
+    }
+
+    button#refunds-btn {
+      img {
+        display: block;
+        object-fit: none;
+        object-position: -635px -420px;
+        height: 180px;
+      }
+    }
+  }
+}

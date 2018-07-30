@@ -1,0 +1,1224 @@
+{
+	"info": {
+		"_postman_id": "1b575092-de0c-46ba-b0ab-7f36b36e639c",
+		"name": "API",
+		"description": "Saved requests for the API server.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Calendars",
+			"description": null,
+			"item": [
+				{
+					"name": "/api/calendars/{year}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/calendars/2017-2018",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"calendars",
+								"2017-2018"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/calendars/{year}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"description": "",
+									"type": "file"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/calendars/2017-2018",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"calendars",
+								"2017-2018"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"description": "",
+			"item": [
+				{
+					"name": "/api/auth/login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "798086a8-b286-42c1-9798-6d25ec26be21",
+								"type": "text/javascript",
+								"exec": [
+									"var json = JSON.parse(responseBody);",
+									"postman.setEnvironmentVariable(\"token\", json.token);"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"RA1\",\n\t\"password\": \"Count DeMonet\"\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/auth/login",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Log user in against AD; get JWT back"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payments",
+			"description": null,
+			"item": [
+				{
+					"name": "/api/payments/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/payments",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"payments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/payments/{id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/payments/716bc268eb",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"payments",
+								"716bc268eb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/payments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"date\": \"2018/05/14\",\n\t\"externalId\": \"bob\",\n\t\"type\": \"Check\",\n\t\"schoolDistrictAun\": 101260303,\n\t\"splits\": [{\n\t\t\"amount\": 10,\n\t\t\"schoolYear\": \"2017-2018\"\n\t}, {\n\t\t\"amount\": 20,\n\t\t\"schoolYear\": \"2018-2019\"\n\t}]\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/payments",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"payments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/payments/{id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"date\": \"2018/05/14\",\n\t\"externalId\": \"bob\",\n\t\"type\": \"Check\",\n\t\"schoolDistrictAun\": 101260303,\n\t\"splits\": [{\n\t\t\"amount\": 30,\n\t\t\"schoolYear\": \"2017-2018\"\n\t}, {\n\t\t\"amount\": 50,\n\t\t\"schoolYear\": \"2018-2019\"\n\t}, {\n\t\t\"amount\": 100,\n\t\t\"schoolYear\": \"2019-2020\"\n\t}]\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/payments/716bc268eb",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"payments",
+								"716bc268eb"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Refunds",
+			"description": null,
+			"item": [
+				{
+					"name": "/api/refunds",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/refunds",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"refunds"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/refunds/{id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/refunds/1",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"refunds",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/refunds",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 10,\n  \"checkNumber\": \"1234\",\n  \"date\": \"2018-05-16\",\n  \"schoolYear\": \"2017-2018\",\n  \"schoolDistrictAun\": 101260303\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/refunds",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"refunds"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/refunds/{id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 20,\n  \"checkNumber\": \"1234\",\n  \"date\": \"2018-05-16T14:06:32Z\",\n  \"schoolYear\": \"2017-2018\",\n  \"schoolDistrictAun\": 101260303\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/refunds/1",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"refunds",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"description": null,
+			"item": [
+				{
+					"name": "/api/reports",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/reports",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"reports"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/reports/{name}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/reports/2017-2018_invoice_1",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"reports",
+								"2017-2018_invoice_1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/reports/zip",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/reports/zip",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"reports",
+								"zip"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/reports",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"reportType\": \"Invoice\",\n\t\"name\": \"2017-2018_invoice_1\",\n\t\"schoolYear\": \"2017-2018\",\n\t\"templateId\": 1,\n\t\"invoice\": {\n\t\t\"asOf\": \"2018-06-07\",\n\t\t\"toSchoolDistrict\": \"2018-06-10\",\n\t\t\"toPDE\": \"2018-06-20\",\n\t\t\"schoolDistrictAun\": 119350303,\n\t\t\"studentsTemplateId\": 2\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/reports",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"reports"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/reports/{name}/approve",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/reports/2017-2018_invoice_1/approve",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"reports",
+								"2017-2018_invoice_1",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/reports/{name}/reject",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/reports/2017-2018_invoice_1/reject",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"reports",
+								"2017-2018_invoice_1",
+								"reject"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/reports/many",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"reportType\": \"Invoice\",\n\t\"schoolYear\": \"2017-2018\",\n\t\"templateId\": 1,\n\t\"invoice\": {\n\t\t\"asOf\": \"2018-01-01\",\n\t\t\"toSchoolDistrict\": \"2017-12-10\",\n\t\t\"toPDE\": \"2017-12-21\",\n\t}\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/reports/many",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"reports",
+								"many"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "SchoolDistricts",
+			"description": "",
+			"item": [
+				{
+					"name": "/api/schooldistricts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/schooldistricts",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"schooldistricts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/schooldistricts/{id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/schooldistricts/1",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"schooldistricts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/schooldistricts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"value": "",
+									"description": "",
+									"type": "file"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/schooldistricts",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"schooldistricts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/schooldistricts/{id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"An Edited School District\"\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/schooldistricts/1",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"schooldistricts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Students",
+			"description": "",
+			"item": [
+				{
+					"name": "/api/students",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/students",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"students"
+							]
+						},
+						"description": "Get all Students"
+					},
+					"response": []
+				},
+				{
+					"name": "/api/students/{id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Bob\",\n  \"lastName\": \"Testy\"\n}"
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/students/1",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"students",
+								"1"
+							]
+						},
+						"description": "Get Student"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "StudentActivityRecords",
+			"description": null,
+			"item": [
+				{
+					"name": "/api/studentactivityrecords/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/studentactivityrecords/",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"studentactivityrecords",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/studentactivityrecords/{id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/studentactivityrecords/nielmancus",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"studentactivityrecords",
+								"nielmancus"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "StudentStatusRecords",
+			"description": null,
+			"item": [
+				{
+					"name": "/api/studentstatusrecords/pending",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/studentstatusrecords/pending?take=10",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"studentstatusrecords",
+								"pending"
+							],
+							"query": [
+								{
+									"key": "take",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/studentstatusrecords/pending/commit",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/studentstatusrecords/pending/commit",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"studentstatusrecords",
+								"pending",
+								"commit"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Swagger",
+			"description": null,
+			"item": [
+				{
+					"name": "/swagger/v1/swagger.json",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/swagger/v1/swagger.json",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"swagger",
+								"v1",
+								"swagger.json"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Templates",
+			"description": null,
+			"item": [
+				{
+					"name": "/api/templates",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/templates",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"templates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/templates/{type}/{year}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/templates/Invoice/2017-2018",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"templates",
+								"Invoice",
+								"2017-2018"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/api/templates/{type}/{year}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "content",
+									"description": "",
+									"type": "file"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{host}}:{{port}}/api/templates/Invoice/2017-2018",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"templates",
+								"Invoice",
+								"2017-2018"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "30aa9240-0d74-4596-8c98-8757484bc043",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "f47e11a8-0ef7-424d-8ebf-df9b7c7a6176",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

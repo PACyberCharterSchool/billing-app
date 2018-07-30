@@ -1,0 +1,56 @@
+.school-district-title-row {
+  height: 62px;
+
+  .create-payment-col {
+    h3 {
+      color: #58a917;
+    }
+  }
+
+  .search-payment-col {
+    input[type='text'] {
+      width: 70%;
+      padding: 6px 2px;
+      line-height: 14px;
+    }
+
+    button.btn-primary {
+      position: relative;
+      left: -4px;
+      top: -2px;
+    }
+
+    button.btn-outline-primary {
+      position: relative;
+      top: -2px;
+    }
+  }
+}
+
+.school-district-action-row {
+  height: 40px;
+}
+
+.school-district-list-row {
+  height: calc(100% - 142px);
+  margin-bottom: 10px;
+
+  div.col-12 {
+    height: 100%;
+
+    table {
+      height: 100%;
+
+      thead {
+        height: 60px;
+      }
+    }
+  }
+}
+
+.school-district-footer-row {
+  height: 40px;
+
+  .school-district-rates-action-col {
+  }
+}

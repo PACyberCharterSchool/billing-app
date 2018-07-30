@@ -1,0 +1,59 @@
+.calendar-title-row {
+  height: 62px;
+  margin-bottom: 15px;
+  padding-top: 25px;
+
+  .calendar-title-col {
+    h4 {
+      color: #58a719;
+    }
+  }
+
+  .calendar-search-col {
+    input[type='text'] {
+      padding: 6px 2px;
+      line-height: 14px;
+      width: 70%;
+    }
+
+    input[type='text'] + button {
+      height: 2.25rem;
+      position: relative;
+      top: -2px;
+      left: -4px;
+    }
+
+    button.btn-outline-primary {
+      position: relative;
+      top: -2px;
+    }
+  }
+}
+
+.calendar-select-row {
+  margin-bottom: 15px;
+}
+
+.calendar-list-row {
+  height: calc(100% - 60px);
+
+  div.col-12 {
+    height: 100%;
+
+    table {
+      thead {
+        height: 60px;
+      }
+
+      tbody {
+        height: calc(100% - 60px);
+      }
+    }
+
+    p {
+      font-size: 24px;
+      color: #4d4d4d;
+      text-align: center;
+    }
+  }
+}

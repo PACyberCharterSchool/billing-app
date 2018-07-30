@@ -1,0 +1,38 @@
+.modal-header {
+  h4 {
+    color: #58a917;
+  }
+}
+
+.modal-body {
+  div.col-md-12 {
+    padding: 0;
+
+    form {
+      div.form-group {
+        display: flex;
+
+        div.col-md-6 {
+          display: flex;
+          align-items: center;
+          padding-left: 0;
+          padding-right: 0;
+
+          div.d-inline-block {
+            width: 100%;
+
+            button {
+              width: 100%;
+            }
+
+            div.dropdown-menu {
+              height: 120px;
+              overflow-y: scroll;
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+.student-activity-history-title-row {
+  height: 20%;
+  width: 100%;
+
+  div {
+    h5 {
+      color: #58a917;
+    }
+
+    div.col-md-2 {
+      display: inline-block;
+    }
+
+    div.reset-button-col {
+      display: inline-block;
+      padding-left: 12%;
+    }
+  }
+}
+
+.student-activity-history-content-row {
+  width: 100%;
+  height: 80%;
+  overflow: hidden;
+
+  table {
+    width: 100%;
+
+    thead {
+      height: 59px;
+    }
+  }
+}

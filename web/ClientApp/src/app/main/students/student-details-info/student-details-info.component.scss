@@ -1,0 +1,31 @@
+.student-bio-info {
+  h2 {
+    color: #58a719;
+  }
+}
+
+.student-school-info {
+  height: 260px;
+
+  table {
+    background-color: #dddddd;
+    width: 100%;
+
+    tbody {
+      overflow: visible;
+
+      tr {
+        margin-top: 0;
+        margin-bottom: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+
+        td {
+          font-size: 16px;
+          margin: 0;
+          padding: 0 4px 0 20px;
+        }
+      }
+    }
+  }
+}

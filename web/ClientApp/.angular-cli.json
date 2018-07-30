@@ -18,14 +18,15 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "styles.css",
-        "../node_modules/bootstrap/dist/css/bootstrap.min.css"
+        "../node_modules/font-awesome/css/font-awesome.min.css",
+        "styles.scss"
       ],
       "scripts": [],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
-        "prod": "environments/environment.prod.ts"
+        "prod": "environments/environment.prod.ts",
+        "staging": "environments/environment.staging.ts"
       }
     }
   ],
@@ -54,8 +55,9 @@
     }
   },
   "defaults": {
-    "styleExt": "css",
-    "component": {},
+    "styleExt": "sass",
+    "component": {
+    },
     "build": {
       "progress": true
     }

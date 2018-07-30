@@ -1,0 +1,72 @@
+.base-search-tools-row {
+  .base-date-search-tools-col {
+    margin: 0;
+    padding: 0;
+
+    div {
+      display: inline-block;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .search-button {
+    height: 40px;
+    left: -4px;
+    margin-left: 0;
+    position: relative;
+    top: -1px;
+    width: 85px;
+  }
+
+  .reset-button {
+    height: 40px;
+    width: 85px;
+  }
+
+  .advanced-search-tools-control-col {
+    margin: 0;
+    padding-left: 0;
+  }
+
+  .advanced-search-tools-toggle-btn {
+    border: none;
+    background-color: transparent;
+  }
+
+  h3, h4 {
+    color: #58a719;
+    display: inline-block;
+    font-family: 'Museo Slab';
+    font-size: 18px;
+  }
+
+  h5 {
+    color: #4d4d4d;
+    display: inline-block;
+    text-align: left;
+  }
+
+  input {
+    height: 40px;
+    margin-left: 20px;
+    margin-right: 0;
+    width: 47%;
+  }
+}
+
+.advanced-search-tools-row {
+}
+
+.student-list-view-row {
+  height: 100%;
+  margin-top: 36px;
+
+  div {
+    table {
+      thead {
+        height: 60px;
+      }
+    }
+  }
+}

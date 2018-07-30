@@ -1,0 +1,43 @@
+<div class='row calendar-title-row align-items-center'>
+  <div class='col-auto calendar-title-col'>
+    <h4>{{academicYear}} School Calendar</h4>
+  </div>
+  <div class='col-6 calendar-search-col'>
+    <input type='text' [(ngModel)]='searchText' />
+    <button type='button' class='btn btn-primary' (click)='filterDays()'>SEARCH</button>
+    <button type='button' class='btn btn-outline-primary' (click)='resetDays()'>RESET</button>
+  </div>
+</div>
+<div class='row calendar-select-row align-items-center'>
+  <div class='col-auto calendar-import-col'>
+    <label for='calendar-file-selector'>Select calendar file:</label>
+    <span class='btn btn-primary btn-file'>
+      <input
+        type='file'
+        accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
+        id='calendarFileSelector'
+        #calendarFileSelector
+        (change)='handleFileSelection($event)' />
+    </span>
+  </div>
+</div>
+<div class='row calendar-list-row align-items-center justify-content-center'>
+  <div class='col-12'>
+    <table class='table table-fixed table-striped' *ngIf='days?.length > 0'>
+      <thead>
+        <tr>
+          <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
+            {{k | normalizeFieldName}}
+            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor='let day of days | orderBy: {property: property, direction: direction}'>
+          <td *ngFor='let v of listDisplayableValues(day)'>{{v | normalizeFieldValue}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf='days?.length <= 0'>No school calendars are imported.</p>
+  </div>
+</div>

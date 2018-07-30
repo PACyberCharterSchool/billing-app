@@ -1,0 +1,62 @@
+.template-filter-row {
+  height: 62px;
+
+  h4 {
+    color: #58a917;
+  }
+
+  .search-template-col {
+    input[type='text'] {
+      padding: 6px 2px;
+      line-height: 14px;
+      width: 50%;
+    }
+
+    button {
+      position: relative;
+      left: -4px;
+      top: -2px;
+    }
+  }
+}
+
+.template-action-row {
+  height: 40px;
+}
+
+.template-list-row {
+  height: calc(100% - 142px);
+
+  div.col-12 {
+    height: 100%;
+
+    table {
+      thead {
+        height: 60px;
+      }
+
+      tbody {
+        height: calc(100% - 60px);
+      }
+    }
+
+    p {
+      color: #4d4d4d;
+      font-size: 36px;
+      text-align: center;
+    }
+  }
+}
+
+.template-footer-row {
+  height: 40px;
+}
+
+.modal-title {
+  color: #58a917;
+}
+
+#dropdownSelectSchoolYear + div.dropdown-menu {
+  height: 240px;
+  overflow: scroll;
+}

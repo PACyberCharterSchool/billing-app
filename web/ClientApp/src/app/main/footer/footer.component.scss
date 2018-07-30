@@ -1,0 +1,29 @@
+.footer-bar-row {
+  background-color: #58a719;
+  bottom: 0;
+  color: #ffffff;
+  font-size: 12px;
+  height: 55px;
+  margin: 0;
+  padding: 0;
+  padding-left: 10px;
+  padding-right: 0;
+  position: absolute;
+  width: 100%;
+
+  div.col-md-4 {
+    margin: 0;
+    padding-left: 10px;
+  }
+
+  div.col-md-8 {
+    margin: 0;
+    padding-right: 0 !important;
+  }
+
+  span {
+    line-height: 60px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+}

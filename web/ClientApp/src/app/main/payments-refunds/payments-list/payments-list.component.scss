@@ -1,0 +1,61 @@
+.payments-title-row {
+  height: 62px;
+  padding-bottom: 10px;
+
+  div.col-2 {
+    color: #58a917;
+  }
+
+  div.col-6 {
+    input[type='text'] {
+      line-height: 14px;
+      padding: 6px 2px;
+      width: 70%;
+    }
+
+    input[type='text'] + button {
+      height: 2.25rem;
+      position: relative;
+      top: -2px;
+      left: -4px;
+    }
+
+    button.btn-outline-primary {
+      position: relative;
+      top: -2px;
+      left: -4px;
+    }
+  }
+}
+
+.payments-action-row {
+  height: 40px;
+}
+
+.payments-list-row {
+  height: calc(100% - 142px);
+
+  .payment-list-col {
+    height: 100%;
+
+    table {
+      thead {
+        height: 130px;
+      }
+
+      tbody {
+        height: calc(100% - 130px);
+      }
+    }
+
+    p {
+      font-size: 36px;
+      color: #4d4d4d;
+      text-align: center;
+    }
+  }
+}
+
+.payments-footer-row {
+  height: 40px;
+}

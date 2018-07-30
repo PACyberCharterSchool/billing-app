@@ -1,0 +1,108 @@
+<div class='row invoices-title-row align-items-center'>
+  <div class='col-2'><h4>Combined Invoices</h4></div>
+  <div class='col-6'>
+    <input type='text' [(ngModel)]='searchText' />
+    <button type='button' class='btn btn-primary' (click)='filterInvoices()'>SEARCH</button>
+    <button type='button' class='btn btn-outline-primary' (click)='resetInvoices()'>RESET</button>
+  </div>
+  <div class='col-4'>
+    <div class='row'>
+      <div class='col'>
+        <div ngbDropdown class="d-inline-block">
+          <button class="btn btn-outline-primary" id="dropdownSchoolYear" ngbDropdownToggle>{{selectedFilterSchoolYear}}</button>
+          <div ngbDropdownMenu aria-labelledby="dropdownSchoolYear">
+            <button class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='filterBySchoolYear(year)'>{{year}}</button>
+          </div>
+        </div>
+        <div ngbDropdown class="d-inline-block">
+          <button class="btn btn-outline-primary" id="dropdownStatus" ngbDropdownToggle>{{selectedFilterStatus}}</button>
+          <div ngbDropdownMenu aria-labelledby="dropdownStatus">
+            <button class='dropdown-item' *ngFor='let status of statuses' (click)='filterByApprovedStatus(status)'>{{status}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class='row invoices-action-row align-items-center'>
+  <div class='col-12'>
+    <button type='button' class='btn btn-primary' (click)='displayCreateBulkInvoiceDialog(bulkCreateContent)'>CREATE</button>
+  </div>
+</div>
+<div class='row invoices-list-row align-items-center'>
+  <div class='col-12 invoices-list-col'>
+    <table class='table table-fixed table-striped'>
+      <thead>
+        <tr>
+          <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
+            {{k | normalizeFieldName}}
+            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+          </th>
+          <th>Preview</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor='let report of bulkReports | orderBy: {property: property, direction: direction}'>
+          <td *ngFor='let v of listDisplayableValues(report)'>{{v | normalizeFieldValue}}</td>
+          <td><button type='button' class='btn btn-primary' (click)='downloadInvoiceStudentActivity(report)'>Preview</button></td>
+          <td><button type='button' class='btn btn-primary' (click)='downloadInvoice(report)'>Download</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class='row invoices-footer-row align-items-center'>
+  <div class='col-12 invoices-back-col'>
+    <a class='btn btn-primary' [routerLink]='["/reports-invoices", { outlets: { "action": ["home"] } }]' (click)='collapse()'>
+      <span class='fa'></span> Reports & Invoices
+    </a>
+  </div>
+</div>
+<ng-template #bulkCreateContent let-c='close' let-d='dismiss'>
+  <div class='modal-header'>
+    <h4 class='modal-title'>Create Bulk Invoice</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class='modal-body'>
+    <div class='row align-items-center'>
+      <div class='col-12 text-center'>
+        <form #createBulkForm (ngSubmit)="c('creating'); create()">
+          <div class='form-group'>
+            <div ngbDropdown class="d-inline-block">
+              <button type='button' class="btn btn-outline-primary" id="dropdownDownloadSchoolYear" ngbDropdownToggle>{{selectedCreateSchoolYear}}</button>
+              <div ngbDropdownMenu aria-labelledby="dropdownDownloadSchoolYear">
+                <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='selectSchoolYear(year)'>{{year}}</button>
+              </div>
+            </div>
+          </div>
+          <div class='form-group'>
+            <div ngbDropdown class="d-inline-block">
+              <button type='button' class="btn btn-outline-primary" id="dropdownDownloadSchoolYear" ngbDropdownToggle>{{selectedAsOfBillingDate}}</button>
+              <div ngbDropdownMenu aria-labelledby="dropdownDownloadSchoolYear">
+                <button type='button' class='dropdown-item' *ngFor='let month of getInvoiceBillingMonths()' (click)='selectBillingMonth(month)'>{{month}}</button>
+              </div>
+            </div>
+          </div>
+          <div class='form-group'>
+            <div ngbDropdown class="d-inline-block">
+              <button type='button' class="btn btn-outline-primary" id="dropdownTemplateType" ngbDropdownToggle>{{selectedTemplateName}}</button>
+              <div ngbDropdownMenu aria-labelledby="dropdownTemplateType">
+                <button type='button' class='dropdown-item' *ngFor='let template of filterBulkTemplates(templates)' (click)='selectTemplate(template)'>{{template.name}}</button>
+              </div>
+            </div>
+          </div>
+          <div class='form-group offset-2'>
+            <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
+            <button type='submit' class='btn btn-primary'>CREATE</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class='modal-footer'>
+  </div>
+</ng-template>
+<ngx-spinner size='large' loadingText='Generating PACBILL invoices.  Please wait...' type='timer'></ngx-spinner>

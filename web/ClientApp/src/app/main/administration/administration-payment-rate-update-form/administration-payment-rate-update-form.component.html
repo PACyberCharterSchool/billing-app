@@ -1,0 +1,54 @@
+<div class='modal-header'>
+    <h4 class='modal-title'>{{schoolDistrict.name}} Rates</h4>
+    <button type='button' class='close' aria-label='Close' (click)='ngbActiveModal.dismiss("Cross click")'>
+        <span aria-hidden='true'>&times;</span>
+    </button>
+</div>
+<div class='modal-body'>
+    <div class='row school-district-details-row'>
+      <div class='col-md-12 school-district-rates'>
+        <form (ngSubmit)='onSubmit()' #schoolDistrictForm='ngForm'>
+          <!-- <div class='form-group'> -->
+            <!-- WDM 04/26/2018:  Note that HTML5 defines that all button elements within a form element will perform a submit -->
+            <!-- when you click them.  To prevent that from happening, any button elements within a form should have the type='button' -->
+            <!-- attribute added to them.  See this item in StackOverflow:  https://stackoverflow.com/questions/2825856/html-button-to-not-submit-form  -->
+          <!-- </div> -->
+          <div class='form-group'>
+            <div class='row'>
+              <div class='col-md-6'>
+                <div class='col-md-12'><label for='rate'>Rate</label></div>
+                <div class='col-md-12'><label for='alternate-rate'>Alternate Rate</label></div>
+                <div class='col-md-12'><label for='specialEducationRate'>Special Education Rate</label></div>
+                <div class='col-md-12'><label for='alternateSpecialEducationRate'>Alt. Special Education Rate</label></div>
+                <div class='col-md-12'><label for='paymentType'>Payment Type</label></div>
+              </div>
+              <div class='col-md-6'>
+                <div class='col-md-12'><input type='number' step='0.01' min=0 id='rate' name='rate' [(ngModel)]='schoolDistrict.rate' /></div>
+                <div class='col-md-12'><input type='number' step='0.01' min=0 id='alternateRate' name='alternateRate' [(ngModel)]='schoolDistrict.alternateRate' /></div>
+                <div class='col-md-12'><input type='number' step='0.01' min=0 id='specialEducationRate' name='specialEducationRate' [(ngModel)]='schoolDistrict.specialEducationRate' /></div>
+                <div class='col-md-12'><input type='number' step='0.01' min=0 id='alternateSpecialEducationRate' name='alternateSpecialEducationRate' [(ngModel)]='schoolDistrict.alternateSpecialEducationRate' /></div>
+                <div class='col-md-12'>
+                  <div class='btn-group btn-group-toggle' ngbRadioGroup id='paymentType' name='paymentType' [(ngModel)]='schoolDistrict.paymentType'>
+                    <label ngbButtonLabel class='btn-primary'>
+                      <input ngbButton type="radio" value='SD'> SD
+                    </label>
+                    <label ngbButtonLabel class='btn-primary'>
+                      <input ngbButton type="radio" value='PDE'> PDE
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class='row'>
+            <div class='col-md-6 offset-md-6'>
+              <button type='button' class='btn btn-outline' (click)="ngbActiveModal.close('Close click')">CANCEL</button>
+              <button type='submit' class='btn btn-success'>UPDATE</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+</div>
+<div class='modal-footer'>
+</div>
