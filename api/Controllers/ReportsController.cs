@@ -887,8 +887,8 @@ namespace api.Controllers
           sheet.PrintSetup.FooterMargin = 0.0;
           sheet.SetMargin(MarginType.BottomMargin, 0.0);
           sheet.SetMargin(MarginType.TopMargin, 0.0);
-          sheet.SetMargin(MarginType.LeftMargin, 0.05);
-          sheet.SetMargin(MarginType.RightMargin, 0.05);
+          sheet.SetMargin(MarginType.LeftMargin, 0.0);
+          sheet.SetMargin(MarginType.RightMargin, 0.0);
           sheet.SetMargin(MarginType.HeaderMargin, 0.0);
           sheet.SetMargin(MarginType.FooterMargin, 0.0);
         } 
