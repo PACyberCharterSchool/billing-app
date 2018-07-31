@@ -151,7 +151,7 @@ export class PaymentsListComponent implements OnInit {
   listDisplayableFields() {
     if (this.allPayments) {
       const fields = this.utilitiesService.objectKeys(this.allPayments[0]);
-      const rejected = ['id'];
+      const rejected = ['id', 'paymentId'];
       return fields.filter((i) => !rejected.includes(i));
     }
   }

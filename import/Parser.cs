@@ -41,17 +41,22 @@ namespace import
 			Console.WriteLine("Reading records...");
 			var count = 0;
 			var records = new List<PendingStudentStatusRecord>();
-			foreach (var record in csvReader.GetRecords<PendingStudentStatusRecord>())
-			{
-				record.BatchTime = batchTime;
-				record.BatchFilename = batchFilename;
-				record.BatchHash = batchHash;
+			try {
+				foreach (var record in csvReader.GetRecords<PendingStudentStatusRecord>())
+				{
+					record.BatchTime = batchTime;
+					record.BatchFilename = batchFilename;
+					record.BatchHash = batchHash;
 
-				records.Add(record);
+					records.Add(record);
 
-				count++;
-				if (count % 1000 == 0)
-					Console.WriteLine($"Read {count} records.");
+					count++;
+					if (count % 1000 == 0)
+						Console.WriteLine($"Read {count} records.");
+				}
+			}
+			catch (Exception e) {
+				Console.WriteLine($"e");
 			}
 
 			Console.WriteLine($"Reading records done ({count})!");
