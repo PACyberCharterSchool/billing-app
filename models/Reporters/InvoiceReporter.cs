@@ -179,7 +179,8 @@ namespace models.Reporters
 						if (s.FirstDay <= end && (s.LastDay == null || s.LastDay >= start)) {
 							return true;
 						}
-						else if (s.FirstDay <= end && (start.Month == 9 && (s.LastDay == null || (s.LastDay.Value.Month >= 7 || s.LastDay.Value.Month <= 9)))) {
+						/* else if (s.FirstDay <= end && (start.Month == 9 && (s.LastDay == null || (s.LastDay.Value.Month >= 7 || s.LastDay.Value.Month <= 9)))) { */
+            else if (s.FirstDay <= end && (end.Month == 9 && (s.LastDay == null || (s.LastDay.Value.Month >= 7 || s.LastDay.Value.Month <= 9)))) {
 							return true;
 						}
 
