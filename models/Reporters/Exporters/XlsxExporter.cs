@@ -44,6 +44,10 @@ namespace models.Reporters.Exporters
 						return token.Value<ulong>();
 
 					case JTokenType.String:
+						if (token.Path.Contains("City")) {
+							// dear god, such a kludge, but it gets rid of extraneous commas from the student itemization sheet
+							return string.Concat(token.Value<string>(), ", ");
+						}
 						return token.Value<string>();
 
 					default:

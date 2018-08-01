@@ -68,12 +68,12 @@
             Payment Type
           </div>
           <div class='col-md-6'>
-            <div class='btn-group btn-group-toggle' name='paymentType' [(ngModel)]='paymentTypeModel' [ngModelOptions]='{standalone: true}'>
+            <div class='btn-group btn-group-toggle' ngbRadioGroup name='paymentType' [(ngModel)]='paymentTypeModel' [ngModelOptions]='{standalone: true}'>
               <label class='btn-primary' ngbButtonLabel>
-                <input type='checkbox' ngbButton  value='check' for='paymentType' />SD
+                <input type='checkbox' ngbButton type='radio' value='check' for='paymentType' />SD
               </label>
               <label class='btn-primary' ngbButtonLabel>
-                <input type='checkbox' ngbButton value='unipay' for='paymentType' />PDE
+                <input type='checkbox' ngbButton type='radio' value='unipay' for='paymentType' />PDE
               </label>
             </div>
           </div>
