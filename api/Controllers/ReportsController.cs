@@ -904,6 +904,8 @@ namespace api.Controllers
       Console.WriteLine($"ReportsController.CreateBulkInvoice():  number of invoices is {invoices.Count}.");
       for (int i = 0; i < invoices.Count; i++) {
         var invoice = invoices[i];
+
+        Console.WriteLine($"ReportsController.CreateBulkInvoice():  processing invoice {invoice.Name}.");
         if (i > 0) {
           CloneInvoiceSummarySheet(wb, i);
         }
