@@ -168,7 +168,7 @@ namespace models.Reporters
 				else
 					end = EndOfMonth(year, month.Number);
 
-				if (end > EndOfMonth(asOf.Year, asOf.Month)) {
+				if (end > EndOfMonth(asOf.Year, asOf.Month) && end.Month != 9) {
 					regularEnrollments[month.Name] = regular;
 					specialEnrollments[month.Name] = special;
 					continue;
