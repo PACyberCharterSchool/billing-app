@@ -286,6 +286,7 @@ namespace models.Reporters
 			DateTime end)
 		{
       Console.WriteLine($"InvoiceReporter.GetStudents():  start is {start}, end is {end}.");
+      Console.WriteLine($"InvoiceReporter.GetStudents():  end.Month is {end.Month}, end.Day is {end.Day}, and end.Year is {end.Year}.");
 
 			if (new[] {7, 8, 9}.Contains(end.Month)) {
 				end = new DateTime(end.Year, 9, end.Day);
