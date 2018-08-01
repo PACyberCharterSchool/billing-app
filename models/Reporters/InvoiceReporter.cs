@@ -289,7 +289,7 @@ namespace models.Reporters
       Console.WriteLine($"InvoiceReporter.GetStudents():  end.Month is {end.Month}, end.Day is {end.Day}, and end.Year is {end.Year}.");
 
 			if (new[] {7, 8, 9}.Contains(end.Month)) {
-				end = new DateTime(end.Year, 9, end.Day);
+				end = EndOfMonth(end.Year, 9);
 			}
 
       IList<InvoiceStudent> studentList = _conn.Query<InvoiceStudent>($@"
