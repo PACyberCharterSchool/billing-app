@@ -241,7 +241,7 @@ namespace models.Transformers
 		protected override IEnumerable<StudentActivityRecord> Transform(IEnumerable<StudentStatusRecord> statuses)
 		{
 			var sequences = new Dictionary<string, int>();
-			var studentCache = new Dictionary<string, Student>();
+			var studentCache = _students.GetMany().ToDictionary(s => s.PACyberId);
 
 			foreach (var status in statuses)
 			{
@@ -250,22 +250,18 @@ namespace models.Transformers
 
 				if (!studentCache.ContainsKey(status.StudentId))
 				{
-					var s = _students.GetByPACyberId(status.StudentId);
-					if (s == null)
+					var s = new Student { PACyberId = status.StudentId };
+					var activity = new StudentActivityRecord
 					{
-						s = new Student { PACyberId = status.StudentId };
-						var activity = new StudentActivityRecord
-						{
-							PACyberId = status.StudentId,
-							Activity = StudentActivity.NewStudent,
-							Timestamp = status.StudentEnrollmentDate,
-							BatchHash = status.BatchHash,
-							Sequence = ++sequences[status.StudentId],
-						};
+						PACyberId = status.StudentId,
+						Activity = StudentActivity.NewStudent,
+						Timestamp = status.StudentEnrollmentDate,
+						BatchHash = status.BatchHash,
+						Sequence = ++sequences[status.StudentId],
+					};
 
-						_activities.Create(activity);
-						yield return activity;
-					}
+					_activities.Create(activity);
+					yield return activity;
 
 					studentCache.Add(status.StudentId, s);
 				}

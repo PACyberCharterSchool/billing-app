@@ -14,6 +14,11 @@ namespace models
 		IList<SchoolDistrict> CreateOrUpdateMany(IList<SchoolDistrict> districts);
 		SchoolDistrict CreateOrUpdate(DateTime time, SchoolDistrict district);
 		SchoolDistrict CreateOrUpdate(SchoolDistrict district);
+
+		SchoolDistrict Create(SchoolDistrict create);
+
+		SchoolDistrict Update(SchoolDistrict update);
+
 		SchoolDistrict Get(int id);
 		SchoolDistrict GetByAun(int aun);
     SchoolDistrict GetByName(string name);
@@ -92,5 +97,27 @@ namespace models
 			CreateOrUpdateMany(time, new[] { update })[0];
 
 		public SchoolDistrict CreateOrUpdate(SchoolDistrict update) => CreateOrUpdate(DateTime.Now, update);
+
+		public SchoolDistrict Create(SchoolDistrict create)
+		{
+			DateTime now = DateTime.Now;
+
+			create.Created = now;
+			create.LastUpdated = now;
+			_schoolDistricts.Add(create); 
+
+			return create;
+		}
+
+		public SchoolDistrict Update(SchoolDistrict update)
+		{
+			DateTime now = DateTime.Now;
+
+			update.LastUpdated = now;
+
+			_schoolDistricts.Update(update);
+
+			return update;
+		}
 	}
 }

@@ -13,6 +13,9 @@ namespace models
 		Student CreateOrUpdate(DateTime time, Student update);
 		Student CreateOrUpdate(Student update);
 
+		Student Create(Student create);
+		Student Update(Student update);
+
 		Student Get(int id);
 		Student GetByPACyberId(string id);
 
@@ -60,6 +63,28 @@ namespace models
 		}
 
 		public Student CreateOrUpdate(Student student) => CreateOrUpdate(DateTime.Now, student);
+
+		public Student Create(Student create)
+		{
+			DateTime now = DateTime.Now;
+
+			create.Created = now;
+			create.LastUpdated = now;
+			_students.Add(create); 
+
+			return create;
+		}	
+
+		public Student Update(Student update)
+		{
+			DateTime now = DateTime.Now;
+
+			update.LastUpdated = now;
+
+			_students.Update(update);
+
+			return update;
+		}
 
 		public Student Get(int id) => _students.SingleOrDefault(s => s.Id == id);
 
