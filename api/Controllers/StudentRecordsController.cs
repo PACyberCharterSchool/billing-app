@@ -1,0 +1,138 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
+using models;
+
+namespace api.Controllers
+{
+	[Route("/api/[Controller]")]
+	public class StudentRecordsController : Controller
+	{
+		private readonly PacBillContext _context;
+		private readonly IStudentRecordRepository _records;
+		private readonly ILogger<StudentRecordsController> _logger;
+
+		public StudentRecordsController(
+			PacBillContext context,
+			 IStudentRecordRepository records,
+			 ILogger<StudentRecordsController> logger)
+		{
+			_context = context;
+			_records = records;
+			_logger = logger;
+		}
+
+		public struct StudentRecordsHeaderResponse
+		{
+			public StudentRecordsHeader Header { get; set; }
+		}
+
+		[HttpGet("header/{scope}")]
+		[Authorize(Policy = "STD+")]
+		[ProducesResponseType(typeof(StudentRecordsHeaderResponse), 200)]
+		[ProducesResponseType(404)]
+		public async Task<IActionResult> GetHeader(string scope)
+		{
+			var header = await Task.Run(() => _records.Get(scope));
+			if (header == null)
+				return NotFound();
+
+			return new ObjectResult(new StudentRecordsHeaderResponse
+			{
+				Header = header,
+			});
+		}
+
+		public class StudentRecordUpdate
+		{
+			[Required]
+			[MinLength(1)]
+			public string StudentFirstName { get; set; }
+
+			[Required]
+			[MinLength(1)]
+			public string StudentMiddleInitial { get; set; }
+
+			[Required]
+			[MinLength(1)]
+			public string StudentLastName { get; set; }
+
+			[Required]
+			[MinLength(1)]
+			public string StudentGradeLevel { get; set; }
+
+			[Required]
+			public DateTime StudentDateOfBirth { get; set; }
+
+			[Required]
+			[MinLength(1)]
+			public string StudentStreet1 { get; set; }
+
+			[Required]
+			[MinLength(1)]
+			public string StudentStreet2 { get; set; }
+
+			[Required]
+			[MinLength(1)]
+			public string StudentCity { get; set; }
+
+			[Required]
+			[MinLength(1)]
+			public string StudentState { get; set; }
+
+			[Required]
+			[MinLength(1)]
+			public string StudentZipCode { get; set; }
+
+			[Required]
+			public DateTime StudentEnrollmentDate { get; set; }
+
+			public DateTime? StudentWithdrawalDate { get; set; }
+
+			[BindRequired]
+			public bool StudentIsSpecialEducation { get; set; }
+
+			public DateTime? StudentCurrentIep { get; set; }
+
+			public DateTime? StudentFormerIep { get; set; }
+
+			public DateTime? StudentNorep { get; set; }
+		}
+
+		[HttpPut("{id}")]
+		[Authorize(Policy = "STD+")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(typeof(ErrorResponse), 400)]
+		public async Task<IActionResult> Update(int id, [FromBody]StudentRecordUpdate update)
+		{
+			if (!ModelState.IsValid)
+				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
+
+			var record = new StudentRecord
+			{
+				StudentFirstName = update.StudentFirstName,
+				StudentMiddleInitial = update.StudentMiddleInitial,
+				StudentLastName = update.StudentLastName,
+				StudentGradeLevel = update.StudentGradeLevel,
+				StudentDateOfBirth = update.StudentDateOfBirth,
+				StudentStreet1 = update.StudentStreet1,
+				StudentStreet2 = update.StudentStreet2,
+				StudentCity = update.StudentCity,
+				StudentState = update.StudentState,
+				StudentZipCode = update.StudentZipCode,
+				StudentEnrollmentDate = update.StudentEnrollmentDate,
+				StudentWithdrawalDate = update.StudentWithdrawalDate,
+				StudentIsSpecialEducation = update.StudentIsSpecialEducation,
+				StudentCurrentIep = update.StudentCurrentIep,
+				StudentFormerIep = update.StudentFormerIep,
+				StudentNorep = update.StudentNorep,
+			};
+			await Task.Run(() => _context.SaveChanges(() => _records.Update(record)));
+			return Ok();
+		}
+	}
+}

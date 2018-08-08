@@ -30,7 +30,7 @@ namespace models
 		public string StudentCity { get; set; }
 		public string StudentState { get; set; }
 		public string StudentZipCode { get; set; }
-		public string ActivitySchoolYear { get; set; } // TODO(Erik): BatchSchoolYear?
+		public string ActivitySchoolYear { get; set; }
 		public DateTime StudentEnrollmentDate { get; set; }
 		public DateTime? StudentWithdrawalDate { get; set; }
 		public bool StudentIsSpecialEducation { get; set; }

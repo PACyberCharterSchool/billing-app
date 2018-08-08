@@ -23,7 +23,6 @@ using api.Services;
 using models;
 using models.Reporters;
 using models.Reporters.Exporters;
-using models.Transformers;
 
 namespace api
 {
@@ -65,36 +64,17 @@ namespace api
 			});
 			services.AddTransient<IAuditRecordRepository, AuditRecordRepository>();
 			services.AddTransient<ICalendarRepository, CalendarRepository>();
-			services.AddTransient<ICommittedStudentStatusRecordRepository, CommittedStudentStatusRecordRepository>();
 			services.AddTransient<IPaymentRepository, PaymentRepository>();
-			services.AddTransient<IPendingStudentStatusRecordRepository, PendingStudentStatusRecordRepository>();
 			services.AddTransient<IRefundRepository, RefundRepository>();
 			services.AddTransient<IReportRepository, ReportRepository>();
 			services.AddTransient<ITemplateRepository, TemplateRepository>();
 			services.AddTransient<ISchoolDistrictRepository, SchoolDistrictRepository>();
-			services.AddTransient<IStudentRepository, StudentRepository>();
-			services.AddTransient<IStudentActivityRecordRepository, StudentActivityRecordRepository>();
-      services.AddTransient<IDigitalSignatureRepository, DigitalSignatureRepository>();
+			services.AddTransient<IDigitalSignatureRepository, DigitalSignatureRepository>();
 
 			services.AddTransient<IFilterParser, FilterParser>();
 
 			services.AddSingleton<IReporterFactory, ReporterFactory>();
 			services.AddSingleton<IXlsxExporter, XlsxExporter>();
-			#endregion
-
-			#region Transformer
-			services.AddTransient<ITransformer>(ctx =>
-			{
-				return new TransformerChain{
-					new PendingToCommittedTransformer(ctx.GetRequiredService<ICommittedStudentStatusRecordRepository>()),
-					new StatusToActivityTransformer(
-						ctx.GetRequiredService<IStudentRepository>(),
-						ctx.GetRequiredService<IStudentActivityRecordRepository>()),
-					new ActivityToStudentTransformer(
-						ctx.GetRequiredService<IStudentRepository>(),
-						ctx.GetRequiredService<ISchoolDistrictRepository>()),
-				};
-			});
 			#endregion
 
 			#region LDAP
@@ -172,7 +152,6 @@ namespace api
 				});
 				o.SchemaFilter<EnumerationSchemaFilter>();
 				o.OperationFilter<EnumerationOperationFilter>();
-				o.OperationFilter<StudentFieldOperationFilter>();
 				o.OperationFilter<AuthorizeOperationFilter>();
 			});
 			#endregion
