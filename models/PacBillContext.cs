@@ -9,16 +9,14 @@ namespace models
 
 		public DbSet<AuditRecord> AuditRecords { get; set; }
 		public DbSet<Calendar> Calendars { get; set; }
-		public DbSet<CommittedStudentStatusRecord> CommittedStudentStatusRecords { get; set; }
 		public DbSet<Payment> Payments { get; set; }
-		public DbSet<PendingStudentStatusRecord> PendingStudentStatusRecords { get; set; }
 		public DbSet<Refund> Refunds { get; set; }
 		public DbSet<Report> Reports { get; set; }
 		public DbSet<Template> Templates { get; set; }
 		public DbSet<SchoolDistrict> SchoolDistricts { get; set; }
-		public DbSet<Student> Students { get; set; }
-		public DbSet<StudentActivityRecord> StudentActivityRecords { get; set; }
-    public DbSet<DigitalSignature> DigitalSignatures { get; set; }
+		public DbSet<DigitalSignature> DigitalSignatures { get; set; }
+		public DbSet<StudentRecord> StudentRecords { get; set; }
+		public DbSet<StudentRecordsHeader> StudentRecordsHeaders { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
@@ -76,20 +74,13 @@ namespace models
 					v => SchoolDistrictPaymentType.FromString(v)
 				);
 
-			builder.Entity<Student>().
-				HasIndex(s => s.PACyberId).
+			builder.Entity<DigitalSignature>().
+				HasIndex(s => s.Title).
 				IsUnique();
 
-			builder.Entity<StudentActivityRecord>().
-				Property(s => s.Activity).
-				HasConversion(
-					v => v.Value,
-					v => StudentActivity.FromString(v)
-				);
-
-      builder.Entity<DigitalSignature>().
-        HasIndex(s => s.Title).
-        IsUnique();
+			builder.Entity<StudentRecordsHeader>().
+				HasIndex(e => e.Scope).
+				IsUnique();
 		}
 	}
 }
