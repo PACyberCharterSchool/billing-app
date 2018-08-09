@@ -298,7 +298,7 @@ export class InvoicesListComponent implements OnInit {
 
   public downloadActivityByFormat(report: Report, format: string) {
     this.selectedDownloadFormat = format;
-    this.reportsService.getReportStudentActivityDataByFormat(report, format).subscribe(
+    this.reportsService.getReportStudentActivityDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
         console.log('InvoiceListComponent.downloadStudentActivityByFormat():  data is ', data);
       },

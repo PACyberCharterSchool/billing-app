@@ -44,6 +44,19 @@ export class ReportsService {
     return this.httpClient.get<Report>(url, this.headers);
   }
 
+  // HTTP GET /api/reports/{id}/activity
+  public getReportStudentActivityDataByFormat(report: Report, format: string): Observable<any> {
+    const url = this.apiReportsUrl + `/activity/name?Name=${report.name}&Format=${format}`;
+    let headers = {};
+    headers['responseType'] = 'arrayBuffer';
+    headers['headers'] = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf'
+    });
+
+    return this.httpClient.get<any>(url, headers);
+  }
+
   // HTTP POST /api/reports/many
   public createInvoices(invoiceInfo: Object): Observable<Report[]> {
     const url = this.apiReportsUrl + '/many';

@@ -55,7 +55,7 @@
             <div ngbDropdown class="d-inline-block">
               <button class="btn btn-outline-primary" id="dropdownActivityDownloadFormat" ngbDropdownToggle>{{selectedDownloadFormat}}</button>
               <div ngbDropdownMenu aria-labelledby="dropdownActivityDownloadFormat">
-                <button class='dropdown-item' *ngFor='let format of downloadFormats' (click)='downloadActivityByFormatType(report, format)'>{{format}}</button>
+                <button class='dropdown-item' *ngFor='let format of downloadFormats' (click)='downloadActivityByFormat(report, format)'>{{format}}</button>
               </div>
             </div>
           </td>
@@ -63,7 +63,7 @@
             <div ngbDropdown class="d-inline-block">
               <button class="btn btn-outline-primary" id="dropdownInvoiceDownloadFormat" ngbDropdownToggle>{{selectedDownloadFormat}}</button>
               <div ngbDropdownMenu aria-labelledby="dropdownInvoiceDownloadFormat">
-                <button class='dropdown-item' *ngFor='let format of downloadFormats' (click)='downloadInvoiceByFormatType(report, format)'>{{format}}</button>
+                <button class='dropdown-item' *ngFor='let format of downloadFormats' (click)='downloadInvoiceByFormat(report, format)'>{{format}}</button>
               </div>
             </div>
           </td>

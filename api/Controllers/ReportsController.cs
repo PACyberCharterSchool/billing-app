@@ -474,7 +474,6 @@ namespace api.Controllers
       return reports;
     }
 
-
     private static readonly object _lock = new object();
 
     public delegate string HeaderMapper(string key);
@@ -656,7 +655,7 @@ namespace api.Controllers
 
     [HttpGet("{name}")]
     [Authorize(Policy = "PAY+")]
-    [Produces(ContentTypes.XLSX)]
+    [Produces(ContentTypes.XLSX, ContentTypes.PDF)]
     [ProducesResponseType(404)]
     [ProducesResponseType(406)]
     public async Task<IActionResult> Get(string name)
@@ -679,7 +678,6 @@ namespace api.Controllers
 
     public class GetActivityArgs
     {
-      public int Id { get; set; }
       public string Name { get; set; }
       [EnumerationValidation(typeof(ReportType))]
       public string Type { get; set; }
@@ -689,7 +687,7 @@ namespace api.Controllers
       public string Format { get; set; }
     }
 
-    [HttpGet("activity/name/{name}")]
+    [HttpGet("activity/name")]
     [Authorize(Policy = "PAY+")]
     [Produces(ContentTypes.XLSX, ContentTypes.PDF)]
     [ProducesResponseType(204)]
@@ -702,7 +700,7 @@ namespace api.Controllers
 
       var accept = Request.Headers["Accept"];
 
-      if (accept != ContentTypes.XLSX)
+      if (accept != ContentTypes.XLSX || accept != ContentTypes.PDF)
         return StatusCode(406);
 
       var name = args.SchoolYear + "_" + args.Name + "_ACTIVITY";
@@ -723,8 +721,8 @@ namespace api.Controllers
       using (var stream = new MemoryStream())
       {
         wb.Save(stream, saveOpts);
-
-        return new FileStreamResult(new MemoryStream(stream.ToArray()), ContentTypes.XLSX)
+        var contentType = args.Format == "excel" ? ContentTypes.XLSX : ContentTypes.PDF;
+        return new FileStreamResult(new MemoryStream(stream.ToArray()), contentType)
         {
           FileDownloadName = name
         };
@@ -740,7 +738,7 @@ namespace api.Controllers
     {
       var accept = Request.Headers["Accept"];
 
-      if (accept != ContentTypes.XLSX)
+      if (accept != ContentTypes.XLSX || accept != ContentTypes.PDF)
         return StatusCode(406);
 
       var reports = await Task.Run(() => _reports.GetMany(
@@ -768,82 +766,7 @@ namespace api.Controllers
       using (var stream = new MemoryStream())
       {
         wb.Save(stream, saveOpts);
-
-        return new FileStreamResult(new MemoryStream(stream.ToArray()), ContentTypes.XLSX)
-        {
-          FileDownloadName = name
-        };
-      };
-    }
-
-    [HttpGet("{id}/activity/{format}")]
-    [Authorize(Policy = "PAY+")]
-    [Produces(ContentTypes.XLSX, ContentTypes.PDF)]
-    [ProducesResponseType(204)]
-    [ProducesResponseType(typeof(ErrorsResponse), 400)]
-    public async Task<IActionResult> GetStudentActivity([FromQuery]GetActivityArgs args)
-    {
-      var accept = Request.Headers["Accept"];
-
-      if (accept != ContentTypes.XLSX)
-        return StatusCode(406);
-
-      var report = await Task.Run(() => _reports.Get(args.Id));
-      
-      if (report == null)
-        return NotFound();
-
-      var data = BuildStudentActivityDataTable(new [] { report });
-      string name = args.SchoolYear + "Student Activity";
-      List<string> headers = GetStudentActivityHeaders(data, MapStudentActivityHeaderKeyToValue); 
-      Workbook wb = new Workbook();
-
-      foreach (var header in headers) {
-        wb.Worksheets[0].Cells.ImportArray(headers.ToArray(), 0, 0, false);
-      }
-
-      wb.Worksheets[0].Cells.ImportDataTable(data, true, 1, 0, true, false);
-
-      var saveOpts = new XlsSaveOptions(args.Format == "excel" ? SaveFormat.Xlsx : SaveFormat.Pdf);
-
-      using (var stream = new MemoryStream())
-      {
-        wb.Save(stream, saveOpts);
-
-        return new FileStreamResult(new MemoryStream(stream.ToArray()), ContentTypes.XLSX)
-        {
-          FileDownloadName = name
-        };
-      };
-    }
-
-    public class GetInvoiceArgs
-    {
-      public int Id { get; set; }
-      public string Format { get; set; }
-    }
-
-    [HttpGet("{id}/invoice/{format}")]
-    [Authorize(Policy = "PAY+")]
-    [Produces(ContentTypes.XLSX, ContentTypes.PDF)]
-    [ProducesResponseType(204)]
-    [ProducesResponseType(typeof(ErrorsResponse), 400)]
-    public async Task<IActionResult> GetInvoice([FromQuery]GetInvoiceArgs args)
-    {
-      var accept = Request.Headers["Accept"];
-
-      if (accept != ContentTypes.XLSX)
-        return StatusCode(406);
-
-      var report = await Task.Run(() => _reports.Get(args.Id));
-
-      if (report == null)
-        return NotFound();
-
-      string name = report.SchoolYear + "_" + report.Name + "_Invoice";
-      var data = args.Format == "excel" ? report.Xlsx : report.Pdf;
-      using (var stream = new MemoryStream(data))
-      {
+        var contentType = args.Format == "excel" ? ContentTypes.XLSX : ContentTypes.PDF;
         return new FileStreamResult(new MemoryStream(stream.ToArray()), ContentTypes.XLSX)
         {
           FileDownloadName = name
@@ -1014,7 +937,6 @@ namespace api.Controllers
     [ProducesResponseType(409)]
     [ProducesResponseType(424)]
     [SwaggerResponse(statusCode: 501, description: "Not Implemented")] // Swashbuckle sees this as "Server Error".
-
     public async Task<IActionResult> CreateBulk([FromBody]CreateReport create)
     {
       if (!ModelState.IsValid)
@@ -1062,7 +984,6 @@ namespace api.Controllers
       {
         Report = new ReportDto(report),
       });
-
     }
 
     [HttpGet]
