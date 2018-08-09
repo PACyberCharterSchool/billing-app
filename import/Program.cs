@@ -67,18 +67,16 @@ namespace import
 				{
 					// TODO(Erik): figure out how scope is actually derived; monthly vs recon
 					var scope = $"{DateTime.Now.Year.ToString("0000")}.{DateTime.Now.Month.ToString("00")}";
-					var header = _context.StudentRecordsHeaders.SingleOrDefault(h => h.Scope == scope);
+					var header = _context.StudentRecordsHeaders.Include(r => r.Records).SingleOrDefault(h => h.Scope == scope);
 					if (header != null)
 					{
 						if (header.Locked)
 						{
-							Console.WriteLine($"Data for ${scope} has already been imported and locked.");
+							Console.WriteLine($"Data for {scope} has already been imported and locked. Aborting import.");
 							return;
 						}
 						else
-						{
 							_context.Remove(header);
-						}
 					}
 					else
 					{
@@ -111,7 +109,11 @@ namespace import
 					try
 					{
 						Console.WriteLine("Writing changes to the database...");
-						_context.Add(header);
+						if (header.Id == 0)
+							_context.Add(header);
+						else
+							_context.Update(header);
+
 						_context.SaveChanges();
 
 						Console.WriteLine("Writing changes to the database done!");

@@ -81,6 +81,11 @@ namespace models
 			builder.Entity<StudentRecordsHeader>().
 				HasIndex(e => e.Scope).
 				IsUnique();
+
+			builder.Entity<StudentRecordsHeader>().
+				HasMany(h => h.Records).
+				WithOne(r => r.Header).
+				OnDelete(DeleteBehavior.Cascade);
 		}
 	}
 }
