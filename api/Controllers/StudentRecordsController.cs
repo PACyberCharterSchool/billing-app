@@ -47,6 +47,16 @@ namespace api.Controllers
 			});
 		}
 
+		[HttpPost("header/{scope}/lock")]
+		[Authorize(Policy = "PAY+")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(404)]
+		public async Task<IActionResult> LockHeader(string scope)
+		{
+			await Task.Run(() => _records.Lock(scope));
+			return Ok();
+		}
+
 		public class StudentRecordUpdate
 		{
 			[Required]

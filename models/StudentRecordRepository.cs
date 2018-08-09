@@ -10,6 +10,7 @@ namespace models
 	public interface IStudentRecordRepository
 	{
 		StudentRecordsHeader Get(string scope);
+		void Lock(string scope);
 		StudentRecord Update(StudentRecord update);
 	}
 
@@ -26,6 +27,13 @@ namespace models
 
 		public StudentRecordsHeader Get(string scope)
 			=> _context.StudentRecordsHeaders.Include(h => h.Records).SingleOrDefault(h => h.Scope == scope);
+
+		public void Lock(string scope)
+		{
+			var header = _context.StudentRecordsHeaders.Single();
+			header.Locked = true;
+			_context.Update(header);
+		}
 
 		public StudentRecord Update(StudentRecord update)
 		{
