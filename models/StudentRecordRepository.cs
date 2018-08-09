@@ -9,10 +9,7 @@ namespace models
 {
 	public interface IStudentRecordRepository
 	{
-		StudentRecordsHeader Create(StudentRecordsHeader create);
-		StudentRecordsHeader Replace(StudentRecordsHeader replace);
 		StudentRecordsHeader Get(string scope);
-
 		StudentRecord Update(StudentRecord update);
 	}
 
@@ -27,21 +24,8 @@ namespace models
 			_logger = logger;
 		}
 
-		public StudentRecordsHeader Create(StudentRecordsHeader create)
-		{
-			create.Created = DateTime.Now;
-			_context.Add(create);
-			return create;
-		}
-
 		public StudentRecordsHeader Get(string scope)
 			=> _context.StudentRecordsHeaders.Include(h => h.Records).SingleOrDefault(h => h.Scope == scope);
-
-		public StudentRecordsHeader Replace(StudentRecordsHeader replace)
-		{
-			_context.Remove(replace);
-			return Create(replace);
-		}
 
 		public StudentRecord Update(StudentRecord update)
 		{
