@@ -17,9 +17,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
-using NPOI.HSSF.UserModel;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 using api.Common;
@@ -28,6 +25,8 @@ using api.Dtos;
 using models;
 using models.Reporters;
 using models.Reporters.Exporters;
+
+using Aspose.Cells;
 
 namespace api.Controllers
 {
@@ -110,46 +109,30 @@ namespace api.Controllers
       public CreateBulkInvoiceReport BulkInvoice { get; set; }
     }
 
-    private void CloneInvoiceSummarySheet(XSSFWorkbook wb, int districtIndex)
+    private void CloneInvoiceSummarySheet(Workbook wb, int districtIndex)
     {
-      wb.CloneSheet(0);
-      var sheet = wb.GetSheetAt(wb.NumberOfSheets - 1);
-
-      sheet.PrintSetup.HeaderMargin = 0.25;
-      sheet.PrintSetup.FooterMargin = 0.10;
-
-      for (var r = sheet.FirstRowNum; r < sheet.LastRowNum; r++)
-      {
-        var row = sheet.GetRow(r);
-        if (row.Cells.All(c => c.CellType == CellType.Blank))
-          continue;
-
-        for (var c = row.FirstCellNum; c < row.LastCellNum; c++)
-        {
-          var cell = row.GetCell(c);
-          if (cell == null)
+      wb.Worksheets.AddCopy(0);
+      var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
+      Cells cells = sheet.Cells;
+      for (int r = 0; r < cells.MaxDataRow; r++) {
+        for (int c = 0; c < cells.MaxDataColumn; c++) {
+          if (!(cells[r, c].Type == CellValueType.IsString))
             continue;
-
-          if (!(cell.CellType == CellType.String))
-            continue;
-
-          var value = cell.StringCellValue;
-
           const string pattern = @"Districts\[(\d+)\]";
-          var matches = Regex.Matches(value, pattern);
+          var matches = Regex.Matches(cells[r, c].StringValue, pattern);
           if (matches.Count > 0)
           {
             var match = matches[0];
             var i = int.Parse(match.Groups[1].Value);
 
-            value = Regex.Replace(value, pattern, $"Districts[{districtIndex}]");
-            cell.SetCellValue(value);
+            cells[r, c].Value = Regex.Replace(cells[r, c].StringValue, pattern, $"Districts[{districtIndex}]");
+            cells[r, c].PutValue(cells[r, c].StringValue);
           }
         }
       }
     }
 
-    private void CloneBulkInvoiceSheets(XSSFWorkbook wb, int count, int districtIndex, Template template)
+    private void CloneStudentItemizationSheets(Workbook wb, int count, int districtIndex, Template template)
     {
       const int per = 8;
 
@@ -158,65 +141,54 @@ namespace api.Controllers
 
       for (var s = 0; s < numSheets - adj; s++)
       {
-        wb.CloneSheet(1);
+        wb.Worksheets.AddCopy(1);
 
-        var sheet = wb.GetSheetAt(wb.NumberOfSheets - 1);
+        var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
+        Cells cells = sheet.Cells;
+        
+        sheet.PageSetup.HeaderMargin = 0.0;
+        sheet.PageSetup.FooterMargin = 0.0;
+        sheet.PageSetup.BottomMargin = 0.0;
+        sheet.PageSetup.TopMargin = 0.0;
+        sheet.PageSetup.LeftMargin = 0.0;
+        sheet.PageSetup.RightMargin = 0.0;
+        sheet.PageSetup.HeaderMargin = 0.0;
+        sheet.PageSetup.FooterMargin = 0.0;
 
-        sheet.PrintSetup.HeaderMargin = 0.0;
-        sheet.PrintSetup.FooterMargin = 0.0;
-        sheet.SetMargin(MarginType.BottomMargin, 0.0);
-        sheet.SetMargin(MarginType.TopMargin, 0.0);
-        sheet.SetMargin(MarginType.LeftMargin, 0.0);
-        sheet.SetMargin(MarginType.RightMargin, 0.0);
-        sheet.SetMargin(MarginType.HeaderMargin, 0.0);
-        sheet.SetMargin(MarginType.FooterMargin, 0.0);
-
-        for (var r = sheet.FirstRowNum; r < sheet.LastRowNum; r++)
-        {
-          var row = sheet.GetRow(r);
-          if (row.Cells.All(c => c.CellType == CellType.Blank))
-            continue;
-
-          for (var c = row.FirstCellNum; c < row.LastCellNum; c++)
-          {
-            var cell = row.GetCell(c);;
-            if (cell == null)
+        for (int r = 0; r < cells.MaxDataRow; r++) {
+          for (int c = 0; c < cells.MaxDataColumn; c++) {
+            if (!(cells[r, c].Type == CellValueType.IsString))
               continue;
 
             if (r == GetRowIndexForFirstStudentItemization(template) && c == 1) // Number column
             {
-              cell.SetCellValue(((s + adj) * per) + 1);
+              cells[r,c].PutValue(((s + adj) * per) + 1);
               continue;
             }
 
-            if (!(cell.CellType == CellType.String))
-              continue;
-
-            var value = cell.StringCellValue;
-
             {
               const string pattern = @"Students\[(\d+)\]";
-              var matches = Regex.Matches(value, pattern);
+              var matches = Regex.Matches(cells[r,c].StringValue, pattern);
               if (matches.Count > 0)
               {
                 var match = matches[0];
                 var i = int.Parse(match.Groups[1].Value);
 
-                value = Regex.Replace(value, pattern, $"Students[{(i + ((s + adj) * per))}]");
-                cell.SetCellValue(value);
+                cells[r,c].Value = Regex.Replace(cells[r,c].StringValue, pattern, $"Students[{(i + ((s + adj) * per))}]");
+                cells[r,c].PutValue(cells[r,c].StringValue);
               }
             }
 
             {
               const string pattern = @"Districts\[(\d+)\]";
-              var matches = Regex.Matches(value, pattern);
+              var matches = Regex.Matches(cells[r,c].StringValue, pattern);
               if (matches.Count > 0)
               {
                 var match = matches[0];
                 var i = int.Parse(match.Groups[1].Value);
 
-                value = Regex.Replace(value, pattern, $"Districts[{districtIndex}]");
-                cell.SetCellValue(value);
+                cells[r,c].Value = Regex.Replace(cells[r,c].StringValue, pattern, $"Districts[{districtIndex}]");
+                cells[r,c].PutValue(cells[r,c].StringValue);
               }
             }
           }
@@ -255,41 +227,34 @@ namespace api.Controllers
       return sequenceNumberRow;
     }
 
-    private void CloneInvoiceSheets(XSSFWorkbook wb, int count, Template template)
+    private void CloneInvoiceSheets(Workbook wb, int count, Template template)
     {
       const int per = 8;
 
       var numSheets = (int)count / per + (count % per == 0 ? 0 : 1);
       for (var s = 0; s < numSheets - 1; s++)
       {
-        wb.CloneSheet(1);
+        wb.Worksheets.AddCopy(1);
 
-        var sheet = wb.GetSheetAt(wb.NumberOfSheets - 1);
+        var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
+        Cells cells = sheet.Cells;
 
+        for (int r = 0; r < cells.MaxDataRow; r++) {
+					Row row = cells.Rows[r];
+					if (row.IsBlank)
+						continue;
 
-        for (var r = sheet.FirstRowNum; r < sheet.LastRowNum; r++)
-        {
-          var row = sheet.GetRow(r);
-          if (row.Cells.All(c => c.CellType == CellType.Blank))
-            continue;
-
-          for (var c = row.FirstCellNum; c < row.LastCellNum; c++)
-          {
-            var cell = row.GetCell(c);
-            if (cell == null)
+          for (int c = 0; c < cells.MaxDataColumn; c++) {
+            if (!(cells[r, c].Type == CellValueType.IsString))
               continue;
-
 
             if (r == GetRowIndexForFirstStudentItemization(template) && c == 1) // Number column
             {
-              cell.SetCellValue(((s + 1) * per) + 1);
+              cells[r,c].PutValue(((s + 1) * per) + 1);
               continue;
             }
 
-            if (!(cell.CellType == CellType.String))
-              continue;
-
-            var value = cell.StringCellValue;
+            var value = cells[r,c].StringValue;
 
             const string pattern = @"Students\[(\d+)\]";
             var matches = Regex.Matches(value, pattern);
@@ -299,7 +264,7 @@ namespace api.Controllers
               var i = int.Parse(match.Groups[1].Value);
 
               value = Regex.Replace(value, pattern, $"Students[{(i + ((s + 1) * per))}]");
-              cell.SetCellValue(value);
+              cells[r,c].PutValue(value);
             }
           }
         }
@@ -327,13 +292,15 @@ namespace api.Controllers
       var invoice = reporter.GenerateReport(config);
 
       // compose workbook
-      var wb = new XSSFWorkbook(new MemoryStream(invoiceTemplate.Content));
+      var wb = new Workbook(new MemoryStream(invoiceTemplate.Content));
       InitializeWorkbookSheetPrinterMargins(wb);
 
-      if (invoice.Students.Count > 0)
+      if (invoice.Students.Count > 0) {
         CloneInvoiceSheets(wb, invoice.Students.Count, invoiceTemplate);
-      else
-        wb.RemoveSheetAt(1);
+      }
+      else {
+        wb.Worksheets.RemoveAt(1);
+      }
 
       // generate xlsx
       var data = JsonConvert.SerializeObject(invoice);
@@ -341,9 +308,12 @@ namespace api.Controllers
 
       // create report
       Report report;
-      using (var ms = new MemoryStream())
+      using (var xlsxms = new MemoryStream())
+      using (var pdfms = new MemoryStream())
       {
-        wb.Write(ms);
+        // wb.Write(ms);
+        wb.Save(xlsxms, new XlsSaveOptions(SaveFormat.Xlsx));
+        wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
 
         report = new Report
         {
@@ -353,7 +323,8 @@ namespace api.Controllers
           Approved = false,
           Created = time,
           Data = data,
-          Xlsx = ms.ToArray(),
+          Xlsx = xlsxms.ToArray(),
+          Pdf = pdfms.ToArray() 
         };
       }
 
@@ -546,20 +517,6 @@ namespace api.Controllers
       return headers;
     }
 
-    private bool IsActivityWorksheet(XSSFSheet sheet)
-    {
-      if (sheet != null) {
-        const string pattern = @"^Individual Student Inform.*";
-        var matches = Regex.Matches(sheet.SheetName, pattern);
-        if (matches.Count > 0)
-        {
-          return true;
-        }
-      }
-
-      return false;
-    }
-
     private DataTable BuildStudentActivityDataTable(IEnumerable<Report> invoices)
     {
       DataTable studentActivityDataTable = new DataTable();
@@ -722,25 +679,24 @@ namespace api.Controllers
 
     public class GetActivityArgs
     {
+      public int Id { get; set; }
       public string Name { get; set; }
-
       [EnumerationValidation(typeof(ReportType))]
       public string Type { get; set; }
-
       [RegularExpression(@"^\d{4}\-\d{4}$")]
       public string SchoolYear { get; set; }
-
       public bool? Approved { get; set; }
+      public string Format { get; set; }
     }
 
     [HttpGet("activity/name/{name}")]
     [Authorize(Policy = "PAY+")]
-    [Produces(ContentTypes.XLSX)]
+    [Produces(ContentTypes.XLSX, ContentTypes.PDF)]
     [ProducesResponseType(204)]
     [ProducesResponseType(typeof(ErrorsResponse), 400)]
-    public async Task<IActionResult> GetActivity(string name)
+    public async Task<IActionResult> GetActivity([FromQuery]GetActivityArgs args)
     {
-      var report = await Task.Run(() => _reports.Get(name));
+      var report = await Task.Run(() => _reports.Get(args.Name));
       if (report == null)
         return NotFound();
 
@@ -749,15 +705,24 @@ namespace api.Controllers
       if (accept != ContentTypes.XLSX)
         return StatusCode(406);
 
+      var name = args.SchoolYear + "_" + args.Name + "_ACTIVITY";
       List<Report> reports = new List<Report>();
       reports.Add(report);
       var data = BuildStudentActivityDataTable(reports);
       List<string> headers = GetStudentActivityHeaders(data, MapStudentActivityHeaderKeyToValue); 
-      XSSFWorkbook wb = NPOIHelper.BuildExcelWorkbookFromDataTable(data, headers, name);
+      Workbook wb = new Workbook();
+
+      foreach (var header in headers) {
+        wb.Worksheets[0].Cells.ImportArray(headers.ToArray(), 0, 0, false);
+      }
+
+      wb.Worksheets[0].Cells.ImportDataTable(data, true, 1, 0, true, false);
+
+      var saveOpts = new XlsSaveOptions(args.Format == "excel" ? SaveFormat.Xlsx : SaveFormat.Pdf);
 
       using (var stream = new MemoryStream())
       {
-        wb.Write(stream);
+        wb.Save(stream, saveOpts);
 
         return new FileStreamResult(new MemoryStream(stream.ToArray()), ContentTypes.XLSX)
         {
@@ -768,7 +733,7 @@ namespace api.Controllers
 
     [HttpGet("activity")]
     [Authorize(Policy = "PAY+")]
-    [Produces(ContentTypes.XLSX)]
+    [Produces(ContentTypes.XLSX, ContentTypes.PDF)]
     [ProducesResponseType(204)]
     [ProducesResponseType(typeof(ErrorsResponse), 400)]
     public async Task<IActionResult> GetBulkActivity([FromQuery]GetActivityArgs args)
@@ -790,12 +755,95 @@ namespace api.Controllers
       var data = BuildStudentActivityDataTable(reports);
       string name = args.SchoolYear + "Student Activity";
       List<string> headers = GetStudentActivityHeaders(data, MapStudentActivityHeaderKeyToValue); 
-      XSSFWorkbook wb = NPOIHelper.BuildExcelWorkbookFromDataTable(data, headers, name);
+      Workbook wb = new Workbook();
+
+      foreach (var header in headers) {
+        wb.Worksheets[0].Cells.ImportArray(headers.ToArray(), 0, 0, false);
+      }
+
+      wb.Worksheets[0].Cells.ImportDataTable(data, true, 1, 0, true, false);
+
+      var saveOpts = new XlsSaveOptions(args.Format == "excel" ? SaveFormat.Xlsx : SaveFormat.Pdf);
 
       using (var stream = new MemoryStream())
       {
-        wb.Write(stream);
+        wb.Save(stream, saveOpts);
 
+        return new FileStreamResult(new MemoryStream(stream.ToArray()), ContentTypes.XLSX)
+        {
+          FileDownloadName = name
+        };
+      };
+    }
+
+    [HttpGet("{id}/activity/{format}")]
+    [Authorize(Policy = "PAY+")]
+    [Produces(ContentTypes.XLSX, ContentTypes.PDF)]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(typeof(ErrorsResponse), 400)]
+    public async Task<IActionResult> GetStudentActivity([FromQuery]GetActivityArgs args)
+    {
+      var accept = Request.Headers["Accept"];
+
+      if (accept != ContentTypes.XLSX)
+        return StatusCode(406);
+
+      var report = await Task.Run(() => _reports.Get(args.Id));
+      
+      if (report == null)
+        return NotFound();
+
+      var data = BuildStudentActivityDataTable(new [] { report });
+      string name = args.SchoolYear + "Student Activity";
+      List<string> headers = GetStudentActivityHeaders(data, MapStudentActivityHeaderKeyToValue); 
+      Workbook wb = new Workbook();
+
+      foreach (var header in headers) {
+        wb.Worksheets[0].Cells.ImportArray(headers.ToArray(), 0, 0, false);
+      }
+
+      wb.Worksheets[0].Cells.ImportDataTable(data, true, 1, 0, true, false);
+
+      var saveOpts = new XlsSaveOptions(args.Format == "excel" ? SaveFormat.Xlsx : SaveFormat.Pdf);
+
+      using (var stream = new MemoryStream())
+      {
+        wb.Save(stream, saveOpts);
+
+        return new FileStreamResult(new MemoryStream(stream.ToArray()), ContentTypes.XLSX)
+        {
+          FileDownloadName = name
+        };
+      };
+    }
+
+    public class GetInvoiceArgs
+    {
+      public int Id { get; set; }
+      public string Format { get; set; }
+    }
+
+    [HttpGet("{id}/invoice/{format}")]
+    [Authorize(Policy = "PAY+")]
+    [Produces(ContentTypes.XLSX, ContentTypes.PDF)]
+    [ProducesResponseType(204)]
+    [ProducesResponseType(typeof(ErrorsResponse), 400)]
+    public async Task<IActionResult> GetInvoice([FromQuery]GetInvoiceArgs args)
+    {
+      var accept = Request.Headers["Accept"];
+
+      if (accept != ContentTypes.XLSX)
+        return StatusCode(406);
+
+      var report = await Task.Run(() => _reports.Get(args.Id));
+
+      if (report == null)
+        return NotFound();
+
+      string name = report.SchoolYear + "_" + report.Name + "_Invoice";
+      var data = args.Format == "excel" ? report.Xlsx : report.Pdf;
+      using (var stream = new MemoryStream(data))
+      {
         return new FileStreamResult(new MemoryStream(stream.ToArray()), ContentTypes.XLSX)
         {
           FileDownloadName = name
@@ -876,30 +924,31 @@ namespace api.Controllers
       };
     }
 
-    private void InitializeWorkbookSheetPrinterMargins(XSSFWorkbook wb)
+    private void InitializeWorkbookSheetPrinterMargins(Workbook wb)
     {
-      for (int i = 0; i < wb.NumberOfSheets; i++) {
-        XSSFSheet sheet = (XSSFSheet)wb.GetSheetAt(i);
+      for (int i = 0; i < wb.Worksheets.Count; i++) {
+        var sheet = wb.Worksheets[i];
         if (sheet != null) {
           // make certain the printer margins for each sheet are zeroed out, lest
           // we have ugly issues when printing them out.
-          sheet.PrintSetup.HeaderMargin = 0.0;
-          sheet.PrintSetup.FooterMargin = 0.0;
-          sheet.SetMargin(MarginType.BottomMargin, 0.0);
-          sheet.SetMargin(MarginType.TopMargin, 0.0);
-          sheet.SetMargin(MarginType.LeftMargin, 0.0);
-          sheet.SetMargin(MarginType.RightMargin, 0.0);
-          sheet.SetMargin(MarginType.HeaderMargin, 0.0);
-          sheet.SetMargin(MarginType.FooterMargin, 0.0);
+          sheet.PageSetup.HeaderMargin = 0.0;
+          sheet.PageSetup.FooterMargin = 0.0;
+          sheet.PageSetup.TopMargin = 0.0;
+          sheet.PageSetup.TopMargin = 0.0;
+          sheet.PageSetup.LeftMargin = 0.0;
+          sheet.PageSetup.RightMargin = 0.0;
+          sheet.PageSetup.HeaderMargin = 0.0;
+          sheet.PageSetup.FooterMargin = 0.0;
         } 
       }
     }
+
     private Report CreateBulkInvoice(DateTime time, IList<Report> reports, Template invoiceTemplate, CreateReport create)
     {
       var invoices = reports.Select(r => JsonConvert.DeserializeObject<Invoice>(r.Data)).OrderBy(i => i.SchoolDistrict.Name).ToList();
 
       // compose workbook
-      var wb = new XSSFWorkbook(new MemoryStream(invoiceTemplate.Content));
+      var wb = new Workbook(new MemoryStream(invoiceTemplate.Content));
       InitializeWorkbookSheetPrinterMargins(wb);
       Console.WriteLine($"ReportsController.CreateBulkInvoice():  number of invoices is {invoices.Count}.");
       for (int i = 0; i < invoices.Count; i++) {
@@ -910,20 +959,20 @@ namespace api.Controllers
         }
 
         if (invoice.Students.Count > 0)
-          CloneBulkInvoiceSheets(wb, invoice.Students.Count, i, invoiceTemplate);
+          CloneStudentItemizationSheets(wb, invoice.Students.Count, i, invoiceTemplate);
       }
 
       if (invoices[0].Students.Count == 0) {
-        wb.RemoveSheetAt(1);
+        wb.Worksheets.RemoveAt(1);
       }
       // generate xlsx
       
       var data = new {
-				SchoolYear = create.SchoolYear,
-				AsOf = create.BulkInvoice.AsOf,
-				Prepared = time,
-				ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
-				ToPDE = create.BulkInvoice.ToPDE,
+        SchoolYear = create.SchoolYear,
+        AsOf = create.BulkInvoice.AsOf,
+        Prepared = time,
+        ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
+        ToPDE = create.BulkInvoice.ToPDE,
         Districts = invoices.Select(i => new {
           Number = i.Number,
           SchoolDistrict = i.SchoolDistrict,
@@ -941,8 +990,8 @@ namespace api.Controllers
       Report report;
       using (var ms = new MemoryStream())
       {
-        wb.Write(ms);
-
+        // wb.Write(ms);
+        wb.Save(ms, new XlsSaveOptions(SaveFormat.Xlsx));
         report = new Report
         {
           Type = ReportType.BulkInvoice,

@@ -15,6 +15,7 @@ namespace models
 		Report Create(DateTime time, Report create);
 		Report Create(Report create);
 		Report Get(string name);
+		Report Get(int id);
 		IEnumerable<Report> GetMany(
 			string name = null,
 			ReportType type = null,
@@ -71,6 +72,8 @@ namespace models
 		public Report Create(Report create) => Create(DateTime.Now, create);
 
 		public Report Get(string name) => _reports.SingleOrDefault(r => r.Name == name);
+
+		public Report Get(int id) => _reports.SingleOrDefault(r => r.Id == id);
 
 		public IEnumerable<Report> GetMany(
 			string name = null,

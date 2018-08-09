@@ -44,6 +44,11 @@ export class InvoicesListComponent implements OnInit {
   private downloadType: string;
   private spinnerMsg: string;
   private templates: Template[];
+  public downloadFormats: string[] = [
+    'Microsoft Excel',
+    'PDF'
+  ];
+  public selectedDownloadFormat: string;
 
   constructor(
     private globals: Globals,
@@ -79,6 +84,7 @@ export class InvoicesListComponent implements OnInit {
 
     this.selectedFilterSchoolYear = 'School Year';
     this.selectedFilterStatus = 'Status';
+    this.selectedDownloadFormat = 'Download as...';
   }
 
   sort(property) {
@@ -290,35 +296,20 @@ export class InvoicesListComponent implements OnInit {
     );
   }
 
-  doDownload() {
-    if (this.downloadType === 'invoices') {
-      this.reportsService.getInvoicesBulk(
-        this.selectedDownloadSchoolYear).subscribe(
-        data => {
-          console.log('InvoicesListComponent.doDownload(): data is ', data);
-          this.ngxSpinnerService.hide();
-          this.excelService.saveDataAsExcelFile(data, 'BulkInvoices');
-        },
-        error => {
-          console.log('InvoicesListComponent.doDownload(): error is ', error);
-          this.ngxSpinnerService.hide();
-        }
-      );
-    } else {
-      this.reportsService.getInvoiceStudentActivityDataBulk(
-        this.selectedDownloadSchoolYear,
-        this.selectedDownloadStatus === 'Approved' ? true : false).subscribe(
-        data => {
-          console.log('InvoicesListComponent.doDownload(): data is ', data);
-          this.ngxSpinnerService.hide();
-          this.excelService.saveDataAsExcelFile(data, 'BulkStudentActivity');
-        },
-        error => {
-          console.log('InvoicesListComponent.doDownload(): error is ', error);
-          this.ngxSpinnerService.hide();
-        }
-      );
-    }
+  public downloadActivityByFormat(report: Report, format: string) {
+    this.selectedDownloadFormat = format;
+    this.reportsService.getReportStudentActivityDataByFormat(report, format).subscribe(
+      data => {
+        console.log('InvoiceListComponent.downloadStudentActivityByFormat():  data is ', data);
+      },
+      error => {
+        console.log('InvoiceListComponent.downloadStudentActivityByFormat():  error is ', error);
+      }
+    );
+  }
+
+  public downloadInvoiceByFormat(report: Report, format: string) {
+
   }
 
   private selectSchoolYear(year: string) {

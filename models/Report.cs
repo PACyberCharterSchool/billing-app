@@ -26,5 +26,6 @@ namespace models
 	{
 		public string Data { get; set; }
 		public byte[] Xlsx { get; set; }
+		public byte[] Pdf { get; set; }
 	}
 }

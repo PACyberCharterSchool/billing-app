@@ -26,9 +26,41 @@ export class ReportsService {
     private httpClient: HttpClient
   ) { }
 
-  public getReports(skip: number): Observable<Report[]> {
-    const url = this.apiReportsUrl;
+  // HTTP GET /api/reports
+  public getReportsByInfo(reportInfo: Object): Observable<Report[]> {
+    let url = this.apiReportsUrl;
+
+    if (reportInfo['Type']) { url +=  `?Type=${reportInfo['Type']}`; }
+    if (reportInfo['Name']) { url += `&Name=${reportInfo['Name']}`; }
+    if (reportInfo['SchoolYear']) { url += `&SchoolYear=${reportInfo['SchoolYear']}`; }
+    if (reportInfo['Approved']) { url += `&Approved=${reportInfo['Approved']}`; }
+
     return this.httpClient.get<Report[]>(url, this.headers);
+  }
+
+  // HTTP Get /api/reports/{id}
+  public getReport(id: number): Observable<Report> {
+    const url = this.apiReportsUrl + `/${id}`;
+    return this.httpClient.get<Report>(url, this.headers);
+  }
+
+  // HTTP POST /api/reports/many
+  public createInvoices(invoiceInfo: Object): Observable<Report[]> {
+    const url = this.apiReportsUrl + '/many';
+    return this.httpClient.post<any>(url, invoiceInfo, this.headers);
+  }
+
+  // HTTP POST /api/reports/
+  public createInvoice(invoiceInfo: Object): Observable<Report> {
+    const url = this.apiReportsUrl;
+    return this.httpClient.post<any>(url, invoiceInfo, this.headers);
+  }
+
+  // HTTP POST /api/reports/bulk
+  public createBulkInvoice(invoiceInfo: Object): Observable<Report> {
+    invoiceInfo = Object.assign(invoiceInfo, { 'reportType': 'BulkInvoice' });
+    const url = this.apiReportsUrl + '/bulk';
+    return this.httpClient.post<any>(url, invoiceInfo, this.headers);
   }
 
   public getInvoices(name: string, year: string, approved: boolean): Observable<Report[]> {
@@ -51,7 +83,7 @@ export class ReportsService {
 
     if (year) { reportInfo['SchoolYear'] = year; }
 
-    return this.getInvoiceByInfoBulk(reportInfo);
+    return this.getBulkInvoiceByInfo(reportInfo);
   }
 
   public getInvoiceByName(name: string): Observable<any> {
@@ -92,7 +124,7 @@ export class ReportsService {
     return this.httpClient.get<any>(url, headers);
   }
 
-  public getInvoiceByInfoBulk(reportInfo: Object): Observable<any> {
+  public getBulkInvoiceByInfo(reportInfo: Object): Observable<any> {
     let url = this.apiReportsUrl;
     let headers = {};
     headers['headers'] = new HttpHeaders({
@@ -122,35 +154,6 @@ export class ReportsService {
     return this.httpClient.get<any>(url, headers);
   }
 
-  public createInvoices(invoiceInfo: Object): Observable<Report[]> {
-    const url = this.apiReportsUrl + '/many';
-    return this.httpClient.post<any>(url, invoiceInfo, this.headers);
-  }
-
-  public createInvoice(invoiceInfo: Object): Observable<Report> {
-    const url = this.apiReportsUrl;
-    return this.httpClient.post<any>(url, invoiceInfo, this.headers);
-  }
-
-  public createBulkInvoice(invoiceInfo: Object): Observable<Report> {
-    invoiceInfo = Object.assign(invoiceInfo, { 'reportType': 'BulkInvoice' });
-    const url = this.apiReportsUrl + '/bulk';
-    return this.httpClient.post<any>(url, invoiceInfo, this.headers);
-  }
-
-  public getReportsByInfo(reportInfo: Object): Observable<Report[]> {
-    let url = this.apiReportsUrl;
-    if (reportInfo['Type']) { url +=  `?Type=${reportInfo['Type']}`; }
-    if (reportInfo['Name']) { url += `&Name=${reportInfo['Name']}`; }
-    if (reportInfo['SchoolYear']) { url += `&SchoolYear=${reportInfo['SchoolYear']}`; }
-    if (reportInfo['Approved']) { url += `&Approved=${reportInfo['Approved']}`; }
-    return this.httpClient.get<Report[]>(url, this.headers);
-  }
-
-  public getReport(id: number): Observable<Report> {
-    const url = this.apiReportsUrl + `/${id}`;
-    return this.httpClient.get<Report>(url, this.headers);
-  }
 
   public getReportByName(name: string): Observable<Report> {
     const url = this.apiReportsUrl + `/${name}`;

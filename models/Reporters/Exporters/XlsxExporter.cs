@@ -3,14 +3,14 @@ using System.Linq;
 using System.Text;
 
 using Newtonsoft.Json.Linq;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
+
+using Aspose.Cells;
 
 namespace models.Reporters.Exporters
 {
 	public interface IXlsxExporter
 	{
-		XSSFWorkbook Export(XSSFWorkbook wb, dynamic data);
+		Workbook Export(Workbook wb, dynamic data);
 	}
 
 	public class XlsxExporter : IXlsxExporter
@@ -44,10 +44,6 @@ namespace models.Reporters.Exporters
 						return token.Value<ulong>();
 
 					case JTokenType.String:
-						if (token.Path.Contains("City")) {
-							// dear god, such a kludge, but it gets rid of extraneous commas from the student itemization sheet
-							return string.Concat(token.Value<string>(), ", ");
-						}
 						return token.Value<string>();
 
 					default:
@@ -103,34 +99,36 @@ namespace models.Reporters.Exporters
 			return sb.ToString();
 		}
 
-		public XSSFWorkbook Export(XSSFWorkbook wb, dynamic data)
+		public Workbook Export(Workbook wb, dynamic data)
 		{
-			for (var s = 0; s < wb.NumberOfSheets; s++)
+			for (var s = 0; s < wb.Worksheets.Count; s++)
 			{
-				var sheet = wb.GetSheetAt(s);
+				var sheet = wb.Worksheets[s];
+				Cells cells = sheet.Cells;
 
-				for (var r = sheet.FirstRowNum; r < sheet.LastRowNum; r++)
-				{
-					var row = sheet.GetRow(r);
-
-					if (row.Cells.All(c => c.CellType == CellType.Blank))
+				for (int r = 0; r < cells.MaxDataRow; r++) {
+					Row row = cells.Rows[r];
+					if (row.IsBlank)
 						continue;
 
-					foreach (var cell in row.Cells.Where(c => c.CellType == CellType.String))
-					{
-						if (ContainsToken(cell.StringCellValue))
-						{
-							var value = GetValue(data, cell.StringCellValue);
-							if (value != null)
-								cell.SetCellValue(value);
-							else
-								cell.SetCellValue((string)null);
+					for (int c = 0; c < cells.MaxDataColumn; c++) {
+						if (cells[r,c].Type == CellValueType.IsString) {
+							if (ContainsToken(cells[r,c].StringValue))
+							{
+								var value = GetValue(data, cells[r,c].StringValue);
+								if (value != null)
+								{
+									cells[r,c].PutValue(value);
+								}
+								else
+								{
+									cells[r,c].PutValue(null);
+								}
+							}
 						}
 					}
 				}
 			}
-
-			wb.SetForceFormulaRecalculation(true);
 			return wb;
 		}
 	}
