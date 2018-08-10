@@ -9,7 +9,7 @@ namespace models
 {
 	public interface IStudentRecordRepository
 	{
-		StudentRecordsHeader Get(string scope);
+		StudentRecordsHeader Get(string scope, int skip = 0, int take = 0);
 		void Lock(string scope);
 		StudentRecord Update(StudentRecord update);
 	}
@@ -25,8 +25,21 @@ namespace models
 			_logger = logger;
 		}
 
-		public StudentRecordsHeader Get(string scope)
-			=> _context.StudentRecordsHeaders.Include(h => h.Records).SingleOrDefault(h => h.Scope == scope);
+		public StudentRecordsHeader Get(string scope, int skip = 0, int take = 0)
+		{
+			var header = _context.StudentRecordsHeaders.SingleOrDefault(h => h.Scope == scope);
+			if (header == null)
+				return null;
+
+			header.Records = header.Records.OrderBy(r => r.Id);
+			if (skip > 0)
+				header.Records = header.Records.Skip(skip);
+
+			if (take > 0)
+				header.Records = header.Records.Take(take);
+
+			return header;
+		}
 
 		public void Lock(string scope)
 		{

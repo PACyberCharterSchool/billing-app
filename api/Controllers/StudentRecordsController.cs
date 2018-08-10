@@ -26,6 +26,15 @@ namespace api.Controllers
 			_logger = logger;
 		}
 
+		public class GetHeaderArgs
+		{
+			[Range(0, int.MaxValue)]
+			public int Skip { get; set; }
+
+			[Range(0, int.MaxValue)]
+			public int Take { get; set; }
+		}
+
 		public struct StudentRecordsHeaderResponse
 		{
 			public StudentRecordsHeader Header { get; set; }
@@ -35,9 +44,13 @@ namespace api.Controllers
 		[Authorize(Policy = "STD+")]
 		[ProducesResponseType(typeof(StudentRecordsHeaderResponse), 200)]
 		[ProducesResponseType(404)]
-		public async Task<IActionResult> GetHeader(string scope)
+		public async Task<IActionResult> GetHeader(string scope, [FromQuery]GetHeaderArgs args)
 		{
-			var header = await Task.Run(() => _records.Get(scope));
+			var header = await Task.Run(() => _records.Get(
+				scope: scope,
+				skip: args.Skip,
+				take: args.Take
+			));
 			if (header == null)
 				return NotFound();
 
