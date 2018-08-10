@@ -27,7 +27,5 @@ namespace models
 
 		public DateTime Created { get; set; }
 		public DateTime LastUpdated { get; set; }
-
-		public virtual IList<Student> Students { get; set; }
 	}
 }

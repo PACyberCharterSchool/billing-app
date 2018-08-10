@@ -65,29 +65,36 @@ namespace import
 
 				using (var tx = _context.Database.BeginTransaction())
 				{
-					try
+					// TODO(Erik): figure out how scope is actually derived; monthly vs recon
+					var scope = $"{DateTime.Now.Year.ToString("0000")}.{DateTime.Now.Month.ToString("00")}";
+					var header = _context.StudentRecordsHeaders.Include(r => r.Records).SingleOrDefault(h => h.Scope == scope);
+					if (header != null)
 					{
-						var table = nameof(_context.PendingStudentStatusRecords);
-						Console.WriteLine($"Truncating {table}...");
-						_context.Database.ExecuteSqlCommand($"TRUNCATE TABLE " + table + ";");
-						_context.SaveChanges();
-						Console.WriteLine("Truncating done!");
+						if (header.Locked)
+						{
+							Console.WriteLine($"Data for {scope} has already been imported and locked. Aborting import.");
+							return;
+						}
+						else
+							_context.Remove(header);
 					}
-					catch (Exception ex)
+					else
 					{
-						Console.WriteLine($"Failed to truncate table: {ex.Message}");
-						if (ex.InnerException != null)
-							Console.WriteLine($"  Inner exception: {ex.InnerException.Message}.");
-						return;
+						header = new StudentRecordsHeader
+						{
+							Scope = scope,
+							Filename = e.Name,
+							Created = DateTime.Now,
+							Locked = false,
+						};
 					}
 
-					IList<PendingStudentStatusRecord> records = null;
 					try
 					{
 						using (var streamReader = File.OpenText(e.FullPath))
 						{
 							var lastWrite = File.GetLastWriteTime(e.FullPath);
-							records = _parser.Parse(lastWrite, streamReader, e.Name);
+							_parser.Parse(lastWrite, streamReader, header);
 						}
 					}
 					catch (Exception ex)
@@ -102,18 +109,14 @@ namespace import
 					try
 					{
 						Console.WriteLine("Writing changes to the database...");
-						_context.AddRange(records);
-						try
-						{
-							_context.Database.ExecuteSqlCommand($"SET IDENTITY_INSERT " + nameof(_context.PendingStudentStatusRecords) + " ON");
-							_context.SaveChanges();
-						}
-						finally
-						{
-							_context.Database.ExecuteSqlCommand($"SET IDENTITY_INSERT " + nameof(_context.PendingStudentStatusRecords) + " OFF");
-						}
-						Console.WriteLine("Writing changes to the database done!");
+						if (header.Id == 0)
+							_context.Add(header);
+						else
+							_context.Update(header);
 
+						_context.SaveChanges();
+
+						Console.WriteLine("Writing changes to the database done!");
 						tx.Commit();
 					}
 					catch (Exception ex)

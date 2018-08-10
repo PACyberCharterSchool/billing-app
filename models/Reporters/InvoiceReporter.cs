@@ -18,7 +18,7 @@ namespace models.Reporters
 		public decimal SpecialRate { get; set; }
 	}
 
-	public class InvoiceEnrollments : Dictionary<string, int> {}
+	public class InvoiceEnrollments : Dictionary<string, int> { }
 
 	public class InvoicePayment
 	{
@@ -139,8 +139,10 @@ namespace models.Reporters
 		{
 			// this assumes to never run in a group where there is a single entry...
 			var activityDates = group.OrderBy(s => s.FirstDay).Select(s => new { s.FirstDay, s.LastDay }).ToList();
-			for (int i = 1; i < activityDates.Count(); i++) {
-				if (activityDates[i].FirstDay.Month == activityDates[i - 1].LastDay.Value.Month) {
+			for (int i = 1; i < activityDates.Count(); i++)
+			{
+				if (activityDates[i].FirstDay.Month == activityDates[i - 1].LastDay.Value.Month)
+				{
 					return true;
 				}
 			}
@@ -156,56 +158,67 @@ namespace models.Reporters
 			var regularEnrollments = new InvoiceEnrollments();
 			var specialEnrollments = new InvoiceEnrollments();
 
-			foreach (var month in _months) {
+			foreach (var month in _months)
+			{
 				var regular = 0;
 				var special = 0;
 
 				var year = month.Number >= 7 ? firstYear : secondYear;
 				var start = new DateTime(year, month.Number, 1);
 				DateTime end;
-				if (new[] {7,8,9}.Contains(month.Number))
+				if (new[] { 7, 8, 9 }.Contains(month.Number))
 					end = EndOfMonth(year, 9);
 				else
 					end = EndOfMonth(year, month.Number);
 
-				if (end > EndOfMonth(asOf.Year, asOf.Month) && end.Month != 9) {
+				if (end > EndOfMonth(asOf.Year, asOf.Month) && end.Month != 9)
+				{
 					regularEnrollments[month.Name] = regular;
 					specialEnrollments[month.Name] = special;
 					continue;
 				}
 
 				var groups = students.
-					Where(s => {
-						if (s.FirstDay <= end && (s.LastDay == null || s.LastDay >= start)) {
+					Where(s =>
+					{
+						if (s.FirstDay <= end && (s.LastDay == null || s.LastDay >= start))
+						{
 							return true;
 						}
 						/* else if (s.FirstDay <= end && (start.Month == 9 && (s.LastDay == null || (s.LastDay.Value.Month >= 7 || s.LastDay.Value.Month <= 9)))) { */
-            else if (s.FirstDay <= end && (end.Month == 9 && (s.LastDay == null || (s.LastDay.Value.Month >= 7 || s.LastDay.Value.Month <= 9)))) {
+						else if (s.FirstDay <= end && (end.Month == 9 && (s.LastDay == null || (s.LastDay.Value.Month >= 7 || s.LastDay.Value.Month <= 9))))
+						{
 							return true;
 						}
 
 						return false;
 					}).
 					GroupBy(s => s.PACyberID);
-				foreach (var group in groups) {
-					if (group.Count() == 1) {
-						if (group.Single().IsSpecialEducation) {
+				foreach (var group in groups)
+				{
+					if (group.Count() == 1)
+					{
+						if (group.Single().IsSpecialEducation)
+						{
 							special++;
 						}
-						else {
+						else
+						{
 							regular++;
 						}
 
 						continue;
 					}
 
-					if (group.All(s => s.IsSpecialEducation)) {
-						if (!AreEnrollmentAndWithdrawalInSameMonth(group)) {
+					if (group.All(s => s.IsSpecialEducation))
+					{
+						if (!AreEnrollmentAndWithdrawalInSameMonth(group))
+						{
 							special++;
 						}
 						continue;
-					} 
-					
+					}
+
 					regular++;
 				}
 
@@ -283,17 +296,20 @@ namespace models.Reporters
 
 		private IList<InvoiceStudent> GetStudents(
 			int aun,
+			string scope,
 			DateTime start,
 			DateTime end)
 		{
-      Console.WriteLine($"InvoiceReporter.GetStudents():  start is {start}, end is {end}.");
-      Console.WriteLine($"InvoiceReporter.GetStudents():  end.Month is {end.Month}, end.Day is {end.Day}, and end.Year is {end.Year}.");
+			Console.WriteLine($"InvoiceReporter.GetStudents():  start is {start}, end is {end}.");
+			Console.WriteLine($"InvoiceReporter.GetStudents():  end.Month is {end.Month}, end.Day is {end.Day}, and end.Year is {end.Year}.");
 
-			if (new[] {7, 8, 9}.Contains(end.Month)) {
+			if (new[] { 7, 8, 9 }.Contains(end.Month))
+			{
 				end = EndOfMonth(end.Year, 9);
 			}
 
-      IList<InvoiceStudent> studentList = _conn.Query<InvoiceStudent>($@"
+			// TODO(Erik): get appropriate StudentRecords from StudentRecordsHeader via Scope
+			IList<InvoiceStudent> studentList = _conn.Query<InvoiceStudent>($@"
 				SELECT
 					StudentPASecuredId AS PASecuredId,
 					StudentId AS PACyberId,
@@ -312,38 +328,47 @@ namespace models.Reporters
 					StudentIsSpecialEducation AS IsSpecialEducation,
 					StudentCurrentIep AS CurrentIep,
 					StudentFormerIep AS FormerIep
-				FROM CommittedStudentStatusRecords
-				WHERE SchoolDistrictId = @Aun
-				AND StudentEnrollmentDate <= @End
+				FROM StudentRecords
+				WHERE HeaderId = (
+					SELECT Id
+					FROM StudentRecordsHeaders
+					WHERE Scope = '2018.08'
+				)
+				AND SchoolDistrictId = @Aun
+				AND StudentEnrollmentDate <= datefromparts(2018, 9, 30)
 				AND (
 					StudentWithdrawalDate IS NULL
 					OR (
-							StudentWithdrawalDate >= @Start AND
-							(
-									StudentWithdrawalDate != StudentEnrollmentDate OR
-									(
-											StudentWithdrawalDate = StudentEnrollmentDate AND
-											DATEPART(month, StudentCurrentIep) = DATEPART(month, StudentEnrollmentDate) AND
-											DATEPART(day, StudentCurrentIep) = DATEPART(day, StudentEnrollmentDate)
-									)
+						StudentWithdrawalDate >= datefromparts(2017, 7, 1)
+						AND (
+							StudentWithdrawalDate != StudentEnrollmentDate
+							OR (
+								StudentWithdrawalDate = StudentEnrollmentDate
+								AND 	DATEPART(month, StudentCurrentIep) = DATEPART(month, StudentEnrollmentDate)
+								AND 	DATEPART(day, StudentCurrentIep) = DATEPART(day, StudentEnrollmentDate)
 							)
+						)
 					)
 				)
-				ORDER BY StudentLastName, StudentFirstName, StudentMiddleInitial, StudentEnrollmentDate, StudentWithdrawalDate",
+				ORDER BY StudentLastName, StudentFirstName, StudentMiddleInitial, StudentEnrollmentDate, StudentWithdrawalDate
+
+",
 				new
 				{
 					Aun = aun,
+					Scope = scope,
 					Start = start,
 					End = end,
 				}).ToList();
 
-      return studentList;
+			return studentList;
 		}
 
 		public class Config
 		{
 			public string InvoiceNumber { get; set; }
 			public string SchoolYear { get; set; }
+			public string Scope { get; set; }
 			public DateTime AsOf { get; set; }
 			public DateTime Prepared { get; set; }
 			public DateTime ToSchoolDistrict { get; set; }
@@ -351,7 +376,6 @@ namespace models.Reporters
 			public int SchoolDistrictAun { get; set; }
 		}
 
-		// TODO(Erik): signature
 		public Invoice GenerateReport(Config config)
 		{
 			var invoice = new Invoice
@@ -368,6 +392,7 @@ namespace models.Reporters
 
 			invoice.Students = GetStudents(
 				config.SchoolDistrictAun,
+				config.Scope,
 				new DateTime(invoice.FirstYear, 7, 1),
 				EndOfMonth(config.AsOf.Year, config.AsOf.Month));
 

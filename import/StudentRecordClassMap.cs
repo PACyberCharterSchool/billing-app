@@ -22,11 +22,10 @@ namespace import
 		}
 	}
 
-	public class StudentStatusRecordClassMap : ClassMap<PendingStudentStatusRecord>
+	public class StudentStatusRecordClassMap : ClassMap<StudentRecord>
 	{
 		public StudentStatusRecordClassMap()
 		{
-			Map(m => m.Id).ConvertUsing(row => row.Context.Row);
 			Map(m => m.SchoolDistrictId).Name("schooldistrict");
 			Map(m => m.SchoolDistrictName).Name("school_name");
 			Map(m => m.StudentId).Name("StudentIndex"); // case in file

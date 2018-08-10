@@ -61,6 +61,11 @@ namespace api.Controllers
 
     public class CreateInvoiceReport
     {
+			[Required]
+			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
+			public string Scope { get; set; }
+
+
       [Required]
       public DateTime AsOf { get; set; }
 
@@ -77,6 +82,11 @@ namespace api.Controllers
 
     public class CreateBulkInvoiceReport
     {
+			[Required]
+			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
+			public string Scope { get; set; }
+
+
       public DateTime AsOf { get; set; }
 
       public DateTime ToSchoolDistrict { get; set; }
@@ -279,6 +289,7 @@ namespace api.Controllers
       // build config
       var config = new InvoiceReporter.Config
       {
+        Scope = create.Invoice.Scope,
         InvoiceNumber = create.Name,
         SchoolYear = create.SchoolYear,
         AsOf = create.Invoice.AsOf,
