@@ -1,5 +1,6 @@
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -10,6 +11,7 @@ namespace models
 	public interface IStudentRecordRepository
 	{
 		StudentRecordsHeader Get(string scope);
+		IList<string> GetScopes();
 		void Lock(string scope);
 		StudentRecord Update(StudentRecord update);
 	}
@@ -27,6 +29,9 @@ namespace models
 
 		public StudentRecordsHeader Get(string scope)
 			=> _context.StudentRecordsHeaders.Include(h => h.Records).SingleOrDefault(h => h.Scope == scope);
+
+		public IList<string> GetScopes()
+			=> _context.StudentRecordsHeaders.Select(h => h.Scope).ToList();
 
 		public void Lock(string scope)
 		{
