@@ -70,6 +70,7 @@ namespace api
 			services.AddTransient<ITemplateRepository, TemplateRepository>();
 			services.AddTransient<ISchoolDistrictRepository, SchoolDistrictRepository>();
 			services.AddTransient<IDigitalSignatureRepository, DigitalSignatureRepository>();
+			services.AddTransient<IStudentRecordRepository, StudentRecordRepository>();
 
 			services.AddTransient<IFilterParser, FilterParser>();
 
