@@ -36,7 +36,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
   ngOnInit() {
     this.ssrImportService.getStudentRecordsHeaders().subscribe(
       data => {
-        this.studentRecordsHeaders = data['headers'];
+        this.studentRecordsHeaders = data;
         this.currentHeader = this.studentRecordsHeaders[0];
       },
       error => {
