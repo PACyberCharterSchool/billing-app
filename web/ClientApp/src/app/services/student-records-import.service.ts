@@ -48,9 +48,9 @@ export class StudentRecordsImportService {
   }
 
   public getStudentRecordsHeaders(): Observable<StudentRecordsHeader[]> {
-    const url = this.apiSSRUrl + `/headers`;
-    // return this.httpClient.get<StudentRecordsHeader[]>(url, this.headers);
-    return Observable.of(studentRecordsHeaders);
+    const url = this.apiSSRUrl + `/scopes`;
+    return this.httpClient.get<StudentRecordsHeader[]>(url, this.headers);
+    // return Observable.of(studentRecordsHeaders);
   }
 
   public getStudentRecordsHeaderByScope(scope: string): Observable<StudentRecordsHeader> {

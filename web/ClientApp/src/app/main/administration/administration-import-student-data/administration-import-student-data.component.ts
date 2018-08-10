@@ -19,8 +19,8 @@ import { NgxSpinnerService } from 'ngx-spinner';
 export class AdministrationImportStudentDataComponent implements OnInit {
 
   studentRecords: StudentRecord[] = [];
-  studentRecordsHeaders: StudentRecordsHeader[];
-  currentHeader: StudentRecordsHeader;
+  scopes: string[];
+  currentScope: string;
   private skip;
 
   constructor(
@@ -34,25 +34,16 @@ export class AdministrationImportStudentDataComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.currentScope = 'Select scope...';
     this.ssrImportService.getStudentRecordsHeaders().subscribe(
       data => {
-        this.studentRecordsHeaders = data;
-        this.currentHeader = this.studentRecordsHeaders[0];
+        this.scopes = data['scopes'];
       },
       error => {
         console.log('AdministrationImportStudentDataComponent.ngOnInit():  error is ', error);
       }
     );
 
-    this.ssrImportService.getStudentRecordsHeaderByScope(this.currentHeader.scope).subscribe(
-      data => {
-        this.updateScrollingSkip();
-        this.studentRecords = data['header']['records'];
-        console.log('AdministrationImportStudentDataComponent.ngOnInit():  student records are ', this.studentRecords);
-      },
-      error => {
-      }
-    );
     this.spinnerService.hide();
   }
 
@@ -60,7 +51,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
     this.router.navigate(['/administration', { outlets: { 'action': ['home'] } }]);
   }
 
-  public handleDataImportCommitClick(): void {
+  public handleCommitClick(): void {
     this.spinnerService.show();
     this.ssrImportService.postStudentData().subscribe(
       response => {
@@ -72,8 +63,24 @@ export class AdministrationImportStudentDataComponent implements OnInit {
     );
   }
 
+  public filterByStudentRecordScope(scope: string): void {
+    this.currentScope = scope;
+    this.spinnerService.show();
+    this.ssrImportService.getStudentRecordsHeaderByScope(this.currentScope).subscribe(
+      data => {
+        this.studentRecords = data['header']['records'];
+        console.log('AdministrationImportStudentDataComponent.ngOnInit():  data is ', data);
+        this.spinnerService.hide();
+      },
+      error => {
+        console.log('AdministrationImportStudentDataComponent.ngOnInit():  error is ', error);
+        this.spinnerService.hide();
+      }
+    );
+  }
+
   getStudentRecords($event) {
-    this.ssrImportService.getStudentRecordsHeaderByScope(this.currentHeader.scope).subscribe(
+    this.ssrImportService.getStudentRecordsHeaderByScope(this.currentScope).subscribe(
       data => {
         this.updateScrollingSkip();
         this.studentRecords = this.studentRecords.concat(data['header']['records']);
