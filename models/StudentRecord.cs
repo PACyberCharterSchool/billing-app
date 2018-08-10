@@ -11,7 +11,7 @@ namespace models
 		public DateTime Created { get; set; }
 		public bool Locked { get; set; }
 
-		public virtual IList<StudentRecord> Records { get; set; }
+		public virtual IEnumerable<StudentRecord> Records { get; set; }
 	}
 
 	public class StudentRecord

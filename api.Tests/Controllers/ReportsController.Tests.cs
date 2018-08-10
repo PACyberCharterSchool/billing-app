@@ -76,13 +76,13 @@ namespace api.Tests.Controllers
 
 				Console.WriteLine($"name: {r.Name} == {create.Name}");
 				Console.WriteLine($"type: {r.Type} == {create.ReportType}");
-				Console.WriteLine($"year: {r.SchoolYear} == {create.SchoolYear}");
+				Console.WriteLine($"year: {r.Scope} == {create.Scope}");
 				Console.WriteLine($"approved: {r.Approved} == false");
 				Console.WriteLine($"data: {r.Data} == {JsonConvert.SerializeObject(invoice)}");
 				Console.WriteLine($"xlsx: {r.Xlsx} == {ms.ToArray()}");
 				return r.Name == create.Name &&
 					r.Type == ReportType.FromString(create.ReportType) &&
-					r.SchoolYear == create.SchoolYear &&
+					r.Scope == create.Scope &&
 					r.Approved == false &&
 					r.Data == JsonConvert.SerializeObject(invoice) &&
 					r.Xlsx.SequenceEqual(ms.ToArray());
@@ -101,13 +101,13 @@ namespace api.Tests.Controllers
 
 				Console.WriteLine($"name: {r.Name} == {invoice.Number}");
 				Console.WriteLine($"type: {r.Type} == {create.ReportType}");
-				Console.WriteLine($"year: {r.SchoolYear} == {create.SchoolYear}");
+				Console.WriteLine($"year: {r.Scope} == {create.Scope}");
 				Console.WriteLine($"approved: {r.Approved} == false");
 				Console.WriteLine($"data: {r.Data} == {JsonConvert.SerializeObject(invoice)}");
 				Console.WriteLine($"xlsx: {r.Xlsx} == {ms.ToArray()}");
 				return r.Name == invoice.Number &&
 					r.Type == ReportType.FromString(create.ReportType) &&
-					r.SchoolYear == create.SchoolYear &&
+					r.Scope == create.Scope &&
 					r.Approved == false &&
 					r.Data == JsonConvert.SerializeObject(invoice) &&
 					r.Xlsx.SequenceEqual(ms.ToArray());
@@ -122,7 +122,7 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-    [Ignore("Why is this failing?")]
+		[Ignore("Why is this failing?")]
 		public async Task CreateCreatesInvoice()
 		{
 			// build config
@@ -131,7 +131,7 @@ namespace api.Tests.Controllers
 			{
 				ReportType = ReportType.Invoice.Value,
 				Name = "invoice",
-				SchoolYear = "2017-2018",
+				Scope = "2017-2018",
 				TemplateId = 3,
 				Invoice = new ReportsController.CreateInvoiceReport
 				{
@@ -150,7 +150,7 @@ namespace api.Tests.Controllers
 			var invoice = new Invoice
 			{
 				Number = create.Name,
-				SchoolYear = create.SchoolYear,
+				SchoolYear = create.Scope,
 				AsOf = create.Invoice.AsOf,
 				Prepared = time,
 				ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
@@ -199,7 +199,7 @@ namespace api.Tests.Controllers
 			};
 			reporter.Setup(r => r.GenerateReport(It.Is<InvoiceReporter.Config>(c =>
 					c.InvoiceNumber == create.Name &&
-					c.SchoolYear == create.SchoolYear &&
+					c.SchoolYear == create.Scope &&
 					c.AsOf == create.Invoice.AsOf &&
 					// c.Prepared == time && // TODO(Erik): DateTime.Now?
 					c.ToSchoolDistrict == create.Invoice.ToSchoolDistrict &&
@@ -374,14 +374,14 @@ namespace api.Tests.Controllers
 			int aun,
 			Invoice invoice)
 		{
-			Console.WriteLine($"number: {config.InvoiceNumber} == {create.SchoolYear}_{aun}_???");
-			Console.WriteLine($"schoolYear: {config.SchoolYear} == {create.SchoolYear}");
+			Console.WriteLine($"number: {config.InvoiceNumber} == {create.Scope}_{aun}_???");
+			Console.WriteLine($"scope: {config.SchoolYear} == {create.Scope}");
 			Console.WriteLine($"asOf: {config.AsOf} == {create.Invoice.AsOf}");
 			Console.WriteLine($"toSchoolDistrict: {config.ToSchoolDistrict} == {create.Invoice.ToSchoolDistrict}");
 			Console.WriteLine($"toPDE: {config.ToPDE} == {create.Invoice.ToPDE}");
 			Console.WriteLine($"aun: {config.SchoolDistrictAun} == {aun}");
-			return config.InvoiceNumber.StartsWith($"{create.SchoolYear}_{aun}_") && // TODO(erik): inject time?
-				config.SchoolYear == create.SchoolYear &&
+			return config.InvoiceNumber.StartsWith($"{create.Scope}_{aun}_") && // TODO(erik): inject time?
+				config.SchoolYear == create.Scope &&
 				config.AsOf == create.Invoice.AsOf &&
 				config.ToSchoolDistrict == create.Invoice.ToSchoolDistrict &&
 				config.ToPDE == create.Invoice.ToPDE &&
@@ -397,14 +397,14 @@ namespace api.Tests.Controllers
 				234567890,
 				345678901
 			};
-//			_districts.Setup(ds => ds.GetManyAuns()).Returns(auns).Verifiable();
+			//			_districts.Setup(ds => ds.GetManyAuns()).Returns(auns).Verifiable();
 
-      var names = new[] {
-        "Test School 1 SD",
-        "Test School 2 SD",
-        "Test School 3 SD"
-      };
-      _districts.Setup(ds => ds.GetManyNames()).Returns(names).Verifiable();
+			var names = new[] {
+				"Test School 1 SD",
+				"Test School 2 SD",
+				"Test School 3 SD"
+			};
+			_districts.Setup(ds => ds.GetManyNames()).Returns(names).Verifiable();
 
 			// get reporter
 			var reporter = new Mock<IReporter<Invoice, InvoiceReporter.Config>>();
@@ -416,7 +416,7 @@ namespace api.Tests.Controllers
 			var create = new ReportsController.CreateManyReports
 			{
 				ReportType = ReportType.Invoice.Value,
-				SchoolYear = "2017-2018",
+				Scope = "2017-2018",
 				TemplateId = 1,
 				Invoice = new ReportsController.CreateManyInvoiceReports
 				{
@@ -433,7 +433,7 @@ namespace api.Tests.Controllers
 					SchoolDistrict = new InvoiceSchoolDistrict
 					{
 						Aun = auns[0],
-            Name = names[0],
+						Name = names[0],
 					},
 					Students = new[] {
 						new InvoiceStudent(),
@@ -444,7 +444,7 @@ namespace api.Tests.Controllers
 					SchoolDistrict = new InvoiceSchoolDistrict
 					{
 						Aun = auns[1],
-            Name = names[1],
+						Name = names[1],
 					},
 					Students = new[] {
 						new InvoiceStudent(),
@@ -455,7 +455,7 @@ namespace api.Tests.Controllers
 					SchoolDistrict = new InvoiceSchoolDistrict
 					{
 						Aun = auns[2],
-            Name = names[2],
+						Name = names[2],
 					},
 					Students = new[] {
 						new InvoiceStudent(),
@@ -514,21 +514,21 @@ namespace api.Tests.Controllers
 			// return reportmetadata
 			var result = _uut.CreateMany(create);
 			Assert.That(result, Is.TypeOf<CreatedResult>());
-			Assert.That(((CreatedResult)result).Location, Is.EqualTo($"/api/reports?type={create.ReportType}&schoolYear={create.SchoolYear}&approved=false"));
+			Assert.That(((CreatedResult)result).Location, Is.EqualTo($"/api/reports?type={create.ReportType}&scope={create.Scope}&approved=false"));
 			var value = ((CreatedResult)result).Value;
 
 			Assert.That(value, Is.TypeOf<ReportsController.ReportsResponse>());
 			var actuals = ((ReportsController.ReportsResponse)value).Reports;
-      // WDM 06-25-2018:  This needs fixed.
-//			Assert.That(actuals, Has.Count.EqualTo(auns.Length));
-//			for (var i = 0; i < auns.Length; i++)
-//				AssertReport(actuals[i], reports[i]);
+			// WDM 06-25-2018:  This needs fixed.
+			//			Assert.That(actuals, Has.Count.EqualTo(auns.Length));
+			//			for (var i = 0; i < auns.Length; i++)
+			//				AssertReport(actuals[i], reports[i]);
 
 			_districts.Verify();
-//			_reporters.Verify();
-//			reporter.Verify();
-//			_exporter.Verify();
-//			_reporters.Verify();
+			//			_reporters.Verify();
+			//			reporter.Verify();
+			//			_exporter.Verify();
+			//			_reporters.Verify();
 		}
 
 		[Test]
@@ -613,7 +613,7 @@ namespace api.Tests.Controllers
 			_reports.Setup(rs => rs.CreateMany(It.IsAny<IList<Report>>())).Throws(new DbUpdateException("", new Exception()));
 
 			/* _districts.Setup(ds => ds.GetManyAuns()).Returns(new[] { 123456789 }); */
-      _districts.Setup(ds => ds.GetManyNames()).Returns(new[] { "Test School SD" });
+			_districts.Setup(ds => ds.GetManyNames()).Returns(new[] { "Test School SD" });
 
 			var reporter = new Mock<IReporter<Invoice, InvoiceReporter.Config>>();
 			_reporters.Setup(rs => rs.CreateInvoiceReporter(_context)).Returns(reporter.Object);
@@ -666,7 +666,7 @@ namespace api.Tests.Controllers
 				report = new Report
 				{
 					Type = ReportType.Invoice,
-					SchoolYear = "2017-2018",
+					Scope = "2017-2018",
 					Name = "invoice",
 					Data = "{'hello':'world'}",
 					Xlsx = templateMemoryStream.ToArray(),
@@ -708,7 +708,7 @@ namespace api.Tests.Controllers
 			var report = new Report
 			{
 				Type = ReportType.Invoice,
-				SchoolYear = "2017-2018",
+				Scope = "2017-2018",
 				Name = "invoice",
 			};
 			_reports.Setup(rs => rs.Get(report.Name)).Returns(report);
@@ -722,7 +722,7 @@ namespace api.Tests.Controllers
 		{
 			Assert.That(actual.Id, Is.EqualTo(report.Id));
 			Assert.That(actual.Type, Is.EqualTo(report.Type));
-			Assert.That(actual.SchoolYear, Is.EqualTo(report.SchoolYear));
+			Assert.That(actual.Scope, Is.EqualTo(report.Scope));
 			Assert.That(actual.Name, Is.EqualTo(report.Name));
 			Assert.That(actual.Approved, Is.EqualTo(report.Approved));
 			Assert.That(actual.Created, Is.EqualTo(report.Created));
@@ -734,12 +734,12 @@ namespace api.Tests.Controllers
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
-					SchoolYear = "2017-2018",
+					Scope = "2017-2018",
 					Name = "invoice1",
 				},
 				new Report {
 					Type = ReportType.Invoice,
-					SchoolYear = "2017-2018",
+					Scope = "2017-2018",
 					Name = "invoice2",
 				},
 			};
@@ -762,29 +762,29 @@ namespace api.Tests.Controllers
 		{
 			var name = "invoice";
 			var type = ReportType.Invoice;
-			var year = "2017-2018";
+			var scope = "2017-2018";
 			var approved = true;
 			var reports = new[] {
 				new Report {
 					Type = type,
-					SchoolYear = year,
+					Scope = scope,
 					Name = name,
 					Approved = approved,
 				},
 				new Report {
 					Type = type,
-					SchoolYear = year,
+					Scope = scope,
 					Name = name,
 					Approved = approved,
 				},
 			};
-			_reports.Setup(rs => rs.GetManyMetadata(name, type, year, approved)).Returns(reports);
+			_reports.Setup(rs => rs.GetManyMetadata(name, type, scope, approved)).Returns(reports);
 
 			var result = await _uut.GetManyMetadata(new ReportsController.GetManyArgs
 			{
 				Name = name,
 				Type = type.Value,
-				SchoolYear = year,
+				Scope = scope,
 				Approved = approved,
 			});
 			Assert.That(result, Is.TypeOf<ObjectResult>());
@@ -923,7 +923,7 @@ namespace api.Tests.Controllers
 			{
 				Name = name,
 				Type = type.Value,
-				SchoolYear = schoolYear,
+				Scope = schoolYear,
 				Approved = approved,
 			});
 			Assert.That(result, Is.TypeOf<FileStreamResult>());

@@ -16,7 +16,7 @@ namespace models
 	{
 		public int Id { get; set; }
 		public ReportType Type { get; set; }
-		public string SchoolYear { get; set; }
+		public string Scope { get; set; }
 		public string Name { get; set; }
 		public bool Approved { get; set; }
 		public DateTime Created { get; set; }
