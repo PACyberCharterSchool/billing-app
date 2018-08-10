@@ -4,7 +4,7 @@ import { UtilitiesService } from '../../../services/utilities.service';
 import { StudentsService } from '../../../services/students.service';
 import { CurrentStudentService } from '../../../services/current-student.service';
 
-import { Student } from '../../../models/student.model';
+import { StudentRecord } from '../../../models/student-record.model';
 import { StudentActivityRecord } from '../../../models/student-activity-record.model';
 
 @Component({
@@ -19,7 +19,7 @@ export class StudentActivityHistoryComponent implements OnInit {
   public property: string;
   public direction: number;
   private isDescending: boolean;
-  private student: Student;
+  private student: StudentRecord;
 
   constructor(
     private utilitiesService: UtilitiesService,
@@ -32,7 +32,7 @@ export class StudentActivityHistoryComponent implements OnInit {
 
   ngOnInit() {
     this.currentStudentService.currentStudent.subscribe((s) => this.student = s, (e) => console.log('error'));
-    this.studentsService.getStudentActivityRecordsByStudentId(this.student.paCyberId).subscribe(
+    this.studentsService.getStudentActivityRecordsByStudentId(+this.student.studentId).subscribe(
       data => {
         this.activities = this.allActivities = data['studentActivityRecords'];
         this.initActivityTypes();

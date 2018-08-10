@@ -2,11 +2,10 @@ import { Component, OnInit } from '@angular/core';
 
 import { Router } from '@angular/router';
 
-import { Student } from '../../../models/student.model';
-import { PendingStudentStatusRecord } from '../../../models/pending-student-status-record.model';
+import { StudentRecord, StudentRecordsHeader } from '../../../models/student-record.model';
 
 import { UtilitiesService } from '../../../services/utilities.service';
-import { StudentStatusRecordsImportService } from '../../../services/student-status-records-import.service';
+import { StudentRecordsImportService } from '../../../services/student-records-import.service';
 
 import { Globals } from '../../../globals';
 
@@ -19,14 +18,15 @@ import { NgxSpinnerService } from 'ngx-spinner';
 })
 export class AdministrationImportStudentDataComponent implements OnInit {
 
-  pendingStudentStatusRecords: PendingStudentStatusRecord[] = [];
+  studentRecords: StudentRecord[] = [];
+  studentRecordsHeaders: StudentRecordsHeader[];
+  currentHeader: StudentRecordsHeader;
   private skip;
-  lastUpdatedDate: string;
 
   constructor(
     private globals: Globals,
     private utilitiesService: UtilitiesService,
-    private ssrImportService: StudentStatusRecordsImportService,
+    private ssrImportService: StudentRecordsImportService,
     private router: Router,
     private spinnerService: NgxSpinnerService
   ) {
@@ -34,16 +34,21 @@ export class AdministrationImportStudentDataComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.ssrImportService.getPending(this.skip).subscribe(
+    this.ssrImportService.getStudentRecordsHeaders().subscribe(
+      data => {
+        this.studentRecordsHeaders = data['headers'];
+        this.currentHeader = this.studentRecordsHeaders[0];
+      },
+      error => {
+        console.log('AdministrationImportStudentDataComponent.ngOnInit():  error is ', error);
+      }
+    );
+
+    this.ssrImportService.getStudentRecordsHeaderByScope(this.currentHeader.scope).subscribe(
       data => {
         this.updateScrollingSkip();
-        this.pendingStudentStatusRecords = data['studentStatusRecords'];
-        console.log('AdministrationImportStudentDataComponent.ngOnInit():  sample status record ', this.pendingStudentStatusRecords[0]);
-        if (this.pendingStudentStatusRecords.length > 0) {
-          this.lastUpdatedDate = this.pendingStudentStatusRecords[0].batchTime;
-        } else {
-          this.lastUpdatedDate = '?';
-        }
+        this.studentRecords = data['header']['records'];
+        console.log('AdministrationImportStudentDataComponent.ngOnInit():  student records are ', this.studentRecords);
       },
       error => {
       }
@@ -51,17 +56,15 @@ export class AdministrationImportStudentDataComponent implements OnInit {
     this.spinnerService.hide();
   }
 
-  handleCancelClick() {
+  public handleCancelClick(): void {
     this.router.navigate(['/administration', { outlets: { 'action': ['home'] } }]);
   }
 
-  handleDataImportCommitClick() {
+  public handleDataImportCommitClick(): void {
     this.spinnerService.show();
     this.ssrImportService.postStudentData().subscribe(
       response => {
         this.spinnerService.hide();
-        this.lastUpdatedDate = this.pendingStudentStatusRecords[0].batchTime;
-        this.pendingStudentStatusRecords = [];
       },
       error => {
         this.spinnerService.hide();
@@ -69,11 +72,11 @@ export class AdministrationImportStudentDataComponent implements OnInit {
     );
   }
 
-  getPending($event) {
-    this.ssrImportService.getPending(this.skip).subscribe(
+  getStudentRecords($event) {
+    this.ssrImportService.getStudentRecordsHeaderByScope(this.currentHeader.scope).subscribe(
       data => {
         this.updateScrollingSkip();
-        this.pendingStudentStatusRecords = this.pendingStudentStatusRecords.concat(data['studentStatusRecords']);
+        this.studentRecords = this.studentRecords.concat(data['header']['records']);
       },
       error => {
       }
@@ -81,7 +84,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
   }
 
   onScroll($event) {
-    this.getPending($event);
+    this.getStudentRecords($event);
   }
 
   private updateScrollingSkip() {
@@ -89,16 +92,13 @@ export class AdministrationImportStudentDataComponent implements OnInit {
   }
 
   listDisplayableFields() {
-    const fields = this.utilitiesService.objectKeys(this.pendingStudentStatusRecords[0]);
+    const fields = this.utilitiesService.objectKeys(this.studentRecords[0]);
     const rejected = [
-      'batchHash',
-      'batchTime',
-      'batchFilename',
       'id',
-      'lazyLoader',
       'studentMiddleInitial',
       'studentState',
-      'studentNorep'
+      'studentNorep',
+      'lastUpdated'
     ];
 
     if (fields) {

@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 
 import { UtilitiesService } from '../../../services/utilities.service';
 
-import { Student } from '../../../models/student.model';
+import { StudentRecord } from '../../../models/student-record.model';
 
 @Component({
   selector: 'app-student-history-info',

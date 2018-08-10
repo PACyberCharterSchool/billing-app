@@ -4,7 +4,7 @@ import { SchoolDistrict } from '../../../models/school-district.model';
 
 import { StudentsService } from '../../../services/students.service';
 
-import { Student } from '../../../models/student.model';
+import { StudentRecord } from '../../../models/student-record.model';
 
 @Component({
   selector: 'app-student-advanced-filter',
@@ -23,7 +23,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
 
   constructor(private studentsService: StudentsService) { }
 
-  @Output() studentsUpdated: EventEmitter<Student[]> = new EventEmitter();
+  @Output() studentsUpdated: EventEmitter<StudentRecord[]> = new EventEmitter();
 
   ngOnInit() {
   }

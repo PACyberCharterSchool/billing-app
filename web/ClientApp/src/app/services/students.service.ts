@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { environment } from '../../environments/environment';
 
-import { Student } from '../models/student.model';
+import { StudentRecord } from '../models/student-record.model';
 import { SchoolDistrict } from '../models/school-district.model';
 import { StudentActivityRecord } from '../models/student-activity-record.model';
 
@@ -25,52 +25,52 @@ export class StudentsService {
     this.apiStudentsUrl = '/api/students';
   }
 
-  public getStudents(skip: number): Observable<Student[]> {
+  public getStudents(skip: number): Observable<StudentRecord[]> {
     const url = this.apiStudentsUrl + `?skip=${skip}&take=${this.globals.take}`;
-    return this.httpClient.get<Student[]>(url, this.headers);
+    return this.httpClient.get<StudentRecord[]>(url, this.headers);
   }
 
-  public getStudent(id: number): Observable<Student> {
-    return this.httpClient.get<Student>(this.apiStudentsUrl + `/${id}`, this.headers);
+  public getStudentRecord(id: number): Observable<StudentRecord> {
+    return this.httpClient.get<StudentRecord>(this.apiStudentsUrl + `/${id}`, this.headers);
   }
 
-  public getStudentsFilteredByIep(isIep: boolean): Observable<Student[]> {
+  public getStudentsFilteredByIep(isIep: boolean): Observable<StudentRecord[]> {
     const url: string = this.buildStudentIepSearchQuery(isIep);
-    return this.httpClient.get<Student[]>(url, this.headers);
+    return this.httpClient.get<StudentRecord[]>(url, this.headers);
   }
 
-  public getStudentsFilteredByNameOrId(searchText: string): Observable<Student[]> {
+  public getStudentsFilteredByNameOrId(searchText: string): Observable<StudentRecord[]> {
     const url: string = this.buildStudentIdOrNameSearchQuery(searchText);
-    return this.httpClient.get<Student[]>(url, this.headers);
+    return this.httpClient.get<StudentRecord[]>(url, this.headers);
   }
 
-  public getStudentsFilteredBySchoolDistrict(schoolId: number): Observable<Student[]> {
+  public getStudentsFilteredBySchoolDistrict(schoolId: number): Observable<StudentRecord[]> {
     const url: string = this.buildStudentSchoolDistrictSearchQuery(schoolId);
-    return this.httpClient.get<Student[]>(url, this.headers);
+    return this.httpClient.get<StudentRecord[]>(url, this.headers);
   }
 
-  public getStudentsFilteredByGrade(grade: number): Observable<Student[]> {
+  public getStudentsFilteredByGrade(grade: number): Observable<StudentRecord[]> {
     const url: string = this.buildStudentGradeSearchQuery(grade);
-    return this.httpClient.get<Student[]>(url, this.headers);
+    return this.httpClient.get<StudentRecord[]>(url, this.headers);
   }
 
-  public getStudentsFilteredByDateOfBirth(dob: Date): Observable<Student[]> {
+  public getStudentsFilteredByDateOfBirth(dob: Date): Observable<StudentRecord[]> {
     const url: string = this.buildStudentDateOfBirthSearchQuery(dob);
-    return this.httpClient.get<Student[]>(url, this.headers);
+    return this.httpClient.get<StudentRecord[]>(url, this.headers);
   }
 
-  public getStudentsFilteredByStartDate(startDate: Date): Observable<Student[]> {
+  public getStudentsFilteredByStartDate(startDate: Date): Observable<StudentRecord[]> {
     const url: string = this.buildStudentStartDateSearchQuery(startDate);
-    return this.httpClient.get<Student[]>(url, this.headers);
+    return this.httpClient.get<StudentRecord[]>(url, this.headers);
   }
 
-  public getStudentsFilteredByEndDate(endDate: Date): Observable<Student[]> {
+  public getStudentsFilteredByEndDate(endDate: Date): Observable<StudentRecord[]> {
     const url: string = this.buildStudentEndDateSearchQuery(endDate);
-    return this.httpClient.get<Student[]>(url, this.headers);
+    return this.httpClient.get<StudentRecord[]>(url, this.headers);
   }
 
   public getStudentActivityRecordsByStudentId(id: number) {
-    const url: string = `/api/StudentActivityRecords/${id}`;
+    const url = `/api/StudentActivityRecords/${id}`;
     return this.httpClient.get<StudentActivityRecord[]>(url, this.headers);
   }
 

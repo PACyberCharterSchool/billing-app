@@ -1,4 +1,4 @@
-import { SchoolDistrict } from '../models/school-district.model';
+import { SchoolDistrict } from './school-district.model';
 
 export enum PaymentType {
   Check = 'Check',

@@ -2,7 +2,7 @@ import { Component, Input, OnInit, AfterViewInit } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
 import * as Handsontable from 'handsontable';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx/types';
 
 import { HotTableRegisterer } from '@handsontable/angular';
 

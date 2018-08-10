@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { Student } from '../../../models/student.model';
+import { StudentRecord } from '../../../models/student-record.model';
 
 import { CurrentStudentService } from '../../../services/current-student.service';
 
@@ -11,7 +11,7 @@ import { CurrentStudentService } from '../../../services/current-student.service
 })
 export class StudentDetailsInfoComponent implements OnInit {
 
-  public student: Student;
+  public student: StudentRecord;
 
   constructor(private currentStudentService: CurrentStudentService) { }
 

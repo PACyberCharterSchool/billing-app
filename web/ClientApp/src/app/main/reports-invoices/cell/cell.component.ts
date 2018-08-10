@@ -1,8 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormControl } from "@angular/forms";
-import { Observable } from "rxjs/Observable";
-import { IScheduler } from "rxjs/Scheduler";
-import 'rxjs/Rx';
+import { FormControl } from '@angular/forms';
+import { Observable } from 'rxjs/Observable';
+import { IScheduler } from 'rxjs/Scheduler';
 
 import { SpreadsheetService } from '../../../services/spreadsheet.service';
 

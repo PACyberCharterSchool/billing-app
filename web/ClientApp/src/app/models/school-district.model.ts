@@ -1,4 +1,4 @@
-import { Student } from '../models/student.model';
+import { StudentRecord } from './student-record.model';
 
 export class SchoolDistrict {
   id: number;

@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { Student } from '../models/student.model';
+import { StudentRecord } from '../models/student-record.model';
 
 @Injectable()
 export class CurrentStudentService {
 
-  private studentSource = new BehaviorSubject<Student>(new Student());
+  private studentSource = new BehaviorSubject<StudentRecord>(new StudentRecord());
   currentStudent = this.studentSource.asObservable();
 
   constructor() { }
 
-  changeStudent(student: Student) {
+  changeStudent(student: StudentRecord) {
     this.studentSource.next(student);
     console.log('CurrentStudentService.changeStudent():  student is ', student);
   }

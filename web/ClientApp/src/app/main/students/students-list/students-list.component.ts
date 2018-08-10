@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { Globals } from '../../../globals';
 
-import { Student } from '../../../models/student.model';
+import { StudentRecord } from '../../../models/student-record.model';
 import { SchoolDistrict } from '../../../models/school-district.model';
 
 import { StudentsService } from '../../../services/students.service';
@@ -19,7 +19,7 @@ import { CurrentStudentService } from '../../../services/current-student.service
 })
 export class StudentsListComponent implements OnInit {
 
-  public students: Student[];
+  public students: StudentRecord[];
   private schoolDistricts: SchoolDistrict[];
   public advancedSearchEnabled: boolean;
   public searchText: string;
@@ -28,7 +28,7 @@ export class StudentsListComponent implements OnInit {
   public direction: number;
   public startDate: Date;
   public endDate: Date;
-  private selectedStudent: Student;
+  private selectedStudent: StudentRecord;
   private skip: number;
   private retrievingStudents: boolean;
   public column: any;
@@ -97,7 +97,7 @@ export class StudentsListComponent implements OnInit {
     );
   }
 
-  studentsUpdatedHandler(students: Student[]) {
+  studentsUpdatedHandler(students: StudentRecord[]) {
     this.students = students;
     console.log('StudentsListComponent.studentsUpdatedHandler():  students are ', this.students);
   }
@@ -122,7 +122,7 @@ export class StudentsListComponent implements OnInit {
 
   showStudentDetails(studentId: number) {
     console.log('StudentsListComponent.showStudentDetails():  studentId is ', studentId);
-    const s: Student = this.students.find((student) => student.id === studentId);
+    const s: StudentRecord = this.students.find((student) => student.id === studentId);
     this.currentStudentService.changeStudent(s);
     this.router.navigate(['/students', { id: studentId, outlets: {'action': [`${studentId}`]} }]);
   }

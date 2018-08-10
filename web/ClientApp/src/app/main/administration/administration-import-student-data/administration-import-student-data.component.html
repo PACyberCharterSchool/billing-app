@@ -1,17 +1,25 @@
 <div class='row import-student-data-title-row align-items-center'>
-  <div class='col-md-6'>
-    <h3>Import Student Data</h3>
+  <div class='col-6'>
+    <h3>Imported Student Data</h3>
   </div>
-  <div class='col-md-4 offset-md-2'>
-    <div class='col-md-8 offset-md-4' *ngIf='pendingStudentStatusRecords?.length !== 0'>
+  <div class='col-4'>
+    <div class='col-8 offset-4' *ngIf='pendingStudentStatusRecords?.length !== 0'>
       <button type='button' class='btn' (click)='handleCancelClick()'>CANCEL</button>
-      <button type='button' class='btn btn-primary' (click)='handleDataImportCommitClick()'>COMMIT</button>
+      <button type='button' class='btn btn-primary' (click)='handleCommitClick()'>COMMIT</button>
+    </div>
+  </div>
+  <div class='col-2'>
+    <div ngbDropdown class="d-inline-block">
+      <button class="btn btn-outline-primary" id="dropdownStudentRecordScope" ngbDropdownToggle>{{selectedStudentRecordScope}}</button>
+      <div ngbDropdownMenu aria-labelledby="dropdownStudentRecordScope">
+        <button class='dropdown-item' *ngFor='let scope of scopes' (click)='filterByStudentRecordScope()'>{{scope}}</button>
+      </div>
     </div>
   </div>
 </div>
 <div class='row import-student-data-content-row align-items-center'>
   <ngx-spinner size='large' loadingText='Committing data to PACBill database.  Please wait...' type='timer'></ngx-spinner>
-  <div class='col-md-12' *ngIf='pendingStudentStatusRecords?.length >= 0'>
+  <div class='col-12' *ngIf='pendingStudentStatusRecords?.length >= 0'>
     <table class='table table-striped table-fixed'>
       <thead>
         <tr>
@@ -28,7 +36,7 @@
       </tbody>
     </table>
   </div>
-  <div class='col-md-12' *ngIf='pendingStudentStatusRecords?.length === 0'>
+  <div class='col-12' *ngIf='pendingStudentStatusRecords?.length === 0'>
     <h4>PACBill data was last updated on {{lastUpdatedDate}}</h4>
   </div>
 </div>

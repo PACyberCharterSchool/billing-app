@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { StudentsService } from '../../../services/students.service';
 import { CurrentStudentService } from '../../../services/current-student.service';
 
-import { Student } from '../../../models/student.model';
+import { StudentRecord } from '../../../models/student-record.model';
 
 @Component({
   selector: 'app-students-detail',
@@ -13,7 +13,7 @@ import { Student } from '../../../models/student.model';
 })
 export class StudentsDetailComponent implements OnInit, OnDestroy {
 
-  public student: Student;
+  public student: StudentRecord;
   private subscription: any;
 
   constructor(
@@ -25,7 +25,7 @@ export class StudentsDetailComponent implements OnInit, OnDestroy {
     this.subscription = this.route.params.subscribe(
       params => {
         console.log('StudentsDetailComponent.ngOnInit(): student id is ', params['id']);
-        this.studentsService.getStudent(+params['id']).subscribe(
+        this.studentsService.getStudents(+params['id']).subscribe(
           data => {
             console.log('StudentsDetailComponent.ngOnInit(): data is ', data);
             this.student = data['student'];

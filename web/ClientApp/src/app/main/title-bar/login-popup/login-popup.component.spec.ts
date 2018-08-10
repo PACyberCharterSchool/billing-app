@@ -5,7 +5,7 @@ import { HttpClient, HttpHandler } from '@angular/common/http';
 
 import { MatMenuModule, MatIconModule } from '@angular/material';
 
-import { LoginPopupComponent } from '../login-popup/login-popup.component';
+import { LoginPopupComponent } from './login-popup.component';
 import { AuthenticationService } from '../../../services/authentication.service';
 
 describe(LoginPopupComponent.name, () => {

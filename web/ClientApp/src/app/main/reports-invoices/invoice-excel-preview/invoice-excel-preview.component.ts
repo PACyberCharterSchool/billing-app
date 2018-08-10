@@ -27,5 +27,4 @@ export class InvoiceExcelPreviewComponent implements OnInit {
       this.worksheet = XLSX.utils.book_new();
     }
   }
-
 }
