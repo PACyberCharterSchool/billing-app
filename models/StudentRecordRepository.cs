@@ -12,7 +12,6 @@ namespace models
 	{
 		StudentRecordsHeader Get(string scope, int skip = 0, int take = 0);
 		IList<string> GetScopes();
-
 		void Lock(string scope);
 		StudentRecord Update(StudentRecord update);
 	}

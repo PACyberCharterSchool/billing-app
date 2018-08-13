@@ -152,6 +152,8 @@ namespace api.Controllers
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
+			// TODO(Erik): check the header for lock
+
 			var record = new StudentRecord
 			{
 				StudentFirstName = update.StudentFirstName,

@@ -65,7 +65,6 @@ namespace api.Controllers
 			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
 			public string Scope { get; set; }
 
-
       [Required]
       public DateTime AsOf { get; set; }
 
@@ -86,8 +85,7 @@ namespace api.Controllers
 			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
 			public string Scope { get; set; }
 
-
-      public DateTime AsOf { get; set; }
+			public DateTime AsOf { get; set; }
 
       public DateTime ToSchoolDistrict { get; set; }
 
@@ -107,8 +105,8 @@ namespace api.Controllers
 			public string Name { get; set; }
 
 			[Required]
-			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
-			public string Scope { get; set; }
+			[RegularExpression(@"^\d{4}\-\d{4}$")]
+			public string SchoolYear { get; set; }
 
 			[Required]
 			[Range(1, int.MaxValue)]
@@ -291,7 +289,7 @@ namespace api.Controllers
       {
         Scope = create.Invoice.Scope,
         InvoiceNumber = create.Name,
-        SchoolYear = create.Scope,
+        SchoolYear = create.Invoice.Scope,
         AsOf = create.Invoice.AsOf,
         Prepared = time,
         ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
@@ -329,7 +327,6 @@ namespace api.Controllers
         report = new Report
         {
           Type = ReportType.Invoice,
-          Scope = create.Invoice.Scope,
           Name = create.Name,
           Approved = false,
           Created = time,
@@ -441,8 +438,8 @@ namespace api.Controllers
 			public string ReportType { get; set; }
 
 			[Required]
-			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
-			public string Scope { get; set; }
+			[RegularExpression(@"^\d{4}\-\d{4}$")]
+			public string SchoolYear { get; set; }
 
 			[Required]
 			[Range(1, int.MaxValue)]
@@ -467,8 +464,8 @@ namespace api.Controllers
           reports.Add(CreateInvoice(now, invoiceTemplate, new CreateReport
           {
             ReportType = create.ReportType,
-            Name = $"{create.Scope}_{sd.Name}_{month}-{create.Invoice.AsOf.Year}",
-            Scope = create.Scope,
+            Name = $"{create.SchoolYear}_{sd.Name}_{month}-{create.Invoice.AsOf.Year}",
+            SchoolYear = create.SchoolYear,
             TemplateId = create.TemplateId,
 
             Invoice = new CreateInvoiceReport
@@ -647,7 +644,7 @@ namespace api.Controllers
           return StatusCode(409);
         }
 
-        return new CreatedResult($"/api/reports?type={create.ReportType}&scope={create.Scope}&approved=false", new ReportsResponse
+        return new CreatedResult($"/api/reports?type={create.ReportType}&scope={create.SchoolYear}&approved=false", new ReportsResponse
         {
           Reports = reports.OrderBy(r => r.Id).Select(r => new ReportDto(r)).ToList(),
         });
@@ -689,13 +686,14 @@ namespace api.Controllers
 
     public class GetActivityArgs
     {
+
 			public string Name { get; set; }
 
 			[EnumerationValidation(typeof(ReportType))]
 			public string Type { get; set; }
 
-			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
-			public string Scope { get; set; }
+			[RegularExpression(@"^\d{4}\-\d{4}$")]
+			public string SchoolYear { get; set; }
 
 			public bool? Approved { get; set; }
       public string Format { get; set; }
@@ -717,7 +715,7 @@ namespace api.Controllers
       if (accept != ContentTypes.XLSX || accept != ContentTypes.PDF)
         return StatusCode(406);
 
-      var name = args.Scope + "_" + args.Name + "_ACTIVITY";
+      var name = args.SchoolYear + "_" + args.Name + "_ACTIVITY";
       List<Report> reports = new List<Report>();
       reports.Add(report);
       var data = BuildStudentActivityDataTable(reports);
@@ -757,7 +755,7 @@ namespace api.Controllers
 
       var reports = await Task.Run(() => _reports.GetMany(
         type: args.Type == null ? null : ReportType.FromString(args.Type),
-        scope: args.Scope,
+        year: args.SchoolYear,
         approved: args.Approved
       ));
 
@@ -765,7 +763,7 @@ namespace api.Controllers
         return NotFound();
 
       var data = BuildStudentActivityDataTable(reports);
-      string name = args.Scope + "Student Activity";
+      string name = args.SchoolYear+ "Student Activity";
       List<string> headers = GetStudentActivityHeaders(data, MapStudentActivityHeaderKeyToValue); 
       Workbook wb = new Workbook();
 
@@ -790,13 +788,14 @@ namespace api.Controllers
 
     public class GetManyArgs
     {
+
 			public string Name { get; set; }
 
 			[EnumerationValidation(typeof(ReportType))]
 			public string Type { get; set; }
 
-			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
-			public string Scope { get; set; }
+			[RegularExpression(@"^\d{4}\-\d{4}$")]
+			public string SchoolYear { get; set; }
 
 			public bool? Approved { get; set; }
     }
@@ -819,7 +818,7 @@ namespace api.Controllers
       var reports = await Task.Run(() => _reports.GetMany(
         name: args.Name,
         type: args.Type == null ? null : ReportType.FromString(args.Type),
-        scope: args.Scope,
+        year: args.SchoolYear,
         approved: args.Approved
       ));
       if (reports == null)
@@ -843,8 +842,8 @@ namespace api.Controllers
         return NoContent();
 
       var name = new StringBuilder("Reports");
-      if (!string.IsNullOrWhiteSpace(args.Scope))
-        name.Append($"-{args.Scope}");
+      if (!string.IsNullOrWhiteSpace(args.SchoolYear))
+        name.Append($"-{args.SchoolYear}");
 
       if (!string.IsNullOrEmpty(args.Type))
         name.Append($"-{args.Type}");
@@ -905,7 +904,7 @@ namespace api.Controllers
       // generate xlsx
       
       var data = new {
-        SchoolYear = create.Scope,
+        SchoolYear = create.SchoolYear,
         AsOf = create.BulkInvoice.AsOf,
         Prepared = time,
         ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
@@ -932,7 +931,6 @@ namespace api.Controllers
         report = new Report
         {
           Type = ReportType.BulkInvoice,
-          Scope = create.BulkInvoice.Scope,
           Name = create.Name,
           Approved = true,
           Created = time,
@@ -967,7 +965,7 @@ namespace api.Controllers
 
           var reports = await Task.Run(() => _reports.GetMany(
             type: ReportType.FromString("Invoice"),
-            scope: create.BulkInvoice.Scope,
+            year: create.SchoolYear,
             approved: create.BulkInvoice.Approved
           ));
 
@@ -1012,7 +1010,7 @@ namespace api.Controllers
       var reports = await Task.Run(() => _reports.GetManyMetadata(
         name: args.Name,
         type: args.Type == null ? null : ReportType.FromString(args.Type),
-        year: args.Scope,
+        year: args.SchoolYear,
         approved: args.Approved
       ));
       if (reports == null)
