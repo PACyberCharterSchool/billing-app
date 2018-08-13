@@ -26,13 +26,13 @@ namespace import
 
 			Console.WriteLine("Reading records...");
 			var count = 0;
-			header.Records = new List<StudentRecord>();
+			var records = new List<StudentRecord>();
 
 			try
 			{
 				foreach (var record in csvReader.GetRecords<StudentRecord>())
 				{
-					header.Records.Add(record);
+					records.Add(record);
 
 					count++;
 					if (count % 1000 == 0)
@@ -43,6 +43,8 @@ namespace import
 			{
 				Console.WriteLine($"{e}");
 			}
+
+			header.Records = records;
 
 			Console.WriteLine($"Reading records done ({count})!");
 			return;
