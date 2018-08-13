@@ -13,7 +13,6 @@ using models.Tests.Util;
 namespace models.Tests
 {
 	[TestFixture]
-	[Ignore("SQLite does not like the migration")]
 	public class TemplateRepositoryTests
 	{
 		private PacBillContext _context;
@@ -165,7 +164,6 @@ namespace models.Tests
 		}
 
 		[Test]
-		[Ignore("SQLite does not like the migration")]
 		public void GetByIdReturnsNullIfNotFound()
 		{
 			var actual = _uut.Get(1);

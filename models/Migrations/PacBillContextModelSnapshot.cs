@@ -192,7 +192,7 @@ namespace models.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<string>("Scope");
+                    b.Property<string>("SchoolYear");
 
                     b.Property<string>("Type");
 
@@ -378,8 +378,7 @@ namespace models.Migrations
                 {
                     b.HasOne("models.StudentRecordsHeader", "Header")
                         .WithMany("Records")
-                        .HasForeignKey("HeaderId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("HeaderId");
                 });
 #pragma warning restore 612, 618
         }

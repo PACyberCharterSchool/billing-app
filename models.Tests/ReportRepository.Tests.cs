@@ -13,7 +13,6 @@ using models.Tests.Util;
 namespace models.Tests
 {
 	[TestFixture]
-	[Ignore("SQLite does not like the migration")]
 	public class ReportRepositoryTests
 	{
 		private PacBillContext _context;
@@ -49,13 +48,12 @@ namespace models.Tests
 		}
 
 		[Test]
-		[Ignore("SQLite doesn't like the migration")]
 		public void ApproveSetsApprovedTrue()
 		{
 			var report = new Report
 			{
 				Type = ReportType.Invoice,
-				Scope = "2017-2018",
+				SchoolYear = "2017-2018",
 				Name = "invoice",
 				Approved = false,
 			};
@@ -78,7 +76,7 @@ namespace models.Tests
 		{
 			Assert.That(actual.Id, Is.EqualTo(report.Id));
 			Assert.That(actual.Type, Is.EqualTo(report.Type));
-			Assert.That(actual.Scope, Is.EqualTo(report.Scope));
+			Assert.That(actual.SchoolYear, Is.EqualTo(report.SchoolYear));
 			Assert.That(actual.Name, Is.EqualTo(report.Name));
 			Assert.That(actual.Approved, Is.EqualTo(report.Approved));
 			Assert.That(actual.Created, Is.EqualTo(report.Created));
@@ -97,7 +95,7 @@ namespace models.Tests
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice",
 					Data = "hello",
 					Xlsx = Encoding.UTF8.GetBytes("hello"),
@@ -123,7 +121,7 @@ namespace models.Tests
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice",
 					Data = "hello",
 				},
@@ -140,7 +138,7 @@ namespace models.Tests
 			var report = new Report
 			{
 				Type = ReportType.Invoice,
-				Scope = "2017-2018",
+				SchoolYear = "2017-2018",
 				Name = "invoice",
 				Data = "hello",
 				Xlsx = Encoding.UTF8.GetBytes("hello"),
@@ -162,7 +160,7 @@ namespace models.Tests
 			var report = new Report
 			{
 				Type = ReportType.Invoice,
-				Scope = "2017-2018",
+				SchoolYear = "2017-2018",
 				Name = "invoice",
 				Data = "hello",
 			};
@@ -178,7 +176,7 @@ namespace models.Tests
 			var report = new Report
 			{
 				Type = ReportType.Invoice,
-				Scope = "2017-2018",
+				SchoolYear = "2017-2018",
 				Name = "invoice",
 				Data = "hello",
 			};
@@ -202,14 +200,14 @@ namespace models.Tests
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice1",
 					Data = "hello",
 					Xlsx = new byte[] {1, 2, 3},
 				},
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice2",
 					Data = "hello",
 					Xlsx = new byte[] {1, 2, 3},
@@ -237,14 +235,14 @@ namespace models.Tests
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice1",
 					Data = "hello",
 					Xlsx = new byte[] {1, 2, 3},
 				},
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice2",
 					Data = "hello",
 					Xlsx = new byte[] {1, 2, 3},
@@ -264,14 +262,14 @@ namespace models.Tests
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice",
 					Data = "hello",
 					Xlsx = new byte[] {1, 2, 3},
 				},
 				new Report {
 					Type = ReportType.StudentInformation,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "student-info",
 					Data = "hello",
 					Xlsx = new byte[] {1, 2, 3},
@@ -292,14 +290,14 @@ namespace models.Tests
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice1",
 					Data = "hello",
 					Xlsx = new byte[] {1, 2, 3},
 				},
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2018-2019",
+					SchoolYear = "2018-2019",
 					Name = "invoice2",
 					Data = "hello",
 					Xlsx = new byte[] {1, 2, 3},
@@ -308,7 +306,7 @@ namespace models.Tests
 			using (var ctx = NewContext())
 				ctx.SaveChanges(() => ctx.AddRange(reports));
 
-			var actuals = _uut.GetMany(scope: "2018-2019").ToList();
+			var actuals = _uut.GetMany(year: "2018-2019").ToList();
 			Assert.That(actuals, Has.Count.EqualTo(1));
 			AssertReport(actuals[0], reports[1]);
 		}
@@ -319,14 +317,14 @@ namespace models.Tests
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice1",
 					Data = "hello",
 					Xlsx = new byte[] {1, 2, 3},
 				},
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice2",
 					Data = "hello",
 					Approved = true,
@@ -347,13 +345,13 @@ namespace models.Tests
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice1",
 					Data = "hello",
 				},
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice2",
 					Data = "hello",
 				},
@@ -380,13 +378,13 @@ namespace models.Tests
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice1",
 					Data = "hello",
 				},
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice2",
 					Data = "hello",
 				},
@@ -405,13 +403,13 @@ namespace models.Tests
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice",
 					Data = "hello",
 				},
 				new Report {
 					Type = ReportType.StudentInformation,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "student-info",
 					Data = "hello",
 				},
@@ -431,13 +429,13 @@ namespace models.Tests
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice1",
 					Data = "hello",
 				},
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2018-2019",
+					SchoolYear = "2018-2019",
 					Name = "invoice2",
 					Data = "hello",
 				},
@@ -445,7 +443,7 @@ namespace models.Tests
 			using (var ctx = NewContext())
 				ctx.SaveChanges(() => ctx.AddRange(reports));
 
-			var actuals = _uut.GetManyMetadata(scope: "2018-2019");
+			var actuals = _uut.GetManyMetadata(year: "2018-2019");
 			Assert.That(actuals, Has.Count.EqualTo(1));
 			AssertReport(actuals[0], reports[1]);
 		}
@@ -456,13 +454,13 @@ namespace models.Tests
 			var reports = new[] {
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice1",
 					Data = "hello",
 				},
 				new Report {
 					Type = ReportType.Invoice,
-					Scope = "2017-2018",
+					SchoolYear = "2017-2018",
 					Name = "invoice2",
 					Data = "hello",
 					Approved = true,
@@ -482,7 +480,7 @@ namespace models.Tests
 			var report = new Report
 			{
 				Type = ReportType.Invoice,
-				Scope = "2017-2018",
+				SchoolYear = "2017-2018",
 				Name = "invoice",
 				Data = "hello",
 			};

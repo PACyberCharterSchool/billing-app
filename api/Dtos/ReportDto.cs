@@ -12,7 +12,7 @@ namespace api.Dtos
 		public int Id { get; set; }
 		[JsonConverter(typeof(ReportTypeJsonConverter))]
 		public ReportType Type { get; set; }
-		public string Scope { get; set; }
+		public string SchoolYear { get; set; }
 		public string Name { get; set; }
 		public bool Approved { get; set; }
 		public DateTime Created { get; set; }
@@ -21,7 +21,7 @@ namespace api.Dtos
 		{
 			this.Id = model.Id;
 			this.Type = model.Type;
-			this.Scope = model.Scope;
+			this.SchoolYear = model.SchoolYear;
 			this.Name = model.Name;
 			this.Approved = model.Approved;
 			this.Created = model.Created;
