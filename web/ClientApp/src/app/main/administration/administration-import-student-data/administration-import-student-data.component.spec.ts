@@ -11,7 +11,7 @@ import { OrderByPipe } from '../../../pipes/orderby.pipe';
 
 import { StudentsService } from '../../../services/students.service';
 import { UtilitiesService } from '../../../services/utilities.service';
-import { StudentRecordsImportService } from '../../../services/student-records-import.service';
+import { StudentRecordsService } from '../../../services/student-records.service';
 
 import { Token } from '@angular/compiler';
 import { NgxSpinnerModule } from 'ngx-spinner';
@@ -36,7 +36,7 @@ describe(AdministrationImportStudentDataComponent.name, () => {
       providers: [
         StudentsService,
         UtilitiesService,
-        StudentRecordsImportService,
+        StudentRecordsService,
         HttpClient,
         HttpHandler,
         Globals

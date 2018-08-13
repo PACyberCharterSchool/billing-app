@@ -10,27 +10,8 @@ import { environment } from '../../environments/environment';
 
 import { StudentRecordsHeader, StudentRecord } from '../models/student-record.model';
 
-let studentRecordsHeaders: StudentRecordsHeader[] = [
-  {
-    id: 1,
-    filename: 'GeniusExport_2018.08.csv',
-    locked: false,
-    created: Date.now(),
-    records: [],
-    scope: '2018.08'
-  },
-  {
-    id: 2,
-    filename: 'GeniusExport_2018.09.csv',
-    locked: false,
-    created: Date.now(),
-    records: [],
-    scope: '2018.09'
-  }
-];
-
 @Injectable()
-export class StudentRecordsImportService {
+export class StudentRecordsService {
   private apiSSRUrl;
   private headers = {
     headers: new HttpHeaders({
@@ -42,8 +23,8 @@ export class StudentRecordsImportService {
     this.apiSSRUrl = 'api/StudentRecords';
   }
 
-  public postStudentData(): Observable<any> {
-    const url = this.apiSSRUrl + `/pending/commit`;
+  public postLockStudentData(scope: string): Observable<any> {
+    const url = this.apiSSRUrl + `/header/${scope}/lock`;
     return this.httpClient.post<any>(url, this.headers);
   }
 
@@ -53,8 +34,13 @@ export class StudentRecordsImportService {
     // return Observable.of(studentRecordsHeaders);
   }
 
-  public getStudentRecordsHeaderByScope(scope: string): Observable<StudentRecordsHeader> {
-    const url = this.apiSSRUrl + `/header/${scope}`;
+  public getStudentRecordsHeaderByScope(scope: string, skip: number): Observable<StudentRecordsHeader> {
+    const url = this.apiSSRUrl + `/header/${scope}?skip=${skip}&take=${this.globals.take}`;
     return this.httpClient.get<StudentRecordsHeader>(url, this.headers);
+  }
+
+  public updateStudentRecord(record: StudentRecord): Observable<StudentRecord> {
+    const url = this.apiSSRUrl + `/${record.id}`;
+    return this.httpClient.put<StudentRecord>(url, delete record.id, this.headers);
   }
 }

@@ -106,12 +106,11 @@ namespace models.Reporters.Exporters
 				var sheet = wb.Worksheets[s];
 				Cells cells = sheet.Cells;
 
-				for (int r = 0; r < cells.MaxDataRow; r++) {
+				for (int r = 0; r < cells.MaxDataRow + 1; r++) {
 					Row row = cells.Rows[r];
 					if (row.IsBlank)
 						continue;
-
-					for (int c = 0; c < cells.MaxDataColumn; c++) {
+					for (int c = 0; c < cells.MaxDataColumn + 1; c++) {
 						if (cells[r,c].Type == CellValueType.IsString) {
 							if (ContainsToken(cells[r,c].StringValue))
 							{
@@ -122,13 +121,14 @@ namespace models.Reporters.Exporters
 								}
 								else
 								{
-									cells[r,c].PutValue(null);
+									cells[r,c].PutValue((string)null);
 								}
 							}
 						}
 					}
 				}
 			}
+			wb.Settings.CalcMode = CalcModeType.Automatic;
 			return wb;
 		}
 	}

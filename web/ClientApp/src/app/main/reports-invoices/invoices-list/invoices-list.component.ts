@@ -161,7 +161,7 @@ export class InvoicesListComponent implements OnInit {
 
   createInvoice(): void {
     const modal = this.ngbModal.open(InvoiceCreateFormComponent, { centered: true });
-    modal.componentInstance.op == 'single';
+    modal.componentInstance.op = 'single';
     modal.result.then(
       (result) => {
         console.log('InvoicesListComponent.createInvoices(): result is ', result);
@@ -338,7 +338,7 @@ export class InvoicesListComponent implements OnInit {
   }
 
   private getInvoicesBySchoolYearAndStatus(year: string, status: boolean): Report[] {
-    return this.allReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year && r.approved == status));
+    return this.allReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year && r.approved === status));
   }
 
   private filterNonBulkTemplates(): Template[] {

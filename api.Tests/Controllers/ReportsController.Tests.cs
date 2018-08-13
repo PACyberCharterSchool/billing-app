@@ -12,8 +12,7 @@ using System.Threading.Tasks;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
+using Aspose.Cells;
 using NUnit.Framework;
 
 using api.Common;
@@ -67,16 +66,16 @@ namespace api.Tests.Controllers
 		private static bool VerifyReport(
 			Report r,
 			ReportsController.CreateReport create,
-			XSSFWorkbook xlsx,
+			Workbook xlsx,
 			Invoice invoice)
 		{
 			using (var ms = new MemoryStream())
 			{
-				xlsx.Write(ms);
+				xlsx.Save(ms, new XlsSaveOptions(SaveFormat.Xlsx));
 
 				Console.WriteLine($"name: {r.Name} == {create.Name}");
 				Console.WriteLine($"type: {r.Type} == {create.ReportType}");
-				Console.WriteLine($"year: {r.Scope} == {create.Scope}");
+				Console.WriteLine($"scope: {r.Scope} == {create.Scope}");
 				Console.WriteLine($"approved: {r.Approved} == false");
 				Console.WriteLine($"data: {r.Data} == {JsonConvert.SerializeObject(invoice)}");
 				Console.WriteLine($"xlsx: {r.Xlsx} == {ms.ToArray()}");
@@ -92,16 +91,16 @@ namespace api.Tests.Controllers
 		private static bool VerifyReport(
 			Report r,
 			ReportsController.CreateManyReports create,
-			XSSFWorkbook xlsx,
+			Workbook xlsx,
 			Invoice invoice)
 		{
 			using (var ms = new MemoryStream())
 			{
-				xlsx.Write(ms);
+				xlsx.Save(ms, new XlsSaveOptions(SaveFormat.Xlsx));
 
 				Console.WriteLine($"name: {r.Name} == {invoice.Number}");
 				Console.WriteLine($"type: {r.Type} == {create.ReportType}");
-				Console.WriteLine($"year: {r.Scope} == {create.Scope}");
+				Console.WriteLine($"scope: {r.Scope} == {create.Scope}");
 				Console.WriteLine($"approved: {r.Approved} == false");
 				Console.WriteLine($"data: {r.Data} == {JsonConvert.SerializeObject(invoice)}");
 				Console.WriteLine($"xlsx: {r.Xlsx} == {ms.ToArray()}");
@@ -114,11 +113,10 @@ namespace api.Tests.Controllers
 			}
 		}
 
-		private static bool MatchWorkbook(XSSFWorkbook wb, int expected)
+		private static bool MatchWorkbook(Workbook wb, int expected)
 		{
-			Console.WriteLine($"num sheets: {wb.NumberOfSheets}");
-			Console.WriteLine($"wb.Count: {wb.Count}");
-			return wb.NumberOfSheets == expected;
+			Console.WriteLine($"num sheets: {wb.Worksheets.Count}");
+			return wb.Worksheets.Count == expected;
 		}
 
 		[Test]
@@ -223,17 +221,17 @@ namespace api.Tests.Controllers
 			}
 
 			// generate xlsx
-			XSSFWorkbook xlsx = null;
+			Workbook xlsx = null;
 			_exporter.Setup(ex => ex.Export(
-				It.Is<XSSFWorkbook>(wb => MatchWorkbook(wb, 3)),
+				It.Is<Workbook>(wb => MatchWorkbook(wb, 3)),
 				It.IsAny<JObject>()
-			)).Returns<XSSFWorkbook, dynamic>((wb, _) =>
+			)).Returns<Workbook, dynamic>((wb, _) =>
 			{
 				xlsx = wb;
 				return wb;
 			});
 
-			// TODO(Erik): Something in VerifyReport occassionally fails.
+			// TODO(Erik): Something in VerifyReport occasionally fails.
 			// save report
 			Report report = null;
 			_reports.Setup(rs => rs.Create(It.Is<Report>(r =>
@@ -353,9 +351,9 @@ namespace api.Tests.Controllers
 			}
 
 			_exporter.Setup(ex => ex.Export(
-				It.IsAny<XSSFWorkbook>(),
+				It.IsAny<Workbook>(),
 				It.IsAny<JObject>()
-			)).Returns<XSSFWorkbook, dynamic>((wb, _) => wb);
+			)).Returns<Workbook, dynamic>((wb, _) => wb);
 
 			var result = await _uut.Create(new ReportsController.CreateReport
 			{
@@ -493,11 +491,11 @@ namespace api.Tests.Controllers
 			}
 
 			// generate xlsx
-			var xlsxs = new List<XSSFWorkbook>();
+			var xlsxs = new List<Workbook>();
 			_exporter.Setup(ex => ex.Export(
-				It.Is<XSSFWorkbook>(wb => MatchWorkbook(wb, 2)),
+				It.Is<Workbook>(wb => MatchWorkbook(wb, 2)),
 				It.IsAny<JObject>()
-			)).Returns<XSSFWorkbook, dynamic>((wb, _) =>
+			)).Returns<Workbook, dynamic>((wb, _) =>
 			{
 				xlsxs.Add(wb);
 				return wb;
@@ -638,9 +636,9 @@ namespace api.Tests.Controllers
 			}
 
 			_exporter.Setup(ex => ex.Export(
-				It.IsAny<XSSFWorkbook>(),
+				It.IsAny<Workbook>(),
 				It.IsAny<JObject>()
-			)).Returns<XSSFWorkbook, dynamic>((wb, _) => wb);
+			)).Returns<Workbook, dynamic>((wb, _) => wb);
 
 
 			var result = _uut.CreateMany(new ReportsController.CreateManyReports

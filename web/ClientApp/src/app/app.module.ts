@@ -20,7 +20,7 @@ import { StudentsService } from './services/students.service';
 import { SchoolDistrictService } from './services/school-district.service';
 import { UtilitiesService } from './services/utilities.service';
 import { CurrentStudentService } from './services/current-student.service';
-import { StudentRecordsImportService } from './services/student-records-import.service';
+import { StudentRecordsService } from './services/student-records.service';
 import { PaymentsService } from './services/payments.service';
 import { RefundsService } from './services/refunds.service';
 import { AcademicYearsService } from './services/academic-years.service';
@@ -75,7 +75,7 @@ const pacbillProviders = [
   SchoolCalendarService,
   SchoolDistrictService,
   StudentsService,
-  StudentRecordsImportService,
+  StudentRecordsService,
   tokenInterceptor,
   UtilitiesService,
   ReportsService,

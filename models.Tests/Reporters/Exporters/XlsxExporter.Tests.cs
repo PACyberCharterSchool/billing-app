@@ -3,8 +3,7 @@ using System.Linq;
 using System.IO;
 
 using Newtonsoft.Json;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
+using Aspose.Cells;
 using NUnit.Framework;
 
 using models.Reporters.Exporters;
@@ -25,7 +24,7 @@ namespace models.Tests.Reporters.Exporters
 		[Test]
 		public void ExportExportsJSON()
 		{
-			var template = new XSSFWorkbook(File.OpenRead("../../../TestData/test-template.xlsx"));
+			var template = new Workbook(File.OpenRead("../../../TestData/test-template.xlsx"));
 			var data = new
 			{
 				String = "bob", // JTokenType.String
@@ -55,25 +54,24 @@ namespace models.Tests.Reporters.Exporters
 			};
 
 			var actual = _uut.Export(template, JsonConvert.DeserializeObject(JsonConvert.SerializeObject(data)));
-			var sheet = actual.GetSheetAt(0);
-			Assert.That(sheet.GetRow(0).GetCell(0).StringCellValue,
+			var sheet = actual.Worksheets[0];
+			Assert.That(sheet.Cells[0, 0].StringValue,
 				Is.EqualTo(data.String));
-			Assert.That(sheet.GetRow(1).GetCell(0).NumericCellValue,
+			Assert.That(sheet.Cells[1, 0].FloatValue,
 				Is.EqualTo(data.Object.Float));
-			Assert.That(sheet.GetRow(2).GetCell(0).DateCellValue,
+			Assert.That(sheet.Cells[2, 0].DateTimeValue,
 				Is.EqualTo(data.Array[0]));
-			Assert.That(sheet.GetRow(3).GetCell(0).NumericCellValue,
+			Assert.That(sheet.Cells[3, 0].IntValue,
 				Is.EqualTo(data.Array[1].Integer));
-			Assert.That(sheet.GetRow(5).GetCell(0).StringCellValue,
+			Assert.That(sheet.Cells[5, 0].StringValue,
 				Is.EqualTo(data.Object.Deeper.Boolean ? "Yes" : "No"));
-			Assert.That(sheet.GetRow(6).GetCell(0).StringCellValue,
+			Assert.That(sheet.Cells[6, 0].StringValue,
 				Is.EqualTo("Please replace me!"));
-			Assert.That(sheet.GetRow(7).GetCell(0).CellType, Is.EqualTo(CellType.Blank));
-			Assert.That(sheet.GetRow(8).GetCell(0).StringCellValue,
+			Assert.That(sheet.Cells[7, 0].Type, Is.EqualTo(CellValueType.IsNull));
+			Assert.That(sheet.Cells[8, 0].StringValue,
 				Is.EqualTo("One Two"));
 
-			XSSFFormulaEvaluator.EvaluateAllFormulaCells(actual);
-			Assert.That(sheet.GetRow(4).GetCell(0).StringCellValue,
+			Assert.That(sheet.Cells[4, 0].StringValue,
 				Is.EqualTo($"{data.String}, {data.Object.Float}"));
 		}
 	}

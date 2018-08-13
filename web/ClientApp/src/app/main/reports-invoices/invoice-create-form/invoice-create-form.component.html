@@ -1,37 +1,37 @@
-<div class='col-md-12'>
+<div class='col-12'>
   <div class='modal-header'>
     <div class='modal-title'>
-      <div class='col-md-12' *ngIf='isMany()'><h4>Create Invoices</h4></div>
-      <div class='col-md-12' *ngIf='!isMany()'><h4>Create Invoice</h4></div>
+      <div class='col-12' *ngIf='isMany()'><h4>Create Invoices</h4></div>
+      <div class='col-12' *ngIf='!isMany()'><h4>Create Invoice</h4></div>
     </div>
     <button type='button' class='close' aria-label='Close' (click)='ngbActiveModal.dismiss("Cross click")'>
       <span aria-hidden='true'>&times;</span>
     </button>
   </div>
   <div class='modal-body'>
-    <div class='col-md-12'>
+    <div class='col-12'>
       <form #invoiceCreateForm='ngForm' (ngSubmit)='create()'>
-        <div class='form-group col-md-12'>
-          <div class='col-md-6'>
-            <label>School Year</label>
+        <div class='form-group col-12'>
+          <div class='col-6'>
+            <label>Scope</label>
           </div>
-          <div class='col-md-6 dropdown-ctrl-col'>
-            <div class='col-md-11 offset-md-1'>
+          <div class='col-6 dropdown-ctrl-col'>
+            <div class='col-11 offset-1'>
               <div ngbDropdown class='d-inline-block'>
-                <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown'>{{selectedSchoolYear}}</button>
-                <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown'>
-                  <button type='button' class='dropdown-item' *ngFor='let y of schoolYears' (click)='setSelectedSchoolYear(y)'>{{y}}</button>
+                <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='selectedScopeDropdown'>{{selectedScope}}</button>
+                <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='selectedScopeDropdown'>
+                  <button type='button' class='dropdown-item' *ngFor='let s of scopes' (click)='setSelectedScope(s)'>{{s}}</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class='form-group col-md-12'>
-          <div class='col-md-6'>
+        <div class='form-group col-12'>
+          <div class='col-6'>
             <label>Invoice Template</label>
           </div>
-          <div class='col-md-6 dropdown-ctrl-col'>
-            <div class='col-md-11 offset-md-1'>
+          <div class='col-6 dropdown-ctrl-col'>
+            <div class='col-11 offset-1'>
               <div ngbDropdown class='d-inline-block'>
                 <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='invoiceTemplateDropdown'>{{selectedInvoiceTemplate?.name}}</button>
                 <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='invoiceTemplateDropdown'>
@@ -41,13 +41,13 @@
             </div>
           </div>
         </div>
-        <div class='form-group col-md-12' *ngIf='!isMany()'>
-          <div class='col-md-6'>
+        <div class='form-group col-12' *ngIf='!isMany()'>
+          <div class='col-6'>
             <label>School District Name</label>
           </div>
-          <div class='col-md-6'>
+          <div class='col-6'>
             <label for='typeahead-school-district'></label>
-            <input id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='schoolDistrictNameModel' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
+            <input id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='schoolDistrictName' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
           </div>
         </div>
         <div class='form-group' *ngIf='!isMany()'>
@@ -58,12 +58,12 @@
             <span>{{selectedSchoolDistrict?.aun}}</span>
           </div>
         </div>
-        <div class='form-group col-md-12'>
-          <div class='col-md-6'>
+        <div class='form-group col-12'>
+          <div class='col-6'>
             <label>As Of Date</label>
           </div>
-          <div class='col-md-6 datepicker-ctrl-col'>
-            <div class='col-md-11 offset-md-1'>
+          <div class='col-6 datepicker-ctrl-col'>
+            <div class='col-11 offset-1'>
               <div class='input-group'>
                 <input class='form-control' placeholder='mm-dd-yyyy'
                 name='dpAsOf' [(ngModel)]='asOfDate' ngbDatepicker #dpAsOf='ngbDatepicker' (ngModelChange)='onAsOfDateChanged()'>
@@ -76,12 +76,12 @@
             </div>
           </div>
         </div>
-        <div class='form-group col-md-12'>
-          <div class='col-md-6'>
+        <div class='form-group col-12'>
+          <div class='col-6'>
             <label>Date Issued to School District</label>
           </div>
-          <div class='col-md-6 datepicker-ctrl-col'>
-            <div class='col-md-11 offset-md-1'>
+          <div class='col-6 datepicker-ctrl-col'>
+            <div class='col-11 offset-1'>
               <div class='input-group'>
                 <input class='form-control' placeholder='mm-dd-yyyy'
                        name='dpToSchoolDistrict' [(ngModel)]='toSchoolDistrictDate' ngbDatepicker #dpToSchoolDistrict='ngbDatepicker' (ngModelChange)='onIssuedSchoolDistrictDateChanged()'>
@@ -94,12 +94,12 @@
             </div>
           </div>
         </div>
-        <div class='form-group col-md-12'>
-          <div class='col-md-6'>
+        <div class='form-group col-12'>
+          <div class='col-6'>
             <label>Date Issued to PDE</label>
           </div>
-          <div class='col-md-6 datepicker-ctrl-col'>
-            <div class='col-md-11 offset-md-1'>
+          <div class='col-6 datepicker-ctrl-col'>
+            <div class='col-11 offset-1'>
               <div class='input-group'>
                 <input class='form-control' placeholder='mm-dd-yyyy'
                        name='dpToPDE' [(ngModel)]='toPDEDate' ngbDatepicker #dpToPDE='ngbDatepicker' (ngModelChange)='onIssuedPDEDateChanged()'>
@@ -112,8 +112,8 @@
             </div>
           </div>
         </div>
-        <div class='form-group col-md-12'>
-          <div class='col-md-6 offset-md-7'>
+        <div class='form-group col-12'>
+          <div class='col-6 offset-7'>
             <button type='button' class='btn btn-outline' (click)='ngbActiveModal.dismiss("Cancel")'>CANCEL</button>
             <button type='submit' class='btn btn-primary'>CREATE</button>
           </div>

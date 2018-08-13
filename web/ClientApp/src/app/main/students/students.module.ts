@@ -17,6 +17,7 @@ import { StudentActivityHistoryComponent } from './student-activity-history/stud
 import { StudentAdvancedFilterComponent } from './student-advanced-filter/student-advanced-filter.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 import { IepEnrolledPipe } from '../../pipes/iep-enrolled.pipe';
 
@@ -37,6 +38,7 @@ import { IepEnrolledPipe } from '../../pipes/iep-enrolled.pipe';
     FormsModule,
     StudentsRoutingModule,
     NgbModule,
+    NgxSpinnerModule,
     HttpClientModule,
     SharedModule
   ],

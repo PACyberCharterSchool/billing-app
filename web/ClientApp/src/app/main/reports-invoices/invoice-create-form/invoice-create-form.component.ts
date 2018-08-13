@@ -10,6 +10,7 @@ import { UtilitiesService } from '../../../services/utilities.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
 import { TemplatesService } from '../../../services/templates.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
+import { StudentRecordsService } from '../../../services/student-records.service';
 
 import { SchoolDistrict } from '../../../models/school-district.model';
 
@@ -26,21 +27,19 @@ import { NgxSpinnerService } from 'ngx-spinner';
   styleUrls: ['./invoice-create-form.component.scss']
 })
 export class InvoiceCreateFormComponent implements OnInit {
-  private schoolYear: string;
   private invoiceTemplate: string;
   public asOfDate;
   public toSchoolDistrictDate;
   public toPDEDate;
   private studentTemplate: string;
-  public selectedSchoolYear: string;
-  public schoolYears: string[];
+  public selectedScope: string;
   private templates: Template[];
   public selectedInvoiceTemplate: Template;
   private selectedSchoolTemplate: Template;
   private skip: number;
-  private selectedSchoolDistrictName: string;
   private selectedSchoolDistrict: SchoolDistrict;
   private schoolDistricts: SchoolDistrict[];
+  public scopes: string[];
 
   @Input() op: string;
 
@@ -52,28 +51,38 @@ export class InvoiceCreateFormComponent implements OnInit {
     private templatesService: TemplatesService,
     private schoolDistrictService: SchoolDistrictService,
     private ngxSpinnerService: NgxSpinnerService,
+    private studentRecordsService: StudentRecordsService,
     public ngbActiveModal: NgbActiveModal
   ) { }
 
   ngOnInit() {
-    this.schoolYears = this.academicYearsService.getAcademicYears();
     this.templatesService.getTemplates(this.skip).subscribe(
       data => {
-        console.log(`InvoiceCreateFormComponent.ngOnInit(): data is ${data}.`);
+        console.log('InvoiceCreateFormComponent.ngOnInit(): data is ', data);
         this.templates = data['templates'];
       },
       error => {
-        console.log(`InvoiceCreateFormComponent.ngOnInit(): error is ${error}.`);
+        console.log('InvoiceCreateFormComponent.ngOnInit(): error is ', error);
       }
     );
 
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
-        console.log(`InvoiceCreateFormComponent.ngOnInit(): data is ${data}.`);
+        console.log('InvoiceCreateFormComponent.ngOnInit(): data is ', data);
         this.schoolDistricts = data['schoolDistricts'];
       },
       error => {
-        console.log(`InvoiceCreateFormComponent.ngOnInit(): error is ${error}.`);
+        console.log('InvoiceCreateFormComponent.ngOnInit(): error is ', error);
+      }
+    );
+
+    this.studentRecordsService.getStudentRecordsHeaders().subscribe(
+      data => {
+        console.log('StudentsListComponent.ngOnInit(): data is ', data['scopes']);
+        this.scopes = data['scopes'];
+      },
+      error => {
+        console.log('StudentsListComponent.ngOnInit():  error is ', error);
       }
     );
   }
@@ -92,12 +101,12 @@ export class InvoiceCreateFormComponent implements OnInit {
     console.log(`InvoiceCreateFormComponent.createInvoice(): whatever.`);
     this.reportsService.createInvoice(this.buildInvoiceCreationInfo()).subscribe(
       data => {
-        console.log(`InvoiceCreateFormComponent.createInvoice(): data is ${data}.`);
+        console.log('InvoiceCreateFormComponent.createInvoice(): data is ', data);
         this.ngxSpinnerService.hide();
         this.ngbActiveModal.close('Invoices created');
       },
       error => {
-        console.log(`InvoiceCreateFormComponent.createInvoice(): error is ${error}.`);
+        console.log('InvoiceCreateFormComponent.createInvoice(): error is ', error);
         this.ngxSpinnerService.hide();
         this.ngbActiveModal.dismiss('Invoices creation failed');
       }
@@ -108,12 +117,12 @@ export class InvoiceCreateFormComponent implements OnInit {
     console.log(`InvoiceCreateFormComponent.createInvoices(): whatever.`);
     this.reportsService.createInvoices(this.buildInvoicesCreationInfo()).subscribe(
       data => {
-        console.log(`InvoiceCreateFormComponent.createInvoices(): data is ${data}.`);
+        console.log('InvoiceCreateFormComponent.createInvoices(): data is ', data);
         this.ngxSpinnerService.hide();
         this.ngbActiveModal.close('Invoices created');
       },
       error => {
-        console.log(`InvoiceCreateFormComponent.createInvoices(): error is ${error}.`);
+        console.log('InvoiceCreateFormComponent.createInvoices(): error is ', error);
         this.ngxSpinnerService.hide();
         this.ngbActiveModal.dismiss('Invoices creation failed');
       }
@@ -126,8 +135,8 @@ export class InvoiceCreateFormComponent implements OnInit {
     }
   }
 
-  setSelectedSchoolYear(year: string): void {
-    this.selectedSchoolYear = year;
+  setSelectedScope(scope: string): void {
+    this.selectedScope = scope;
   }
 
   setSelectedInvoiceTemplate(template: Template): void {
@@ -173,15 +182,16 @@ export class InvoiceCreateFormComponent implements OnInit {
   private buildInvoiceCreationInfo(): Object {
     return {
       reportType: ReportType.Invoice,
-      name: this.selectedSchoolYear + '_INVOICE_' + this.selectedSchoolDistrict.name,
-      schoolYear: this.selectedSchoolYear.replace(/\s+/g, ''),
+      name: this.selectedScope + '_INVOICE_' + this.selectedSchoolDistrict.name,
+      scope: this.selectedScope.replace(/\s+/g, ''),
       templateId: this.selectedInvoiceTemplate.id,
       invoice: {
         asOf: new Date(`${this.asOfDate.month}/${this.asOfDate.day}/${this.asOfDate.year}`),
         toSchoolDistrict: new Date(`${this.toSchoolDistrictDate.month}/${this.toSchoolDistrictDate.day}/${this.toSchoolDistrictDate.year}`),
         toPDE: new Date(`${this.toPDEDate.month}/${this.toPDEDate.day}/${this.toPDEDate.year}`),
         schoolDistrictAun: +this.selectedSchoolDistrict.aun,
-        studentsTemplateId: null
+        studentsTemplateId: null,
+        scope: this.selectedScope.replace(/\s+/g, '')
       }
     };
   }
@@ -189,12 +199,13 @@ export class InvoiceCreateFormComponent implements OnInit {
   private buildInvoicesCreationInfo(): Object {
     return {
       reportType: ReportType.Invoice,
-      schoolYear: this.selectedSchoolYear.replace(/\s+/g, ''),
+      scope: this.selectedScope.replace(/\s+/g, ''),
       templateId: this.selectedInvoiceTemplate.id,
       invoice: {
         asOf: new Date(`${this.asOfDate.month}/${this.asOfDate.day}/${this.asOfDate.year}`),
         toSchoolDistrict: new Date(`${this.toSchoolDistrictDate.month}/${this.toSchoolDistrictDate.day}/${this.toSchoolDistrictDate.year}`),
-        toPDE: new Date(`${this.toPDEDate.month}/${this.toPDEDate.day}/${this.toPDEDate.year}`)
+        toPDE: new Date(`${this.toPDEDate.month}/${this.toPDEDate.day}/${this.toPDEDate.year}`),
+        scope: this.selectedScope.replace(/\s+/g, '')
       }
     };
   }

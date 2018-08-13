@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -24,6 +25,22 @@ namespace api.Controllers
 			_context = context;
 			_records = records;
 			_logger = logger;
+		}
+
+		public struct ScopesResponse
+		{
+			public IList<string> Scopes { get; set; }
+		}
+ 		[HttpGet("scopes")]
+		[Authorize(Policy = "STD+")]
+		[ProducesResponseType(200)]
+		public async Task<IActionResult> GetScopes()
+		{
+			var scopes = await Task.Run(() => _records.GetScopes());
+ 			return new ObjectResult(new ScopesResponse
+			{
+				Scopes = scopes,
+			});
 		}
 
 		public class GetHeaderArgs

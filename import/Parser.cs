@@ -32,7 +32,7 @@ namespace import
 			{
 				foreach (var record in csvReader.GetRecords<StudentRecord>())
 				{
-					header.Records.Add(record);
+					header.Records.Append(record);
 
 					count++;
 					if (count % 1000 == 0)

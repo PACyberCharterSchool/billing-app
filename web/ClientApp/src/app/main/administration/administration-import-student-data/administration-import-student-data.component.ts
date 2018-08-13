@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { StudentRecord, StudentRecordsHeader } from '../../../models/student-record.model';
 
 import { UtilitiesService } from '../../../services/utilities.service';
-import { StudentRecordsImportService } from '../../../services/student-records-import.service';
+import { StudentRecordsService } from '../../../services/student-records.service';
 
 import { Globals } from '../../../globals';
 
@@ -18,15 +18,15 @@ import { NgxSpinnerService } from 'ngx-spinner';
 })
 export class AdministrationImportStudentDataComponent implements OnInit {
 
-  studentRecords: StudentRecord[] = [];
-  scopes: string[];
-  currentScope: string;
+  public studentRecords: StudentRecord[] = [];
+  public scopes: string[];
+  public currentScope: string;
   private skip;
 
   constructor(
     private globals: Globals,
     private utilitiesService: UtilitiesService,
-    private ssrImportService: StudentRecordsImportService,
+    private ssrImportService: StudentRecordsService,
     private router: Router,
     private spinnerService: NgxSpinnerService
   ) {
@@ -53,7 +53,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
 
   public handleCommitClick(): void {
     this.spinnerService.show();
-    this.ssrImportService.postStudentData().subscribe(
+    this.ssrImportService.postLockStudentData(this.currentScope).subscribe(
       response => {
         this.spinnerService.hide();
       },
@@ -66,7 +66,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
   public filterByStudentRecordScope(scope: string): void {
     this.currentScope = scope;
     this.spinnerService.show();
-    this.ssrImportService.getStudentRecordsHeaderByScope(this.currentScope).subscribe(
+    this.ssrImportService.getStudentRecordsHeaderByScope(this.currentScope, this.skip).subscribe(
       data => {
         this.studentRecords = data['header']['records'];
         console.log('AdministrationImportStudentDataComponent.ngOnInit():  data is ', data);
@@ -80,7 +80,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
   }
 
   getStudentRecords($event) {
-    this.ssrImportService.getStudentRecordsHeaderByScope(this.currentScope).subscribe(
+    this.ssrImportService.getStudentRecordsHeaderByScope(this.currentScope, this.skip).subscribe(
       data => {
         this.updateScrollingSkip();
         this.studentRecords = this.studentRecords.concat(data['header']['records']);
@@ -105,7 +105,8 @@ export class AdministrationImportStudentDataComponent implements OnInit {
       'studentMiddleInitial',
       'studentState',
       'studentNorep',
-      'lastUpdated'
+      'lastUpdated',
+      'lazyLoader'
     ];
 
     if (fields) {
