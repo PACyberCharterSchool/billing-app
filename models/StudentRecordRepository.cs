@@ -12,6 +12,7 @@ namespace models
 	{
 		StudentRecordsHeader Get(string scope, int skip = 0, int take = 0);
 		IList<string> GetScopes();
+		bool IsLocked(string scope);
 		void Lock(string scope);
 		StudentRecord Update(StudentRecord update);
 	}
@@ -29,7 +30,11 @@ namespace models
 
 		public StudentRecordsHeader Get(string scope, int skip = 0, int take = 0)
 		{
-			var header = _context.StudentRecordsHeaders.SingleOrDefault(h => h.Scope == scope);
+			var header = _context.
+				StudentRecordsHeaders.
+				AsNoTracking(). // HACK(Erik): Without this EF complains about changes, slowing everything down
+				Include(h => h.Records).
+				SingleOrDefault(h => h.Scope == scope);
 			if (header == null)
 				return null;
 
@@ -50,6 +55,9 @@ namespace models
 		public IList<string> GetScopes()
 			=> _context.StudentRecordsHeaders.Select(h => h.Scope).ToList();
 
+		public bool IsLocked(string scope)
+		 => _context.StudentRecordsHeaders.Where(r => r.Scope == scope).Select(r => r.Locked).SingleOrDefault();
+
 		public void Lock(string scope)
 		{
 			var header = _context.StudentRecordsHeaders.Single();
@@ -61,10 +69,16 @@ namespace models
 		{
 			var current = _context.StudentRecords.Single(r => r.Id == update.Id);
 			MergeProperties(current, update, new[] {
-				 nameof(StudentRecord.Id) ,
+				 nameof(StudentRecord.Id),
+				 nameof(StudentRecord.StudentId),
+				 nameof(StudentRecord.SchoolDistrictId),
+				 nameof(StudentRecord.SchoolDistrictName),
 				 nameof(StudentRecord.Header),
 				 nameof(StudentRecord.LastUpdated),
+				 nameof(StudentRecord.ActivitySchoolYear),
+				 nameof(StudentRecord.StudentPaSecuredId),
 			});
+			current.LastUpdated = DateTime.Now;
 			_context.Update(current);
 
 			return current;

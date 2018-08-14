@@ -83,7 +83,7 @@ namespace api.Controllers
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> LockHeader(string scope)
 		{
-			await Task.Run(() => _records.Lock(scope));
+			await Task.Run(() => _context.SaveChanges(() => _records.Lock(scope)));
 			return Ok();
 		}
 
@@ -112,8 +112,7 @@ namespace api.Controllers
 			[MinLength(1)]
 			public string StudentStreet1 { get; set; }
 
-			[Required]
-			[MinLength(1)]
+			[MinLength(0)]
 			public string StudentStreet2 { get; set; }
 
 			[Required]
@@ -143,19 +142,22 @@ namespace api.Controllers
 			public DateTime? StudentNorep { get; set; }
 		}
 
-		[HttpPut("{id}")]
+		[HttpPut("{scope}/{id}")]
 		[Authorize(Policy = "STD+")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(typeof(ErrorResponse), 400)]
-		public async Task<IActionResult> Update(int id, [FromBody]StudentRecordUpdate update)
+		[ProducesResponseType(423)]
+		public async Task<IActionResult> Update(string scope, int id, [FromBody]StudentRecordUpdate update)
 		{
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
-			// TODO(Erik): check the header for lock
+			if (_records.IsLocked(scope))
+				return StatusCode(423);
 
 			var record = new StudentRecord
 			{
+				Id = id,
 				StudentFirstName = update.StudentFirstName,
 				StudentMiddleInitial = update.StudentMiddleInitial,
 				StudentLastName = update.StudentLastName,
