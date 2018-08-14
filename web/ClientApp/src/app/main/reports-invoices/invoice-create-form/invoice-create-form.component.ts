@@ -33,6 +33,7 @@ export class InvoiceCreateFormComponent implements OnInit {
   public toPDEDate;
   private studentTemplate: string;
   public selectedScope: string;
+  public selectedSchoolYear: string;
   private templates: Template[];
   public selectedInvoiceTemplate: Template;
   private selectedSchoolTemplate: Template;
@@ -85,6 +86,15 @@ export class InvoiceCreateFormComponent implements OnInit {
         console.log('StudentsListComponent.ngOnInit():  error is ', error);
       }
     );
+
+  }
+
+  getSchoolYears(): string[] {
+    return this.academicYearsService.getAcademicYears();
+  }
+
+  setSelectedSchoolYear(year: string): void {
+    this.selectedSchoolYear = year;
   }
 
   create(): void {
@@ -183,7 +193,7 @@ export class InvoiceCreateFormComponent implements OnInit {
     return {
       reportType: ReportType.Invoice,
       name: this.selectedScope + '_INVOICE_' + this.selectedSchoolDistrict.name,
-      scope: this.selectedScope.replace(/\s+/g, ''),
+      schoolYear: this.selectedSchoolYear.replace(/\s+/g, ''),
       templateId: this.selectedInvoiceTemplate.id,
       invoice: {
         asOf: new Date(`${this.asOfDate.month}/${this.asOfDate.day}/${this.asOfDate.year}`),
@@ -199,7 +209,7 @@ export class InvoiceCreateFormComponent implements OnInit {
   private buildInvoicesCreationInfo(): Object {
     return {
       reportType: ReportType.Invoice,
-      scope: this.selectedScope.replace(/\s+/g, ''),
+      schoolYear: this.selectedSchoolYear.replace(/\s+/g, ''),
       templateId: this.selectedInvoiceTemplate.id,
       invoice: {
         asOf: new Date(`${this.asOfDate.month}/${this.asOfDate.day}/${this.asOfDate.year}`),

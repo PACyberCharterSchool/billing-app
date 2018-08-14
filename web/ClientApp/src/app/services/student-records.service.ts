@@ -35,7 +35,7 @@ export class StudentRecordsService {
   }
 
   public getStudentRecordsHeaderByScope(scope: string, skip: number): Observable<StudentRecordsHeader> {
-    const url = this.apiSSRUrl + `/header/${scope}?skip=${skip}&take=${this.globals.take}`;
+    const url = this.apiSSRUrl + `/header/${scope}?Skip=${skip}&Take=${this.globals.take}`;
     return this.httpClient.get<StudentRecordsHeader>(url, this.headers);
   }
 

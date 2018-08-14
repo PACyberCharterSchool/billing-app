@@ -11,7 +11,7 @@ import { HotTableModule, HotTableRegisterer } from '@handsontable/angular';
 import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { ReportsService } from '../../../services/reports.service';
-import { ExcelService } from '../../../services/excel.service';
+import { FileSaverService } from '../../../services/file-saver.service';
 
 import { Globals } from '../../../globals';
 
@@ -34,7 +34,7 @@ xdescribe('InvoicePreviewFormComponent', () => {
         HotTableRegisterer,
         NgbActiveModal,
         ReportsService,
-        ExcelService,
+        FileSaverService,
         Globals,
         HttpClient,
         HttpHandler

@@ -5,7 +5,7 @@ import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Report, ReportType } from '../../../models/report.model';
 
 import { ReportsService } from '../../../services/reports.service';
-import { ExcelService } from '../../../services/excel.service';
+import { FileSaverService } from '../../../services/file-saver.service';
 
 @Component({
   selector: 'app-invoice-preview-form',
@@ -23,7 +23,7 @@ export class InvoicePreviewFormComponent implements OnInit {
   constructor(
     public ngbActiveModal: NgbActiveModal,
     private reportsService: ReportsService,
-    private excelService: ExcelService
+    private fileSaverService: FileSaverService
   ) { }
 
   ngOnInit() {
@@ -38,7 +38,7 @@ export class InvoicePreviewFormComponent implements OnInit {
       data => {
         console.log('InvoicePreviewFormComponent.getCurrentInvoiceData(): data is ', data);
         this.currentInvoice.xlsx = data;
-        this.excelService.saveStudentActivityAsExcelFile(data, this.currentInvoice);
+        this.fileSaverService.saveStudentActivityAsExcelFile(data, this.currentInvoice);
         this.ngbActiveModal.close('Successful download');
       },
       error => {

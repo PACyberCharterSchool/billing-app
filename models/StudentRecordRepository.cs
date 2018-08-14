@@ -33,12 +33,16 @@ namespace models
 			if (header == null)
 				return null;
 
+			Console.WriteLine($"StudentRecordRepository.Get():  header is {header}.");
 			header.Records = header.Records.OrderBy(r => r.Id);
+
 			if (skip > 0)
 				header.Records = header.Records.Skip(skip);
 
 			if (take > 0)
 				header.Records = header.Records.Take(take);
+
+			Console.WriteLine($"StudentRecordRepository.Get():  records are {header.Records}.");
 
 			return header;
 		}

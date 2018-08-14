@@ -16,4 +16,5 @@ class ReportMetadata {
 export class Report extends ReportMetadata {
   data: string;
   xlsx: Blob;
+  pdf: Blob;
 }

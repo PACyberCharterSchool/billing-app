@@ -289,7 +289,7 @@ namespace api.Controllers
       {
         Scope = create.Invoice.Scope,
         InvoiceNumber = create.Name,
-        SchoolYear = create.Invoice.Scope,
+        SchoolYear = create.SchoolYear,
         AsOf = create.Invoice.AsOf,
         Prepared = time,
         ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
@@ -661,6 +661,42 @@ namespace api.Controllers
       public ReportDto Report { get; set; }
     }
 
+    public class GetInvoiceArgs
+    {
+			public string Name { get; set; }
+      public string Format { get; set; }
+    }
+
+    [HttpGet("invoice/name")]
+    [Authorize(Policy = "PAY+")]
+    [Produces(ContentTypes.XLSX, ContentTypes.PDF)]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(406)]
+    public async Task<IActionResult> GetInvoice([FromQuery]GetInvoiceArgs args)
+    {
+      var report = await Task.Run(() => _reports.Get(args.Name));
+      if (report == null)
+        return NotFound();
+
+      var accept = Request.Headers["Accept"];
+      foreach (var v in accept) {
+        if (!v.Contains(ContentTypes.XLSX) && !v.Contains(ContentTypes.PDF))
+          return StatusCode(406);
+      }
+
+      var name = args.Name;
+      var contentType = args.Format == "excel" ? ContentTypes.XLSX : ContentTypes.PDF;
+      var data = contentType == ContentTypes.XLSX ? report.Xlsx : report.Pdf;
+
+      using (var stream = new MemoryStream(data))
+      {
+        return new FileStreamResult(new MemoryStream(stream.ToArray()), contentType)
+        {
+          FileDownloadName = name
+        };
+      };
+    }
+
     [HttpGet("{name}")]
     [Authorize(Policy = "PAY+")]
     [Produces(ContentTypes.XLSX, ContentTypes.PDF)]
@@ -674,8 +710,10 @@ namespace api.Controllers
 
       var accept = Request.Headers["Accept"];
 
-      if (accept != ContentTypes.XLSX)
-        return StatusCode(406);
+      foreach (var v in accept) {
+        if (!v.Contains(ContentTypes.XLSX) && !v.Contains(ContentTypes.PDF))
+          return StatusCode(406);
+      }
 
       var stream = new MemoryStream(report.Xlsx);
       return new FileStreamResult(stream, ContentTypes.XLSX)
@@ -686,17 +724,15 @@ namespace api.Controllers
 
     public class GetActivityArgs
     {
-
 			public string Name { get; set; }
 
-			[EnumerationValidation(typeof(ReportType))]
-			public string Type { get; set; }
-
-			[RegularExpression(@"^\d{4}\-\d{4}$")]
-			public string SchoolYear { get; set; }
-
-			public bool? Approved { get; set; }
       public string Format { get; set; }
+
+      public string Type { get; set; }
+
+      public string SchoolYear { get; set; }
+
+      public bool? Approved { get; set; }
     }
 
     [HttpGet("activity/name")]
@@ -711,11 +747,12 @@ namespace api.Controllers
         return NotFound();
 
       var accept = Request.Headers["Accept"];
+      foreach (var v in accept) {
+        if (!v.Contains(ContentTypes.XLSX) && !v.Contains(ContentTypes.PDF))
+          return StatusCode(406);
+      }
 
-      if (accept != ContentTypes.XLSX || accept != ContentTypes.PDF)
-        return StatusCode(406);
-
-      var name = args.SchoolYear + "_" + args.Name + "_ACTIVITY";
+      var name = args.Name + "_ACTIVITY";
       List<Report> reports = new List<Report>();
       reports.Add(report);
       var data = BuildStudentActivityDataTable(reports);
@@ -750,8 +787,10 @@ namespace api.Controllers
     {
       var accept = Request.Headers["Accept"];
 
-      if (accept != ContentTypes.XLSX || accept != ContentTypes.PDF)
-        return StatusCode(406);
+      foreach (var v in accept) {
+        if (!v.Contains(ContentTypes.XLSX) && !v.Contains(ContentTypes.PDF))
+          return StatusCode(406);
+      }
 
       var reports = await Task.Run(() => _reports.GetMany(
         type: args.Type == null ? null : ReportType.FromString(args.Type),
@@ -788,7 +827,6 @@ namespace api.Controllers
 
     public class GetManyArgs
     {
-
 			public string Name { get; set; }
 
 			[EnumerationValidation(typeof(ReportType))]
@@ -925,9 +963,12 @@ namespace api.Controllers
       // create report
       Report report;
       using (var ms = new MemoryStream())
+      using (var pdfms = new MemoryStream())
       {
         // wb.Write(ms);
         wb.Save(ms, new XlsSaveOptions(SaveFormat.Xlsx));
+        wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
+
         report = new Report
         {
           Type = ReportType.BulkInvoice,
@@ -936,6 +977,7 @@ namespace api.Controllers
           Created = time,
           Data = json,
           Xlsx = ms.ToArray(),
+          Pdf = pdfms.ToArray()
         };
       }
 

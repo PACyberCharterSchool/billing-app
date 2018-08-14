@@ -6,7 +6,7 @@ import { Template } from '../../../models/template.model';
 import { Globals } from '../../../globals';
 import { ReportsService } from '../../../services/reports.service';
 import { UtilitiesService } from '../../../services/utilities.service';
-import { ExcelService } from '../../../services/excel.service';
+import { FileSaverService } from '../../../services/file-saver.service';
 import { TemplatesService } from '../../../services/templates.service';
 
 import { InvoiceCreateFormComponent } from '../invoice-create-form/invoice-create-form.component';
@@ -50,7 +50,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     private globals: Globals,
     private reportsService: ReportsService,
     private utilitiesService: UtilitiesService,
-    private excelService: ExcelService,
+    private fileSaverService: FileSaverService,
     private templatesService: TemplatesService,
     private ngxSpinnerService: NgxSpinnerService,
     private ngbModal: NgbModal,
@@ -233,7 +233,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.reportsService.getInvoiceStudentActivityDataByName(invoice.name).subscribe(
       data => {
         console.log('InvoiceListComponent().downloadInvoiceStudentActivity():  data is ', data);
-        this.excelService.saveStudentActivityAsExcelFile(data, invoice);
+        this.fileSaverService.saveStudentActivityAsExcelFile(data, invoice);
       },
       error => {
         console.log('InvoiceListComponent().downloadInvoiceStudentActivity():  error is ', error);
@@ -246,7 +246,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       data => {
         console.log('InvoicesListComponent.downloadInvoice(): data is', data);
         invoice.xlsx = data;
-        this.excelService.saveInvoiceAsExcelFile(invoice);
+        this.fileSaverService.saveInvoiceAsExcelFile(invoice);
       },
       error => {
         console.log('InvoicesListComponent.downloadInvoice(): error is', error);
@@ -292,7 +292,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
           data => {
             console.log('InvoicesListComponent.doDownload(): data is ', data);
             this.ngxSpinnerService.hide();
-            this.excelService.saveDataAsExcelFile(data, 'BulkInvoices');
+            this.fileSaverService.saveDataAsExcelFile(data, 'BulkInvoices');
           },
           error => {
             console.log('InvoicesListComponent.doDownload(): error is ', error);
@@ -306,7 +306,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
           data => {
             console.log('InvoicesListComponent.doDownload(): data is ', data);
             this.ngxSpinnerService.hide();
-            this.excelService.saveDataAsExcelFile(data, 'BulkStudentActivity');
+            this.fileSaverService.saveDataAsExcelFile(data, 'BulkStudentActivity');
           },
           error => {
             console.log('InvoicesListComponent.doDownload(): error is ', error);

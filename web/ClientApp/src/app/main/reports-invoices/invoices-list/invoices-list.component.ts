@@ -7,7 +7,7 @@ import { Template } from '../../../models/template.model';
 
 import { ReportsService } from '../../../services/reports.service';
 import { UtilitiesService } from '../../../services/utilities.service';
-import { ExcelService } from '../../../services/excel.service';
+import { FileSaverService } from '../../../services/file-saver.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { TemplatesService } from '../../../services/templates.service';
 
@@ -54,7 +54,7 @@ export class InvoicesListComponent implements OnInit {
     private globals: Globals,
     private reportsService: ReportsService,
     private utilitiesService: UtilitiesService,
-    private excelService: ExcelService,
+    private fileSaverService: FileSaverService,
     private templatesService: TemplatesService,
     private ngxSpinnerService: NgxSpinnerService,
     private ngbModal: NgbModal,
@@ -215,7 +215,7 @@ export class InvoicesListComponent implements OnInit {
     this.reportsService.getInvoiceStudentActivityDataByName(invoice.name).subscribe(
       data => {
         console.log('InvoiceListComponent().downloadInvoiceStudentActivity():  data is ', data);
-        this.excelService.saveStudentActivityAsExcelFile(data, invoice);
+        this.fileSaverService.saveStudentActivityAsExcelFile(data, invoice);
       },
       error => {
         console.log('InvoiceListComponent().downloadInvoiceStudentActivity():  error is ', error);
@@ -228,7 +228,7 @@ export class InvoicesListComponent implements OnInit {
       data => {
         console.log('InvoicesListComponent.downloadInvoice(): data is', data);
         invoice.xlsx = data;
-        this.excelService.saveInvoiceAsExcelFile(invoice);
+        this.fileSaverService.saveInvoiceAsExcelFile(data, invoice);
       },
       error => {
         console.log('InvoicesListComponent.downloadInvoice(): error is', error);
@@ -301,6 +301,11 @@ export class InvoicesListComponent implements OnInit {
     this.reportsService.getReportStudentActivityDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
         console.log('InvoiceListComponent.downloadStudentActivityByFormat():  data is ', data);
+        if (format.toLowerCase().includes('excel')) {
+          this.fileSaverService.saveStudentActivityAsExcelFile(data, report);
+        } else {
+          this.fileSaverService.saveStudentActivityAsPDFFile(data, report);
+        }
       },
       error => {
         console.log('InvoiceListComponent.downloadStudentActivityByFormat():  error is ', error);
@@ -309,7 +314,21 @@ export class InvoicesListComponent implements OnInit {
   }
 
   public downloadInvoiceByFormat(report: Report, format: string) {
+    this.selectedDownloadFormat = format;
+    this.reportsService.getReportInvoiceByDataFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
+      data => {
+        console.log('InvoiceListComponent.downloadInvoiceByFormat():  data is ', data);
+        if (format.toLowerCase().includes('excel')) {
+          this.fileSaverService.saveInvoiceAsExcelFile(data, report);
+        } else {
+          this.fileSaverService.saveInvoiceAsPDFFile(data, report);
+        }
 
+      },
+      error => {
+        console.log('InvoiceListComponent.downloadInvoiceByFormat():  error is ', error);
+      }
+    );
   }
 
   private selectSchoolYear(year: string) {

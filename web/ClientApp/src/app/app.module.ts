@@ -30,7 +30,7 @@ import { AuditRecordsService } from './services/audit-records.service';
 import { ReportsService } from './services/reports.service';
 import { TemplatesService } from './services/templates.service';
 import { SpreadsheetService } from './services/spreadsheet.service';
-import { ExcelService } from './services/excel.service';
+import { FileSaverService } from './services/file-saver.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
@@ -68,7 +68,7 @@ const pacbillProviders = [
   AuthenticationService,
   CurrentStudentService,
   DigitalSignaturesService,
-  ExcelService,
+  FileSaverService,
   Globals,
   PaymentsService,
   RefundsService,

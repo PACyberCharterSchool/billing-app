@@ -16,7 +16,7 @@ import { InvoicesMonthlyCombinedListComponent } from './invoices-monthly-combine
 
 import { ReportsService } from '../../../services/reports.service';
 import { UtilitiesService } from '../../../services/utilities.service';
-import { ExcelService } from '../../../services/excel.service';
+import { FileSaverService } from '../../../services/file-saver.service';
 import { TemplatesService } from '../../../services/templates.service';
 
 import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
@@ -45,7 +45,7 @@ describe('InvoicesMonthlyCombinedListComponent', () => {
         Globals,
         ReportsService,
         UtilitiesService,
-        ExcelService,
+        FileSaverService,
         TemplatesService,
         HttpClient,
         HttpHandler,
