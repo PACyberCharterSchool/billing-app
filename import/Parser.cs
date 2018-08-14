@@ -32,6 +32,7 @@ namespace import
 			{
 				foreach (var record in csvReader.GetRecords<StudentRecord>())
 				{
+					record.LastUpdated = batchTime;
 					records.Add(record);
 
 					count++;
