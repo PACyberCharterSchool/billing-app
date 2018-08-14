@@ -30,7 +30,11 @@ namespace models
 
 		public StudentRecordsHeader Get(string scope, int skip = 0, int take = 0)
 		{
-			var header = _context.StudentRecordsHeaders.SingleOrDefault(h => h.Scope == scope);
+			var header = _context.
+				StudentRecordsHeaders.
+				AsNoTracking(). // HACK(Erik): Without this EF complains about changes, slowing everything down
+				Include(h => h.Records).
+				SingleOrDefault(h => h.Scope == scope);
 			if (header == null)
 				return null;
 
