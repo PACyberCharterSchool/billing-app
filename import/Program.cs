@@ -44,6 +44,7 @@ namespace import
 			var path = Path.Combine(Environment.CurrentDirectory, importDir);
 			var watcher = new FileSystemWatcher(path, importGlob);
 			watcher.Created += HandleFileChange;
+			watcher.Changed += HandleFileChange;
 			watcher.EnableRaisingEvents = true;
 
 			Console.WriteLine($"Watching directory {path} for '{importGlob}'...");
