@@ -18,6 +18,8 @@ import { ReportsService } from '../../../services/reports.service';
 import { UtilitiesService } from '../../../services/utilities.service';
 import { FileSaverService } from '../../../services/file-saver.service';
 import { TemplatesService } from '../../../services/templates.service';
+import { AcademicYearsService } from '../../../services/academic-years.service';
+import { StudentRecordsService } from '../../../services/student-records.service';
 
 import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -47,6 +49,8 @@ describe('InvoicesMonthlyCombinedListComponent', () => {
         UtilitiesService,
         FileSaverService,
         TemplatesService,
+        AcademicYearsService,
+        StudentRecordsService,
         HttpClient,
         HttpHandler,
         NgbActiveModal

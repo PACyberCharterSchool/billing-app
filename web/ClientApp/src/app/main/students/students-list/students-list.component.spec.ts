@@ -13,11 +13,24 @@ import { StudentAdvancedFilterComponent } from '../student-advanced-filter/stude
 import { StudentsService } from '../../../services/students.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
 import { CurrentStudentService } from '../../../services/current-student.service';
+import { StudentRecordsService } from '../../../services/student-records.service';
+import { UtilitiesService } from '../../../services/utilities.service';
+
+import { NormalizeFieldNamePipe } from '../../../pipes/normalize-field-name.pipe';
+import { NormalizeFieldValuePipe } from '../../../pipes/normalize-field-value.pipe';
 
 import { OrderByPipe } from '../../../pipes/orderby.pipe';
 import { IepEnrolledPipe } from '../../../pipes/iep-enrolled.pipe';
 
-import { NgbModule, NgbDateAdapter, NgbDatepicker, NgbDateParserFormatter, NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbModule,
+  NgbDateAdapter,
+  NgbDatepicker,
+  NgbDateParserFormatter,
+  NgbCalendar,
+  NgbDropdownConfig } from '@ng-bootstrap/ng-bootstrap';
+
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
@@ -34,9 +47,11 @@ describe('StudentsListComponent', () => {
         StudentDatepickerComponent,
         StudentAdvancedFilterComponent,
         OrderByPipe,
-        IepEnrolledPipe
+        IepEnrolledPipe,
+        NormalizeFieldNamePipe,
+        NormalizeFieldValuePipe
       ],
-      imports: [ FormsModule, NgbModule, RouterTestingModule, InfiniteScrollModule ],
+      imports: [ FormsModule, NgbModule, RouterTestingModule, InfiniteScrollModule, NgxSpinnerModule ],
       providers: [
         NgbCalendar,
         NgbDateAdapter,
@@ -44,9 +59,12 @@ describe('StudentsListComponent', () => {
         NgbDatepicker,
         SchoolDistrictService,
         StudentsService,
+        StudentRecordsService,
         CurrentStudentService,
+        UtilitiesService,
         HttpClient,
         HttpHandler,
+        NgbDropdownConfig,
         Globals
       ]
     })
