@@ -152,6 +152,7 @@ namespace api.Controllers
         wb.Worksheets.AddCopy(1);
 
         var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
+        sheet.Name = "Individual Student Information";
         Cells cells = sheet.Cells;
         
         sheet.PageSetup.HeaderMargin = 0.0;
@@ -780,10 +781,7 @@ namespace api.Controllers
       List<string> headers = GetStudentActivityHeaders(data, MapStudentActivityHeaderKeyToValue); 
       Workbook wb = new Workbook();
 
-      foreach (var header in headers) {
-        wb.Worksheets[0].Cells.ImportArray(headers.ToArray(), 0, 0, false);
-      }
-
+      wb.Worksheets[0].Cells.ImportArray(headers.ToArray(), 0, 0, false);
       wb.Worksheets[0].Cells.ImportDataTable(data, true, 1, 0, true, false);
 
       var saveOpts = new XlsSaveOptions(args.Format == "excel" ? SaveFormat.Xlsx : SaveFormat.Pdf);
@@ -827,10 +825,7 @@ namespace api.Controllers
       List<string> headers = GetStudentActivityHeaders(data, MapStudentActivityHeaderKeyToValue); 
       Workbook wb = new Workbook();
 
-      foreach (var header in headers) {
-        wb.Worksheets[0].Cells.ImportArray(headers.ToArray(), 0, 0, false);
-      }
-
+      wb.Worksheets[0].Cells.ImportArray(headers.ToArray(), 0, 0, false);
       wb.Worksheets[0].Cells.ImportDataTable(data, true, 1, 0, true, false);
 
       var saveOpts = new XlsSaveOptions(args.Format == "excel" ? SaveFormat.Xlsx : SaveFormat.Pdf);

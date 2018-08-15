@@ -62,13 +62,17 @@ export class InvoicesListComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.spinnerMsg = 'Loading invoices.  Please wait...';
+    this.ngxSpinnerService.show();
     this.reportsService.getInvoices(null, null, null).subscribe(
       data => {
         console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
         this.reports = this.allReports = data['reports'];
+        this.ngxSpinnerService.hide();
       },
       error => {
         console.log('InvoicesListComponent.ngOnInit(): error is ', error);
+        this.ngxSpinnerService.hide();
       }
     );
 
@@ -114,13 +118,17 @@ export class InvoicesListComponent implements OnInit {
   }
 
   refreshInvoices(): void {
+    this.spinnerMsg = 'Loading invoices.  Please wait...';
+    this.ngxSpinnerService.show();
     this.reportsService.getReportsByInfo({'Type': ReportType.Invoice, 'Name': '', 'Approved': null, 'SchoolYear': null}).subscribe(
       data => {
         console.log(`InvoicesListComponent.refreshInvoices(): data is ${data}.`);
         this.reports = this.allReports = data['reports'];
+        this.ngxSpinnerService.hide();
       },
       error => {
         console.log(`InvoicesListComponent.refreshInvoices(): error is ${error}.`);
+        this.ngxSpinnerService.hide();
       }
     );
   }
@@ -212,12 +220,16 @@ export class InvoicesListComponent implements OnInit {
     //   (reason) => {
     //   }
     // )
+    this.spinnerMsg = 'Downloading student activity.  Please wait...';
+    this.ngxSpinnerService.show();
     this.reportsService.getInvoiceStudentActivityDataByName(invoice.name).subscribe(
       data => {
         console.log('InvoiceListComponent().downloadInvoiceStudentActivity():  data is ', data);
+        this.ngxSpinnerService.hide();
         this.fileSaverService.saveStudentActivityAsExcelFile(data, invoice);
       },
       error => {
+        this.ngxSpinnerService.hide();
         console.log('InvoiceListComponent().downloadInvoiceStudentActivity():  error is ', error);
       }
     );
@@ -228,14 +240,18 @@ export class InvoicesListComponent implements OnInit {
   }
 
   downloadInvoice(invoice: Report) {
+    this.spinnerMsg = 'Downloading invoice.  Please wait...';
+    this.ngxSpinnerService.show();
     this.reportsService.getInvoiceByName(invoice.name).subscribe(
       data => {
         console.log('InvoicesListComponent.downloadInvoice(): data is', data);
         invoice.xlsx = data;
+        this.ngxSpinnerService.hide();
         this.fileSaverService.saveInvoiceAsExcelFile(data, invoice);
       },
       error => {
         console.log('InvoicesListComponent.downloadInvoice(): error is', error);
+        this.ngxSpinnerService.hide();
         invoice.data = error.error.text;
       }
     );
@@ -301,9 +317,12 @@ export class InvoicesListComponent implements OnInit {
   }
 
   public downloadActivityByFormat(report: Report, format: string) {
+    this.spinnerMsg = 'Downloading student activity.  Please wait...';
+    this.ngxSpinnerService.show();
     this.reportsService.getReportStudentActivityDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
         console.log('InvoiceListComponent.downloadStudentActivityByFormat():  data is ', data);
+        this.ngxSpinnerService.hide();
         if (format.toLowerCase().includes('excel')) {
           this.fileSaverService.saveStudentActivityAsExcelFile(data, report);
         } else {
@@ -317,15 +336,17 @@ export class InvoicesListComponent implements OnInit {
   }
 
   public downloadInvoiceByFormat(report: Report, format: string) {
+    this.spinnerMsg = 'Downloading invoice.  Please wait...';
+    this.ngxSpinnerService.show();
     this.reportsService.getReportInvoiceByDataFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
         console.log('InvoiceListComponent.downloadInvoiceByFormat():  data is ', data);
+        this.ngxSpinnerService.hide();
         if (format.toLowerCase().includes('excel')) {
           this.fileSaverService.saveInvoiceAsExcelFile(data, report);
         } else {
           this.fileSaverService.saveInvoiceAsPDFFile(data, report);
         }
-
       },
       error => {
         console.log('InvoiceListComponent.downloadInvoiceByFormat():  error is ', error);

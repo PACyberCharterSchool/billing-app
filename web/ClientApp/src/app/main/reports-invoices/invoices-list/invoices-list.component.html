@@ -85,7 +85,7 @@
     </a>
   </div>
 </div>
-<ngx-spinner size='large' loadingText='Generating PACBILL invoices.  Please wait...' type='timer'></ngx-spinner>
+<ngx-spinner size='large' loadingText='{{spinnerMsg}}' type='timer'></ngx-spinner>
 <ng-template #downloadFormatContent let-c='close' let-d='dismiss'>
   <div class='modal-header'>
     <h4 class='modal-title'>Download as...</h4>
@@ -99,7 +99,7 @@
         <div ngbDropdown class="d-inline-block">
           <button type='button' class="btn btn-outline-primary" id="dropdownDownloadFormat" ngbDropdownToggle>Format type</button>
           <div ngbDropdownMenu aria-labelledby="dropdownDownloadFormat">
-            <button type='button' class='dropdown-item' *ngFor='let format of downloadFormats' (click)=setSelectedDownloadFormat(format)>{{format}}</button>
+            <button type='button' class='dropdown-item' *ngFor='let format of downloadFormats' (click)='setSelectedDownloadFormat(format)'>{{format}}</button>
           </div>
         </div>
       </div>

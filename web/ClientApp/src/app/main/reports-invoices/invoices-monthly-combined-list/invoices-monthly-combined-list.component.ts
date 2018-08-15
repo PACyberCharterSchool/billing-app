@@ -36,6 +36,10 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     'Approved',
     'Disapproved'
   ];
+  public downloadFormats: string[] = [
+    'Microsoft Excel',
+    'PDF'
+  ];
   private selectedCreateSchoolYear: string;
   private selectedDownloadSchoolYear: string;
   private selectedDownloadStatus: string;
@@ -49,6 +53,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   public selectedScope: string;
   public scopes: string[];
   public selectedAsOfBillingDate: string;
+  public selectedDownloadFormat: string;
 
   constructor(
     private globals: Globals,
@@ -67,14 +72,17 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.selectedTemplateName = 'Select Bulk Invoice Template';
     this.selectedCreateSchoolYear = 'Select Academic Year';
     this.selectedScope = 'Select billing period';
-
-    this.reportsService.getInvoicesBulk(null).subscribe(
+    this.spinnerMsg = 'Loading bulk invoices.  Please wait...';
+    this.ngxSpinnerService.show();
+    this.reportsService.getBulkInvoices(null).subscribe(
       data => {
         console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
         this.bulkReports = this.allBulkReports = data['reports'];
+        this.ngxSpinnerService.hide();
       },
       error => {
         console.log('InvoicesListComponent.ngOnInit(): error is ', error);
+        this.ngxSpinnerService.hide();
       }
     );
 
@@ -138,18 +146,26 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   refreshInvoices(): void {
-   this.reportsService.getReportsByInfo({
-     'Type': ReportType.Invoice,
-     'Name': '', 'Approved': null,
-     'SchoolYear': null}).subscribe(
-      data => {
-        console.log(`InvoicesListComponent.refreshInvoices(): data is ${data}.`);
-        this.bulkReports = this.allBulkReports = data['reports'];
-      },
-      error => {
-        console.log(`InvoicesListComponent.refreshInvoices(): error is ${error}.`);
-      }
-    );
+    this.spinnerMsg = 'Loading bulk invoices.  Please wait...';
+    this.ngxSpinnerService.show();
+    this.reportsService.getReportsByInfo({
+      'Type': ReportType.Invoice,
+      'Name': '', 'Approved': null,
+      'SchoolYear': null}).subscribe(
+        data => {
+          console.log(`InvoicesListComponent.refreshInvoices(): data is ${data}.`);
+          this.ngxSpinnerService.hide();
+          this.bulkReports = this.allBulkReports = data['reports'];
+        },
+        error => {
+          this.ngxSpinnerService.hide();
+          console.log(`InvoicesListComponent.refreshInvoices(): error is ${error}.`);
+        }
+      );
+  }
+
+  setSelectedDownloadFormat(format: string): void {
+    this.selectedDownloadFormat = format;
   }
 
   listDisplayableFields() {
@@ -207,6 +223,8 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   create(): void {
+    this.spinnerMsg = 'Creating bulk invoice.  Please wait...';
+    this.ngxSpinnerService.show();
     this.reportsService.createBulkInvoice(
       {
         'schoolYear': this.selectedCreateSchoolYear.replace(/\s+/g, ''),
@@ -232,6 +250,51 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     );
   }
 
+  displayDownloadFormatDialog(downloadFormatContent, report: Report): void {
+    const modal = this.ngbModal.open(downloadFormatContent, { centered: true, size: 'sm' });
+    modal.result.then(
+      (result) => {
+        console.log('InvoicesListComponent.displayDownloadFormatDialog(): result is ', result);
+        this.downloadInvoiceByFormat(report, this.selectedDownloadFormat);
+      },
+      (reason) => {
+        console.log('InvoicesListComponent.displayDownloadFormatDialog(): reason is ', reason);
+      }
+    );
+  }
+
+  public downloadActivityByFormat(report: Report, format: string) {
+    this.reportsService.getReportStudentActivityDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
+      data => {
+        console.log('InvoiceListComponent.downloadStudentActivityByFormat():  data is ', data);
+        if (format.toLowerCase().includes('excel')) {
+          this.fileSaverService.saveStudentActivityAsExcelFile(data, report);
+        } else {
+          this.fileSaverService.saveStudentActivityAsPDFFile(data, report);
+        }
+      },
+      error => {
+        console.log('InvoiceListComponent.downloadStudentActivityByFormat():  error is ', error);
+      }
+    );
+  }
+
+  public downloadInvoiceByFormat(report: Report, format: string) {
+    this.reportsService.getReportInvoiceByDataFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
+      data => {
+        console.log('InvoiceListComponent.downloadInvoiceByFormat():  data is ', data);
+        if (format.toLowerCase().includes('excel')) {
+          this.fileSaverService.saveInvoiceAsExcelFile(data, report);
+        } else {
+          this.fileSaverService.saveInvoiceAsPDFFile(data, report);
+        }
+      },
+      error => {
+        console.log('InvoiceListComponent.downloadInvoiceByFormat():  error is ', error);
+      }
+    );
+  }
+
   displayCreateBulkInvoiceDialog(bulkCreateContent): void {
     const modal = this.ngbModal.open(bulkCreateContent, { centered: true, size: 'sm' });
     modal.result.then(
@@ -241,29 +304,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       },
       (reason) => {
         console.log('InvoicesListComponent.createBulkInvoice(): reason is ', reason);
-      }
-    );
-  }
-
-  downloadInvoiceStudentActivity(invoice: Report) {
-    // WDM - 07/02/2018
-    // this defines a modal dialog that was designed to present the Excel spreadsheet as a preview.
-    // current time constraints preclude implementation, but we eventually want to come back to this.
-    // const modal = this.ngbModal.open(InvoicePreviewFormComponent, { centered: true, size: 'lg' });
-    // modal.componentInstance.invoices = [invoice];
-    // modal.result.then(
-    //   (result) => {
-    //   },
-    //   (reason) => {
-    //   }
-    // )
-    this.reportsService.getInvoiceStudentActivityDataByName(invoice.name).subscribe(
-      data => {
-        console.log('InvoiceListComponent().downloadInvoiceStudentActivity():  data is ', data);
-        this.fileSaverService.saveStudentActivityAsExcelFile(data, invoice);
-      },
-      error => {
-        console.log('InvoiceListComponent().downloadInvoiceStudentActivity():  error is ', error);
       }
     );
   }
@@ -314,7 +354,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
   doDownload() {
     if (this.downloadType === 'invoices') {
-      this.reportsService.getInvoicesBulk(
+      this.reportsService.getBulkInvoices(
         this.selectedDownloadSchoolYear).subscribe(
           data => {
             console.log('InvoicesListComponent.doDownload(): data is ', data);

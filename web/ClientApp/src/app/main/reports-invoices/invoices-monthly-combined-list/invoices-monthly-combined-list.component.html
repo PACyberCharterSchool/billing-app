@@ -38,15 +38,13 @@
             {{k | normalizeFieldName}}
             <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
           </th>
-          <th>Preview</th>
           <th>Download</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor='let report of bulkReports | orderBy: {property: property, direction: direction}'>
           <td *ngFor='let v of listDisplayableValues(report)'>{{v | normalizeFieldValue}}</td>
-          <td><button type='button' class='btn btn-primary' (click)='downloadInvoiceStudentActivity(report)'>Preview</button></td>
-          <td><button type='button' class='btn btn-primary' (click)='downloadInvoice(report)'>Download</button></td>
+          <td><button type='button' class='btn btn-primary' (click)='displayDownloadFormatDialog(downloadFormatContent, report)'>Download</button></td>
         </tr>
       </tbody>
     </table>
@@ -107,6 +105,32 @@
             <button type='submit' class='btn btn-primary'>CREATE</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+  <div class='modal-footer'>
+  </div>
+</ng-template>
+<ng-template #downloadFormatContent let-c='close' let-d='dismiss'>
+  <div class='modal-header'>
+    <h4 class='modal-title'>Download as...</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class='modal-body'>
+    <div class='row align-items-center'>
+      <div class='col-12 text-center'>
+        <div ngbDropdown class="d-inline-block">
+          <button type='button' class="btn btn-outline-primary" id="dropdownDownloadFormat" ngbDropdownToggle>Format type</button>
+          <div ngbDropdownMenu aria-labelledby="dropdownDownloadFormat">
+            <button type='button' class='dropdown-item' *ngFor='let format of downloadFormats' (click)=setSelectedDownloadFormat(format)>{{format}}</button>
+          </div>
+        </div>
+      </div>
+      <div class='form-group offset-2'>
+        <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
+        <button type='button' class='btn btn-primary' (click)='c("Selected")'>SELECT</button>
       </div>
     </div>
   </div>

@@ -104,7 +104,7 @@ export class ReportsService {
     return this.httpClient.get<any>(url, this.headers);
   }
 
-  public getInvoicesBulk(year: string): Observable<any> {
+  public getBulkInvoices(year: string): Observable<any> {
     let reportInfo: Object = Object.assign({}, {'Type': ReportType.BulkInvoice});
 
     if (year) { reportInfo['SchoolYear'] = year; }
@@ -183,6 +183,11 @@ export class ReportsService {
   public getReportByName(name: string): Observable<Report> {
     const url = this.apiReportsUrl + `/${name}`;
     return this.httpClient.get<Report>(url, this.headers);
+  }
+
+  // HTTP POST /api/activity/bulk
+  public createBulkActivity(activityInfo: Object): Observable<Report> {
+    return Observable.of(null);
   }
 
   // HTTP GET /api/activity/bulk
