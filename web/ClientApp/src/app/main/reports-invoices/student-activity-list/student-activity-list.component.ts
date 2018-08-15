@@ -26,6 +26,7 @@ export class StudentActivityListComponent implements OnInit {
   public selectedScope: string;
   public selectedCreateSchoolYear: string;
   public spinnerMsg: string;
+  public selectedAsOfBillingDate: Date;
 
   constructor(
     private utilitiesService: UtilitiesService,
@@ -62,28 +63,31 @@ export class StudentActivityListComponent implements OnInit {
   refreshActivityReports(): void {
   }
 
+  generateBulkActivityName(year: string, scope: string): void {
+  }
+
   create(): void {
-    // this.reportsService.createBulkActivity(
-    //   {
-    //     'schoolYear': this.selectedCreateSchoolYear,
-    //     'name': this.generateBulkActivityName(this.selectedCreateSchoolYear, this.selectedScope),
-    //     'bulkInvoice': {
-    //       'asOf': this.selectedAsOfBillingDate,
-    //       'toSchoolDistrict': this.selectedAsOfBillingDate,
-    //       'toPDE': this.selectedAsOfBillingDate
-    //     }
-    //   }
-    // ).subscribe(
-    //   data => {
-    //     console.log('InvoicesMonthlyCombinedListComponent.create(): data is ', data['reports']);
-    //     this.ngxSpinnerService.hide();
-    //     this.refreshActivityReports();
-    //   },
-    //   error => {
-    //     console.log('InvoicesMonthlyCombinedListComponent.create(): error is ', error);
-    //     this.ngxSpinnerService.hide();
-    //   }
-    // );
+    this.reportsService.createBulkActivity(
+      {
+        'schoolYear': this.selectedCreateSchoolYear,
+        'name': this.generateBulkActivityName(this.selectedCreateSchoolYear, this.selectedScope),
+        'bulkInvoice': {
+          'asOf': this.selectedAsOfBillingDate,
+          'toSchoolDistrict': this.selectedAsOfBillingDate,
+          'toPDE': this.selectedAsOfBillingDate
+        }
+      }
+    ).subscribe(
+      data => {
+        console.log('InvoicesMonthlyCombinedListComponent.create(): data is ', data['reports']);
+        this.ngxSpinnerService.hide();
+        this.refreshActivityReports();
+      },
+      error => {
+        console.log('InvoicesMonthlyCombinedListComponent.create(): error is ', error);
+        this.ngxSpinnerService.hide();
+      }
+    );
   }
 
   displayCreateBulkActivityDialog(bulkCreateContent): void {
