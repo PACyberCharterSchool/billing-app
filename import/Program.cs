@@ -12,6 +12,7 @@ using CsvHelper;
 using dotenv.net;
 
 using models;
+using System.Text.RegularExpressions;
 
 namespace import
 {
@@ -43,12 +44,62 @@ namespace import
 			var path = Path.Combine(Environment.CurrentDirectory, importDir);
 			var watcher = new FileSystemWatcher(path, importGlob);
 			watcher.Created += HandleFileChange;
+			watcher.Changed += HandleFileChange;
 			watcher.EnableRaisingEvents = true;
 
 			Console.WriteLine($"Watching directory {path} for '{importGlob}'...");
 			Console.CancelKeyPress += OnExit;
 			_closing.WaitOne();
 		}
+
+		private static (int First, int Second) GetYears(DateTime now)
+		{
+			if (now.Month >= 7)
+				return (now.Year, now.Year + 1);
+			else
+				return (now.Year - 1, now.Year);
+		}
+
+		private static string GetReconScope()
+		{
+			var now = DateTime.Now;
+			var (first, second) = GetYears(now);
+
+			return $"{first.ToString("0000")}-{second.ToString("0000")}";
+		}
+
+		private static string GetMonthlyScope(PacBillContext _context)
+		{
+			var now = DateTime.Now;
+			var (first, second) = GetYears(now);
+
+			var last = _context.StudentRecordsHeaders.
+				OrderBy(h => h.Scope).
+				Where(h => Regex.IsMatch(h.Scope, @"^\d{4}\.\d{2}$")).
+				Where(h =>
+					String.Compare(h.Scope, $"{first.ToString("0000")}.08") == 1 &&
+					String.Compare(h.Scope, $"{second.ToString("0000")}.08") == -1).
+				LastOrDefault();
+			if (last == null)
+				return $"{now.Year.ToString("0000")}.09";
+
+			Console.WriteLine($"last.Scope: {last.Scope}");
+
+			var month = int.Parse(last.Scope.Substring(last.Scope.Length - 2));
+			var year = int.Parse(last.Scope.Substring(0, 4));
+			if (month >= 12)
+			{
+				month = 0;
+				year = now.Year + 1;
+			}
+
+			if (!last.Locked)
+				return $"{year.ToString("0000")}.{(month).ToString("00")}";
+			else
+				return $"{year.ToString("0000")}.{(++month).ToString("00")}";
+		}
+
+		private static bool IsRecon(string filename) => filename.ToLower().Contains("recon");
 
 		private static AutoResetEvent _processing = new AutoResetEvent(true);
 		private static PacBillContext _context;
@@ -65,18 +116,27 @@ namespace import
 
 				using (var tx = _context.Database.BeginTransaction())
 				{
-					// TODO(Erik): figure out how scope is actually derived; monthly vs recon
-					var scope = $"{DateTime.Now.Year.ToString("0000")}.{DateTime.Now.Month.ToString("00")}";
+					string scope;
+					if (IsRecon(e.Name))
+						scope = GetReconScope();
+					else
+						scope = GetMonthlyScope(_context);
+
+					Console.WriteLine($"Scope: {scope}");
+
 					var header = _context.StudentRecordsHeaders.Include(r => r.Records).SingleOrDefault(h => h.Scope == scope);
 					if (header != null)
 					{
-						if (header.Locked)
+						if (!header.Locked)
 						{
-							Console.WriteLine($"Data for {scope} has already been imported and locked. Aborting import.");
-							return;
+							Console.WriteLine($"Data for {scope} exists and is not locked. Overwriting.");
+							_context.Remove(header);
 						}
 						else
-							_context.Remove(header);
+						{
+							Console.WriteLine($"Data for {scope} exists and is locked. Aborting import.");
+							return;
+						}
 					}
 					else
 					{
