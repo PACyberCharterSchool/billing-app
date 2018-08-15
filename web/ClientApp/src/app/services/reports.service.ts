@@ -47,7 +47,7 @@ export class ReportsService {
   // HTTP GET /api/reports/activity/name
   public getReportStudentActivityDataByFormat(report: Report, format: string): Observable<any> {
     const url = this.apiReportsUrl + `/activity/name?Name=${report.name}&Format=${format}`;
-    let headers = {};
+    const headers = {};
     headers['responseType'] = 'arrayBuffer';
     headers['headers'] = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ export class ReportsService {
   // HTTP GET /api/reports/invoice/name
   public getReportInvoiceByDataFormat(report: Report, format: string): Observable<ArrayBuffer> {
     const url = this.apiReportsUrl + `/invoice/name?Name=${report.name}&Format=${format}`;
-    let headers = {};
+    const headers = {};
     headers['responseType'] = 'arrayBuffer';
     headers['headers'] = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -90,7 +90,7 @@ export class ReportsService {
   }
 
   public getInvoices(name: string, year: string, approved: boolean): Observable<Report[]> {
-    let reportInfo: Object = Object.assign({}, {'Type': ReportType.Invoice});
+    const reportInfo: Object = Object.assign({}, {'Type': ReportType.Invoice});
 
     if (name) { reportInfo['Name'] = name; }
     if (year) { reportInfo['SchoolYear'] = year; }
@@ -105,7 +105,7 @@ export class ReportsService {
   }
 
   public getBulkInvoices(year: string): Observable<any> {
-    let reportInfo: Object = Object.assign({}, {'Type': ReportType.BulkInvoice});
+    const reportInfo: Object = Object.assign({}, {'Type': ReportType.BulkInvoice});
 
     if (year) { reportInfo['SchoolYear'] = year; }
 
@@ -113,7 +113,7 @@ export class ReportsService {
   }
 
   public getInvoiceByName(name: string): Observable<any> {
-    let headers = {};
+    const headers = {};
     headers['responseType'] = 'arrayBuffer';
     headers['headers'] = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -130,7 +130,7 @@ export class ReportsService {
   }
 
   public getInvoiceStudentActivityDataBulk(year: string, approved: boolean): Observable<any> {
-    let reportInfo: Object = Object.assign({}, {'Type': ReportType.Invoice});
+    const reportInfo: Object = Object.assign({}, {'Type': ReportType.Invoice});
 
     if (year) { reportInfo['SchoolYear'] = year; }
     if (approved != null) { reportInfo['Approved'] = approved; }
@@ -139,7 +139,7 @@ export class ReportsService {
   }
 
   public getInvoiceStudentActivityDataByName(name: string): Observable<any> {
-    let headers = {};
+    const headers = {};
     headers['responseType'] = 'arrayBuffer';
     headers['headers'] = new HttpHeaders({
       'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ export class ReportsService {
 
   public getBulkInvoiceByInfo(reportInfo: Object): Observable<any> {
     let url = this.apiReportsUrl;
-    let headers = {};
+    const headers = {};
     headers['headers'] = new HttpHeaders({
       'Content-Type': 'application/json',
       'Accept': 'application/json'
@@ -166,7 +166,7 @@ export class ReportsService {
 
   public getInvoiceStudentActivityDataBulkByInfo(reportInfo: Object): Observable<any> {
     let url = this.apiReportsUrl + '/activity';
-    let headers = {};
+    const headers = {};
     headers['responseType'] = 'arrayBuffer';
     headers['headers'] = new HttpHeaders({
       'Content-Type': 'application/json',
