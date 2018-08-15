@@ -128,7 +128,7 @@ export class InvoicesListComponent implements OnInit {
   listDisplayableFields() {
     if (this.allReports) {
       const fields = this.utilitiesService.objectKeys(this.allReports[0]);
-      const rejected = ['data', 'xlsx', 'type', 'id'];
+      const rejected = ['data', 'xlsx', 'type', 'id', 'pdf'];
       return fields.filter((i) => !rejected.includes(i));
     }
   }
@@ -223,6 +223,10 @@ export class InvoicesListComponent implements OnInit {
     );
   }
 
+  setSelectedDownloadFormat(format: string): void {
+    this.selectedDownloadFormat = format;
+  }
+
   downloadInvoice(invoice: Report) {
     this.reportsService.getInvoiceByName(invoice.name).subscribe(
       data => {
@@ -297,7 +301,6 @@ export class InvoicesListComponent implements OnInit {
   }
 
   public downloadActivityByFormat(report: Report, format: string) {
-    this.selectedDownloadFormat = format;
     this.reportsService.getReportStudentActivityDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
         console.log('InvoiceListComponent.downloadStudentActivityByFormat():  data is ', data);
@@ -314,7 +317,6 @@ export class InvoicesListComponent implements OnInit {
   }
 
   public downloadInvoiceByFormat(report: Report, format: string) {
-    this.selectedDownloadFormat = format;
     this.reportsService.getReportInvoiceByDataFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
         console.log('InvoiceListComponent.downloadInvoiceByFormat():  data is ', data);
@@ -327,6 +329,23 @@ export class InvoicesListComponent implements OnInit {
       },
       error => {
         console.log('InvoiceListComponent.downloadInvoiceByFormat():  error is ', error);
+      }
+    );
+  }
+
+  displayDownloadFormatDialog(downloadFormatContent, type: string, report: Report): void {
+    const modal = this.ngbModal.open(downloadFormatContent, { centered: true, size: 'sm' });
+    modal.result.then(
+      (result) => {
+        console.log('InvoicesListComponent.displayDownloadFormatDialog(): result is ', result);
+        if (type === 'activity') {
+          this.downloadActivityByFormat(report, this.selectedDownloadFormat);
+        } else {
+          this.downloadInvoiceByFormat(report, this.selectedDownloadFormat);
+        }
+      },
+      (reason) => {
+        console.log('InvoicesListComponent.displayDownloadFormatDialog(): reason is ', reason);
       }
     );
   }

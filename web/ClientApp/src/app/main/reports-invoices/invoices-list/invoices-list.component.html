@@ -54,20 +54,24 @@
         <tr *ngFor='let report of reports | orderBy: {property: property, direction: direction}'>
           <td *ngFor='let v of listDisplayableValues(report)'>{{v | normalizeFieldValue}}</td>
           <td>
-            <div ngbDropdown class="d-inline-block">
-              <button class="btn btn-outline-primary" id="dropdownActivityDownloadFormat" ngbDropdownToggle>{{selectedDownloadFormat}}</button>
+            <!-- <div ngbDropdown class="d-inline-block">
+              <button class="btn btn-outline-primary" id="dropdownActivityDownloadFormat" ngbDropdownToggle>Download as...</button>
               <div ngbDropdownMenu aria-labelledby="dropdownActivityDownloadFormat">
-                <button class='dropdown-item' *ngFor='let format of downloadFormats' (click)='downloadActivityByFormat(report, format)'>{{format}}</button>
+                <button class='dropdown-item' (click)='downloadInvoiceByFormat(report, "excel")'>Microsoft Excel</button>
+                <button class='dropdown-item' (click)='downloadInvoiceByFormat(report, "pdf")'>PDF</button>
               </div>
-            </div>
+            </div> -->
+            <button class='dropdown-item btn btn-primary' (click)='displayDownloadFormatDialog(downloadFormatContent, "activity", report)'>Download</button>
           </td>
           <td>
-            <div ngbDropdown class="d-inline-block">
-              <button class="btn btn-outline-primary" id="dropdownInvoiceDownloadFormat" ngbDropdownToggle>{{selectedDownloadFormat}}</button>
+            <!-- <div ngbDropdown class="d-inline-block">
+              <button class="btn btn-outline-primary" id="dropdownInvoiceDownloadFormat" ngbDropdownToggle>Download as...</button>
               <div ngbDropdownMenu aria-labelledby="dropdownInvoiceDownloadFormat">
-                <button class='dropdown-item' *ngFor='let format of downloadFormats' (click)='downloadInvoiceByFormat(report, format)'>{{format}}</button>
+                <button class='dropdown-item' (click)='downloadInvoiceByFormat(report, "excel")'>Microsoft Excel</button>
+                <button class='dropdown-item' (click)='downloadInvoiceByFormat(report, "pdf")'>PDF</button>
               </div>
-            </div>
+            </div> -->
+            <button class='dropdown-item btn btn-primary' (click)='displayDownloadFormatDialog(downloadFormatContent, "invoice", report)'>Download</button>
           </td>
         </tr>
       </tbody>
@@ -82,3 +86,30 @@
   </div>
 </div>
 <ngx-spinner size='large' loadingText='Generating PACBILL invoices.  Please wait...' type='timer'></ngx-spinner>
+<ng-template #downloadFormatContent let-c='close' let-d='dismiss'>
+  <div class='modal-header'>
+    <h4 class='modal-title'>Download as...</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class='modal-body'>
+    <div class='row align-items-center'>
+      <div class='col-12 text-center'>
+        <div ngbDropdown class="d-inline-block">
+          <button type='button' class="btn btn-outline-primary" id="dropdownDownloadFormat" ngbDropdownToggle>Format type</button>
+          <div ngbDropdownMenu aria-labelledby="dropdownDownloadFormat">
+            <button type='button' class='dropdown-item' *ngFor='let format of downloadFormats' (click)=setSelectedDownloadFormat(format)>{{format}}</button>
+          </div>
+        </div>
+      </div>
+      <div class='form-group offset-2'>
+        <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
+        <button type='button' class='btn btn-primary' (click)='c("Selected")'>SELECT</button>
+      </div>
+    </div>
+  </div>
+  <div class='modal-footer'>
+  </div>
+</ng-template>
+

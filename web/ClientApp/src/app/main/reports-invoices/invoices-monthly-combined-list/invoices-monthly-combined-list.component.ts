@@ -155,7 +155,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   listDisplayableFields() {
     if (this.allBulkReports) {
       const fields = this.utilitiesService.objectKeys(this.allBulkReports[0]);
-      const rejected = ['data', 'xlsx', 'type', 'id'];
+      const rejected = ['data', 'xlsx', 'type', 'id', 'pdf'];
       return fields.filter((i) => !rejected.includes(i));
     }
   }

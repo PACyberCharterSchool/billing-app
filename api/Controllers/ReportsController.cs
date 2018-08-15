@@ -348,7 +348,7 @@ namespace api.Controllers
         {
           Type = ReportType.Invoice,
           Name = create.Name,
-          SchoolYear = GenerateSchoolYear(create.Invoice.Scope),
+          SchoolYear = create.Invoice.Scope != null && create.Invoice.Scope.Length > 0 ? GenerateSchoolYear(create.Invoice.Scope) : create.SchoolYear,
           Approved = false,
           Created = time,
           Data = data,
