@@ -24,6 +24,9 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.2"/>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Aspose.Cells.lic" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\models\models.csproj"/>
   </ItemGroup>
 </Project>
