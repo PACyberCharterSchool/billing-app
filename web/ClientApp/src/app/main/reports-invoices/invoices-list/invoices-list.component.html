@@ -25,15 +25,17 @@
   </div>
 </div>
 <div class='row invoices-action-row align-items-center'>
-  <div class='col-7'>
+  <div class='col-auto'>
+    <button type='button' class='btn btn-primary' (click)='createInvoice()'>CREATE</button>
+    <button type='button' class='btn btn-primary' (click)='createInvoices()'>BULK CREATE</button>
     <button type='button' class='btn btn-outline-primary' (click)='approveInvoices()'>
       APPROVE INVOICES
     </button>
   </div>
-  <div class='col-5 create-invoice-col'>
+  <!-- <div class='col-5 create-invoice-col'>
     <button type='button' class='btn btn-primary' (click)='createInvoice()'>CREATE</button>
     <button type='button' class='btn btn-primary' (click)='createInvoices()'>BULK CREATE</button>
-  </div>
+  </div> -->
 </div>
 <div class='row invoices-list-row align-items-center'>
   <div class='col-12 invoices-list-col'>

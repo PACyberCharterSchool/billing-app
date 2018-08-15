@@ -26,14 +26,11 @@
       </div>
     </div>
   </div>
-  <div class='col-auto'>
-    <button class='btn btn-primary' (click)='handleCommitClick()'>COMMIT</button>
-  </div>
 </div>
 <div class='row advanced-search-tools-row align-items-center' *ngIf="advancedSearchEnabled">
-  <!-- <div class='col-auto'> -->
+  <div class='col-auto'>
     <app-student-advanced-filter [schoolDistricts]='schoolDistricts' (studentsUpdated)='studentsUpdatedHandler($event)'></app-student-advanced-filter>
-  <!-- </div> -->
+  </div>
 </div>
 <div class='row student-list-view-row'>
   <ngx-spinner size='large' loadingText='Retrieving student records for scope {{currentScope}} from PACBill database.  Please wait...' type='timer'></ngx-spinner>
@@ -53,4 +50,5 @@
         </tr>
       </tbody>
     </table>
+  </div>
 </div>

@@ -38,7 +38,7 @@ export class StudentsListComponent implements OnInit {
   private selectedStudent: StudentRecord;
   private skip: number;
   private retrievingStudents: boolean;
-  public column: any;
+  public canEdit: boolean;
 
   constructor(
     private globals: Globals,
@@ -145,6 +145,7 @@ export class StudentsListComponent implements OnInit {
     this.studentRecordsService.getStudentRecordsHeaderByScope(this.currentScope, this.skip).subscribe(
       data => {
         this.studentRecords = data['header']['records'];
+        this.canEdit = data['header']['locked'];
         console.log('AdministrationImportStudentDataComponent.ngOnInit():  data is ', data);
         this.spinnerService.hide();
       },
@@ -175,9 +176,11 @@ export class StudentsListComponent implements OnInit {
 
   showStudentDetails(studentRecord: StudentRecord) {
     console.log('StudentsListComponent.showStudentDetails():  studentId is ', studentRecord.id);
-    const s: StudentRecord = this.studentRecords.find((student) => student.id === studentRecord.id);
-    this.currentStudentService.changeStudent(s);
-    this.router.navigate(['/students', { id: studentRecord.id, outlets: {'action': [`${studentRecord.id}`]} }]);
+    if (this.canEdit) {
+      const s: StudentRecord = this.studentRecords.find((student) => student.id === studentRecord.id);
+      this.currentStudentService.changeStudent(s);
+      this.router.navigate(['/students', { id: studentRecord.id, outlets: {'action': [`${studentRecord.id}`]} }]);
+    }
   }
 
   toggleAdvancedSearchTools() {

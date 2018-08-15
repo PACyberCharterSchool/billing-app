@@ -22,6 +22,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
   public scopes: string[];
   public currentScope: string;
   private skip;
+  public canCommit: boolean;
 
   constructor(
     private globals: Globals,
@@ -31,6 +32,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
     private spinnerService: NgxSpinnerService
   ) {
     this.skip = 0;
+    this.canCommit = true;
   }
 
   ngOnInit() {
@@ -71,6 +73,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
         this.studentRecords = data['header']['records'];
         console.log('AdministrationImportStudentDataComponent.ngOnInit():  data is ', data);
         this.spinnerService.hide();
+        this.canCommit = !data['header']['locked'];
       },
       error => {
         console.log('AdministrationImportStudentDataComponent.ngOnInit():  error is ', error);

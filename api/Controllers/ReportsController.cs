@@ -279,6 +279,26 @@ namespace api.Controllers
       }
     }
 
+    private string GenerateSchoolYear(string scope)
+    {
+      string year;
+
+      if (scope.Contains(@"\d{4}-\d{4}")) {
+        year = scope;
+      }
+      else {
+        var components = scope.Split('.');
+        if (new[] { 7, 8, 9, 10, 11, 12}.Contains(int.Parse(components[1]))) {
+          year = $"{components[0] + 1}-{components[0]}";
+        }
+        else {
+          year = $"{components[0]}-{components[0] + 1}";
+        }
+      }
+
+      return year;
+    } 
+
     private Report CreateInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
     {
       // get reporter
@@ -328,6 +348,7 @@ namespace api.Controllers
         {
           Type = ReportType.Invoice,
           Name = create.Name,
+          SchoolYear = GenerateSchoolYear(create.Invoice.Scope),
           Approved = false,
           Created = time,
           Data = data,

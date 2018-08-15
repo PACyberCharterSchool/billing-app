@@ -4,16 +4,16 @@
   </div>
   <div class='col'>
     <div ngbDropdown class="d-inline-block">
-      <button class="btn btn-outline-primary" id="dropdownStudentRecordScope" ngbDropdownToggle>{{currentScope}}</button>
-      <div ngbDropdownMenu aria-labelledby="dropdownStudentRecordScope">
-        <button class='dropdown-item' *ngFor='let scope of scopes' (click)='filterByStudentRecordScope(scope)'>{{scope}}</button>
+      <button type='button' class="btn btn-outline-primary" id="dropdownSelectTemplateType" ngbDropdownToggle>{{currentScope}}</button>
+      <div ngbDropdownMenu aria-labelledby="dropdownSelectTemplateType">
+        <button type='button' class='dropdown-item' *ngFor='let scope of scopes' (click)='filterByStudentRecordScope(scope)'>{{scope}}</button>
       </div>
     </div>
   </div>
   <div class='col-4'>
     <div class='col-8 offset-4' *ngIf='pendingStudentStatusRecords?.length !== 0'>
       <button type='button' class='btn' (click)='handleCancelClick()'>CANCEL</button>
-      <button type='button' class='btn btn-primary' (click)='handleCommitClick()'>COMMIT</button>
+      <button type='button' class='btn btn-primary' (click)='handleCommitClick()' [disabled]='!canCommit'>COMMIT</button>
     </div>
   </div>
 </div>

@@ -180,9 +180,15 @@ export class ReportsService {
     return this.httpClient.get<any>(url, headers);
   }
 
-
   public getReportByName(name: string): Observable<Report> {
     const url = this.apiReportsUrl + `/${name}`;
     return this.httpClient.get<Report>(url, this.headers);
+  }
+
+  // HTTP GET /api/activity/bulk
+  public getBulkActivity(invoiceInfo: Object): Observable<Report> {
+    invoiceInfo = Object.assign(invoiceInfo, { 'reportType': 'StudentInformation' });
+    const url = this.apiReportsUrl + '/bulk';
+    return this.httpClient.post<any>(url, invoiceInfo, this.headers);
   }
 }

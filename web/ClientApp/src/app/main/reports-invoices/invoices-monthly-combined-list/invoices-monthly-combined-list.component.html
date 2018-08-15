@@ -61,7 +61,7 @@
 </div>
 <ng-template #bulkCreateContent let-c='close' let-d='dismiss'>
   <div class='modal-header'>
-    <h4 class='modal-title'>Create Bulk Invoice</h4>
+    <h4 class='modal-title'>Create Combined Invoice</h4>
     <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -80,12 +80,20 @@
           </div>
           <div class='form-group'>
             <div ngbDropdown class="d-inline-block">
+              <button type='button' class="btn btn-outline-primary" id="dropdownScopes" ngbDropdownToggle>{{selectedScope}}</button>
+              <div ngbDropdownMenu aria-labelledby="dropdownScopes">
+                <button type='button' class='dropdown-item' *ngFor='let scope of scopes' (click)='selectScope(scope)'>{{scope}}</button>
+              </div>
+            </div>
+          </div>
+          <!-- <div class='form-group'>
+            <div ngbDropdown class="d-inline-block">
               <button type='button' class="btn btn-outline-primary" id="dropdownDownloadSchoolYear" ngbDropdownToggle>{{selectedAsOfBillingDate}}</button>
               <div ngbDropdownMenu aria-labelledby="dropdownDownloadSchoolYear">
                 <button type='button' class='dropdown-item' *ngFor='let month of getInvoiceBillingMonths()' (click)='selectBillingMonth(month)'>{{month}}</button>
               </div>
             </div>
-          </div>
+          </div> -->
           <div class='form-group'>
             <div ngbDropdown class="d-inline-block">
               <button type='button' class="btn btn-outline-primary" id="dropdownTemplateType" ngbDropdownToggle>{{selectedTemplateName}}</button>

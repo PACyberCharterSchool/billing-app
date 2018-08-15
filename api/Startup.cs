@@ -24,6 +24,8 @@ using models;
 using models.Reporters;
 using models.Reporters.Exporters;
 
+using Aspose.Cells;
+
 namespace api
 {
 	public class Startup
@@ -155,6 +157,11 @@ namespace api
 				o.OperationFilter<EnumerationOperationFilter>();
 				o.OperationFilter<AuthorizeOperationFilter>();
 			});
+			#endregion
+
+			#region Aspose.Cells
+			Aspose.Cells.License license = new Aspose.Cells.License();
+			license.SetLicense("Aspose.Cells.lic");
 			#endregion
 
 			services.AddMvc().

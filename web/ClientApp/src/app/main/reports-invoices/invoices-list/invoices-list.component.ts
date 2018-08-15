@@ -164,11 +164,11 @@ export class InvoicesListComponent implements OnInit {
     modal.componentInstance.op = 'single';
     modal.result.then(
       (result) => {
-        console.log('InvoicesListComponent.createInvoices(): result is ', result);
+        console.log('InvoicesListComponent.createInvoice(): result is ', result);
         this.refreshInvoices();
       },
       (reason) => {
-        console.log('InvoicesListComponent.createInvoices(): reason is ', reason);
+        console.log('InvoicesListComponent.createInvoice(): reason is ', reason);
       }
     );
   }

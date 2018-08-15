@@ -8,6 +8,8 @@ import { ReportsService } from '../../../services/reports.service';
 import { UtilitiesService } from '../../../services/utilities.service';
 import { FileSaverService } from '../../../services/file-saver.service';
 import { TemplatesService } from '../../../services/templates.service';
+import { AcademicYearsService } from '../../../services/academic-years.service';
+import { StudentRecordsService } from '../../../services/student-records.service';
 
 import { InvoiceCreateFormComponent } from '../invoice-create-form/invoice-create-form.component';
 
@@ -35,7 +37,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     'Disapproved'
   ];
   private selectedCreateSchoolYear: string;
-  private selectedAsOfBillingDate: string;
   private selectedDownloadSchoolYear: string;
   private selectedDownloadStatus: string;
   private selectedTemplate: Template;
@@ -45,6 +46,9 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   private downloadType: string;
   private spinnerMsg: string;
   private templates: Template[];
+  public selectedScope: string;
+  public scopes: string[];
+  public selectedAsOfBillingDate: string;
 
   constructor(
     private globals: Globals,
@@ -53,14 +57,16 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     private fileSaverService: FileSaverService,
     private templatesService: TemplatesService,
     private ngxSpinnerService: NgxSpinnerService,
+    private academicYearsService: AcademicYearsService,
+    private studentRecordsService: StudentRecordsService,
     private ngbModal: NgbModal,
     private ngbActiveModal: NgbActiveModal
   ) { }
 
   ngOnInit() {
-    this.selectedAsOfBillingDate = 'Select As Of Billing Month';
     this.selectedTemplateName = 'Select Bulk Invoice Template';
     this.selectedCreateSchoolYear = 'Select Academic Year';
+    this.selectedScope = 'Select billing period';
 
     this.reportsService.getInvoicesBulk(null).subscribe(
       data => {
@@ -84,14 +90,23 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
     this.templatesService.getTemplates(this.skip).subscribe(
       data => {
-        console.log(`InvoiceCreateFormComponent.ngOnInit(): data is ${data}.`);
+        console.log(`InvoicesListComponent.ngOnInit(): data is ${data}.`);
         this.templates = data['templates'];
       },
       error => {
-        console.log(`InvoiceCreateFormComponent.ngOnInit(): error is ${error}.`);
+        console.log(`InvoicesListComponent.ngOnInit(): error is ${error}.`);
       }
     );
 
+    this.studentRecordsService.getStudentRecordsHeaders().subscribe(
+      data => {
+        console.log(`InvoicesListComponent.ngOnInit(): data is ${data}.`);
+        this.scopes = data['scopes'];
+      },
+      error => {
+        console.log(`InvoicesListComponent.ngOnInit(): error is ${error}.`);
+      }
+    );
     this.selectedFilterSchoolYear = 'School Year';
     this.selectedFilterStatus = 'Status';
   }
@@ -159,7 +174,17 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
   filterByApprovedStatus(status: string) {
     this.selectedFilterStatus = status;
-    this.bulkReports = this.allBulkReports.filter((r) => (r.type === ReportType.Invoice && r.approved === (status === 'Approved' ? true : false)));
+    this.bulkReports = this.allBulkReports.filter((r) => {
+      if (r.type === ReportType.Invoice &&
+        r.approved === (status === 'Approved')) {
+          return true;
+        }
+        return false;
+    });
+  }
+
+  selectScope(scope: string): void {
+    this.selectedScope = scope;
   }
 
   getInvoiceBillingMonths(): string[] {
@@ -172,24 +197,26 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   getSchoolYears(): string[] {
-    if (this.allReports) {
-      const years = this.allReports.filter((obj, pos, arr) => {
-        return arr.map(mo => mo['schoolYear']).indexOf(obj['schoolYear']) === pos;
-      });
-      return years.map(y => y.schoolYear);
-    }
+    // if (this.allReports) {
+    //   const years = this.allReports.filter((obj, pos, arr) => {
+    //     return arr.map(mo => mo['schoolYear']).indexOf(obj['schoolYear']) === pos;
+    //   });
+    //   return years.map(y => y.schoolYear);
+    // }
+    return this.academicYearsService.getAcademicYears();
   }
 
   create(): void {
     this.reportsService.createBulkInvoice(
       {
-        'schoolYear': this.selectedCreateSchoolYear,
-        'name': this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedAsOfBillingDate),
+        'schoolYear': this.selectedCreateSchoolYear.replace(/\s+/g, ''),
+        'name': this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedScope),
         'templateId': this.selectedTemplate.id,
         'bulkInvoice': {
           'asOf': this.selectedAsOfBillingDate,
           'toSchoolDistrict': this.selectedAsOfBillingDate,
-          'toPDE': this.selectedAsOfBillingDate
+          'toPDE': this.selectedAsOfBillingDate,
+          'scope': this.selectedScope
         }
       }
     ).subscribe(
@@ -246,7 +273,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       data => {
         console.log('InvoicesListComponent.downloadInvoice(): data is', data);
         invoice.xlsx = data;
-        this.fileSaverService.saveInvoiceAsExcelFile(invoice);
+        this.fileSaverService.saveInvoiceAsExcelFile(data, invoice);
       },
       error => {
         console.log('InvoicesListComponent.downloadInvoice(): error is', error);
@@ -355,11 +382,10 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   private getInvoicesBySchoolYearAndStatus(year: string, status: boolean): Report[] {
-    return this.allBulkReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year && r.approved == status));
+    return this.allBulkReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year && r.approved === status));
   }
 
   private filterBulkTemplates(): Template[] {
     return this.templates.filter(r => r.reportType === ReportType.BulkInvoice);
   }
-
 }
