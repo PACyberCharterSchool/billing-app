@@ -1,0 +1,87 @@
+.activity-title-row {
+  height: 62px;
+  padding-bottom: 5px;
+
+  h4 {
+    color: #58a917;
+  }
+
+  div {
+    input[type='text'] {
+      padding: 6px 2px;
+      line-height: 14px;
+      width: 70%;
+    }
+
+    input[type='text'] + button {
+      height: 2.37rem;
+      position: relative;
+      top: -2px;
+      left: -4px;
+    }
+
+    button.btn-outline-primary {
+      position: relative;
+      top: -2px;
+      left: -4px;
+    }
+  }
+}
+
+.activity-action-row {
+  height: 40px;
+  padding-bottom: 5px;
+}
+
+.activity-list-row {
+  height: calc(100% - 164px);
+  padding-bottom: 5px;
+
+  .activity-list-col {
+    height: 100%;
+
+    table {
+      height: 100%;
+
+      thead {
+        height: 60px;
+      }
+
+      tbody {
+        height: calc(100% - 60px);
+      }
+    }
+  }
+}
+
+.activity-footer-row {
+  height: 62px;
+}
+
+.modal-title {
+  color: #58a917;
+}
+
+.modal-body {
+  div.col-md-12 {
+    form {
+      div.form-group {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        div.d-inline-block {
+          width: 100%;
+
+          button {
+            width: 100%;
+          }
+
+          div {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

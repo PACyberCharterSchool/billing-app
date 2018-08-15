@@ -11,7 +11,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 @Component({
   selector: 'app-student-activity-list',
   templateUrl: './student-activity-list.component.html',
-  styleUrls: ['./student-activity-list.component.sass']
+  styleUrls: ['./student-activity-list.component.scss']
 })
 export class StudentActivityListComponent implements OnInit {
   private reports: Report[];
@@ -25,6 +25,7 @@ export class StudentActivityListComponent implements OnInit {
   public searchText: string;
   public selectedScope: string;
   public selectedCreateSchoolYear: string;
+  public spinnerMsg: string;
 
   constructor(
     private utilitiesService: UtilitiesService,
@@ -34,6 +35,7 @@ export class StudentActivityListComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.spinnerMsg = 'Loading bulk student activity reports.  Please wait...';
   }
 
   sort(property) {
@@ -84,7 +86,7 @@ export class StudentActivityListComponent implements OnInit {
     // );
   }
 
-  displayCreateBulkInvoiceDialog(bulkCreateContent): void {
+  displayCreateBulkActivityDialog(bulkCreateContent): void {
     const modal = this.ngbModal.open(bulkCreateContent, { centered: true, size: 'sm' });
     modal.result.then(
       (result) => {
