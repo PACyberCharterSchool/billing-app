@@ -498,10 +498,11 @@ namespace api.Controllers
 				if (sd != null)
 				{
 					var month = create.Invoice.AsOf.ToString("MMMM");
+          var stamp = new Random(DateTime.Now.Millisecond).Next();
 					reports.Add(CreateInvoice(now, invoiceTemplate, new CreateReport
 					{
 						ReportType = create.ReportType,
-						Name = $"{create.SchoolYear}_{sd.Name}_{month}-{create.Invoice.AsOf.Year}",
+						Name = $"{create.Invoice.Scope}_{sd.Name}_{stamp}",
 						SchoolYear = create.SchoolYear,
 						TemplateId = create.TemplateId,
 
