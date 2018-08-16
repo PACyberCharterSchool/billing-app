@@ -22,7 +22,7 @@ namespace import
 			Console.WriteLine($"Batch time: {batchTime}");
 
 			var csvReader = new CsvReader(reader);
-			csvReader.Configuration.RegisterClassMap<StudentStatusRecordClassMap>();
+			csvReader.Configuration.RegisterClassMap<StudentRecordClassMap>();
 
 			Console.WriteLine("Reading records...");
 			var count = 0;

@@ -22,9 +22,9 @@ namespace import
 		}
 	}
 
-	public class StudentStatusRecordClassMap : ClassMap<StudentRecord>
+	public class StudentRecordClassMap : ClassMap<StudentRecord>
 	{
-		public StudentStatusRecordClassMap()
+		public StudentRecordClassMap()
 		{
 			Map(m => m.SchoolDistrictId).Name("schooldistrict");
 			Map(m => m.SchoolDistrictName).Name("school_name");
