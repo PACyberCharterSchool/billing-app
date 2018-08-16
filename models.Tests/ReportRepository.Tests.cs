@@ -13,7 +13,7 @@ using models.Tests.Util;
 namespace models.Tests
 {
 	[TestFixture]
-	[Ignore("Cause tests suck")]
+	[Ignore("not now")]
 	public class ReportRepositoryTests
 	{
 		private PacBillContext _context;

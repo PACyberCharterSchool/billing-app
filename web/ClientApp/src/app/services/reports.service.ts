@@ -30,10 +30,11 @@ export class ReportsService {
   public getReportsByInfo(reportInfo: Object): Observable<Report[]> {
     let url = this.apiReportsUrl;
 
-    if (reportInfo['Type']) { url +=  `?Type=${reportInfo['Type']}`; }
+    if (reportInfo['Type']) { url +=  `?Type=${reportInfo['Type']}`; } // there will *always* be a Type
     if (reportInfo['Name']) { url += `&Name=${reportInfo['Name']}`; }
     if (reportInfo['SchoolYear']) { url += `&SchoolYear=${reportInfo['SchoolYear']}`; }
     if (reportInfo['Approved']) { url += `&Approved=${reportInfo['Approved']}`; }
+    if (reportInfo['Scope']) { url += `&Scope=${reportInfo['Scope']}`; }
 
     return this.httpClient.get<Report[]>(url, this.headers);
   }
@@ -89,12 +90,13 @@ export class ReportsService {
     return this.httpClient.post<any>(url, invoiceInfo, this.headers);
   }
 
-  public getInvoices(name: string, year: string, approved: boolean): Observable<Report[]> {
+  public getInvoices(name: string, year: string, scope: string, approved: boolean): Observable<Report[]> {
     const reportInfo: Object = Object.assign({}, {'Type': ReportType.Invoice});
 
     if (name) { reportInfo['Name'] = name; }
     if (year) { reportInfo['SchoolYear'] = year; }
     if (approved != null) { reportInfo['Approved'] = approved; }
+    if (scope) { reportInfo['Scope'] = scope; }
 
     return this.getReportsByInfo(reportInfo);
   }

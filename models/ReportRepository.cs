@@ -20,11 +20,13 @@ namespace models
 			string name = null,
 			ReportType type = null,
 			string year = null,
+			string scope = null,
 			bool? approved = null);
 		IList<ReportMetadata> GetManyMetadata( // TODO(Erik): skip take
 			string name = null,
 			ReportType type = null,
 			string year = null,
+			string scope = null,
 			bool? approved = null);
 		void Reject(string name);
 	}
@@ -66,7 +68,7 @@ namespace models
 		public Report CreateBulk(Report createBulk)
 		{
 			_reports.Add(createBulk);
-			return createBulk;	
+			return createBulk;
 		}
 
 		public Report Create(Report create) => Create(DateTime.Now, create);
@@ -79,6 +81,7 @@ namespace models
 			string name = null,
 			ReportType type = null,
 			string year = null,
+			string scope = null,
 			bool? approved = null)
 		{
 			var reports = _reports.AsQueryable();
@@ -92,6 +95,9 @@ namespace models
 			if (year != null)
 				reports = reports.Where(r => r.SchoolYear == year);
 
+			if (scope != null)
+				reports = reports.Where(r => r.Scope == scope);
+
 			if (approved != null)
 				reports = reports.Where(r => r.Approved == approved);
 
@@ -103,13 +109,15 @@ namespace models
 			string name = null,
 			ReportType type = null,
 			string year = null,
+			string scope = null,
 			bool? approved = null)
 		{
-			return GetMany(name, type, year, approved).Select(r => new ReportMetadata
+			return GetMany(name, type, year, scope, approved).Select(r => new ReportMetadata
 			{
 				Id = r.Id,
 				Type = r.Type,
 				SchoolYear = r.SchoolYear,
+				Scope = r.Scope,
 				Name = r.Name,
 				Approved = r.Approved,
 				Created = r.Created,

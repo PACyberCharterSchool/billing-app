@@ -10,6 +10,7 @@ import { UtilitiesService } from '../../../services/utilities.service';
 import { FileSaverService } from '../../../services/file-saver.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { TemplatesService } from '../../../services/templates.service';
+import { StudentRecordsService } from '../../../services/student-records.service';
 
 import { Globals } from '../../../globals';
 
@@ -49,6 +50,8 @@ export class InvoicesListComponent implements OnInit {
     'PDF'
   ];
   public selectedDownloadFormat: string;
+  public scopes: string[];
+  public selectedScope: string;
 
   constructor(
     private globals: Globals,
@@ -57,6 +60,7 @@ export class InvoicesListComponent implements OnInit {
     private fileSaverService: FileSaverService,
     private templatesService: TemplatesService,
     private ngxSpinnerService: NgxSpinnerService,
+    private studentRecordsService: StudentRecordsService,
     private ngbModal: NgbModal,
     private ngbActiveModal: NgbActiveModal
   ) { }
@@ -64,7 +68,17 @@ export class InvoicesListComponent implements OnInit {
   ngOnInit() {
     this.spinnerMsg = 'Loading invoices.  Please wait...';
     this.ngxSpinnerService.show();
-    this.reportsService.getInvoices(null, null, null).subscribe(
+
+    this.studentRecordsService.getStudentRecordsHeaders().subscribe(
+      data => {
+        this.scopes = data['scopes'];
+      },
+      error => {
+        console.log('InvoicesListComponent.ngInit():  error is ', error);
+      }
+    );
+
+    this.reportsService.getInvoices(null, null, null, null).subscribe(
       data => {
         console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
         this.reports = this.allReports = data['reports'];
@@ -89,6 +103,7 @@ export class InvoicesListComponent implements OnInit {
     this.selectedFilterSchoolYear = 'School Year';
     this.selectedFilterStatus = 'Status';
     this.selectedDownloadFormat = 'Download as...';
+    this.selectedScope = 'Select billing period...';
   }
 
   sort(property) {
@@ -148,9 +163,22 @@ export class InvoicesListComponent implements OnInit {
     return this.utilitiesService.objectValues(selected);
   }
 
-  filterBySchoolYear(year: string) {
-    this.selectedFilterSchoolYear = year;
-    this.reports = this.allReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year));
+  filterByScope(scope: string) {
+    this.selectedScope = scope;
+    this.spinnerMsg = `Retrieving invoices for the ${scope} billing period.  Please wait...`;
+    this.ngxSpinnerService.show();
+    this.reportsService.getInvoices(null, null, scope, null).subscribe(
+      data => {
+        console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
+        this.reports = this.allReports = data['reports'];
+        this.ngxSpinnerService.hide();
+      },
+      error => {
+        console.log('InvoicesListComponent.ngOnInit(): error is ', error);
+        this.ngxSpinnerService.hide();
+      }
+    );
+
   }
 
   filterByApprovedStatus(status: string) {

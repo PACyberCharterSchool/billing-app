@@ -120,7 +120,7 @@ namespace api.Tests.Controllers
 		}
 
 		[Test]
-    [Ignore("Why is this failing?")]
+		[Ignore("Why is this failing?")]
 		public async Task CreateCreatesInvoice()
 		{
 			// build config
@@ -397,14 +397,14 @@ namespace api.Tests.Controllers
 				234567890,
 				345678901
 			};
-//			_districts.Setup(ds => ds.GetManyAuns()).Returns(auns).Verifiable();
+			//			_districts.Setup(ds => ds.GetManyAuns()).Returns(auns).Verifiable();
 
-      var names = new[] {
-        "Test School 1 SD",
-        "Test School 2 SD",
-        "Test School 3 SD"
-      };
-      _districts.Setup(ds => ds.GetManyNames()).Returns(names).Verifiable();
+			var names = new[] {
+				"Test School 1 SD",
+				"Test School 2 SD",
+				"Test School 3 SD"
+			};
+			_districts.Setup(ds => ds.GetManyNames()).Returns(names).Verifiable();
 
 			// get reporter
 			var reporter = new Mock<IReporter<Invoice, InvoiceReporter.Config>>();
@@ -433,7 +433,7 @@ namespace api.Tests.Controllers
 					SchoolDistrict = new InvoiceSchoolDistrict
 					{
 						Aun = auns[0],
-            Name = names[0],
+						Name = names[0],
 					},
 					Students = new[] {
 						new InvoiceStudent(),
@@ -444,7 +444,7 @@ namespace api.Tests.Controllers
 					SchoolDistrict = new InvoiceSchoolDistrict
 					{
 						Aun = auns[1],
-            Name = names[1],
+						Name = names[1],
 					},
 					Students = new[] {
 						new InvoiceStudent(),
@@ -455,7 +455,7 @@ namespace api.Tests.Controllers
 					SchoolDistrict = new InvoiceSchoolDistrict
 					{
 						Aun = auns[2],
-            Name = names[2],
+						Name = names[2],
 					},
 					Students = new[] {
 						new InvoiceStudent(),
@@ -519,16 +519,16 @@ namespace api.Tests.Controllers
 
 			Assert.That(value, Is.TypeOf<ReportsController.ReportsResponse>());
 			var actuals = ((ReportsController.ReportsResponse)value).Reports;
-      // WDM 06-25-2018:  This needs fixed.
-//			Assert.That(actuals, Has.Count.EqualTo(auns.Length));
-//			for (var i = 0; i < auns.Length; i++)
-//				AssertReport(actuals[i], reports[i]);
+			// WDM 06-25-2018:  This needs fixed.
+			//			Assert.That(actuals, Has.Count.EqualTo(auns.Length));
+			//			for (var i = 0; i < auns.Length; i++)
+			//				AssertReport(actuals[i], reports[i]);
 
 			_districts.Verify();
-//			_reporters.Verify();
-//			reporter.Verify();
-//			_exporter.Verify();
-//			_reporters.Verify();
+			//			_reporters.Verify();
+			//			reporter.Verify();
+			//			_exporter.Verify();
+			//			_reporters.Verify();
 		}
 
 		[Test]
@@ -613,7 +613,7 @@ namespace api.Tests.Controllers
 			_reports.Setup(rs => rs.CreateMany(It.IsAny<IList<Report>>())).Throws(new DbUpdateException("", new Exception()));
 
 			/* _districts.Setup(ds => ds.GetManyAuns()).Returns(new[] { 123456789 }); */
-      _districts.Setup(ds => ds.GetManyNames()).Returns(new[] { "Test School SD" });
+			_districts.Setup(ds => ds.GetManyNames()).Returns(new[] { "Test School SD" });
 
 			var reporter = new Mock<IReporter<Invoice, InvoiceReporter.Config>>();
 			_reporters.Setup(rs => rs.CreateInvoiceReporter(_context)).Returns(reporter.Object);
@@ -743,7 +743,7 @@ namespace api.Tests.Controllers
 					Name = "invoice2",
 				},
 			};
-			_reports.Setup(rs => rs.GetManyMetadata(null, null, null, null)).Returns(reports);
+			_reports.Setup(rs => rs.GetManyMetadata(null, null, null, null, null)).Returns(reports);
 
 			var result = await _uut.GetManyMetadata(new ReportsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<ObjectResult>());
@@ -763,28 +763,32 @@ namespace api.Tests.Controllers
 			var name = "invoice";
 			var type = ReportType.Invoice;
 			var year = "2017-2018";
+			var scope = "2017.09";
 			var approved = true;
 			var reports = new[] {
 				new Report {
 					Type = type,
 					SchoolYear = year,
+					Scope = scope,
 					Name = name,
 					Approved = approved,
 				},
 				new Report {
 					Type = type,
 					SchoolYear = year,
+					Scope = scope,
 					Name = name,
 					Approved = approved,
 				},
 			};
-			_reports.Setup(rs => rs.GetManyMetadata(name, type, year, approved)).Returns(reports);
+			_reports.Setup(rs => rs.GetManyMetadata(name, type, year, scope, approved)).Returns(reports);
 
 			var result = await _uut.GetManyMetadata(new ReportsController.GetManyArgs
 			{
 				Name = name,
 				Type = type.Value,
 				SchoolYear = year,
+				Scope = scope,
 				Approved = approved,
 			});
 			Assert.That(result, Is.TypeOf<ObjectResult>());
@@ -818,7 +822,7 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task GetManyMetadataReturnsEmptyListWhenEmpty()
 		{
-			_reports.Setup(rs => rs.GetManyMetadata(null, null, null, null)).Returns(new List<ReportMetadata>());
+			_reports.Setup(rs => rs.GetManyMetadata(null, null, null, null, null)).Returns(new List<ReportMetadata>());
 
 			var result = await _uut.GetManyMetadata(new ReportsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<ObjectResult>());
@@ -833,7 +837,7 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task GetManyMetadataReturnsEmptyListWhenNull()
 		{
-			_reports.Setup(rs => rs.GetManyMetadata(null, null, null, null)).Returns<List<ReportMetadata>>(null);
+			_reports.Setup(rs => rs.GetManyMetadata(null, null, null, null, null)).Returns<List<ReportMetadata>>(null);
 
 			var result = await _uut.GetManyMetadata(new ReportsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<ObjectResult>());
@@ -877,7 +881,7 @@ namespace api.Tests.Controllers
 					Xlsx = Encoding.UTF8.GetBytes("hello"),
 				},
 			};
-			_reports.Setup(rs => rs.GetMany(null, null, null, null)).Returns(reports);
+			_reports.Setup(rs => rs.GetMany(null, null, null, null, null)).Returns(reports);
 
 			var result = await _uut.GetZip(new ReportsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<FileStreamResult>());
@@ -916,14 +920,16 @@ namespace api.Tests.Controllers
 			var name = "bob";
 			var type = ReportType.Invoice;
 			var schoolYear = "2017-2018";
+			var scope = "2017.09";
 			var approved = true;
-			_reports.Setup(rs => rs.GetMany(name, type, schoolYear, approved)).Returns(reports);
+			_reports.Setup(rs => rs.GetMany(name, type, schoolYear, scope, approved)).Returns(reports);
 
 			var result = await _uut.GetZip(new ReportsController.GetManyArgs
 			{
 				Name = name,
 				Type = type.Value,
 				SchoolYear = schoolYear,
+				Scope = scope,
 				Approved = approved,
 			});
 			Assert.That(result, Is.TypeOf<FileStreamResult>());
@@ -951,7 +957,7 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task GetZipReturnsNoContentWhenNull()
 		{
-			_reports.Setup(rs => rs.GetMany(null, null, null, null)).Returns<IEnumerable<Report>>(null);
+			_reports.Setup(rs => rs.GetMany(null, null, null, null, null)).Returns<IEnumerable<Report>>(null);
 
 			var result = await _uut.GetZip(new ReportsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<NoContentResult>());
@@ -960,7 +966,7 @@ namespace api.Tests.Controllers
 		[Test]
 		public async Task GetZipReturnsNoContentWhenEmpty()
 		{
-			_reports.Setup(rs => rs.GetMany(null, null, null, null)).Returns(new Report[] { });
+			_reports.Setup(rs => rs.GetMany(null, null, null, null, null)).Returns(new Report[] { });
 
 			var result = await _uut.GetZip(new ReportsController.GetManyArgs());
 			Assert.That(result, Is.TypeOf<NoContentResult>());

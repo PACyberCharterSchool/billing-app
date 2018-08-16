@@ -350,6 +350,7 @@ namespace api.Controllers
           Type = ReportType.Invoice,
           Name = create.Name,
           SchoolYear = create.Invoice.Scope != null && create.Invoice.Scope.Length > 0 ? GenerateSchoolYear(create.Invoice.Scope) : create.SchoolYear,
+					Scope = create.Invoice.Scope,
           Approved = false,
           Created = time,
           Data = data,
@@ -851,6 +852,9 @@ namespace api.Controllers
 			[RegularExpression(@"^\d{4}\-\d{4}$")]
 			public string SchoolYear { get; set; }
 
+			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
+			public string Scope { get; set; }
+
 			public bool? Approved { get; set; }
     }
 
@@ -873,6 +877,7 @@ namespace api.Controllers
         name: args.Name,
         type: args.Type == null ? null : ReportType.FromString(args.Type),
         year: args.SchoolYear,
+				scope: args.Scope,
         approved: args.Approved
       ));
       if (reports == null)
@@ -988,6 +993,8 @@ namespace api.Controllers
         report = new Report
         {
           Type = ReportType.BulkInvoice,
+					SchoolYear = create.SchoolYear,
+					Scope = create.BulkInvoice.Scope,
           Name = create.Name,
           Approved = true,
           Created = time,
@@ -1069,6 +1076,7 @@ namespace api.Controllers
         name: args.Name,
         type: args.Type == null ? null : ReportType.FromString(args.Type),
         year: args.SchoolYear,
+				scope: args.Scope,
         approved: args.Approved
       ));
       if (reports == null)
