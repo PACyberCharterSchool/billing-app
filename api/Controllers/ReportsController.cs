@@ -829,6 +829,9 @@ namespace api.Controllers
 			[RegularExpression(@"^\d{4}\-\d{4}$")]
 			public string SchoolYear { get; set; }
 
+			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
+			public string Scope { get; set; }
+
 			public bool? Approved { get; set; }
 		}
 
@@ -851,6 +854,7 @@ namespace api.Controllers
 				name: args.Name,
 				type: args.Type == null ? null : ReportType.FromString(args.Type),
 				year: args.SchoolYear,
+				scope: args.Scope,
 				approved: args.Approved
 			));
 			if (reports == null)
@@ -1053,6 +1057,7 @@ namespace api.Controllers
 				name: args.Name,
 				type: args.Type == null ? null : ReportType.FromString(args.Type),
 				year: args.SchoolYear,
+				scope: args.Scope,
 				approved: args.Approved
 			));
 			if (reports == null)

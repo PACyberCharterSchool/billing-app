@@ -114,6 +114,7 @@ namespace models
 				Id = r.Id,
 				Type = r.Type,
 				SchoolYear = r.SchoolYear,
+				Scope = r.Scope,
 				Name = r.Name,
 				Approved = r.Approved,
 				Created = r.Created,

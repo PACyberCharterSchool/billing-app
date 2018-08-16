@@ -788,6 +788,7 @@ namespace api.Tests.Controllers
 				Name = name,
 				Type = type.Value,
 				SchoolYear = year,
+				Scope = scope,
 				Approved = approved,
 			});
 			Assert.That(result, Is.TypeOf<ObjectResult>());
@@ -928,6 +929,7 @@ namespace api.Tests.Controllers
 				Name = name,
 				Type = type.Value,
 				SchoolYear = schoolYear,
+				Scope = scope,
 				Approved = approved,
 			});
 			Assert.That(result, Is.TypeOf<FileStreamResult>());
