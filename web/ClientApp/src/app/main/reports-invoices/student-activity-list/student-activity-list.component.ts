@@ -27,6 +27,7 @@ export class StudentActivityListComponent implements OnInit {
   public selectedCreateSchoolYear: string;
   public spinnerMsg: string;
   public selectedAsOfBillingDate: Date;
+  public scopes: string[];
 
   constructor(
     private utilitiesService: UtilitiesService,
@@ -63,7 +64,13 @@ export class StudentActivityListComponent implements OnInit {
   refreshActivityReports(): void {
   }
 
+  resetStudentActivityReports(): void {
+  }
+
   generateBulkActivityName(year: string, scope: string): void {
+  }
+
+  filterStudentActivityReports(): void {
   }
 
   create(): void {

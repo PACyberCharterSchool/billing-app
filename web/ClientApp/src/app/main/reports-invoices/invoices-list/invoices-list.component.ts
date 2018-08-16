@@ -42,7 +42,7 @@ export class InvoicesListComponent implements OnInit {
   public selectedFilterSchoolYear: string;
   public selectedFilterStatus: string;
   private downloadType: string;
-  private spinnerMsg: string;
+  public spinnerMsg: string;
   private templates: Template[];
   public downloadFormats: string[] = [
     'Microsoft Excel',
