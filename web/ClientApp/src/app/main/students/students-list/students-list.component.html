@@ -46,7 +46,7 @@
       </thead>
       <tbody infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]="false">
         <tr *ngFor='let sr of studentRecords'>
-          <td *ngFor='let v of listDisplayableValues(sr)' (click)='showStudentDetails(sr.id)'>{{v | normalizeFieldValue}}</td>
+          <td *ngFor='let v of listDisplayableValues(sr)' (click)='showStudentDetails(sr)'>{{v | normalizeFieldValue}}</td>
         </tr>
       </tbody>
     </table>

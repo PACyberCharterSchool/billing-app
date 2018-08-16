@@ -17,6 +17,6 @@ export class StudentDetailsInfoComponent implements OnInit {
 
   ngOnInit() {
     this.currentStudentService.currentStudent.subscribe((s) => this.student = s);
-    console.log(`StudentDetailsInfoComponent.ngOnInit(): student is ${this.student}.`);
+    console.log('StudentDetailsInfoComponent.ngOnInit(): student is ', this.student);
   }
 }
