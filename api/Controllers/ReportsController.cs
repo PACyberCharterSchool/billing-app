@@ -358,6 +358,7 @@ namespace api.Controllers
 				{
 					Type = ReportType.Invoice,
 					SchoolYear = create.SchoolYear,
+					Scope = create.Invoice.Scope,
 					Name = create.Name,
 					Approved = false,
 					Created = time,
@@ -969,6 +970,7 @@ namespace api.Controllers
 				{
 					Type = ReportType.BulkInvoice,
 					SchoolYear = create.SchoolYear,
+					Scope = create.BulkInvoice.Scope,
 					Name = create.Name,
 					Approved = true,
 					Created = time,
