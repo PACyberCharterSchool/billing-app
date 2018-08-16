@@ -86,7 +86,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       }
     );
 
-    this.reportsService.getInvoices(null, null, null).subscribe(
+    this.reportsService.getInvoices(null, null, null, null).subscribe(
       data => {
         console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
         this.reports = this.allReports = data['reports'];

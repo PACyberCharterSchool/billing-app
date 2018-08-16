@@ -444,6 +444,9 @@ namespace api.Controllers
 
     public class CreateManyInvoiceReports
     {
+			[Required]
+			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
+			public string Scope { get; set; }
       [Required]
       public DateTime AsOf { get; set; }
 
@@ -480,9 +483,11 @@ namespace api.Controllers
       var reports = new List<Report>();
       var now = DateTime.Now;
       var names = _districts.GetManyNames();
-      foreach (var name in names) {
+      foreach (var name in names)
+      {
         var sd = _districts.GetByName(name);
-        if (sd != null) {
+        if (sd != null)
+        {
           var month = create.Invoice.AsOf.ToString("MMMM");
           reports.Add(CreateInvoice(now, invoiceTemplate, new CreateReport
           {
@@ -490,9 +495,9 @@ namespace api.Controllers
             Name = $"{create.SchoolYear}_{sd.Name}_{month}-{create.Invoice.AsOf.Year}",
             SchoolYear = create.SchoolYear,
             TemplateId = create.TemplateId,
-
             Invoice = new CreateInvoiceReport
             {
+              Scope = create.Invoice.Scope,
               AsOf = create.Invoice.AsOf,
               ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
               ToPDE = create.Invoice.ToPDE,
@@ -540,7 +545,8 @@ namespace api.Controllers
     {
       List<string> headers = new List<string>();
 
-      foreach (DataColumn column in dt.Columns) {
+      foreach (DataColumn column in dt.Columns)
+      {
         headers.Add(headerMapper(column.ColumnName));
       }
 
@@ -553,7 +559,8 @@ namespace api.Controllers
 
       AddColumnsToStudentActivityDataTable(studentActivityDataTable);
 
-      foreach (var invoice in invoices) {
+      foreach (var invoice in invoices)
+      {
         var students = JObject.Parse(invoice.Data)["Students"];
         var schoolDistrict = JObject.Parse(invoice.Data)["SchoolDistrict"];
         var studentsJSONStr = JsonConvert.SerializeObject(students);
@@ -586,7 +593,8 @@ namespace api.Controllers
     private void AddRowsToStudentActivityDataTable(DataTable dtDest, DataTable dt, JObject schoolDistrict)
     {
       int i = 0;
-      foreach (var row in dt.Rows) {
+      foreach (var row in dt.Rows)
+      {
         AddRowToStudentActivityDataTable(dtDest, (DataRow)row, schoolDistrict, ++i);
       }
     }
