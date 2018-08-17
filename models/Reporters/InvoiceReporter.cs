@@ -350,9 +350,7 @@ namespace models.Reporters
 						)
 					)
 				)
-				ORDER BY StudentLastName, StudentFirstName, StudentMiddleInitial, StudentEnrollmentDate, StudentWithdrawalDate
-
-",
+				ORDER BY StudentLastName, StudentFirstName, StudentMiddleInitial, StudentEnrollmentDate, StudentWithdrawalDate",
 				new
 				{
 					Aun = aun,
