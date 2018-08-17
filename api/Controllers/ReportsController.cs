@@ -347,6 +347,7 @@ namespace api.Controllers
       {
         // wb.Write(ms);
         wb.Save(xlsxms, new XlsSaveOptions(SaveFormat.Xlsx));
+        wb.CalculateFormula();
         wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
 
         report = new Report
@@ -1002,6 +1003,7 @@ namespace api.Controllers
       {
         // wb.Write(ms);
         wb.Save(ms, new XlsSaveOptions(SaveFormat.Xlsx));
+        wb.CalculateFormula();
         wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
 
         report = new Report
