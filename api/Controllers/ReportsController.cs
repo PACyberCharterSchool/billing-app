@@ -340,13 +340,9 @@ namespace api.Controllers
 			InitializeWorkbookSheetPrinterMargins(wb);
 
 			if (invoice.Students.Count > 0)
-			{
 				CloneInvoiceSheets(wb, invoice.Students.Count, invoiceTemplate);
-			}
 			else
-			{
 				wb.Worksheets.RemoveAt(1);
-			}
 
 			// generate xlsx
 			var data = JsonConvert.SerializeObject(invoice);
@@ -379,13 +375,6 @@ namespace api.Controllers
 			return report;
 		}
 
-		private class MissingTemplateException : Exception
-		{
-			public MissingTemplateException(int templateId) :
-				base($"Could not find template with Id '{templateId}'.")
-			{ }
-		}
-
 		private Report CreateInvoice(DateTime time, CreateReport create)
 		{
 			// get template
@@ -396,7 +385,90 @@ namespace api.Controllers
 			return CreateInvoice(time, invoiceTemplate, create);
 		}
 
-		private Report CreateBulkInvoice(DateTime time, CreateReport create, IList<Report> reports)
+		private Report CreateInvoice(CreateReport create) => CreateInvoice(DateTime.Now, create);
+
+		private Report CreateBulkInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
+		{
+			var reports = _reports.GetMany(
+				type: ReportType.FromString("Invoice"),
+				year: create.SchoolYear,
+				approved: create.BulkInvoice.Approved
+			).ToList();
+
+			var invoices = reports.Select(r => JsonConvert.DeserializeObject<Invoice>(r.Data)).OrderBy(i => i.SchoolDistrict.Name).ToList();
+
+			// compose workbook
+			var wb = new Workbook(new MemoryStream(invoiceTemplate.Content));
+			InitializeWorkbookSheetPrinterMargins(wb);
+			Console.WriteLine($"ReportsController.CreateBulkInvoice():  number of invoices is {invoices.Count}.");
+			for (int i = 0; i < invoices.Count; i++)
+			{
+				var invoice = invoices[i];
+
+				if (i > 0)
+				{
+					CloneInvoiceSummarySheet(wb, i);
+				}
+
+				if (invoice.Students.Count > 0)
+					CloneStudentItemizationSheets(wb, invoice.Students.Count, i, invoiceTemplate);
+			}
+
+			if (invoices[0].Students.Count == 0)
+			{
+				wb.Worksheets.RemoveAt(1);
+			}
+			// generate xlsx
+
+			var data = new
+			{
+				SchoolYear = create.SchoolYear,
+				AsOf = create.BulkInvoice.AsOf,
+				Prepared = time,
+				ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
+				ToPDE = create.BulkInvoice.ToPDE,
+				Districts = invoices.Select(i => new
+				{
+					Number = i.Number,
+					SchoolDistrict = i.SchoolDistrict,
+					Students = i.Students,
+					RegularEnrollments = i.RegularEnrollments,
+					SpecialEnrollments = i.SpecialEnrollments,
+					Transactions = i.Transactions
+				})
+			};
+
+			var json = JsonConvert.SerializeObject(data);
+			wb = _exporter.Export(wb, JsonConvert.DeserializeObject(json));
+
+			// create report
+			Report report;
+			using (var ms = new MemoryStream())
+			using (var pdfms = new MemoryStream())
+			{
+				// wb.Write(ms);
+				wb.Save(ms, new XlsSaveOptions(SaveFormat.Xlsx));
+				wb.CalculateFormula();
+				wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
+
+				report = new Report
+				{
+					Type = ReportType.BulkInvoice,
+					SchoolYear = create.SchoolYear,
+					Scope = create.BulkInvoice.Scope,
+					Name = create.Name,
+					Approved = true,
+					Created = time,
+					Data = json,
+					Xlsx = ms.ToArray(),
+					Pdf = pdfms.ToArray()
+				};
+			}
+
+			return report;
+		}
+
+		private Report CreateBulkInvoice(DateTime time, CreateReport create)
 		{
 			// get template
 			var invoiceTemplate = _templates.Get(create.TemplateId);
@@ -404,11 +476,17 @@ namespace api.Controllers
 				throw new MissingTemplateException(create.TemplateId);
 
 
-			return CreateBulkInvoice(time, reports, invoiceTemplate, create);
+			return CreateBulkInvoice(time, invoiceTemplate, create);
 		}
 
-		private Report CreateInvoice(CreateReport create) => CreateInvoice(DateTime.Now, create);
-		private Report CreateBulkInvoice(CreateReport create, IList<Report> reports) => CreateBulkInvoice(DateTime.Now, create, reports);
+		private Report CreateBulkInvoice(CreateReport create) => CreateBulkInvoice(DateTime.Now, create);
+
+		private class MissingTemplateException : Exception
+		{
+			public MissingTemplateException(int templateId) :
+				base($"Could not find template with Id '{templateId}'.")
+			{ }
+		}
 
 		[HttpPost]
 		[Authorize(Policy = "PAY+")]
@@ -431,6 +509,13 @@ namespace api.Controllers
 						return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without 'invoice' config."));
 
 					report = CreateInvoice(create);
+				}
+				else if (create.ReportType == ReportType.BulkInvoice.Value)
+				{
+					if (create.BulkInvoice == null)
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without 'bulk invoice' config."));
+
+					report = CreateBulkInvoice(create);
 				}
 				else
 				{
@@ -458,6 +543,15 @@ namespace api.Controllers
 				Report = new ReportDto(report),
 			});
 		}
+
+		[HttpPost("bulk")]
+		[Authorize(Policy = "PAY+")]
+		[ProducesResponseType(typeof(ReportResponse), 200)]
+		[ProducesResponseType(typeof(ErrorsResponse), 400)]
+		[ProducesResponseType(409)]
+		[ProducesResponseType(424)]
+		[SwaggerResponse(statusCode: 501, description: "Not Implemented")] // Swashbuckle sees this as "Server Error".
+		public async Task<IActionResult> CreateBulk([FromBody]CreateReport create) => await Create(create);
 
 		public class CreateManyInvoiceReports
 		{
@@ -905,137 +999,6 @@ namespace api.Controllers
 					sheet.PageSetup.FooterMargin = 0.0;
 				}
 			}
-		}
-
-		private Report CreateBulkInvoice(DateTime time, IList<Report> reports, Template invoiceTemplate, CreateReport create)
-		{
-			var invoices = reports.Select(r => JsonConvert.DeserializeObject<Invoice>(r.Data)).OrderBy(i => i.SchoolDistrict.Name).ToList();
-
-			// compose workbook
-			var wb = new Workbook(new MemoryStream(invoiceTemplate.Content));
-			InitializeWorkbookSheetPrinterMargins(wb);
-			Console.WriteLine($"ReportsController.CreateBulkInvoice():  number of invoices is {invoices.Count}.");
-			for (int i = 0; i < invoices.Count; i++)
-			{
-				var invoice = invoices[i];
-
-				if (i > 0)
-				{
-					CloneInvoiceSummarySheet(wb, i);
-				}
-
-				if (invoice.Students.Count > 0)
-					CloneStudentItemizationSheets(wb, invoice.Students.Count, i, invoiceTemplate);
-			}
-
-			if (invoices[0].Students.Count == 0)
-			{
-				wb.Worksheets.RemoveAt(1);
-			}
-			// generate xlsx
-
-			var data = new
-			{
-				SchoolYear = create.SchoolYear,
-				AsOf = create.BulkInvoice.AsOf,
-				Prepared = time,
-				ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
-				ToPDE = create.BulkInvoice.ToPDE,
-				Districts = invoices.Select(i => new
-				{
-					Number = i.Number,
-					SchoolDistrict = i.SchoolDistrict,
-					Students = i.Students,
-					RegularEnrollments = i.RegularEnrollments,
-					SpecialEnrollments = i.SpecialEnrollments,
-					Transactions = i.Transactions
-				})
-			};
-
-			var json = JsonConvert.SerializeObject(data);
-			wb = _exporter.Export(wb, JsonConvert.DeserializeObject(json));
-
-			// create report
-			Report report;
-			using (var ms = new MemoryStream())
-			using (var pdfms = new MemoryStream())
-			{
-				// wb.Write(ms);
-				wb.Save(ms, new XlsSaveOptions(SaveFormat.Xlsx));
-				wb.CalculateFormula();
-				wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
-
-				report = new Report
-				{
-					Type = ReportType.BulkInvoice,
-					SchoolYear = create.SchoolYear,
-					Scope = create.BulkInvoice.Scope,
-					Name = create.Name,
-					Approved = true,
-					Created = time,
-					Data = json,
-					Xlsx = ms.ToArray(),
-					Pdf = pdfms.ToArray()
-				};
-			}
-
-			return report;
-		}
-
-		[HttpPost("bulk")]
-		[Authorize(Policy = "PAY+")]
-		[ProducesResponseType(typeof(ReportResponse), 200)]
-		[ProducesResponseType(typeof(ErrorsResponse), 400)]
-		[ProducesResponseType(409)]
-		[ProducesResponseType(424)]
-		[SwaggerResponse(statusCode: 501, description: "Not Implemented")] // Swashbuckle sees this as "Server Error".
-		public async Task<IActionResult> CreateBulk([FromBody]CreateReport create)
-		{
-			if (!ModelState.IsValid)
-				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
-
-			Report report;
-
-			try
-			{
-				if (create.ReportType == ReportType.BulkInvoice.Value)
-				{
-					if (create.BulkInvoice == null)
-						return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without 'bulk invoice' config."));
-
-					var reports = await Task.Run(() => _reports.GetMany(
-						type: ReportType.FromString("Invoice"),
-						year: create.SchoolYear,
-						approved: create.BulkInvoice.Approved
-					));
-
-					report = CreateBulkInvoice(create, reports.ToList());
-				}
-				else
-				{
-					return StatusCode(501);
-				}
-			}
-			catch (MissingTemplateException e)
-			{
-				var result = new ObjectResult(new ErrorResponse(e.Message));
-				result.StatusCode = 424;
-				return result;
-			}
-
-			try
-			{
-				report = await Task.Run(() => _context.SaveChanges(() => _reports.Create(report)));
-			}
-			catch (DbUpdateException)
-			{
-				return StatusCode(409);
-			}
-
-			return new CreatedResult($"/api/reports/{report.Name}", new ReportResponse
-			{
-				Report = new ReportDto(report),
-			});
 		}
 
 		[HttpGet]
