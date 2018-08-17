@@ -332,7 +332,7 @@ namespace models.Reporters
 				WHERE HeaderId = (
 					SELECT Id
 					FROM StudentRecordsHeaders
-					WHERE Scope = '2018.08'
+					WHERE Scope = @Scope 
 				)
 				AND SchoolDistrictId = @Aun
 				AND StudentEnrollmentDate <= datefromparts(2018, 9, 30)
