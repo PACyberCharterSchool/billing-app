@@ -152,7 +152,7 @@ namespace api.Controllers
         wb.Worksheets.AddCopy(1);
 
         var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
-        sheet.Name = $"Individual Student Inform. {s+1}";
+        // sheet.Name = $"Ind. Student Information {s+1}";
         Cells cells = sheet.Cells;
         
         sheet.PageSetup.HeaderMargin = 0.0;
@@ -247,7 +247,7 @@ namespace api.Controllers
 
         var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
         Cells cells = sheet.Cells;
-        sheet.Name = $"Individual Student Inform. {s+1}";
+        sheet.Name = $"Ind. Student Information {s+1}";
 
         for (int r = 0; r < cells.MaxDataRow + 1; r++) {
 					Row row = cells.Rows[r];
@@ -294,10 +294,10 @@ namespace api.Controllers
       else {
         var components = scope.Split('.');
         if (new[] { 7, 8, 9, 10, 11, 12}.Contains(int.Parse(components[1]))) {
-          year = $"{components[0] + 1}-{components[0]}";
+          year = $"{components[0]}-{int.Parse(components[0]) + 1}";
         }
         else {
-          year = $"{components[0]}-{components[0] + 1}";
+          year = $"{int.Parse(components[0]) - 1}-{components[0]}";
         }
       }
 
@@ -340,6 +340,8 @@ namespace api.Controllers
       var data = JsonConvert.SerializeObject(invoice);
       wb = _exporter.Export(wb, JsonConvert.DeserializeObject(data));
 
+      var stamp = new Random(DateTime.Now.Millisecond).Next();
+ 
       // create report
       Report report;
       using (var xlsxms = new MemoryStream())
@@ -353,7 +355,7 @@ namespace api.Controllers
         report = new Report
         {
           Type = ReportType.Invoice,
-          Name = create.Name,
+          Name = $"{create.Invoice.Scope}_{create.Name}_{stamp}",
           SchoolYear = create.Invoice.Scope != null && create.Invoice.Scope.Length > 0 ? GenerateSchoolYear(create.Invoice.Scope) : create.SchoolYear,
 					Scope = create.Invoice.Scope,
           Approved = false,
@@ -999,6 +1001,8 @@ namespace api.Controllers
       wb = _exporter.Export(wb, JsonConvert.DeserializeObject(json));
 
       // create report
+      var stamp = new Random(DateTime.Now.Millisecond).Next();
+
       Report report;
       using (var ms = new MemoryStream())
       using (var pdfms = new MemoryStream())
@@ -1013,7 +1017,7 @@ namespace api.Controllers
           Type = ReportType.BulkInvoice,
 					SchoolYear = create.SchoolYear,
 					Scope = create.BulkInvoice.Scope,
-          Name = create.Name,
+          Name = $"{create.BulkInvoice.Scope}_{create.Name}_{stamp}",
           Approved = true,
           Created = time,
           Data = json,
@@ -1048,8 +1052,9 @@ namespace api.Controllers
 
           var reports = await Task.Run(() => _reports.GetMany(
             type: ReportType.FromString("Invoice"),
-            year: create.SchoolYear,
-            approved: create.BulkInvoice.Approved
+            // year: create.SchoolYear,
+            // approved: create.BulkInvoice.Approved,
+            scope: create.BulkInvoice.Scope
           ));
 
           report = CreateBulkInvoice(create, reports.ToList());

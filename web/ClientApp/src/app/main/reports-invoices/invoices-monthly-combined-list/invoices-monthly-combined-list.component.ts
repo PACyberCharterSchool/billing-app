@@ -149,9 +149,11 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.spinnerMsg = 'Loading bulk invoices.  Please wait...';
     this.ngxSpinnerService.show();
     this.reportsService.getReportsByInfo({
-      'Type': ReportType.Invoice,
-      'Name': '', 'Approved': null,
-      'SchoolYear': null}).subscribe(
+      'Type': ReportType.BulkInvoice,
+      'Name': '',
+      'Approved': null,
+      'SchoolYear': null
+    }).subscribe(
         data => {
           console.log(`InvoicesListComponent.refreshInvoices(): data is ${data}.`);
           this.ngxSpinnerService.hide();
