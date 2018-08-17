@@ -211,6 +211,9 @@ export class NormalizeFieldNamePipe implements PipeTransform {
       case 'approved':
         fieldName = 'Approved';
         break;
+      case 'scope':
+        fieldName = 'Billing Period';
+        break;
       default:
         fieldName = 'Column';
         break;

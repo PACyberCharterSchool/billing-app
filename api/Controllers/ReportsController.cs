@@ -152,7 +152,7 @@ namespace api.Controllers
         wb.Worksheets.AddCopy(1);
 
         var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
-        sheet.Name = "Individual Student Information";
+        sheet.Name = $"Individual Student Inform. {s+1}";
         Cells cells = sheet.Cells;
         
         sheet.PageSetup.HeaderMargin = 0.0;
@@ -247,6 +247,7 @@ namespace api.Controllers
 
         var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
         Cells cells = sheet.Cells;
+        sheet.Name = $"Individual Student Inform. {s+1}";
 
         for (int r = 0; r < cells.MaxDataRow + 1; r++) {
 					Row row = cells.Rows[r];
@@ -254,7 +255,7 @@ namespace api.Controllers
 						continue;
 
           for (int c = 0; c < cells.MaxDataColumn + 1; c++) {
-            if (!(cells[r, c].Type == CellValueType.IsString))
+            if (cells[r,c] == null)
               continue;
 
             if (r == GetRowIndexForFirstStudentItemization(template) && c == 1) // Number column
@@ -262,6 +263,9 @@ namespace api.Controllers
               cells[r,c].PutValue(((s + 1) * per) + 1);
               continue;
             }
+
+            if (!(cells[r, c].Type == CellValueType.IsString))
+              continue;
 
             var value = cells[r,c].StringValue;
 
