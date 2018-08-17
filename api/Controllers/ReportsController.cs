@@ -886,62 +886,6 @@ namespace api.Controllers
 			public IList<ReportDto> Reports { get; set; }
 		}
 
-		[HttpGet("zip")]
-		[Authorize(Policy = "PAY+")]
-		[Produces(ContentTypes.ZIP)]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(typeof(ErrorsResponse), 400)]
-		public async Task<IActionResult> GetZip([FromQuery]GetManyArgs args)
-		{
-			if (!ModelState.IsValid)
-				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
-
-			var reports = await Task.Run(() => _reports.GetMany(
-				name: args.Name,
-				type: args.Type == null ? null : ReportType.FromString(args.Type),
-				year: args.SchoolYear,
-				scope: args.Scope,
-				approved: args.Approved
-			));
-			if (reports == null)
-				return NoContent();
-
-			var content = false; // avoids using .Count(), which executes the IEnumerable
-			var zipStream = new MemoryStream();
-			using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, leaveOpen: true))
-			{
-				foreach (var report in reports)
-				{
-					content = true;
-					var entry = archive.CreateEntry($"{report.Name}.xlsx");
-					using (var entryStream = entry.Open())
-						entryStream.Write(report.Xlsx, 0, report.Xlsx.Length);
-				}
-			}
-			zipStream.Position = 0;
-
-			if (!content)
-				return NoContent();
-
-			var name = new StringBuilder("Reports");
-			if (!string.IsNullOrWhiteSpace(args.SchoolYear))
-				name.Append($"-{args.SchoolYear}");
-
-			if (!string.IsNullOrEmpty(args.Type))
-				name.Append($"-{args.Type}");
-
-			if (!string.IsNullOrWhiteSpace(args.Name))
-				name.Append($"-{args.Name}");
-
-			if (args.Approved.HasValue)
-				name.Append(args.Approved.Value ? "-Approved" : "-Pending");
-
-			return new FileStreamResult(zipStream, ContentTypes.ZIP)
-			{
-				FileDownloadName = name.ToString(),
-			};
-		}
-
 		private void InitializeWorkbookSheetPrinterMargins(Workbook wb)
 		{
 			for (int i = 0; i < wb.Worksheets.Count; i++)
