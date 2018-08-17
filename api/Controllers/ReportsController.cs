@@ -548,18 +548,6 @@ namespace api.Controllers
       return null;
     }
 
-    private List<string> GetStudentActivityHeaders(DataTable dt, HeaderMapper headerMapper)
-    {
-      List<string> headers = new List<string>();
-
-      foreach (DataColumn column in dt.Columns)
-      {
-        headers.Add(headerMapper(column.ColumnName));
-      }
-
-      return headers;
-    }
-
     private DataTable BuildStudentActivityDataTable(IEnumerable<Report> invoices)
     {
       DataTable studentActivityDataTable = new DataTable();
@@ -794,11 +782,18 @@ namespace api.Controllers
       List<Report> reports = new List<Report>();
       reports.Add(report);
       var data = BuildStudentActivityDataTable(reports);
-      List<string> headers = GetStudentActivityHeaders(data, MapStudentActivityHeaderKeyToValue); 
       Workbook wb = new Workbook();
 
-      wb.Worksheets[0].Cells.ImportArray(headers.ToArray(), 0, 0, false);
-      wb.Worksheets[0].Cells.ImportDataTable(data, true, 1, 0, true, false);
+      wb.Worksheets[0].Cells.ImportDataTable(data, true, 0, 0, true, false);
+      Style style = wb.CreateStyle();
+      style.Number = 14;
+      StyleFlag styleFlag = new StyleFlag();
+      styleFlag.NumberFormat = true;
+      wb.Worksheets[0].Cells.Columns[5].ApplyStyle(style, styleFlag);
+      wb.Worksheets[0].Cells.Columns[7].ApplyStyle(style, styleFlag);
+      wb.Worksheets[0].Cells.Columns[8].ApplyStyle(style, styleFlag);
+      wb.Worksheets[0].Cells.Columns[10].ApplyStyle(style, styleFlag);
+      wb.Worksheets[0].Cells.Columns[11].ApplyStyle(style, styleFlag);
 
       var saveOpts = new XlsSaveOptions(args.Format == "excel" ? SaveFormat.Xlsx : SaveFormat.Pdf);
 
@@ -838,11 +833,18 @@ namespace api.Controllers
 
       var data = BuildStudentActivityDataTable(reports);
       string name = args.SchoolYear+ "Student Activity";
-      List<string> headers = GetStudentActivityHeaders(data, MapStudentActivityHeaderKeyToValue); 
       Workbook wb = new Workbook();
 
-      wb.Worksheets[0].Cells.ImportArray(headers.ToArray(), 0, 0, false);
-      wb.Worksheets[0].Cells.ImportDataTable(data, true, 1, 0, true, false);
+      wb.Worksheets[0].Cells.ImportDataTable(data, true, 0, 0, true, false);
+      Style style = wb.CreateStyle();
+      style.Number = 14;
+      StyleFlag styleFlag = new StyleFlag();
+      styleFlag.NumberFormat = true;
+      wb.Worksheets[0].Cells.Columns[5].ApplyStyle(style, styleFlag);
+      wb.Worksheets[0].Cells.Columns[7].ApplyStyle(style, styleFlag);
+      wb.Worksheets[0].Cells.Columns[8].ApplyStyle(style, styleFlag);
+      wb.Worksheets[0].Cells.Columns[10].ApplyStyle(style, styleFlag);
+      wb.Worksheets[0].Cells.Columns[11].ApplyStyle(style, styleFlag);
 
       var saveOpts = new XlsSaveOptions(args.Format == "excel" ? SaveFormat.Xlsx : SaveFormat.Pdf);
 
