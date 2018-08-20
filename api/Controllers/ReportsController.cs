@@ -94,6 +94,12 @@ namespace api.Controllers
 			public bool Approved { get; set; }
 		}
 
+		public class CreateBulkStudentInformationReport
+		{
+			public string Type { get; set; }
+			public bool? Approved { get; set; }
+		}
+
 		public class CreateReport
 		{
 			[EnumerationValidation(typeof(ReportType))]
@@ -114,6 +120,7 @@ namespace api.Controllers
 
 			public CreateInvoiceReport Invoice { get; set; }
 			public CreateBulkInvoiceReport BulkInvoice { get; set; }
+			public CreateBulkStudentInformationReport BulkStudentInformation { get; set; }
 		}
 
 		private void CloneInvoiceSummarySheet(Workbook wb, int districtIndex)
@@ -487,10 +494,82 @@ namespace api.Controllers
 			{ }
 		}
 
+		public Report CreateStudentInformation(CreateReport create)
+		{
+			var sourceReport = _reports.Get(create.Name);
+			if (sourceReport == null)
+				throw new NotFoundException();
+
+			var name = create.Name + "_ACTIVITY";
+			var wb = BuildActivityWorkbook(name, new[] { sourceReport });
+
+			Report report;
+			using (var xlsxStream = new MemoryStream())
+			using (var pdfStream = new MemoryStream())
+			{
+				wb.Save(xlsxStream, SaveFormat.Xlsx);
+				wb.CalculateFormula();
+				wb.Save(pdfStream, SaveFormat.Pdf);
+
+				report = new Report
+				{
+					Type = ReportType.StudentInformation,
+					SchoolYear = create.SchoolYear,
+					Scope = sourceReport.Scope,
+					Name = name,
+					Approved = true,
+					Created = DateTime.Now,
+					Xlsx = xlsxStream.ToArray(),
+					Pdf = pdfStream.ToArray(),
+				};
+			}
+
+			return report;
+		}
+
+		public Report CreateBulkStudentInformation(CreateReport create)
+		{
+			var type = create.BulkStudentInformation.Type;
+			var reports = _reports.GetMany(
+				type: type == null ? null : ReportType.FromString(type),
+				year: create.SchoolYear,
+				approved: create.BulkStudentInformation.Approved
+			);
+
+			if (reports == null)
+				throw new NotFoundException();
+
+			var name = create.SchoolYear + "Student Activity";
+			var wb = BuildActivityWorkbook(name, reports);
+
+			Report report;
+			using (var xlsxStream = new MemoryStream())
+			using (var pdfStream = new MemoryStream())
+			{
+				wb.Save(xlsxStream, SaveFormat.Xlsx);
+				wb.CalculateFormula();
+				wb.Save(pdfStream, SaveFormat.Pdf);
+
+				report = new Report
+				{
+					Type = ReportType.StudentInformation,
+					SchoolYear = create.SchoolYear,
+					Name = name,
+					Approved = true,
+					Created = DateTime.Now,
+					Xlsx = xlsxStream.ToArray(),
+					Pdf = pdfStream.ToArray(),
+				};
+			}
+
+			return report;
+		}
+
 		[HttpPost]
 		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportResponse), 200)]
 		[ProducesResponseType(typeof(ErrorsResponse), 400)]
+		[ProducesResponseType(404)]
 		[ProducesResponseType(409)]
 		[ProducesResponseType(424)]
 		[SwaggerResponse(statusCode: 501, description: "Not Implemented")] // Swashbuckle sees this as "Server Error".
@@ -516,6 +595,17 @@ namespace api.Controllers
 
 					report = CreateBulkInvoice(create);
 				}
+				else if (create.ReportType == ReportType.StudentInformation.Value)
+				{
+					report = CreateStudentInformation(create);
+				}
+				else if (create.ReportType == ReportType.BulkStudentInformation.Value)
+				{
+					if (create.BulkStudentInformation == null)
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without 'bulk student information' config."));
+
+					report = CreateBulkStudentInformation(create);
+				}
 				else
 				{
 					return StatusCode(501);
@@ -526,6 +616,10 @@ namespace api.Controllers
 				var result = new ObjectResult(new ErrorResponse(e.Message));
 				result.StatusCode = 424;
 				return result;
+			}
+			catch (NotFoundException)
+			{
+				return NotFound();
 			}
 
 			try
@@ -551,6 +645,51 @@ namespace api.Controllers
 		[ProducesResponseType(424)]
 		[SwaggerResponse(statusCode: 501, description: "Not Implemented")] // Swashbuckle sees this as "Server Error".
 		public async Task<IActionResult> CreateBulk([FromBody]CreateReport create) => await Create(create);
+
+		public class GetActivityArgs
+		{
+			public string Name { get; set; }
+			public string SchoolYear { get; set; }
+		}
+
+		[HttpGet("activity/name")]
+		[Authorize(Policy = "PAY+")]
+		[Produces(ContentTypes.XLSX, ContentTypes.PDF)]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(typeof(ErrorsResponse), 400)]
+		[ProducesResponseType(404)]
+		public async Task<IActionResult> GetActivity([FromQuery]GetActivityArgs args)
+			=> await Create(new CreateReport
+			{
+				Name = args.Name,
+				ReportType = ReportType.StudentInformation.Value,
+				SchoolYear = args.SchoolYear,
+			});
+
+		public class GetBulkActivityArgs : GetActivityArgs
+		{
+			public string Type { get; set; }
+			public bool? Approved { get; set; }
+		}
+
+		[HttpGet("activity")]
+		[Authorize(Policy = "PAY+")]
+		[Produces(ContentTypes.XLSX, ContentTypes.PDF)]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(typeof(ErrorsResponse), 400)]
+		[ProducesResponseType(404)]
+		public async Task<IActionResult> GetBulkActivity([FromQuery]GetBulkActivityArgs args)
+			=> await Create(new CreateReport
+			{
+				Name = args.Name,
+				ReportType = ReportType.BulkStudentInformation.Value,
+				SchoolYear = args.SchoolYear,
+				BulkStudentInformation = new CreateBulkStudentInformationReport
+				{
+					Type = args.Type,
+					Approved = args.Approved,
+				},
+			});
 
 		public class CreateManyInvoiceReports
 		{
@@ -804,17 +943,24 @@ namespace api.Controllers
 				return NotFound();
 
 			var accept = Request.Headers["Accept"];
+			MemoryStream stream = null;
 			foreach (var v in accept)
 			{
-				if (!v.Contains(ContentTypes.XLSX) && !v.Contains(ContentTypes.PDF))
-					return StatusCode(406);
+				if (v.Contains(ContentTypes.XLSX))
+				{
+					stream = new MemoryStream(report.Xlsx);
+					break;
+				}
+				else if (v.Contains(ContentTypes.PDF))
+				{
+					stream = new MemoryStream(report.Pdf);
+					break;
+				}
 			}
+			if (stream == null)
+				return StatusCode(406);
 
-			var stream = new MemoryStream(report.Xlsx);
-			return new FileStreamResult(stream, accept)
-			{
-				FileDownloadName = report.Name,
-			};
+			return new FileStreamResult(stream, accept) { FileDownloadName = report.Name };
 		}
 
 		private Workbook BuildActivityWorkbook(string name, IEnumerable<Report> reports)
@@ -831,93 +977,6 @@ namespace api.Controllers
 				wb.Worksheets[0].Cells.Columns[c].ApplyStyle(style, styleFlag);
 
 			return wb;
-		}
-
-		public class GetActivityArgs
-		{
-			public string Name { get; set; }
-
-			public string Format { get; set; }
-
-			public string Type { get; set; }
-
-			public string SchoolYear { get; set; }
-
-			public bool? Approved { get; set; }
-		}
-
-		[HttpGet("activity/name")]
-		[Authorize(Policy = "PAY+")]
-		[Produces(ContentTypes.XLSX, ContentTypes.PDF)]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(typeof(ErrorsResponse), 400)]
-		public async Task<IActionResult> GetActivity([FromQuery]GetActivityArgs args)
-		{
-			var report = await Task.Run(() => _reports.Get(args.Name));
-			if (report == null)
-				return NotFound();
-
-			var accept = Request.Headers["Accept"];
-			foreach (var v in accept)
-			{
-				if (!v.Contains(ContentTypes.XLSX) && !v.Contains(ContentTypes.PDF))
-					return StatusCode(406);
-			}
-
-			var name = args.Name + "_ACTIVITY";
-			var wb = BuildActivityWorkbook(name, new[] { report });
-
-			var saveOpts = new XlsSaveOptions(args.Format == "excel" ? SaveFormat.Xlsx : SaveFormat.Pdf);
-
-			using (var stream = new MemoryStream())
-			{
-				wb.Save(stream, saveOpts);
-				var contentType = args.Format == "excel" ? ContentTypes.XLSX : ContentTypes.PDF;
-				return new FileStreamResult(new MemoryStream(stream.ToArray()), contentType)
-				{
-					FileDownloadName = name
-				};
-			};
-		}
-
-		[HttpGet("activity")]
-		[Authorize(Policy = "PAY+")]
-		[Produces(ContentTypes.XLSX, ContentTypes.PDF)]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(typeof(ErrorsResponse), 400)]
-		public async Task<IActionResult> GetBulkActivity([FromQuery]GetActivityArgs args)
-		{
-			var accept = Request.Headers["Accept"];
-
-			foreach (var v in accept)
-			{
-				if (!v.Contains(ContentTypes.XLSX) && !v.Contains(ContentTypes.PDF))
-					return StatusCode(406);
-			}
-
-			var reports = await Task.Run(() => _reports.GetMany(
-				type: args.Type == null ? null : ReportType.FromString(args.Type),
-				year: args.SchoolYear,
-				approved: args.Approved
-			));
-
-			if (reports == null)
-				return NotFound();
-
-			var name = args.SchoolYear + "Student Activity";
-			var wb = BuildActivityWorkbook(name, reports);
-
-			var saveOpts = new XlsSaveOptions(args.Format == "excel" ? SaveFormat.Xlsx : SaveFormat.Pdf);
-
-			using (var stream = new MemoryStream())
-			{
-				wb.Save(stream, saveOpts);
-				var contentType = args.Format == "excel" ? ContentTypes.XLSX : ContentTypes.PDF;
-				return new FileStreamResult(new MemoryStream(stream.ToArray()), ContentTypes.XLSX)
-				{
-					FileDownloadName = name
-				};
-			};
 		}
 
 		public class GetManyArgs
