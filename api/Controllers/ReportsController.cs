@@ -112,9 +112,8 @@ namespace api.Controllers
 			[RegularExpression(@"^\d{4}\-\d{4}$")]
 			public string SchoolYear { get; set; }
 
-			[Required]
 			[Range(1, int.MaxValue)]
-			public int TemplateId { get; set; }
+			public int? TemplateId { get; set; }
 
 			public CreateInvoiceReport Invoice { get; set; }
 			public CreateBulkInvoiceReport BulkInvoice { get; set; }
@@ -382,9 +381,9 @@ namespace api.Controllers
 		private Report CreateInvoice(DateTime time, CreateReport create)
 		{
 			// get template
-			var invoiceTemplate = _templates.Get(create.TemplateId);
+			var invoiceTemplate = _templates.Get(create.TemplateId.Value);
 			if (invoiceTemplate == null)
-				throw new MissingTemplateException(create.TemplateId);
+				throw new MissingTemplateException(create.TemplateId.Value);
 
 			return CreateInvoice(time, invoiceTemplate, create);
 		}
@@ -475,9 +474,9 @@ namespace api.Controllers
 		private Report CreateBulkInvoice(DateTime time, CreateReport create)
 		{
 			// get template
-			var invoiceTemplate = _templates.Get(create.TemplateId);
+			var invoiceTemplate = _templates.Get(create.TemplateId.Value);
 			if (invoiceTemplate == null)
-				throw new MissingTemplateException(create.TemplateId);
+				throw new MissingTemplateException(create.TemplateId.Value);
 
 
 			return CreateBulkInvoice(time, invoiceTemplate, create);
@@ -496,7 +495,7 @@ namespace api.Controllers
 		{
 			var sourceReport = _reports.Get(create.Name);
 			if (sourceReport == null)
-				throw new NotFoundException();
+				throw new NotFoundException(typeof(Report), create.Name);
 
 			var name = create.Name + "_ACTIVITY";
 			var wb = BuildActivityWorkbook(name, new[] { sourceReport });
@@ -584,12 +583,18 @@ namespace api.Controllers
 					if (create.Invoice == null)
 						return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without 'invoice' config."));
 
+					if (!create.TemplateId.HasValue)
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without template ID."));
+
 					report = CreateInvoice(create);
 				}
 				else if (create.ReportType == ReportType.BulkInvoice.Value)
 				{
 					if (create.BulkInvoice == null)
-						return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without 'bulk invoice' config."));
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create bulk invoice without 'bulk invoice' config."));
+
+					if (!create.TemplateId.HasValue)
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create bulk invoice without template ID."));
 
 					report = CreateBulkInvoice(create);
 				}
@@ -600,7 +605,7 @@ namespace api.Controllers
 				else if (create.ReportType == ReportType.BulkStudentInformation.Value)
 				{
 					if (create.BulkStudentInformation == null)
-						return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without 'bulk student information' config."));
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create bulk student information without 'bulk student information' config."));
 
 					report = CreateBulkStudentInformation(create);
 				}
@@ -615,8 +620,9 @@ namespace api.Controllers
 				result.StatusCode = 424;
 				return result;
 			}
-			catch (NotFoundException)
+			catch (NotFoundException e)
 			{
+				Console.WriteLine(e.Message);
 				return NotFound();
 			}
 
