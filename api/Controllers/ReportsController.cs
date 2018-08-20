@@ -14,9 +14,9 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Aspose.Cells;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 using api.Common;
@@ -25,8 +25,6 @@ using api.Dtos;
 using models;
 using models.Reporters;
 using models.Reporters.Exporters;
-
-using Aspose.Cells;
 
 namespace api.Controllers
 {
