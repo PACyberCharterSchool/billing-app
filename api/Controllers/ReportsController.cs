@@ -113,7 +113,6 @@ namespace api.Controllers
 			public int TemplateId { get; set; }
 
 			public CreateInvoiceReport Invoice { get; set; }
-
 			public CreateBulkInvoiceReport BulkInvoice { get; set; }
 		}
 
@@ -793,43 +792,6 @@ namespace api.Controllers
 			public ReportDto Report { get; set; }
 		}
 
-		public class GetInvoiceArgs
-		{
-			public string Name { get; set; }
-			public string Format { get; set; }
-		}
-
-		[HttpGet("invoice/name")]
-		[Authorize(Policy = "PAY+")]
-		[Produces(ContentTypes.XLSX, ContentTypes.PDF)]
-		[ProducesResponseType(404)]
-		[ProducesResponseType(406)]
-		public async Task<IActionResult> GetInvoice([FromQuery]GetInvoiceArgs args)
-		{
-			var report = await Task.Run(() => _reports.Get(args.Name));
-			if (report == null)
-				return NotFound();
-
-			var accept = Request.Headers["Accept"];
-			foreach (var v in accept)
-			{
-				if (!v.Contains(ContentTypes.XLSX) && !v.Contains(ContentTypes.PDF))
-					return StatusCode(406);
-			}
-
-			var name = args.Name;
-			var contentType = args.Format == "excel" ? ContentTypes.XLSX : ContentTypes.PDF;
-			var data = contentType == ContentTypes.XLSX ? report.Xlsx : report.Pdf;
-
-			using (var stream = new MemoryStream(data))
-			{
-				return new FileStreamResult(new MemoryStream(stream.ToArray()), contentType)
-				{
-					FileDownloadName = name
-				};
-			};
-		}
-
 		[HttpGet("{name}")]
 		[Authorize(Policy = "PAY+")]
 		[Produces(ContentTypes.XLSX, ContentTypes.PDF)]
@@ -842,7 +804,6 @@ namespace api.Controllers
 				return NotFound();
 
 			var accept = Request.Headers["Accept"];
-
 			foreach (var v in accept)
 			{
 				if (!v.Contains(ContentTypes.XLSX) && !v.Contains(ContentTypes.PDF))
@@ -850,7 +811,7 @@ namespace api.Controllers
 			}
 
 			var stream = new MemoryStream(report.Xlsx);
-			return new FileStreamResult(stream, ContentTypes.XLSX)
+			return new FileStreamResult(stream, accept)
 			{
 				FileDownloadName = report.Name,
 			};
