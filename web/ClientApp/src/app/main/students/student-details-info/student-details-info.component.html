@@ -9,7 +9,7 @@
           </div>
         </div>
         <div class='card-body'>
-          <form class='form' role='form' [formGroup]='studentDetailForm' (ngSubmit)='updateStudentInfo()'>
+          <form class='form' role='form' [formGroup]='studentDetailForm' (ngSubmit)='updateStudentInfo(confirmationContent)'>
             <div class='row'>
               <div class='col-6 form-group flex-nowrap' formGroupName='personalInfo'>
                 <h4>Personal Information</h4>
@@ -201,3 +201,23 @@
     </div>
   </div>
 </div>
+<ng-template #confirmationContent let-c='close' let-d='dismiss'>
+  <div class='modal-header'>
+    <h4 class='modal-title'>Update student {{student.studentFirstName}} {{student.studentLastName}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class='modal-body'>
+    <div class='row align-items-center'>
+      <div class='col-12'>
+        <p>{{updateOpMessage}}</p>
+      </div>
+      <div class='align-items-center'>
+        <button type='button' class='btn btn-primary' (click)='c("OK click")'>OK</button>
+      </div>
+    </div>
+  </div>
+  <div class='modal-footer'>
+  </div>
+</ng-template>

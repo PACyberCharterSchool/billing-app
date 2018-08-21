@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { ActivatedRoute, Params } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 
@@ -13,6 +13,8 @@ import { StudentRecordsService } from '../../../services/student-records.service
 
 import { Observable } from 'rxjs/Observable';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-student-details-info',
@@ -29,12 +31,15 @@ export class StudentDetailsInfoComponent implements OnInit {
   public schoolDistricts: SchoolDistrict[];
   public selectedSchoolDistrict: SchoolDistrict;
   public scope: string;
+  public updateOpMessage: string;
 
   constructor(
     private currentStudentService: CurrentStudentService,
     private schoolDistrictService: SchoolDistrictService,
     private studentRecordsService: StudentRecordsService,
     private activatedRoute: ActivatedRoute,
+    private router: Router,
+    private ngbModal: NgbModal,
     private fb: FormBuilder
   ) { }
 
@@ -148,7 +153,7 @@ export class StudentDetailsInfoComponent implements OnInit {
     return results;
   }
 
-  updateStudentInfo(): void {
+  updateStudentInfo(confirmationDlgContent): void {
     let month: number;
     let day: number;
     let year: number;
@@ -157,10 +162,14 @@ export class StudentDetailsInfoComponent implements OnInit {
     this.student.studentLastName = this.studentDetailForm.get('personalInfo.lastName').value;
     this.student.studentMiddleInitial = this.studentDetailForm.get('personalInfo.middleInitial').value;
 
-    month = this.studentDetailForm.get('personalInfo.dateOfBirth').value.month;
-    day = this.studentDetailForm.get('personalInfo.dateOfBirth').value.day;
-    year = this.studentDetailForm.get('personalInfo.dateOfBirth').value.year;
-    this.student.studentDateOfBirth = new Date(`${month}/${day}/${year}`);
+    if (this.studentDetailForm.get('personalInfo.dateOfBirth').dirty) {
+      if (this.studentDetailForm.get('personalInfo.dateOfBirth').value) {
+        month = this.studentDetailForm.get('personalInfo.dateOfBirth').value.month;
+        day = this.studentDetailForm.get('personalInfo.dateOfBirth').value.day;
+        year = this.studentDetailForm.get('personalInfo.dateOfBirth').value.year;
+        this.student.studentDateOfBirth = new Date(`${month}/${day}/${year}`);
+      }
+    }
 
     this.student.studentStreet1 = this.studentDetailForm.get('addressInfo.street1').value;
     this.student.studentStreet2 = this.studentDetailForm.get('addressInfo.street2').value;
@@ -173,25 +182,47 @@ export class StudentDetailsInfoComponent implements OnInit {
       this.schoolDistricts.find(
         (s) => s.name.toLowerCase() === this.student.schoolDistrictName.toLowerCase()).id;
 
-    month = this.studentDetailForm.get('studentInfo.currentIepDate').value.month;
-    day = this.studentDetailForm.get('studentInfo.currentIepDate').value.day;
-    year = this.studentDetailForm.get('studentInfo.currentIepDate').value.year;
-    this.student.studentCurrentIep = new Date(`${month}/${day}/${year}`);
+    if (this.studentDetailForm.get('studentInfo.currentIepDate').dirty) {
+      if (!this.studentDetailForm.get('studentInfo.currentIepDate').value) {
+        this.student.studentCurrentIep = null;
+      } else {
+        month = this.studentDetailForm.get('studentInfo.currentIepDate').value.month;
+        day = this.studentDetailForm.get('studentInfo.currentIepDate').value.day;
+        year = this.studentDetailForm.get('studentInfo.currentIepDate').value.year;
+        this.student.studentCurrentIep = new Date(`${month}/${day}/${year}`);
+      }
+    }
 
-    month = this.studentDetailForm.get('studentInfo.formerIepDate').value.month;
-    day = this.studentDetailForm.get('studentInfo.formerIepDate').value.day;
-    year = this.studentDetailForm.get('studentInfo.formerIepDate').value.year;
-    this.student.studentFormerIep = new Date(`${month}/${day}/${year}`);
+    if (this.studentDetailForm.get('studentInfo.formerIepDate').dirty) {
+      if (!this.studentDetailForm.get('studentInfo.formerIepDate').value) {
+        this.student.studentFormerIep = null;
+      } else {
+        month = this.studentDetailForm.get('studentInfo.formerIepDate').value.month;
+        day = this.studentDetailForm.get('studentInfo.formerIepDate').value.day;
+        year = this.studentDetailForm.get('studentInfo.formerIepDate').value.year;
+        this.student.studentFormerIep = new Date(`${month}/${day}/${year}`);
+      }
+    }
 
-    month = this.studentDetailForm.get('studentInfo.enrollmentDate').value.month;
-    day = this.studentDetailForm.get('studentInfo.enrollmentDate').value.day;
-    year = this.studentDetailForm.get('studentInfo.enrollmentDate').value.year;
-    this.student.studentEnrollmentDate = new Date(`${month}/${day}/${year}`);
+    if (this.studentDetailForm.get('studentInfo.enrollmentDate').dirty) {
+      if (this.studentDetailForm.get('studentInfo.enrollmentDate').value) {
+        month = this.studentDetailForm.get('studentInfo.enrollmentDate').value.month;
+        day = this.studentDetailForm.get('studentInfo.enrollmentDate').value.day;
+        year = this.studentDetailForm.get('studentInfo.enrollmentDate').value.year;
+        this.student.studentEnrollmentDate = new Date(`${month}/${day}/${year}`);
+      }
+    }
 
-    month = this.studentDetailForm.get('studentInfo.withdrawalDate').value.month;
-    day = this.studentDetailForm.get('studentInfo.withdrawalDate').value.day;
-    year = this.studentDetailForm.get('studentInfo.withdrawalDate').value.year;
-    this.student.studentWithdrawalDate = new Date(`${month}/${day}/${year}`);
+    if (this.studentDetailForm.get('studentInfo.withdrawalDate').dirty) {
+      if (!this.studentDetailForm.get('studentInfo.withdrawalDate').value) {
+        this.student.studentWithdrawalDate = null;
+      } else {
+        month = this.studentDetailForm.get('studentInfo.withdrawalDate').value.month;
+        day = this.studentDetailForm.get('studentInfo.withdrawalDate').value.day;
+        year = this.studentDetailForm.get('studentInfo.withdrawalDate').value.year;
+        this.student.studentWithdrawalDate = new Date(`${month}/${day}/${year}`);
+      }
+    }
 
     this.student.studentGradeLevel = this.studentDetailForm.get('studentInfo.gradeLevel').value;
     this.student.studentPaSecuredId = this.studentDetailForm.get('studentInfo.paSecuredId').value;
@@ -200,9 +231,27 @@ export class StudentDetailsInfoComponent implements OnInit {
     this.studentRecordsService.updateStudentRecord(this.scope, this.student).subscribe(
       data => {
         console.log('StudentDetailsInfoComponent.updateStudentInfo(): data is ', data);
+        this.updateOpMessage = `Student update for student ${this.student.studentFirstName}
+         ${this.student.studentLastName} was successful`;
+        this.ngbModal.open(confirmationDlgContent).result.then(
+          result => {
+            this.router.navigate(['/students', { outlets: { 'action': ['list']}}]);
+          },
+          reason => {
+          }
+        );
       },
       error => {
         console.log('StudentDetailsInfoComponent.updateStudentInfo(): error is ', error);
+        this.updateOpMessage = `Failed to update student ${this.student.studentFirstName}
+           ${this.student.studentLastName}.  Error: ` + error;
+        this.ngbModal.open(confirmationDlgContent).result.then(
+          result => {
+            this.router.navigate(['/students', { outlets: { 'action': ['list']}}]);
+          },
+          reason => {
+          }
+        );
       }
     );
   }
