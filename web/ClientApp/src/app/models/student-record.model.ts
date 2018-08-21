@@ -33,6 +33,7 @@ export class StudentRecord {
   studentNorep: Date;
   studentPaSecuredId: number;
   lastUpdated: Date;
+  lazyLoader?: Object;
 
   header: StudentRecordsHeader;
 }

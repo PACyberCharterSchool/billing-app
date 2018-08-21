@@ -40,7 +40,13 @@ export class StudentRecordsService {
   }
 
   public updateStudentRecord(scope: string, record: StudentRecord): Observable<StudentRecord> {
-    const url = this.apiSSRUrl + `${scope}/${record.id}`;
-    return this.httpClient.put<StudentRecord>(url, delete record.id, this.headers);
+    const url = this.apiSSRUrl + `/${scope}/${record.id}`;
+
+    delete record.id;
+    delete record.header;
+    delete record.lazyLoader;
+    delete record.lastUpdated;
+
+    return this.httpClient.put<StudentRecord>(url, record, this.headers);
   }
 }

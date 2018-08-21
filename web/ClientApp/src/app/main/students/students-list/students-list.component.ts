@@ -180,7 +180,7 @@ export class StudentsListComponent implements OnInit {
       const s: StudentRecord = this.studentRecords.find((student) => student.id === studentRecord.id);
       this.currentStudentService.changeStudent(s);
       // this.router.navigate(['/students', { id: studentRecord.id, outlets: {'action': [`${studentRecord.id}`]} }]);
-      this.router.navigate([{ outlets: {'action': ['students', this.currentScope, studentRecord.id]} }]);
+      this.router.navigate(['/students', { outlets: {'action': [this.currentScope, studentRecord.id]} }]);
     }
   }
 
@@ -189,15 +189,23 @@ export class StudentsListComponent implements OnInit {
   }
 
   resetStudentList() {
-    this.studentsService.getStudents(this.skip).subscribe(
+    this.studentRecordsService.getStudentRecordsHeaders().subscribe(
       data => {
-        this.studentRecords = this.allStudentRecords = data['students'];
+        console.log('StudentsListComponent.resetStudentList(): data is ', data['scopes']);
+        this.scopes = data['scopes'];
+        if (this.scopes.length > 0) {
+          this.currentScope = this.scopes[0];
+          this.filterByStudentRecordScope(this.currentScope);
+        } else {
+          this.currentScope = 'Select scope...';
+        }
       },
       error => {
-        console.log('StudentsListComponent.resetStudentList(): error is ', error);
-        this.studentRecords = this.allStudentRecords = [];
+        console.log('StudentsListComponent.resetStudentList():  error is ', error);
+        this.currentScope = 'Select scope...';
       }
     );
+
     this.searchText = '';
   }
 
