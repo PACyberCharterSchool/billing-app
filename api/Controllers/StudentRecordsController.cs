@@ -31,13 +31,13 @@ namespace api.Controllers
 		{
 			public IList<string> Scopes { get; set; }
 		}
- 		[HttpGet("scopes")]
+		[HttpGet("scopes")]
 		[Authorize(Policy = "STD+")]
 		[ProducesResponseType(200)]
 		public async Task<IActionResult> GetScopes()
 		{
 			var scopes = await Task.Run(() => _records.GetScopes());
- 			return new ObjectResult(new ScopesResponse
+			return new ObjectResult(new ScopesResponse
 			{
 				Scopes = scopes,
 			});
@@ -146,14 +146,14 @@ namespace api.Controllers
 		[Authorize(Policy = "STD+")]
 		[ProducesResponseType(200)]
 		[ProducesResponseType(typeof(ErrorResponse), 400)]
-		[ProducesResponseType(423)]
+		[ProducesResponseType(422)]
 		public async Task<IActionResult> Update(string scope, int id, [FromBody]StudentRecordUpdate update)
 		{
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
-			if (_records.IsLocked(scope))
-				return StatusCode(423);
+			if (!_records.IsLocked(scope))
+				return StatusCode(422);
 
 			var record = new StudentRecord
 			{
