@@ -45,6 +45,8 @@ namespace api.Controllers
 
 		public class GetHeaderArgs
 		{
+			public string Filter { get; set; }
+
 			[Range(0, int.MaxValue)]
 			public int Skip { get; set; }
 
@@ -65,6 +67,7 @@ namespace api.Controllers
 		{
 			var header = await Task.Run(() => _records.Get(
 				scope: scope,
+				filter: args.Filter,
 				skip: args.Skip,
 				take: args.Take
 			));
