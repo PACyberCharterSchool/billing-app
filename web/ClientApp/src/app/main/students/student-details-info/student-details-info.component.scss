@@ -19,6 +19,15 @@
 
       .col-9 {
         margin-bottom: 4px;
+        button {
+          width: 2.30rem;
+          height: 2.30rem;
+          i {
+            position: relative;
+            left: -9px;
+            top: -5px;
+          }
+        }
       }
     }
   }

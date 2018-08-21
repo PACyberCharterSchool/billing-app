@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 
+import { ActivatedRoute, Params } from '@angular/router';
+
 import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
 
 import { StudentRecord } from '../../../models/student-record.model';
@@ -26,15 +28,24 @@ export class StudentDetailsInfoComponent implements OnInit {
   ];
   public schoolDistricts: SchoolDistrict[];
   public selectedSchoolDistrict: SchoolDistrict;
+  public scope: string;
 
   constructor(
     private currentStudentService: CurrentStudentService,
     private schoolDistrictService: SchoolDistrictService,
     private studentRecordsService: StudentRecordsService,
+    private activatedRoute: ActivatedRoute,
     private fb: FormBuilder
   ) { }
 
   ngOnInit() {
+    console.log('StudentDetailsInfoComponent.ngOnInit(): route is ', this.activatedRoute.url);
+    this.activatedRoute.params.subscribe(
+      (params) => {
+        this.scope = params['scope'];
+      }
+    );
+
     this.currentStudentService.currentStudent.subscribe(s => {
       this.student = s;
     });
@@ -161,7 +172,7 @@ export class StudentDetailsInfoComponent implements OnInit {
     this.student.studentPaSecuredId = this.studentDetailForm.get('studentInfo.paSecuredId').value;
     this.student.studentIsSpecialEducation = this.studentDetailForm.get('studentInfo.spedStatus').value;
 
-    this.studentRecordsService.updateStudentRecord(this.student).subscribe(
+    this.studentRecordsService.updateStudentRecord(this.scope, this.student).subscribe(
       data => {
         console.log('StudentDetailsInfoComponent.updateStudentInfo(): data is ', data);
       },

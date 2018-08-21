@@ -20,6 +20,12 @@ const studentsRoutes: Routes = [
         canActivate: [ AuthenticationGuardService ]
       },
       {
+        path: ':scope/:id',
+        component: StudentsDetailComponent,
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
+      },
+      {
         path: ':id',
         component: StudentsDetailComponent,
         outlet: 'action',
