@@ -32,5 +32,11 @@ namespace models
 			var pred = parser.Parse<T>("x", filter);
 			return source.Where(pred as Expression<Func<T, bool>>);
 		}
+
+		public static IEnumerable<T> Filter<T>(this IEnumerable<T> source, IFilterParser parser, string filter)
+		{
+			var pred = parser.Parse<T>("x", filter);
+			return source.Where(pred.Compile() as Func<T, bool>);
+		}
 	}
 }

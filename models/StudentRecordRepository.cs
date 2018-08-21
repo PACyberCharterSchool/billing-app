@@ -10,7 +10,7 @@ namespace models
 {
 	public interface IStudentRecordRepository
 	{
-		StudentRecordsHeader Get(string scope, int skip = 0, int take = 0);
+		StudentRecordsHeader Get(string scope, int skip = 0, int take = 0, string filter = null);
 		IList<string> GetScopes();
 		bool IsLocked(string scope);
 		void Lock(string scope);
@@ -20,15 +20,17 @@ namespace models
 	public class StudentRecordRepository : IStudentRecordRepository
 	{
 		private readonly PacBillContext _context;
+		private readonly IFilterParser _parser;
 		private readonly ILogger<StudentRecordRepository> _logger;
 
 		public StudentRecordRepository(PacBillContext context, ILogger<StudentRecordRepository> logger)
 		{
 			_context = context;
+			_parser = new FilterParser();
 			_logger = logger;
 		}
 
-		public StudentRecordsHeader Get(string scope, int skip = 0, int take = 0)
+		public StudentRecordsHeader Get(string scope, int skip = 0, int take = 0, string filter = null)
 		{
 			var header = _context.
 				StudentRecordsHeaders.
@@ -38,16 +40,16 @@ namespace models
 			if (header == null)
 				return null;
 
-			Console.WriteLine($"StudentRecordRepository.Get():  header is {header}.");
 			header.Records = header.Records.OrderBy(r => r.Id);
+
+			if (filter != null)
+				header.Records = header.Records.Filter(_parser, filter);
 
 			if (skip > 0)
 				header.Records = header.Records.Skip(skip);
 
 			if (take > 0)
 				header.Records = header.Records.Take(take);
-
-			Console.WriteLine($"StudentRecordRepository.Get():  records are {header.Records}.");
 
 			return header;
 		}
