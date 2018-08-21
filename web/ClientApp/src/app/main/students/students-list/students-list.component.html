@@ -25,6 +25,7 @@
         <button class='dropdown-item' *ngFor='let scope of scopes' (click)='filterByStudentRecordScope(scope)'>{{scope}}</button>
       </div>
     </div>
+    <button type='button' class='btn btn-primary' (click)='handleCommitClick()' [disabled]='!canCommit'>COMMIT</button>
   </div>
 </div>
 <div class='row advanced-search-tools-row align-items-center' *ngIf="advancedSearchEnabled">

@@ -179,11 +179,8 @@ export class StudentsListComponent implements OnInit {
     if (this.canEdit) {
       const s: StudentRecord = this.studentRecords.find((student) => student.id === studentRecord.id);
       this.currentStudentService.changeStudent(s);
-      this.router.navigate(['/students',
-        { scope: this.currentScope, id: studentRecord.id, outlets: {'action': [`${this.currentScope}/${studentRecord.id}`]} }]);
-      // this.router.navigate([
-      //   `/students/${this.currentScope}/${studentRecord.id}`,
-      //   { outlets: { 'action': [`${this.currentScope}/${studentRecord.id}`] }}]);
+      // this.router.navigate(['/students', { id: studentRecord.id, outlets: {'action': [`${studentRecord.id}`]} }]);
+      this.router.navigate([{ outlets: {'action': ['students', this.currentScope, studentRecord.id]} }]);
     }
   }
 
