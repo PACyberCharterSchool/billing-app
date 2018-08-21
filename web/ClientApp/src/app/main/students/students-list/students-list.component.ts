@@ -39,6 +39,7 @@ export class StudentsListComponent implements OnInit {
   private skip: number;
   private retrievingStudents: boolean;
   public canEdit: boolean;
+  public currentScopeCommitState: string;
 
   constructor(
     private globals: Globals,
@@ -93,35 +94,6 @@ export class StudentsListComponent implements OnInit {
     this.currentStudentService.currentStudent.subscribe((student) => this.selectedStudent = student, (error) => error);
   }
 
-  public dateSelectedStartDateHandler(date: Date): void {
-    this.startDate = date;
-    this.studentRecords = this.allStudentRecords.filter((sr) => {
-      if (this.endDate) {
-        if (sr.studentEnrollmentDate >= this.startDate && sr.studentEnrollmentDate <= this.endDate) {
-          return true;
-        }
-      }
-
-      if (sr.studentEnrollmentDate <= date) {
-        return true;
-      }
-
-      return false;
-    });
-  }
-
-  public dateSelectedEndDateHandler(date: Date): void {
-    this.endDate = date;
-    this.studentsService.getStudentsFilteredByEndDate(date).subscribe(
-      data => {
-        this.studentRecords = data['students'];
-      },
-      error => {
-        console.log('error');
-      }
-    );
-  }
-
   public studentsUpdatedHandler(students: StudentRecord[]): void {
     this.studentRecords = students;
     console.log('StudentsListComponent.studentsUpdatedHandler():  students are ', this.studentRecords);
@@ -146,6 +118,7 @@ export class StudentsListComponent implements OnInit {
       data => {
         this.studentRecords = data['header']['records'];
         this.canEdit = data['header']['locked'];
+        this.currentScopeCommitState = this.canEdit ? 'Committed' : 'Not committed';
         console.log('AdministrationImportStudentDataComponent.ngOnInit():  data is ', data);
         this.spinnerService.hide();
       },
@@ -160,10 +133,12 @@ export class StudentsListComponent implements OnInit {
     this.studentsService.getStudents(this.skip).subscribe(
       data => {
         this.studentRecords = this.studentRecords.concat(data['students']);
+        this.retrievingStudents = false;
         console.log('StudentsListComponent.getStudents():  students are ', this.studentRecords);
       },
       error => {
         console.log('error');
+        this.retrievingStudents = false;
       }
     );
   }
@@ -229,6 +204,7 @@ export class StudentsListComponent implements OnInit {
 
   onScroll($event) {
     if (!this.retrievingStudents) {
+      this.retrievingStudents = true;
       this.getStudents($event);
     }
   }

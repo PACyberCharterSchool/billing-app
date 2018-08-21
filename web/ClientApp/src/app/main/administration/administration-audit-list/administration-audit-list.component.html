@@ -27,11 +27,11 @@
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
             {{k | normalizeFieldName}}
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+            <i class='fa' [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
           </th>
           <th>
             Details
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+            <i class='fa' [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
           </th>
         </tr>
       </thead>
@@ -45,7 +45,7 @@
             <td>Old Value:</td><td>{{selectedAuditRecord.oldValue}}</td>
             <td>New Value:</td><td>{{selectedAuditRecord.newValue}}</td>
           </tr>
-        </ng-container> 
+        </ng-container>
       </tbody>
     </table>
   </div>

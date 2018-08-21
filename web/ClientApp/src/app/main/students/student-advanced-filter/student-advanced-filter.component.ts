@@ -16,10 +16,13 @@ export class StudentAdvancedFilterComponent implements OnInit {
   public grades: number[] = [
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
   ];
-
   public date: Date;
+  public startDate: Date;
+  public endDate: Date;
+  public studentRecords: StudentRecord[];
 
   @Input() schoolDistricts: SchoolDistrict[];
+  @Input() allStudentRecords: StudentRecord[];
 
   constructor(private studentsService: StudentsService) { }
 
@@ -37,6 +40,34 @@ export class StudentAdvancedFilterComponent implements OnInit {
     );
   }
 
+  public dateSelectedStartDateHandler(date: Date): void {
+    this.startDate = date;
+    this.studentRecords = this.allStudentRecords.filter((sr) => {
+      if (this.endDate) {
+        if (sr.studentEnrollmentDate >= this.startDate && sr.studentEnrollmentDate <= this.endDate) {
+          return true;
+        }
+      }
+
+      if (sr.studentEnrollmentDate <= date) {
+        return true;
+      }
+
+      return false;
+    });
+  }
+
+  public dateSelectedEndDateHandler(date: Date): void {
+    this.endDate = date;
+    this.studentsService.getStudentsFilteredByEndDate(date).subscribe(
+      data => {
+        this.studentRecords = data['students'];
+      },
+      error => {
+        console.log('error');
+      }
+    );
+  }
 
   filterStudentListBySchoolDistrict(schoolId: number) {
     this.studentsService.getStudentsFilteredBySchoolDistrict(schoolId).subscribe(

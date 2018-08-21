@@ -64,8 +64,12 @@
 
   div {
     table {
+      height: 100%;
       thead {
         height: 130px;
+      }
+      tbody {
+        height: calc(100% - 130px);
       }
     }
   }
