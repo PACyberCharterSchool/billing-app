@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -63,6 +64,7 @@ namespace api
 			{
 				opt.UseSqlServer(connectionString);
 				opt.UseLazyLoadingProxies();
+				opt.ConfigureWarnings(b => b.Ignore(CoreEventId.DetachedLazyLoadingWarning));
 			});
 			services.AddTransient<IAuditRecordRepository, AuditRecordRepository>();
 			services.AddTransient<ICalendarRepository, CalendarRepository>();
