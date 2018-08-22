@@ -43,8 +43,10 @@ export class StudentAdvancedFilterComponent implements OnInit {
     this.studentRecordsService.getHeaderByScopeByDob(this.scope, date).subscribe(
       data => {
         this.studentsUpdated.emit(data['header']['records']);
+        console.log('StudentAdvancedFilterComponent.dateSelectedDOBDateHandler():  data is ', data);
       },
       error => {
+        console.log('StudentAdvancedFilterComponent.dateSelectedDOBDateHandler():  error is ', error);
       }
     );
   }
