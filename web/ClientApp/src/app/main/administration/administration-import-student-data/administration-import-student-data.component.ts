@@ -37,7 +37,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
 
   ngOnInit() {
     this.currentScope = 'Select billing period...';
-    this.ssrImportService.getStudentRecordsHeaders().subscribe(
+    this.ssrImportService.getHeaders().subscribe(
       data => {
         this.scopes = data['scopes'];
       },
@@ -68,7 +68,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
   public filterByStudentRecordScope(scope: string): void {
     this.currentScope = scope;
     this.spinnerService.show();
-    this.ssrImportService.getStudentRecordsHeaderByScope(this.currentScope, this.skip).subscribe(
+    this.ssrImportService.getHeaderByScope(this.currentScope, this.skip).subscribe(
       data => {
         this.studentRecords = data['header']['records'];
         console.log('AdministrationImportStudentDataComponent.ngOnInit():  data is ', data);
@@ -83,7 +83,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
   }
 
   getStudentRecords($event) {
-    this.ssrImportService.getStudentRecordsHeaderByScope(this.currentScope, this.skip).subscribe(
+    this.ssrImportService.getHeaderByScope(this.currentScope, this.skip).subscribe(
       data => {
         this.updateScrollingSkip();
         this.studentRecords = this.studentRecords.concat(data['header']['records']);

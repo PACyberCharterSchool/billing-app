@@ -33,7 +33,7 @@
 </div>
 <div class='row advanced-search-tools-row align-items-center' *ngIf="advancedSearchEnabled">
   <div class='col-auto'>
-    <app-student-advanced-filter [schoolDistricts]='schoolDistricts' (studentsUpdated)='studentsUpdatedHandler($event)'></app-student-advanced-filter>
+    <app-student-advanced-filter [schoolDistricts]='schoolDistricts' [scope]='currentScope' (studentsUpdated)='studentsUpdatedHandler($event)'></app-student-advanced-filter>
   </div>
 </div>
 <div class='row student-list-view-row'>
@@ -49,7 +49,7 @@
         </tr>
       </thead>
       <tbody infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]="false">
-        <tr *ngFor='let sr of studentRecords'>
+        <tr *ngFor='let sr of studentRecords | orderBy: {property: property, direction: direction}'>
           <td *ngFor='let v of listDisplayableValues(sr)' (click)='showStudentDetails(sr)'>{{v | normalizeFieldValue}}</td>
         </tr>
       </tbody>

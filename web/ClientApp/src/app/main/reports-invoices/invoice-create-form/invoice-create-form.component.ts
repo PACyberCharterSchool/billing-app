@@ -77,7 +77,7 @@ export class InvoiceCreateFormComponent implements OnInit {
       }
     );
 
-    this.studentRecordsService.getStudentRecordsHeaders().subscribe(
+    this.studentRecordsService.getHeaders().subscribe(
       data => {
         console.log('StudentsListComponent.ngOnInit(): data is ', data['scopes']);
         this.scopes = data['scopes'];

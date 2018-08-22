@@ -69,7 +69,7 @@ export class InvoicesListComponent implements OnInit {
     this.spinnerMsg = 'Loading invoices.  Please wait...';
     this.ngxSpinnerService.show();
 
-    this.studentRecordsService.getStudentRecordsHeaders().subscribe(
+    this.studentRecordsService.getHeaders().subscribe(
       data => {
         this.scopes = data['scopes'];
       },

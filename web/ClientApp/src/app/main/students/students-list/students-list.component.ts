@@ -60,36 +60,32 @@ export class StudentsListComponent implements OnInit {
     }
 
   ngOnInit() {
-    if (this.allStudentRecords && this.allStudentRecords.length <= 0) {
-      this.studentRecordsService.getStudentRecordsHeaders().subscribe(
-        data => {
-          console.log('StudentsListComponent.ngOnInit(): data is ', data['scopes']);
-          this.scopes = data['scopes'];
-          if (this.scopes.length > 0) {
-            this.currentScope = this.scopes[0];
-            this.filterByStudentRecordScope(this.currentScope);
-          } else {
-            this.currentScope = 'Select scope...';
-          }
-        },
-        error => {
-          console.log('StudentsListComponent.ngOnInit():  error is ', error);
+    this.studentRecordsService.getHeaders().subscribe(
+      data => {
+        console.log('StudentsListComponent.ngOnInit(): data is ', data['scopes']);
+        this.scopes = data['scopes'];
+        if (this.scopes.length > 0) {
+          this.currentScope = this.scopes[0];
+          this.filterByStudentRecordScope(this.currentScope);
+        } else {
           this.currentScope = 'Select scope...';
         }
-      );
-    }
+      },
+      error => {
+        console.log('StudentsListComponent.ngOnInit():  error is ', error);
+        this.currentScope = 'Select scope...';
+      }
+    );
 
-    if (this.schoolDistricts && this.schoolDistricts.length <= 0) {
-      this.schoolDistrictService.getSchoolDistricts().subscribe(
-        data => {
-          this.schoolDistricts = data['schoolDistricts'];
-          console.log('StudentsListComponent.ngOnInit():  school districts are', this.schoolDistricts);
-        },
-        error => {
-          console.log('StudentsListComponent.ngOnInit():  error is ', error);
-        }
-      );
-    }
+    this.schoolDistrictService.getSchoolDistricts().subscribe(
+      data => {
+        this.schoolDistricts = data['schoolDistricts'];
+        console.log('StudentsListComponent.ngOnInit():  school districts are', this.schoolDistricts);
+      },
+      error => {
+        console.log('StudentsListComponent.ngOnInit():  error is ', error);
+      }
+    );
 
     this.currentStudentService.currentStudent.subscribe((student) => this.selectedStudent = student, (error) => error);
   }
@@ -114,7 +110,7 @@ export class StudentsListComponent implements OnInit {
   public filterByStudentRecordScope(scope: string): void {
     this.currentScope = scope;
     this.spinnerService.show();
-    this.studentRecordsService.getStudentRecordsHeaderByScope(this.currentScope, this.skip).subscribe(
+    this.studentRecordsService.getHeaderByScope(this.currentScope, this.skip).subscribe(
       data => {
         this.studentRecords = data['header']['records'];
         this.canEdit = data['header']['locked'];
@@ -130,10 +126,11 @@ export class StudentsListComponent implements OnInit {
   }
 
   getStudents($event) {
-    this.studentsService.getStudents(this.skip).subscribe(
+    this.studentRecordsService.getHeaderByScope(this.currentScope, this.skip).subscribe(
       data => {
-        this.studentRecords = this.studentRecords.concat(data['students']);
+        this.studentRecords = this.studentRecords.concat(data['header']['records']);
         this.retrievingStudents = false;
+        this.updateScrollingSkip();
         console.log('StudentsListComponent.getStudents():  students are ', this.studentRecords);
       },
       error => {
@@ -162,8 +159,14 @@ export class StudentsListComponent implements OnInit {
     this.advancedSearchEnabled = !this.advancedSearchEnabled;
   }
 
+  private initAllFilterControls(): void {
+    this.searchText = '';
+    this.startDate = null;
+    this.endDate = null;
+  }
+
   resetStudentList() {
-    this.studentRecordsService.getStudentRecordsHeaders().subscribe(
+    this.studentRecordsService.getHeaders().subscribe(
       data => {
         console.log('StudentsListComponent.resetStudentList(): data is ', data['scopes']);
         this.scopes = data['scopes'];
@@ -180,7 +183,7 @@ export class StudentsListComponent implements OnInit {
       }
     );
 
-    this.searchText = '';
+    this.initAllFilterControls();
   }
 
   filterStudentListByNameOrId() {

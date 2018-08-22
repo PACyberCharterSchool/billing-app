@@ -28,15 +28,86 @@ export class StudentRecordsService {
     return this.httpClient.post<any>(url, this.headers);
   }
 
-  public getStudentRecordsHeaders(): Observable<StudentRecordsHeader[]> {
+  public getHeaders(): Observable<StudentRecordsHeader[]> {
     const url = this.apiSSRUrl + `/scopes`;
     return this.httpClient.get<StudentRecordsHeader[]>(url, this.headers);
     // return Observable.of(studentRecordsHeaders);
   }
 
-  public getStudentRecordsHeaderByScope(scope: string, skip: number): Observable<StudentRecordsHeader> {
+  public getHeaderByScope(scope: string, skip: number): Observable<StudentRecordsHeader> {
     const url = this.apiSSRUrl + `/header/${scope}?Skip=${skip}&Take=${this.globals.take}`;
     return this.httpClient.get<StudentRecordsHeader>(url, this.headers);
+  }
+
+  public getHeaderByScopeByDob(scope: string, date: Date): Observable<StudentRecordsHeader> {
+    const url = this.buildStudentDOBQuery(scope, date);
+    return this.httpClient.get<StudentRecordsHeader>(url, this.headers);
+  }
+
+  private buildStudentDOBQuery(scope: string, dob: Date): string {
+    const url: string = this.apiSSRUrl + `/header/${scope}?Filter=(StudentDateOfBirth eq ${dob.toLocaleDateString('en-US')})`;
+    return url;
+  }
+
+  public getHeaderByScopeByIep(scope: string, isIep: boolean): Observable<StudentRecordsHeader> {
+    const url: string = this.buildStudentIepSearchQuery(scope, isIep);
+    return this.httpClient.get<StudentRecordsHeader>(url, this.headers);
+  }
+
+  private buildStudentIepSearchQuery(scope: string, isIep: boolean): string {
+    const url: string = this.apiSSRUrl + `/header/${scope}?Filter=(StudentIsSpecialEducation eq ${isIep})`;
+    return url;
+  }
+
+  public getHeaderByScopeByStart(scope: string, start: Date): Observable<StudentRecordsHeader> {
+    const url: string = this.buildStudentsStartDateQuery(scope, start);
+    return this.httpClient.get<StudentRecordsHeader>(url, this.headers);
+  }
+
+  private buildStudentsStartDateQuery(scope: string, start: Date): string {
+    const url: string = this.apiSSRUrl + `/header/${scope}?Filter=(StudentEnrollmentDate eq ${start.toLocaleDateString('en-US')})`;
+    return url;
+  }
+
+  public getHeaderByScopeByStartByEnd(scope: string, start: Date, end: Date): Observable<StudentRecordsHeader> {
+    const url: string = this.buildStudentsStartDateEndDateQuery(scope, start, end);
+    return this.httpClient.get<StudentRecordsHeader>(url, this.headers);
+  }
+
+  private buildStudentsStartDateEndDateQuery(scope: string, start: Date, end: Date): string {
+    const url: string = this.apiSSRUrl + `/header/${scope}?Filter=((StudentEnrollmentDate ge ${start.toLocaleDateString('en-US')}/
+     and (EndDate le ${end.toLocaleDateString('en-US')})))`;
+    return url;
+  }
+
+  public getHeaderByScopeByEnd(scope: string, end: Date): Observable<StudentRecordsHeader> {
+    const url: string = this.buildStudentsEndDateQuery(scope, end);
+    return this.httpClient.get<StudentRecordsHeader>(url, this.headers);
+  }
+
+  private buildStudentsEndDateQuery(scope: string, end: Date): string {
+    const url: string = this.apiSSRUrl + `/header/${scope}?Filter=(StudentWithdrawalDate eq ${end.toLocaleDateString('en-US')})`;
+    return url;
+  }
+
+  public getHeaderByScopeByGrade(scope: string, grade: number): Observable<StudentRecordsHeader> {
+    const url: string = this.buildStudentsGradeQuery(scope, grade);
+    return this.httpClient.get<StudentRecordsHeader>(url, this.headers);
+  }
+
+  private buildStudentsGradeQuery(scope: string, grade: number): string {
+    const url: string = this.apiSSRUrl + `/header/${scope}?Filter=(StudentGrade eq ${grade})`;
+    return url;
+  }
+
+  public getHeaderByScopeBySchoolDistrict(scope: string, schoolDistrictId: number): Observable<StudentRecordsHeader> {
+    const url: string = this.buildStudentsSchoolDistrictQuery(scope, schoolDistrictId);
+    return this.httpClient.get<StudentRecordsHeader>(url, this.headers);
+  }
+
+  private buildStudentsSchoolDistrictQuery(scope: string, schoolDistrictId: number): string {
+    const url: string = this.apiSSRUrl + `/header/${scope}?Filter=(SchoolDistrictId eq ${schoolDistrictId})`;
+    return url;
   }
 
   public updateStudentRecord(scope: string, record: StudentRecord): Observable<StudentRecord> {
