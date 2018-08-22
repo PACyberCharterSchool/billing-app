@@ -20,6 +20,8 @@ namespace models.Tests
 		public string D { get; set; }
 		public int? E { get; set; }
 		public NestedClass F { get; set; }
+		public DateTime G { get; set; }
+		public bool H { get; set; }
 	}
 
 	[TestFixture]
@@ -32,7 +34,7 @@ namespace models.Tests
 		[TestCase("(a ge 1)", "x => (x.A >= 1)")]
 		[TestCase("(a lt 1)", "x => (x.A < 1)")]
 		[TestCase("(a le 1)", "x => (x.A <= 1)")]
-		/* [TestCase("(d has z)", "x => x.D.Contains(\"z\")")] */
+		[TestCase("(d has z)", "x => x.D.Contains(\"z\")")]
 		[TestCase("(d bgn z)", "x => x.D.StartsWith(\"z\")")]
 		[TestCase("(d end z)", "x => x.D.EndsWith(\"z\")")]
 		[TestCase("((a eq 1) and (b eq 2))", "x => ((x.A == 1) AndAlso (x.B == 2))")]
@@ -41,6 +43,8 @@ namespace models.Tests
 		[TestCase("(e eq 1)", "x => (x.E == 1)")] // nullables
 		[TestCase("(f.a eq 1)", "x => (x.F.A == 1)")]
 		[TestCase("(f.z eq 1)", "x => (x.F.Z == 1)")]
+		[TestCase("(g eq 01/01/1987)", "x => (x.G == 1/1/87 12:00:00 AM)")]
+		[TestCase("(h eq true)", "x => (x.H == True)")]
 		public void ParseProducesLambda(string clause, string lambda)
 		{
 			var actual = new FilterParser().Parse<TestClass>(clause);
