@@ -4,7 +4,7 @@
     <div ngbDropdown class='d-inline-block'>
       <button ngbDropdownToggle class='btn btn-outline-primary' id='schoolDistrictDropdown'>Select</button>
       <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='schoolDistrictDropdown'>
-        <button class='dropdown-item' *ngFor='let sd of schoolDistricts' (click)='filterBySchoolDistrict(sd.id)'>{{sd.name}}</button>
+        <button class='dropdown-item' *ngFor='let sd of schoolDistricts' (click)='filterBySchoolDistrict(sd.aun)'>{{sd.name}}</button>
       </div>
     </div>
   </div>
@@ -19,18 +19,18 @@
   </div>
   <div class='col-auto advanced-dob-col'>
     <h6>Date of Birth</h6>
-    <app-student-datepicker [(date)]='date' (dateSelected)='dateSelectedDOBDateHandler($event)' iconSize="fa-2x"></app-student-datepicker>
+    <app-student-datepicker #studentDatepickerDOB [(date)]='date' (dateSelected)='dateSelectedDOBDateHandler($event)' iconSize="fa-2x"></app-student-datepicker>
   </div>
   <div class='col-auto'>
     <h6>Enrollment Date</h6>
     <div class='col-auto'>
-      <app-student-datepicker iconSize='fa-2x' [(date)]='startDate' (dateSelected)='dateSelectedStartDateHandler($event)'></app-student-datepicker>
+      <app-student-datepicker #studentDatepickerEnrollment iconSize='fa-2x' [(date)]='startDate' (dateSelected)='dateSelectedStartDateHandler($event)'></app-student-datepicker>
     </div>
   </div>
   <div class='col-auto'>
     <h6>Withdrawal Date</h6>
     <div class='col-auto'>
-      <app-student-datepicker iconSize='fa-2x' [(date)]='endDate' (dateSelected)='dateSelectedEndDateHandler($event)'></app-student-datepicker>
+      <app-student-datepicker #studentDatepickerWithdrawal iconSize='fa-2x' [(date)]='endDate' (dateSelected)='dateSelectedEndDateHandler($event)'></app-student-datepicker>
     </div>
   </div>
   <div class='col-auto advanced-iep-col'>
@@ -44,3 +44,4 @@
     </div>
   </div>
 </div>
+<ngx-spinner size='large' loadingText='Retrieving student records for scope {{scope}} from PACBill database.  Please wait...' type='timer'></ngx-spinner>

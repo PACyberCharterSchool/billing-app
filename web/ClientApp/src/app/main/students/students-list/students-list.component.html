@@ -33,7 +33,7 @@
 </div>
 <div class='row advanced-search-tools-row align-items-center' *ngIf="advancedSearchEnabled">
   <div class='col-auto'>
-    <app-student-advanced-filter [schoolDistricts]='schoolDistricts' [scope]='currentScope' (studentsUpdated)='studentsUpdatedHandler($event)'></app-student-advanced-filter>
+    <app-student-advanced-filter #advancedStudentFilter [schoolDistricts]='schoolDistricts' [scope]='currentScope' (studentsUpdated)='studentsUpdatedHandler($event)'></app-student-advanced-filter>
   </div>
 </div>
 <div class='row student-list-view-row'>

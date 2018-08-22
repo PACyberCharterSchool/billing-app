@@ -9,8 +9,10 @@ import { OrderByPipe } from '../../../pipes/orderby.pipe';
 import { IepEnrolledPipe } from '../../../pipes/iep-enrolled.pipe';
 
 import { StudentsService } from '../../../services/students.service';
+import { StudentRecordsService } from '../../../services/student-records.service';
 
 import { NgbModule, NgbCalendar, NgbDropdownConfig, NgbDateParserFormatter, NgbDateAdapter  } from '@ng-bootstrap/ng-bootstrap';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 import { Globals } from '../../../globals';
 
@@ -21,9 +23,10 @@ describe('StudentAdvancedFilterComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ StudentAdvancedFilterComponent, StudentDatepickerComponent, IepEnrolledPipe, OrderByPipe ],
-      imports: [ FormsModule, NgbModule ],
+      imports: [ FormsModule, NgbModule, NgxSpinnerModule ],
       providers: [
         StudentsService,
+        StudentRecordsService,
         HttpClient,
         HttpHandler,
         NgbDropdownConfig,

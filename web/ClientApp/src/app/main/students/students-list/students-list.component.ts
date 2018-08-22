@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Observable } from 'rxjs/Observable';
@@ -13,6 +13,8 @@ import { StudentRecordsService } from '../../../services/student-records.service
 import { SchoolDistrictService } from '../../../services/school-district.service';
 import { CurrentStudentService } from '../../../services/current-student.service';
 import { UtilitiesService } from '../../../services/utilities.service';
+
+import { StudentAdvancedFilterComponent } from '../student-advanced-filter/student-advanced-filter.component';
 
 import { NgxSpinnerService } from 'ngx-spinner';
 
@@ -40,6 +42,9 @@ export class StudentsListComponent implements OnInit {
   private retrievingStudents: boolean;
   public canEdit: boolean;
   public currentScopeCommitState: string;
+
+  @ViewChild('advancedStudentFilter')
+  private advancedStudentFilterComponent: StudentAdvancedFilterComponent;
 
   constructor(
     private globals: Globals,
@@ -184,6 +189,7 @@ export class StudentsListComponent implements OnInit {
     );
 
     this.initAllFilterControls();
+    this.advancedStudentFilterComponent.initAllFilterControls();
   }
 
   filterStudentListByNameOrId() {

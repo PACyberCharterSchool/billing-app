@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import { SchoolDistrict } from '../../../models/school-district.model';
 
@@ -6,6 +6,9 @@ import { StudentsService } from '../../../services/students.service';
 import { StudentRecordsService } from '../../../services/student-records.service';
 
 import { StudentRecord } from '../../../models/student-record.model';
+
+import { NgxSpinnerService } from 'ngx-spinner';
+import { StudentDatepickerComponent } from '../student-datepicker/student-datepicker.component';
 
 @Component({
   selector: 'app-student-advanced-filter',
@@ -28,9 +31,17 @@ export class StudentAdvancedFilterComponent implements OnInit {
   @Input() allStudentRecords: StudentRecord[];
   @Input() scope: string;
 
+  @ViewChild('studentDatepickerDOB')
+  studentDatepickerDOBComponent: StudentDatepickerComponent;
+  @ViewChild('studentDatepickerEnrollment')
+  studentDatepickerEnrollmentComponent: StudentDatepickerComponent;
+  @ViewChild('studentDatepickerWithdrawal')
+  studentDatepickerWithdrawalComponent: StudentDatepickerComponent;
+
   constructor(
     private studentsService: StudentsService,
-    private studentRecordsService: StudentRecordsService
+    private studentRecordsService: StudentRecordsService,
+    private ngxSpinnerService: NgxSpinnerService
   ) { }
 
   @Output() studentsUpdated: EventEmitter<StudentRecord[]> = new EventEmitter();
@@ -38,168 +49,153 @@ export class StudentAdvancedFilterComponent implements OnInit {
   ngOnInit() {
   }
 
+  public initAllFilterControls(): void {
+    this.date = null;
+    this.startDate = null;
+    this.endDate = null;
+    this.enrollmentDate = null;
+    this.withdrawalDate = null;
+    this.studentDatepickerDOBComponent.date = null;
+    this.studentDatepickerEnrollmentComponent.date = null;
+    this.studentDatepickerWithdrawalComponent.date = null;
+  }
+
   public dateSelectedDOBDateHandler(date: Date) {
     console.log('StudentAdvancedFilter.dateSelectedDOBDateHandler(): date is ', date);
+    this.ngxSpinnerService.show();
     this.studentRecordsService.getHeaderByScopeByDob(this.scope, date).subscribe(
       data => {
         this.studentsUpdated.emit(data['header']['records']);
         console.log('StudentAdvancedFilterComponent.dateSelectedDOBDateHandler():  data is ', data);
+        this.ngxSpinnerService.hide();
       },
       error => {
         console.log('StudentAdvancedFilterComponent.dateSelectedDOBDateHandler():  error is ', error);
+        this.ngxSpinnerService.hide();
       }
     );
   }
 
   public dateSelectedStartDateHandler(date: Date): void {
     this.startDate = date;
+    this.ngxSpinnerService.show();
     if (this.endDate) {
       this.studentRecordsService.getHeaderByScopeByStartByEnd(this.scope, this.startDate, this.endDate).subscribe(
         data => {
+          this.studentsUpdated.emit(data['header']['records']);
           console.log('StudentAdvancedFilter.dateSelectedStartDateHandler():  data is ', data['header']['records']);
+          this.ngxSpinnerService.hide();
         },
         error => {
           console.log('StudentAdvancedFilter.dateSelectedStartDateHandler():  error is ', error);
+          this.ngxSpinnerService.hide();
         }
       );
     } else {
       this.studentRecordsService.getHeaderByScopeByStart(this.scope, this.startDate).subscribe(
         data => {
+          this.studentsUpdated.emit(data['header']['records']);
           console.log('StudentAdvancedFilter.dateSelectedStartDateHandler():  data is ', data['header']['records']);
+          this.ngxSpinnerService.hide();
         },
         error => {
           console.log('StudentAdvancedFilter.dateSelectedStartDateHandler():  error is ', error);
+          this.ngxSpinnerService.hide();
         }
       );
     }
-    // this.studentRecords = this.allStudentRecords.filter((sr) => {
-    //   if (this.endDate) {
-    //     if (sr.studentEnrollmentDate >= this.startDate && sr.studentEnrollmentDate <= this.endDate) {
-    //       return true;
-    //     }
-    //   }
-
-    //   if (sr.studentEnrollmentDate <= date) {
-    //     return true;
-    //   }
-
-    //   return false;
-    // });
   }
 
   public dateSelectedEndDateHandler(date: Date): void {
     this.endDate = date;
+    this.ngxSpinnerService.show();
     if (this.startDate) {
       this.studentRecordsService.getHeaderByScopeByStartByEnd(this.scope, this.startDate, date).subscribe(
         data => {
           console.log('StudentAdvancedFilterComponent.dateSelectedEndDateHandler():  data is ', data['header']['records']);
           this.studentRecords = data['header']['records'];
+          this.ngxSpinnerService.hide();
         },
         error => {
           console.log('StudentAdvancedFilterComponent.dateSelectedEndDateHandler():  error is ', error);
+          this.ngxSpinnerService.hide();
         }
       );
     } else {
       this.studentRecordsService.getHeaderByScopeByEnd(this.scope, date).subscribe(
         data => {
           console.log('StudentAdvancedFilterComponent.dateSelectedEndDateHandler():  data is ', data['header']['records']);
+          this.studentRecords = data['header']['records'];
+          this.ngxSpinnerService.hide();
         },
         error => {
           console.log('StudentAdvancedFilterComponent.dateSelectedEndDateHandler():  error is ', error);
+          this.ngxSpinnerService.hide();
         }
       );
     }
-    // this.studentsService.getStudentsFilteredByEndDate(date).subscribe(
-    //   data => {
-    //     this.studentRecords = data['students'];
-    //   },
-    //   error => {
-    //     console.log('error');
-    //   }
-    // );
   }
 
   filterBySchoolDistrict(schoolId: number) {
+    this.ngxSpinnerService.show();
     this.studentRecordsService.getHeaderByScopeBySchoolDistrict(this.scope, schoolId).subscribe(
       data => {
         this.studentsUpdated.emit(data['header']['records']);
+        this.ngxSpinnerService.hide();
       },
       error => {
         console.log('StudentsAdvancedFilterComponent.filterBySchoolDistrict():  error is ', error);
+        this.ngxSpinnerService.hide();
       }
     );
-    // this.studentsService.getStudentsFilteredBySchoolDistrict(schoolId).subscribe(
-    //   data => {
-    //     this.studentsUpdated.emit(data['students']);
-    //     console.log('StudentsListComponent.filterBySchoolDistrict():  students are ', data);
-    //   }
-    // );
   }
 
   filterByGrade(grade: number) {
     if (grade) {
+      this.ngxSpinnerService.show();
       this.studentRecordsService.getHeaderByScopeByGrade(this.scope, grade).subscribe(
         data => {
           console.log('StudentAdvancedFilterComponent.filterByGrade(): data is ', data);
+          this.studentsUpdated.emit(data['header']['records']);
+          this.ngxSpinnerService.hide();
         },
         error => {
           console.log('StudentAdvancedFilterComponent.filterByGrade(): error is ', error);
+          this.ngxSpinnerService.hide();
         }
       );
-      // this.studentsService.getStudentsFilteredByGrade(grade).subscribe(
-      //   data => {
-      //     this.studentsUpdated.emit(data['students']);
-      //     console.log('StudentAdvancedFilterComponent.filterByGrade(): students are ', data);
-      //   },
-      //   error => {
-      //     console.log('StudentAdvancedFilterComponent.filterByGrade(): error is ', error);
-      //   }
-      // );
     }
   }
 
   filterByDateOfBirth(dob: Date) {
     if (dob) {
+      this.ngxSpinnerService.show();
       this.studentRecordsService.getHeaderByScopeByDob(this.scope, dob).subscribe(
         data => {
           console.log('StudentAdvancedFilterComponent.filterByDateOfBirth(): students are ', data);
           this.studentRecords = data['header']['records'];
+          this.ngxSpinnerService.hide();
         },
         error => {
           console.log('StudentAdvancedFilterComponent.filterByDateOfBirth():  error is ', error);
+          this.ngxSpinnerService.hide();
         }
       );
-      // this.studentsService.getStudentsFilteredByDateOfBirth(dob).subscribe(
-      //   data => {
-      //     this.studentsUpdated.emit(data['students']);
-      //     console.log('StudentAdvancedFilterComponent.filterByDateOfBirth(): students are ', data);
-      //   },
-      //   error => {
-      //     console.log('StudentAdvancedFilterComponent.filterByDateOfBirth():  error is ', error);
-      //   }
-      // );
     }
   }
 
   filterByIep(iep: boolean) {
+    this.ngxSpinnerService.show();
     this.studentRecordsService.getHeaderByScopeByIep(this.scope, iep).subscribe(
       data => {
         this.studentsUpdated.emit(data['header']['records']);
+        this.ngxSpinnerService.hide();
         console.log('StudentAdvancedFilterComponent.filterByIep():  data is ', data);
       },
       error => {
         console.log('StudentAdvancedFilterComponent.filterByIep():  error is ', error);
+        this.ngxSpinnerService.hide();
       }
     );
-
-    // this.studentsService.getStudentsFilteredByIep(iep).subscribe(
-    //   data => {
-    //     this.studentsUpdated.emit(data['students']);
-    //     console.log('StudentAdvancedFilterComponent.filterByIep(): students are ', data);
-    //   },
-    //   error => {
-    //     console.log('StudentAdvancedFilterComponent.filterByIep():  error is ', error);
-    //   }
-    // );
   }
 }

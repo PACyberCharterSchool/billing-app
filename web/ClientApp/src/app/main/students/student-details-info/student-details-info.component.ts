@@ -48,6 +48,8 @@ export class StudentDetailsInfoComponent implements OnInit {
     this.activatedRoute.params.subscribe(
       (params) => {
         this.scope = params['scope'];
+      },
+      (stuff) => {
       }
     );
 

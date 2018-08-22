@@ -75,8 +75,12 @@ export class StudentRecordsService {
   }
 
   private buildStudentsStartDateEndDateQuery(scope: string, start: Date, end: Date): string {
-    const url: string = this.apiSSRUrl + `/header/${scope}?Filter=((StudentEnrollmentDate ge ${start.toLocaleDateString('en-US')}/
-     and (EndDate le ${end.toLocaleDateString('en-US')})))`;
+    const url: string = this.apiSSRUrl +
+      `/header/${scope}?Filter=` +
+      `(((StudentEnrollmentDate ge ${start.toLocaleDateString('en-US')}) and ` +
+      `(StudentEnrollmentDate le ${end.toLocaleDateString('en-US')})) and ` +
+      `((StudentWithdrawalDate ge ${end.toLocaleDateString('en-US')}) and ` +
+      `(StudentWithdrawalDate le ${start.toLocaleDateString('en-US')})))`;
     return url;
   }
 
@@ -96,7 +100,7 @@ export class StudentRecordsService {
   }
 
   private buildStudentsGradeQuery(scope: string, grade: number): string {
-    const url: string = this.apiSSRUrl + `/header/${scope}?Filter=(StudentGrade eq ${grade})`;
+    const url: string = this.apiSSRUrl + `/header/${scope}?Filter=(StudentGradeLevel eq ${grade})`;
     return url;
   }
 
