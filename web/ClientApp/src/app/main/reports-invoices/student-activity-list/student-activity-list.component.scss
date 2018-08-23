@@ -63,22 +63,17 @@
 }
 
 .modal-body {
-  div.col-md-12 {
+  div.col-12 {
     form {
-      div.form-group {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        div.d-inline-block {
-          width: 100%;
-
-          button {
-            width: 100%;
-          }
-
-          div {
-            width: 100%;
+      div.row {
+        div.form-group {
+          div.row {
+            div.col-6 {
+              div.dropdown-menu {
+                height: 120px;
+                overflow-y: scroll;
+              }
+            }
           }
         }
       }

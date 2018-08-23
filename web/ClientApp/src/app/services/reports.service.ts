@@ -189,7 +189,11 @@ export class ReportsService {
 
   // HTTP POST /api/activity/bulk
   public createBulkActivity(activityInfo: Object): Observable<Report> {
-    return Observable.of(null);
+    activityInfo = Object.assign(activityInfo, { 'reportType': 'BulkStudentInformation' });
+    const url = this.apiReportsUrl + '/bulk';
+    return this.httpClient.post<any>(url, activityInfo, this.headers);
+
+    // return Observable.of(null);
   }
 
   // HTTP GET /api/activity/bulk
@@ -197,5 +201,16 @@ export class ReportsService {
     invoiceInfo = Object.assign(invoiceInfo, { 'reportType': 'StudentInformation' });
     const url = this.apiReportsUrl + '/bulk';
     return this.httpClient.post<any>(url, invoiceInfo, this.headers);
+  }
+
+  public getActivities(name: string, year: string, scope: string, approved: boolean): Observable<Report[]> {
+    const reportInfo: Object = Object.assign({}, {'Type': ReportType.BulkStudentInformation});
+
+    if (name) { reportInfo['Name'] = name; }
+    if (year) { reportInfo['SchoolYear'] = year; }
+    if (approved != null) { reportInfo['Approved'] = approved; }
+    if (scope) { reportInfo['Scope'] = scope; }
+
+    return this.getReportsByInfo(reportInfo);
   }
 }

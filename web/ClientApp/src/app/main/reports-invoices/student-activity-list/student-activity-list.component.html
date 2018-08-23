@@ -14,12 +14,6 @@
             <button class='dropdown-item' *ngFor='let scope of scopes' (click)='filterByScope(year)'>{{scope}}</button>
           </div>
         </div>
-        <!-- <div ngbDropdown class="d-inline-block">
-          <button class="btn btn-outline-primary" id="dropdownStatus" ngbDropdownToggle>{{selectedFilterStatus}}</button>
-          <div ngbDropdownMenu aria-labelledby="dropdownStatus">
-            <button class='dropdown-item' *ngFor='let status of statuses' (click)='filterByApprovedStatus(status)'>{{status}}</button>
-          </div>
-        </div> -->
       </div>
     </div>
   </div>
@@ -59,7 +53,7 @@
 </div>
 <ng-template #bulkCreateContent let-c='close' let-d='dismiss'>
   <div class='modal-header'>
-    <h4 class='modal-title'>Create Itemized Combined Activity</h4>
+    <h4 class='modal-title'>Create Combined Activity</h4>
     <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -68,53 +62,47 @@
     <div class='row align-items-center'>
       <div class='col-12 text-center'>
         <form #createBulkForm (ngSubmit)="c('creating'); create()">
-          <div class='form-group'>
-            <div ngbDropdown class="d-inline-block">
-              <button type='button' class="btn btn-outline-primary" id="dropdownCreateScope" ngbDropdownToggle>{{selectedCreateSchoolYear}}</button>
-              <div ngbDropdownMenu aria-labelledby="dropdownCreateScope">
-                <button type='button' class='dropdown-item' *ngFor='let scope of scopes' (click)='selectScope(scope)'>{{scope}}</button>
+          <div class='row'>
+            <div class='form-group col-12'>
+              <div class='row'>
+                <div class='col-6'>
+                  <label>Billing Period</label>
+                </div>
+                <div class='col-6'>
+                  <div ngbDropdown class="d-inline-block">
+                    <button type='button' class="btn btn-outline-primary" id="dropdownCreateScope" ngbDropdownToggle>{{selectedCreateScope}}</button>
+                    <div ngbDropdownMenu aria-labelledby="dropdownCreateScope">
+                      <button type='button' class='dropdown-item' *ngFor='let scope of scopes' (click)='selectCreateScope(scope)'>{{scope}}</button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div class='form-group'>
-            <div ngbDropdown class="d-inline-block">
-              <button type='button' class="btn btn-outline-primary" id="dropdownSchoolYear" ngbDropdownToggle>{{selectedSchoolYear}}</button>
-              <div ngbDropdownMenu aria-labelledby="dropdownSchoolYear">
-                <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='selectSchoolYear(year)'>{{year}}</button>
+          <div class='row'>
+            <div class='form-group col-12'>
+              <div class='row'>
+                <div class='col-6'>
+                  <label>Academic Year</label>
+                </div>
+                <div class='col-6'>
+                  <div ngbDropdown class="d-inline-block">
+                    <button type='button' class="btn btn-outline-primary" id="dropdownSchoolYear" ngbDropdownToggle>{{selectedCreateSchoolYear}}</button>
+                    <div ngbDropdownMenu aria-labelledby="dropdownSchoolYear">
+                      <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='selectSchoolYear(year)'>{{year}}</button>
+                    </div>
+                </div>
               </div>
             </div>
+            </div>
           </div>
-          <div class='form-group offset-2'>
-            <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
-            <button type='submit' class='btn btn-primary'>CREATE</button>
+          <div class='row d-flex justify-content-end'>
+            <div class='d-flex col-12 form-group justify-content-end'>
+              <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
+              <button type='submit' class='btn btn-primary'>CREATE</button>
+            </div>
           </div>
         </form>
-      </div>
-    </div>
-  </div>
-  <div class='modal-footer'>
-  </div>
-</ng-template>
-<ng-template #downloadFormatContent let-c='close' let-d='dismiss'>
-  <div class='modal-header'>
-    <h4 class='modal-title'>Download as...</h4>
-    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class='modal-body'>
-    <div class='row align-items-center'>
-      <div class='col-12 text-center'>
-        <div ngbDropdown class="d-inline-block">
-          <button type='button' class="btn btn-outline-primary" id="dropdownDownloadFormat" ngbDropdownToggle>Format type</button>
-          <div ngbDropdownMenu aria-labelledby="dropdownDownloadFormat">
-            <button type='button' class='dropdown-item' *ngFor='let format of downloadFormats' (click)=setSelectedDownloadFormat(format)>{{format}}</button>
-          </div>
-        </div>
-      </div>
-      <div class='form-group offset-2'>
-        <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
-        <button type='button' class='btn btn-primary' (click)='c("Selected")'>SELECT</button>
       </div>
     </div>
   </div>
