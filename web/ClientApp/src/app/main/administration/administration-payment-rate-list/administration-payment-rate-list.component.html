@@ -35,13 +35,13 @@
     <p *ngIf='schoolDistricts?.length == 0'>No school district records have been imported.</p>
   </div>
 </div>
-<div class='row school-district-footer-row align-items-center'>
+<!-- <div class='row school-district-footer-row align-items-center'>
   <div class='col-12 school-district-rates-action-col'>
     <a class='btn btn-primary' [routerLink]='["/administration", { outlets: { "action": ["home"] } }]'>
       <span class='fa'></span> Back to Administration
     </a>
   </div>
-</div>
+</div> -->
 <ng-template #importSchoolDistrictsContent let-c='close' let-d='dismiss'>
   <div class='col-md-12'>
     <div class='modal-header'>
