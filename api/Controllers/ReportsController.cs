@@ -95,6 +95,9 @@ namespace api.Controllers
 		public class CreateBulkStudentInformationReport
 		{
 			public string Type { get; set; }
+
+			public string Scope { get; set; }
+
 			public bool? Approved { get; set; }
 		}
 
@@ -395,7 +398,8 @@ namespace api.Controllers
 		{
 			var reports = _reports.GetMany(
 				type: ReportType.FromString("Invoice"),
-				year: create.SchoolYear,
+				// year: create.SchoolYear,
+				scope: create.BulkInvoice.Scope,
 				approved: create.BulkInvoice.Approved
 			).ToList();
 
@@ -530,14 +534,15 @@ namespace api.Controllers
 			var type = create.BulkStudentInformation.Type;
 			var reports = _reports.GetMany(
 				type: type == null ? null : ReportType.FromString(type),
-				year: create.SchoolYear,
+				// year: create.SchoolYear,
+				scope: create.BulkStudentInformation.Scope,
 				approved: create.BulkStudentInformation.Approved
 			);
 
 			if (reports == null)
 				throw new NotFoundException();
 
-			var name = create.SchoolYear + "Student Activity";
+			var name = create.Name;
 			var wb = BuildActivityWorkbook(name, reports);
 
 			Report report;
@@ -550,7 +555,7 @@ namespace api.Controllers
 
 				report = new Report
 				{
-					Type = ReportType.StudentInformation,
+					Type = ReportType.BulkStudentInformation,
 					SchoolYear = create.SchoolYear,
 					Name = name,
 					Approved = true,
@@ -805,9 +810,19 @@ namespace api.Controllers
 
 			foreach (var invoice in invoices)
 			{
-				var students = JObject.Parse(invoice.Data)["Students"];
-				var schoolDistrict = JObject.Parse(invoice.Data)["SchoolDistrict"];
-				var studentsJSONStr = JsonConvert.SerializeObject(students);
+				JObject students, schoolDistrict;
+				string studentsJSONStr;
+
+				try {
+					students = (JObject)JObject.Parse(invoice.Data)["Students"];
+					schoolDistrict = (JObject)JObject.Parse(invoice.Data)["SchoolDistrict"];
+					studentsJSONStr = JsonConvert.SerializeObject(students);
+				}
+				catch (Exception e) {
+					Console.WriteLine("BuildStudentActivityDataTable():  exception is ${e}.");
+					continue;
+				}
+
 				DataTable dt = GetDataTableFromJsonString(studentsJSONStr);
 
 				// we only want the student data...

@@ -6,6 +6,7 @@ import { UtilitiesService } from '../../../services/utilities.service';
 import { ReportsService } from '../../../services/reports.service';
 import { StudentRecordsService } from '../../../services/student-records.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
+import { FileSaverService } from '../../../services/file-saver.service';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -18,8 +19,6 @@ import { NgxSpinnerService } from 'ngx-spinner';
 export class StudentActivityListComponent implements OnInit {
   private reports: Report[];
   private allReports: Report[];
-  public bulkReports: Report[];
-  private allBulkReports: Report[];
   private skip: number;
   public property: string;
   public direction: number;
@@ -38,6 +37,7 @@ export class StudentActivityListComponent implements OnInit {
     private reportsService: ReportsService,
     private studentRecordsService: StudentRecordsService,
     private academicYearsService: AcademicYearsService,
+    private fileSaverService: FileSaverService,
     private ngxSpinnerService: NgxSpinnerService
   ) { }
 
@@ -75,8 +75,8 @@ export class StudentActivityListComponent implements OnInit {
   }
 
   listDisplayableFields() {
-    if (this.allBulkReports) {
-      const fields = this.utilitiesService.objectKeys(this.allBulkReports[0]);
+    if (this.allReports) {
+      const fields = this.utilitiesService.objectKeys(this.allReports[0]);
       const rejected = ['data', 'xlsx', 'type', 'id'];
       return fields.filter((i) => !rejected.includes(i));
     }
@@ -90,9 +90,17 @@ export class StudentActivityListComponent implements OnInit {
   }
 
   refreshActivityReports(): void {
-  }
-
-  resetStudentActivityReports(): void {
+    this.reportsService.getActivities(null, null, null, null).subscribe(
+      data => {
+        console.log('StudentActivityListComponent.ngOnInit(): invoices are ', data['reports']);
+        this.reports = this.allReports = data['reports'];
+        this.ngxSpinnerService.hide();
+      },
+      error => {
+        console.log('StudentActivityComponent.ngOnInit(): error is ', error);
+        this.ngxSpinnerService.hide();
+      }
+    );
   }
 
   private generateBulkActivityName(schoolYear: string, asOfDate: string): string {
@@ -101,11 +109,7 @@ export class StudentActivityListComponent implements OnInit {
       'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
     ];
 
-    return 'BulkActivity_' + months[billingDate.getMonth()] + '-' + billingDate.getFullYear() + '_' + schoolYear;
-  }
-
-
-  filterStudentActivityReports(): void {
+    return 'BulkActivity_' + this.selectedCreateScope + '_' + schoolYear;
   }
 
   getSchoolYears(): string[] {
@@ -150,6 +154,22 @@ export class StudentActivityListComponent implements OnInit {
       },
       (reason) => {
         console.log('StudentActivityListComponent.createBulkInvoice(): reason is ', reason);
+      }
+    );
+  }
+
+  downloadStudentActivityReport(invoice: Report) {
+    this.spinnerMsg = 'Downloading student activity.  Please wait...';
+    this.ngxSpinnerService.show();
+    this.reportsService.getReportDataByFormat(invoice, 'excel').subscribe(
+      data => {
+        console.log('InvoiceListComponent().downloadInvoiceStudentActivity():  data is ', data);
+        this.ngxSpinnerService.hide();
+        this.fileSaverService.saveStudentActivityAsExcelFile(data, invoice);
+      },
+      error => {
+        this.ngxSpinnerService.hide();
+        console.log('InvoiceListComponent().downloadInvoiceStudentActivity():  error is ', error);
       }
     );
   }

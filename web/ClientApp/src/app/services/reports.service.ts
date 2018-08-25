@@ -39,36 +39,18 @@ export class ReportsService {
     return this.httpClient.get<Report[]>(url, this.headers);
   }
 
-  // HTTP Get /api/reports/{id}
-  public getReport(id: number): Observable<Report> {
-    const url = this.apiReportsUrl + `/${id}`;
-    return this.httpClient.get<Report>(url, this.headers);
-  }
-
-  // HTTP GET /api/reports/activity/name
-  public getReportStudentActivityDataByFormat(report: Report, format: string): Observable<any> {
-    const url = this.apiReportsUrl + `/activity/name?Name=${report.name}&Format=${format}`;
+  // HTTP GET /api/reports/:name
+  public getReportDataByFormat(report: Report, format: string): Observable<any> {
+    const url = this.apiReportsUrl + `/${report.name}`;
+    const accept: string = format === 'excel' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'application/pdf';
     const headers = {};
     headers['responseType'] = 'arrayBuffer';
     headers['headers'] = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf'
+      'Accept': accept
     });
 
     return this.httpClient.get<any>(url, headers);
-  }
-
-  // HTTP GET /api/reports/invoice/name
-  public getReportInvoiceByDataFormat(report: Report, format: string): Observable<ArrayBuffer> {
-    const url = this.apiReportsUrl + `/invoice/name?Name=${report.name}&Format=${format}`;
-    const headers = {};
-    headers['responseType'] = 'arrayBuffer';
-    headers['headers'] = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf'
-    });
-
-    return this.httpClient.get<ArrayBuffer>(url, headers);
   }
 
   // HTTP POST /api/reports/many
@@ -101,11 +83,6 @@ export class ReportsService {
     return this.getReportsByInfo(reportInfo);
   }
 
-  public getInvoicesZipped(name: string, year: string, approved: boolean): Observable<any> {
-    const url = this.apiReportsUrl + '/zip';
-    return this.httpClient.get<any>(url, this.headers);
-  }
-
   public getBulkInvoices(year: string): Observable<any> {
     const reportInfo: Object = Object.assign({}, {'Type': ReportType.BulkInvoice});
 
@@ -119,7 +96,7 @@ export class ReportsService {
     headers['responseType'] = 'arrayBuffer';
     headers['headers'] = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf'
     });
 
     const url = this.apiReportsUrl + `/${name}`;
@@ -145,10 +122,10 @@ export class ReportsService {
     headers['responseType'] = 'arrayBuffer';
     headers['headers'] = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf'
     });
 
-    const url = this.apiReportsUrl + `/activity/name/${name}`;
+    const url = this.apiReportsUrl + `/${name}`;
     return this.httpClient.get<any>(url, headers);
   }
 
@@ -172,7 +149,7 @@ export class ReportsService {
     headers['responseType'] = 'arrayBuffer';
     headers['headers'] = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf'
     });
 
     url += '?Type=Invoice';
@@ -182,14 +159,16 @@ export class ReportsService {
     return this.httpClient.get<any>(url, headers);
   }
 
-  public getReportByName(name: string): Observable<Report> {
-    const url = this.apiReportsUrl + `/${name}`;
-    return this.httpClient.get<Report>(url, this.headers);
-  }
-
   // HTTP POST /api/activity/bulk
   public createBulkActivity(activityInfo: Object): Observable<Report> {
-    activityInfo = Object.assign(activityInfo, { 'reportType': 'BulkStudentInformation' });
+    activityInfo = Object.assign(activityInfo,
+      {
+        'reportType': 'BulkStudentInformation',
+        'bulkStudentInformation': {
+          'type': 'BulkStudentInformation',
+          'scope': activityInfo['bulkStudentInformation']['scope']
+        }
+      });
     const url = this.apiReportsUrl + '/bulk';
     return this.httpClient.post<any>(url, activityInfo, this.headers);
 

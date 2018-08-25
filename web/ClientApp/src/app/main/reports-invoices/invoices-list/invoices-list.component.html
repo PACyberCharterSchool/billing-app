@@ -14,28 +14,15 @@
             <button class='dropdown-item' *ngFor='let scope of scopes' (click)='filterByScope(scope)'>{{scope}}</button>
           </div>
         </div>
-        <div ngbDropdown class="d-inline-block">
-          <button class="btn btn-outline-primary" id="dropdownStatus" ngbDropdownToggle>{{selectedFilterStatus}}</button>
-          <div ngbDropdownMenu aria-labelledby="dropdownStatus">
-            <button class='dropdown-item' *ngFor='let status of statuses' (click)='filterByApprovedStatus(status)'>{{status}}</button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
 </div>
 <div class='row invoices-action-row align-items-center'>
   <div class='col-auto'>
-    <button type='button' class='btn btn-primary' (click)='createInvoice()'>CREATE</button>
-    <button type='button' class='btn btn-primary' (click)='createInvoices()'>BULK CREATE</button>
-    <!-- <button type='button' class='btn btn-outline-primary' (click)='approveInvoices()'>
-      APPROVE INVOICES
-    </button> -->
+    <button type='button' class='btn btn-primary' (click)='createInvoice()'>CREATE INDIVIDUAL</button>
+    <button type='button' class='btn btn-primary' (click)='createInvoices()'>CREATE MULTIPLE FOR BILLING PERIOD</button>
   </div>
-  <!-- <div class='col-5 create-invoice-col'>
-    <button type='button' class='btn btn-primary' (click)='createInvoice()'>CREATE</button>
-    <button type='button' class='btn btn-primary' (click)='createInvoices()'>BULK CREATE</button>
-  </div> -->
 </div>
 <div class='row invoices-list-row align-items-center'>
   <div class='col-12 invoices-list-col'>
@@ -46,31 +33,17 @@
             {{k | normalizeFieldName}}
             <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
           </th>
-          <th>Student Activity</th>
+          <!-- <th>Student Activity</th> -->
           <th>Invoice</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor='let report of reports | orderBy: {property: property, direction: direction}'>
           <td *ngFor='let v of listDisplayableValues(report)'>{{v | normalizeFieldValue}}</td>
-          <td>
-            <!-- <div ngbDropdown class="d-inline-block">
-              <button class="btn btn-outline-primary" id="dropdownActivityDownloadFormat" ngbDropdownToggle>Download as...</button>
-              <div ngbDropdownMenu aria-labelledby="dropdownActivityDownloadFormat">
-                <button class='dropdown-item' (click)='downloadInvoiceByFormat(report, "excel")'>Microsoft Excel</button>
-                <button class='dropdown-item' (click)='downloadInvoiceByFormat(report, "pdf")'>PDF</button>
-              </div>
-            </div> -->
+          <!-- <td>
             <button class='dropdown-item btn btn-primary' (click)='displayDownloadFormatDialog(downloadFormatContent, "activity", report)'>Download</button>
-          </td>
+          </td> -->
           <td>
-            <!-- <div ngbDropdown class="d-inline-block">
-              <button class="btn btn-outline-primary" id="dropdownInvoiceDownloadFormat" ngbDropdownToggle>Download as...</button>
-              <div ngbDropdownMenu aria-labelledby="dropdownInvoiceDownloadFormat">
-                <button class='dropdown-item' (click)='downloadInvoiceByFormat(report, "excel")'>Microsoft Excel</button>
-                <button class='dropdown-item' (click)='downloadInvoiceByFormat(report, "pdf")'>PDF</button>
-              </div>
-            </div> -->
             <button class='dropdown-item btn btn-primary' (click)='displayDownloadFormatDialog(downloadFormatContent, "invoice", report)'>Download</button>
           </td>
         </tr>
@@ -78,13 +51,13 @@
     </table>
   </div>
 </div>
-<div class='row invoices-footer-row align-items-center'>
+<!-- <div class='row invoices-footer-row align-items-center'>
   <div class='col-12 invoices-back-col'>
     <a class='btn btn-primary' [routerLink]='["/reports-invoices", { outlets: { "action": ["home"] } }]'>
       <span class='fa'></span> Reports & Invoices
     </a>
   </div>
-</div>
+</div> -->
 <ngx-spinner size='large' loadingText='{{spinnerMsg}}' type='timer'></ngx-spinner>
 <ng-template #downloadFormatContent let-c='close' let-d='dismiss'>
   <div class='modal-header'>
@@ -112,4 +85,3 @@
   <div class='modal-footer'>
   </div>
 </ng-template>
-

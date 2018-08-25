@@ -223,31 +223,7 @@ export class InvoicesListComponent implements OnInit {
     );
   }
 
-  approveInvoices() {
-    const modal = this.ngbModal.open(InvoicePreviewFormComponent, { centered: true, size: 'lg' });
-    modal.componentInstance.invoices = this.getUnapprovedInvoices();
-    modal.result.then(
-      (result) => {
-        console.log('InvoicesListComponent.previewInvoices(): result is ', result);
-      },
-      (reason) => {
-        console.log('InvoicesListComponent.previewInvoices(): reason is ', reason);
-      }
-    );
-  }
-
   downloadInvoiceStudentActivity(invoice: Report) {
-    // WDM - 07/02/2018
-    // this defines a modal dialog that was designed to present the Excel spreadsheet as a preview.
-    // current time constraints preclude implementation, but we eventually want to come back to this.
-    // const modal = this.ngbModal.open(InvoicePreviewFormComponent, { centered: true, size: 'lg' });
-    // modal.componentInstance.invoices = [invoice];
-    // modal.result.then(
-    //   (result) => {
-    //   },
-    //   (reason) => {
-    //   }
-    // )
     this.spinnerMsg = 'Downloading student activity.  Please wait...';
     this.ngxSpinnerService.show();
     this.reportsService.getInvoiceStudentActivityDataByName(invoice.name).subscribe(
@@ -289,7 +265,6 @@ export class InvoicesListComponent implements OnInit {
     const modal = this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' });
     this.downloadType = 'invoices';
     this.selectedDownloadSchoolYear = 'Select School Year';
-    this.selectedDownloadStatus = 'Approval Status';
     this.selectedTemplateName = 'Select Template';
 
     modal.result.then(
@@ -318,25 +293,22 @@ export class InvoicesListComponent implements OnInit {
     const modal = this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' });
     this.downloadType = 'students';
     this.selectedDownloadSchoolYear = 'Select School Year';
-    this.selectedDownloadStatus = 'Approval Status';
 
     modal.result.then(
       (result) => {
         this.spinnerMsg = 'Generating student activity data.  Please wait...';
         this.ngxSpinnerService.show();
 
-        this.reportsService.getInvoiceStudentActivityDataBulk(
-          this.selectedDownloadSchoolYear,
-          this.selectedDownloadStatus === 'Approved').subscribe(
-          data => {
-            console.log('InvoiceListComponent.downloadStudentActivity():  data is ', data);
-            this.ngxSpinnerService.hide();
-          },
-          error => {
-            console.log('InvoiceListComponent.downloadStudentActivity():  error is ', error);
-            this.ngxSpinnerService.hide();
-          }
-        );
+        // this.reportsService.getReportDataByFormat().subscribe(
+        //   data => {
+        //     console.log('InvoiceListComponent.downloadStudentActivity():  data is ', data);
+        //     this.ngxSpinnerService.hide();
+        //   },
+        //   error => {
+        //     console.log('InvoiceListComponent.downloadStudentActivity():  error is ', error);
+        //     this.ngxSpinnerService.hide();
+        //   }
+        // );
       },
       (reason) => {
         console.log('InvoiceListComponent.downloadStudentActivity(): reason is ', reason);
@@ -347,7 +319,7 @@ export class InvoicesListComponent implements OnInit {
   public downloadActivityByFormat(report: Report, format: string) {
     this.spinnerMsg = 'Downloading student activity.  Please wait...';
     this.ngxSpinnerService.show();
-    this.reportsService.getReportStudentActivityDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
+    this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
         console.log('InvoiceListComponent.downloadStudentActivityByFormat():  data is ', data);
         this.ngxSpinnerService.hide();
@@ -366,7 +338,7 @@ export class InvoicesListComponent implements OnInit {
   public downloadInvoiceByFormat(report: Report, format: string) {
     this.spinnerMsg = 'Downloading invoice.  Please wait...';
     this.ngxSpinnerService.show();
-    this.reportsService.getReportInvoiceByDataFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
+    this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
         console.log('InvoiceListComponent.downloadInvoiceByFormat():  data is ', data);
         this.ngxSpinnerService.hide();
@@ -383,20 +355,19 @@ export class InvoicesListComponent implements OnInit {
   }
 
   displayDownloadFormatDialog(downloadFormatContent, type: string, report: Report): void {
-    const modal = this.ngbModal.open(downloadFormatContent, { centered: true, size: 'sm' });
-    modal.result.then(
-      (result) => {
-        console.log('InvoicesListComponent.displayDownloadFormatDialog(): result is ', result);
-        if (type === 'activity') {
-          this.downloadActivityByFormat(report, this.selectedDownloadFormat);
-        } else {
+    if (type !== 'activity') {
+      const modal = this.ngbModal.open(downloadFormatContent, { centered: true, size: 'sm' });
+      modal.result.then(
+        (result) => {
           this.downloadInvoiceByFormat(report, this.selectedDownloadFormat);
+        },
+        (reason) => {
+          console.log('InvoicesListComponent.displayDownloadFormatDialog(): reason is ', reason);
         }
-      },
-      (reason) => {
-        console.log('InvoicesListComponent.displayDownloadFormatDialog(): reason is ', reason);
-      }
-    );
+      );
+    } else {
+      this.downloadActivityByFormat(report, 'Microsoft Excel');
+    }
   }
 
   private selectSchoolYear(year: string) {

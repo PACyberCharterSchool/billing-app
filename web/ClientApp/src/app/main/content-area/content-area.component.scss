@@ -1,17 +1,16 @@
 .content-area-row {
-  height: calc(100% - 95px);
+  height: calc(100% - 130px);
   margin: 0;
   padding: 0;
   overflow: hidden;
 
   div {
-    // height: 100%;
     padding: 0;
     margin: 0;
   }
 
   .action-content-col {
     padding: 5px 40px 5px 40px;
-    overflow: scroll;
+    overflow-y: scroll;
   }
 }

@@ -266,7 +266,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   public downloadActivityByFormat(report: Report, format: string) {
-    this.reportsService.getReportStudentActivityDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
+    this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
         console.log('InvoiceListComponent.downloadStudentActivityByFormat():  data is ', data);
         if (format.toLowerCase().includes('excel')) {
@@ -282,7 +282,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   public downloadInvoiceByFormat(report: Report, format: string) {
-    this.reportsService.getReportInvoiceByDataFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
+    this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
         console.log('InvoiceListComponent.downloadInvoiceByFormat():  data is ', data);
         if (format.toLowerCase().includes('excel')) {
