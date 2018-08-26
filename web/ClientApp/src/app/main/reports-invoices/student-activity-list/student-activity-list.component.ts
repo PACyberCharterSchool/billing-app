@@ -17,8 +17,8 @@ import { NgxSpinnerService } from 'ngx-spinner';
   styleUrls: ['./student-activity-list.component.scss']
 })
 export class StudentActivityListComponent implements OnInit {
-  private reports: Report[];
-  private allReports: Report[];
+  public reports: Report[];
+  public allReports: Report[];
   private skip: number;
   public property: string;
   public direction: number;
@@ -114,6 +114,10 @@ export class StudentActivityListComponent implements OnInit {
         console.log('StudentActivityListComponent.filterByScope():  error is ', error);
       }
     );
+  }
+
+  filterStudentActivityReports(): void {
+
   }
 
   private generateBulkActivityName(schoolYear: string, asOfDate: string): string {
