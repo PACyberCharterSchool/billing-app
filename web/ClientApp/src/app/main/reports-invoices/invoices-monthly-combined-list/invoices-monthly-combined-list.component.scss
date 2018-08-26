@@ -34,7 +34,7 @@
 }
 
 .invoices-list-row {
-  height: calc(100% - 164px);
+  height: calc(100% - 95px);
   padding-bottom: 5px;
 
   .invoices-list-col {
@@ -66,9 +66,9 @@
   div.col-md-12 {
     form {
       div.form-group {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        // display: flex;
+        // align-items: center;
+        // justify-content: center;
 
         div.d-inline-block {
           width: 100%;

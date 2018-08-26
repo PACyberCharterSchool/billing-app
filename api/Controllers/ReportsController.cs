@@ -123,10 +123,11 @@ namespace api.Controllers
 			public CreateBulkStudentInformationReport BulkStudentInformation { get; set; }
 		}
 
-		private void CloneInvoiceSummarySheet(Workbook wb, int districtIndex)
+		private void CloneInvoiceSummarySheet(Workbook wb, int districtIndex, string districtName)
 		{
 			wb.Worksheets.AddCopy(0);
 			var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
+			sheet.Name = $"{districtName.Substring(0, Math.Min(districtName.Length, 17))} Summary Info"; 
 			Cells cells = sheet.Cells;
 			for (int r = 0; r < cells.MaxDataRow + 1; r++)
 			{
@@ -148,7 +149,7 @@ namespace api.Controllers
 			}
 		}
 
-		private void CloneStudentItemizationSheets(Workbook wb, int count, int districtIndex, Template template)
+		private void CloneStudentItemizationSheets(Workbook wb, int count, int districtIndex, string districtName, Template template)
 		{
 			const int per = 8;
 
@@ -160,7 +161,8 @@ namespace api.Controllers
 				wb.Worksheets.AddCopy(1);
 
 				var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
-				sheet.Name = $"Individual Student Inform. {s + 1}";
+				Console.WriteLine($"CloneStudentItemizationSheets():  name is {districtName.Substring(0, Math.Min(districtName.Length, 15))} St. Info({s + 1})");
+				sheet.Name = $"{districtName.Substring(0, Math.Min(districtName.Length, 15))} St. Info({s + 1})";
 				Cells cells = sheet.Cells;
 
 				sheet.PageSetup.HeaderMargin = 0.0;
@@ -306,11 +308,11 @@ namespace api.Controllers
         var components = scope.Split('.');
 				if (new[] { 7, 8, 9, 10, 11, 12 }.Contains(int.Parse(components[1])))
 				{
-					year = $"{components[0] + 1}-{components[0]}";
+					year = $"{components[0]}-{int.Parse(components[0]) + 1}";
 				}
 				else
 				{
-					year = $"{components[0]}-{components[0] + 1}";
+					year = $"{int.Parse(components[0]) - 1}-{components[0]}";
 				}
       }
 
@@ -415,11 +417,11 @@ namespace api.Controllers
 
 				if (i > 0)
 				{
-					CloneInvoiceSummarySheet(wb, i);
+					CloneInvoiceSummarySheet(wb, i, invoice.SchoolDistrict.Name);
 				}
 
 				if (invoice.Students.Count > 0)
-					CloneStudentItemizationSheets(wb, invoice.Students.Count, i, invoiceTemplate);
+					CloneStudentItemizationSheets(wb, invoice.Students.Count, i,  invoice.SchoolDistrict.Name, invoiceTemplate);
 			}
 
 			if (invoices[0].Students.Count == 0)
@@ -533,8 +535,9 @@ namespace api.Controllers
 		{
 			var type = create.BulkStudentInformation.Type;
 			var reports = _reports.GetMany(
-				type: type == null ? null : ReportType.FromString(type),
-				// year: create.SchoolYear,
+				// type: type == null ? null : ReportType.FromString(type),
+				type: ReportType.FromString("Invoice"),
+				year: create.SchoolYear,
 				scope: create.BulkStudentInformation.Scope,
 				approved: create.BulkStudentInformation.Approved
 			);
@@ -560,6 +563,7 @@ namespace api.Controllers
 					Name = name,
 					Approved = true,
 					Created = DateTime.Now,
+					Scope = create.BulkStudentInformation.Scope,
 					Xlsx = xlsxStream.ToArray(),
 					Pdf = pdfStream.ToArray(),
 				};
@@ -810,18 +814,9 @@ namespace api.Controllers
 
 			foreach (var invoice in invoices)
 			{
-				JObject students, schoolDistrict;
-				string studentsJSONStr;
-
-				try {
-					students = (JObject)JObject.Parse(invoice.Data)["Students"];
-					schoolDistrict = (JObject)JObject.Parse(invoice.Data)["SchoolDistrict"];
-					studentsJSONStr = JsonConvert.SerializeObject(students);
-				}
-				catch (Exception e) {
-					Console.WriteLine("BuildStudentActivityDataTable():  exception is ${e}.");
-					continue;
-				}
+				var students = JObject.Parse(invoice.Data)["Students"];
+				var schoolDistrict = JObject.Parse(invoice.Data)["SchoolDistrict"];
+				var studentsJSONStr = JsonConvert.SerializeObject(students);
 
 				DataTable dt = GetDataTableFromJsonString(studentsJSONStr);
 

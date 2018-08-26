@@ -57,22 +57,23 @@ namespace api.Controllers
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
-			LdapUser user = new LdapUser("RA1", "Rivers Agile 1", "ADM");
+			// LdapUser user = new LdapUser("RA1", "Rivers Agile 1", "ADM");
+			LdapUser user = new LdapUser();
 
-			// try
-			// {
-			// 	user = await Task.Run(() => _ldap.GetUser(args.Username, args.Password));
-			// }
-			// catch (LdapConnectionException e)
-			// {
-			// 	_logger.LogError($"exception: {e}");
-			// 	return StatusCode(500, new ErrorResponse("could not connect to LDAP server"));
-			// }
-			// catch (LdapUnauthorizedException e)
-			// {
-			// 	_logger.LogWarning($"exception: {e}");
-			// 	return Unauthorized();
-			// }
+			try
+			{
+				user = await Task.Run(() => _ldap.GetUser(args.Username, args.Password));
+			}
+			catch (LdapConnectionException e)
+			{
+				_logger.LogError($"exception: {e}");
+				return StatusCode(500, new ErrorResponse("could not connect to LDAP server"));
+			}
+			catch (LdapUnauthorizedException e)
+			{
+				_logger.LogWarning($"exception: {e}");
+				return Unauthorized();
+			}
 
 			return Ok(new TokenResponse(new JwtSecurityTokenHandler().WriteToken(_jwt.BuildToken(new[]{
 				new Claim(JwtRegisteredClaimNames.Sub, user.Username),

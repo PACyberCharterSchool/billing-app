@@ -16,6 +16,9 @@ import { OrderByPipe } from '../../../pipes/orderby.pipe';
 
 import { UtilitiesService } from '../../../services/utilities.service';
 import { ReportsService } from '../../../services/reports.service';
+import { StudentRecordsService } from '../../../services/student-records.service';
+import { AcademicYearsService } from '../../../services/academic-years.service';
+import { FileSaverService } from '../../../services/file-saver.service';
 
 import { NgxSpinnerModule } from 'ngx-spinner';
 
@@ -42,6 +45,9 @@ describe('StudentActivityListComponent', () => {
       providers: [
         UtilitiesService,
         ReportsService,
+        StudentRecordsService,
+        AcademicYearsService,
+        FileSaverService,
         NgbModal,
         Globals,
         HttpClient,

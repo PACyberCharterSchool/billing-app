@@ -65,9 +65,16 @@ export class ReportsService {
     return this.httpClient.post<any>(url, invoiceInfo, this.headers);
   }
 
-  // HTTP POST /api/reports/bulk
+  // HTTP POST /api/reports
   public createBulkInvoice(invoiceInfo: Object): Observable<Report> {
-    invoiceInfo = Object.assign(invoiceInfo, { 'reportType': 'BulkInvoice' });
+    invoiceInfo = Object.assign(invoiceInfo,
+      {
+        'reportType': 'BulkInvoice',
+        'bulkInvoice': {
+          'type': 'BulkInvoice',
+          'scope': invoiceInfo['bulkInvoice']['scope']
+        }
+      });
     const url = this.apiReportsUrl + '/bulk';
     return this.httpClient.post<any>(url, invoiceInfo, this.headers);
   }

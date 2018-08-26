@@ -50,7 +50,8 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   private downloadType: string;
   private spinnerMsg: string;
   private templates: Template[];
-  public selectedScope: string;
+  public selectedCurrentScope: string;
+  public selectedCreatedScope: string;
   public scopes: string[];
   public selectedAsOfBillingDate: string;
   public selectedDownloadFormat: string;
@@ -71,7 +72,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   ngOnInit() {
     this.selectedTemplateName = 'Select Bulk Invoice Template';
     this.selectedCreateSchoolYear = 'Select Academic Year';
-    this.selectedScope = 'Select billing period';
+    this.selectedCurrentScope = 'Select billing period';
     this.spinnerMsg = 'Loading bulk invoices.  Please wait...';
     this.ngxSpinnerService.show();
     this.reportsService.getBulkInvoices(null).subscribe(
@@ -185,6 +186,18 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     return this.utilitiesService.objectValues(selected);
   }
 
+  filterByScope(scope: string): void {
+    this.selectedCurrentScope = scope;
+    this.reportsService.getActivities(null, null, scope, null).subscribe(
+      data => {
+        this.reports = this.allReports = data['reports'];
+      },
+      error => {
+        console.log('StudentActivityListComponent.filterByScope():  error is ', error);
+      }
+    );
+  }
+
   filterBySchoolYear(year: string) {
     this.selectedFilterSchoolYear = year;
     this.bulkReports = this.allBulkReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year));
@@ -201,8 +214,8 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     });
   }
 
-  selectScope(scope: string): void {
-    this.selectedScope = scope;
+  selectCreatedScope(scope: string): void {
+    this.selectedCreatedScope = scope;
   }
 
   getInvoiceBillingMonths(): string[] {
@@ -230,13 +243,13 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.reportsService.createBulkInvoice(
       {
         'schoolYear': this.selectedCreateSchoolYear.replace(/\s+/g, ''),
-        'name': this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedScope),
+        'name': this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedCreatedScope),
         'templateId': this.selectedTemplate.id,
         'bulkInvoice': {
           'asOf': this.selectedAsOfBillingDate,
           'toSchoolDistrict': this.selectedAsOfBillingDate,
           'toPDE': this.selectedAsOfBillingDate,
-          'scope': this.selectedScope
+          'scope': this.selectedCreatedScope
         }
       }
     ).subscribe(
@@ -385,13 +398,8 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     }
   }
 
-  private generateBulkInvoiceName(schoolYear: string, asOfDate: string): string {
-    const billingDate: Date = new Date(asOfDate);
-    const months: string[] = [
-      'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-
-    return 'BulkInvoice_' + months[billingDate.getMonth()] + '-' + billingDate.getFullYear() + '_' + schoolYear;
+  private generateBulkInvoiceName(schoolYear: string, scope: string): string {
+    return 'BulkInvoice_' + scope + '_' + schoolYear;
   }
 
   private selectSchoolYear(year: string): void {

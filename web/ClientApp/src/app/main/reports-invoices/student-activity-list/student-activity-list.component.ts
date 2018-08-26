@@ -49,6 +49,7 @@ export class StudentActivityListComponent implements OnInit {
     this.studentRecordsService.getHeaders().subscribe(
       data => {
         this.scopes = data['scopes'];
+        this.selectedScope = this.scopes[0];
       },
       error => {
         console.log('StudentActivityListComponent.ngOnInit():  error is ', error);
@@ -99,6 +100,18 @@ export class StudentActivityListComponent implements OnInit {
       error => {
         console.log('StudentActivityComponent.ngOnInit(): error is ', error);
         this.ngxSpinnerService.hide();
+      }
+    );
+  }
+
+  filterByScope(scope: string): void {
+    this.selectedScope = scope;
+    this.reportsService.getActivities(null, null, scope, null).subscribe(
+      data => {
+        this.reports = this.allReports = data['reports'];
+      },
+      error => {
+        console.log('StudentActivityListComponent.filterByScope():  error is ', error);
       }
     );
   }

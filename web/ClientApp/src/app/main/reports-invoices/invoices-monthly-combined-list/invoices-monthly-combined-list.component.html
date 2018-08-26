@@ -9,17 +9,17 @@
     <div class='row'>
       <div class='col'>
         <div ngbDropdown class="d-inline-block">
-          <button class="btn btn-outline-primary" id="dropdownSchoolYear" ngbDropdownToggle>{{selectedFilterSchoolYear}}</button>
-          <div ngbDropdownMenu aria-labelledby="dropdownSchoolYear">
-            <button class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='filterBySchoolYear(year)'>{{year}}</button>
+          <button class="btn btn-outline-primary" id="dropdownScope" ngbDropdownToggle>{{selectedScope}}</button>
+          <div ngbDropdownMenu aria-labelledby="dropdownScope">
+            <button class='dropdown-item' *ngFor='let scope of scopes' (click)='filterByScope(scope)'>{{scope}}</button>
           </div>
         </div>
-        <div ngbDropdown class="d-inline-block">
+        <!-- <div ngbDropdown class="d-inline-block">
           <button class="btn btn-outline-primary" id="dropdownStatus" ngbDropdownToggle>{{selectedFilterStatus}}</button>
           <div ngbDropdownMenu aria-labelledby="dropdownStatus">
             <button class='dropdown-item' *ngFor='let status of statuses' (click)='filterByApprovedStatus(status)'>{{status}}</button>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -50,13 +50,13 @@
     </table>
   </div>
 </div>
-<div class='row invoices-footer-row align-items-center'>
+<!-- <div class='row invoices-footer-row align-items-center'>
   <div class='col-12 invoices-back-col'>
-    <a class='btn btn-primary' [routerLink]='["/reports-invoices", { outlets: { "action": ["home"] } }]'>
+    <a class='btn btn-primary' [routerLink]='["/reports-invoices", { outlets: { "action": ["home"] } }]'></a>
       <span class='fa'></span> Reports & Invoices
     </a>
   </div>
-</div>
+</div> -->
 <ng-template #bulkCreateContent let-c='close' let-d='dismiss'>
   <div class='modal-header'>
     <h4 class='modal-title'>Create Combined Invoice</h4>
@@ -78,9 +78,9 @@
           </div>
           <div class='form-group'>
             <div ngbDropdown class="d-inline-block">
-              <button type='button' class="btn btn-outline-primary" id="dropdownScopes" ngbDropdownToggle>{{selectedScope}}</button>
-              <div ngbDropdownMenu aria-labelledby="dropdownScopes">
-                <button type='button' class='dropdown-item' *ngFor='let scope of scopes' (click)='selectScope(scope)'>{{scope}}</button>
+              <button type='button' class="btn btn-outline-primary" id="dropdownCreateScopes" ngbDropdownToggle>{{selectedCreatedScope}}</button>
+              <div ngbDropdownMenu aria-labelledby="dropdownCreateScopes">
+                <button type='button' class='dropdown-item' *ngFor='let scope of scopes' (click)='selectCreatedScope(scope)'>{{scope}}</button>
               </div>
             </div>
           </div>
