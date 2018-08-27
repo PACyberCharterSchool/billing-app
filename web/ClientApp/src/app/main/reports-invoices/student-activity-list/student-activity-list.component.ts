@@ -164,6 +164,8 @@ export class StudentActivityListComponent implements OnInit {
 
   displayCreateBulkActivityDialog(bulkCreateContent): void {
     const modal = this.ngbModal.open(bulkCreateContent, { centered: true, size: 'sm' });
+    this.selectedCreateScope = 'Select Billing Period';
+    this.selectedCreateSchoolYear = 'Select School Year';
     modal.result.then(
       (result) => {
         console.log('StudentActivityListComponent.createBulkInvoice(): result is ', result);
