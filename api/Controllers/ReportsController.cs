@@ -127,7 +127,7 @@ namespace api.Controllers
 		{
 			wb.Worksheets.AddCopy(0);
 			var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
-			sheet.Name = $"{districtName.Substring(0, Math.Min(districtName.Length, 17))} Summary Info"; 
+			sheet.Name = $"{districtName.Substring(0, Math.Min(districtName.Length, 17))} Summary Info";
 			Cells cells = sheet.Cells;
 			for (int r = 0; r < cells.MaxDataRow + 1; r++)
 			{
@@ -177,38 +177,42 @@ namespace api.Controllers
 				{
 					for (int c = 0; c < cells.MaxDataColumn + 1; c++)
 					{
-						if (!(cells[r, c].Type == CellValueType.IsString))
+						var cell = cells[r, c];
+						if (cell.Value == null)
 							continue;
 
 						if (r == GetRowIndexForFirstStudentItemization(template) && c == 1) // Number column
 						{
-							cells[r, c].PutValue(((s + adj) * per) + 1);
+							cell.PutValue(((s + adj) * per) + 1);
 							continue;
 						}
 
+						if (!(cell.Type == CellValueType.IsString))
+							continue;
+
 						{
 							const string pattern = @"Students\[(\d+)\]";
-							var matches = Regex.Matches(cells[r, c].StringValue, pattern);
+							var matches = Regex.Matches(cell.StringValue, pattern);
 							if (matches.Count > 0)
 							{
 								var match = matches[0];
 								var i = int.Parse(match.Groups[1].Value);
 
-								cells[r, c].Value = Regex.Replace(cells[r, c].StringValue, pattern, $"Students[{(i + ((s + adj) * per))}]");
-								cells[r, c].PutValue(cells[r, c].StringValue);
+								cell.Value = Regex.Replace(cell.StringValue, pattern, $"Students[{(i + ((s + adj) * per))}]");
+								cell.PutValue(cell.StringValue);
 							}
 						}
 
 						{
 							const string pattern = @"Districts\[(\d+)\]";
-							var matches = Regex.Matches(cells[r, c].StringValue, pattern);
+							var matches = Regex.Matches(cell.StringValue, pattern);
 							if (matches.Count > 0)
 							{
 								var match = matches[0];
 								var i = int.Parse(match.Groups[1].Value);
 
-								cells[r, c].Value = Regex.Replace(cells[r, c].StringValue, pattern, $"Districts[{districtIndex}]");
-								cells[r, c].PutValue(cells[r, c].StringValue);
+								cell.Value = Regex.Replace(cell.StringValue, pattern, $"Districts[{districtIndex}]");
+								cell.PutValue(cell.StringValue);
 							}
 						}
 					}
@@ -218,33 +222,16 @@ namespace api.Controllers
 
 		private int GetRowIndexForFirstStudentItemization(Template template)
 		{
-			int sequenceNumberRow;
-
 			// What does this do you ask? Well, since we can't anticipate what the Pennsylvania
 			// Department of Education is ever going to do with the invoice templates they provide
 			// for use to cyber charter schools, we have to build logic in to find the cell that
 			// has the index value for the first student in the student itemization.  The remainder
 			// of the index values are calculated from the first index cell.
-			switch (template.SchoolYear)
-			{
-				case "2017-2018":
-					if (template.ReportType == ReportType.Invoice)
-						sequenceNumberRow = 13;
-					else
-						sequenceNumberRow = 13;
-					break;
-				case "2018-2019":
-					if (template.ReportType == ReportType.Invoice)
-						sequenceNumberRow = 12;
-					else
-						sequenceNumberRow = 12;
-					break;
-				default:
-					sequenceNumberRow = 13;
-					break;
-			}
+			// TODO(Erik): find programmatically by searching for cell with value == 1?
+			if (template.SchoolYear.StartsWith("2018") && template.SchoolYear.EndsWith("2019"))
+				return 12;
 
-			return sequenceNumberRow;
+			return 13;
 		}
 
 		private void CloneInvoiceSheets(Workbook wb, int count, Template template)
@@ -266,45 +253,49 @@ namespace api.Controllers
 					if (row.IsBlank)
 						continue;
 
-          for (int c = 0; c < cells.MaxDataColumn + 1; c++) {
-            if (cells[r,c] == null)
-              continue;
+					for (int c = 0; c < cells.MaxDataColumn + 1; c++)
+					{
+						var cell = cells[r, c];
+						if (cell.Value == null)
+							continue;
 
-            if (r == GetRowIndexForFirstStudentItemization(template) && c == 1) // Number column
-            {
-              cells[r,c].PutValue(((s + 1) * per) + 1);
-              continue;
-            }
+						if (r == GetRowIndexForFirstStudentItemization(template) && c == 1) // Number column
+						{
+							cell.PutValue(((s + 1) * per) + 1);
+							continue;
+						}
 
-            if (!(cells[r, c].Type == CellValueType.IsString))
-              continue;
+						if (!(cell.Type == CellValueType.IsString))
+							continue;
 
-            var value = cells[r,c].StringValue;
+						var value = cell.StringValue;
 
-            const string pattern = @"Students\[(\d+)\]";
-            var matches = Regex.Matches(value, pattern);
-            if (matches.Count > 0)
-            {
-              var match = matches[0];
-              var i = int.Parse(match.Groups[1].Value);
+						const string pattern = @"Students\[(\d+)\]";
+						var matches = Regex.Matches(value, pattern);
+						if (matches.Count > 0)
+						{
+							var match = matches[0];
+							var i = int.Parse(match.Groups[1].Value);
 
-              value = Regex.Replace(value, pattern, $"Students[{(i + ((s + 1) * per))}]");
-              cells[r,c].PutValue(value);
-            }
-          }
-        }
-      }
-    }
+							value = Regex.Replace(value, pattern, $"Students[{(i + ((s + 1) * per))}]");
+							cell.PutValue(value);
+						}
+					}
+				}
+			}
+		}
 
-    private string GenerateSchoolYear(string scope)
-    {
-      string year;
+		private string GenerateSchoolYear(string scope)
+		{
+			string year;
 
-      if (scope.Contains(@"\d{4}-\d{4}")) {
-        year = scope;
-      }
-      else {
-        var components = scope.Split('.');
+			if (scope.Contains(@"\d{4}-\d{4}"))
+			{
+				year = scope;
+			}
+			else
+			{
+				var components = scope.Split('.');
 				if (new[] { 7, 8, 9, 10, 11, 12 }.Contains(int.Parse(components[1])))
 				{
 					year = $"{components[0]}-{int.Parse(components[0]) + 1}";
@@ -313,64 +304,66 @@ namespace api.Controllers
 				{
 					year = $"{int.Parse(components[0]) - 1}-{components[0]}";
 				}
-      }
+			}
 
-      return year;
-    } 
+			return year;
+		}
 
-    private Report CreateInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
-    {
-      // get reporter
-      var reporter = _reporters.CreateInvoiceReporter(_context);
+		private Report CreateInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
+		{
+			// get reporter
+			var reporter = _reporters.CreateInvoiceReporter(_context);
 
-      // build config
-      var config = new InvoiceReporter.Config
-      {
-        Scope = create.Invoice.Scope,
-        InvoiceNumber = create.Name,
-        SchoolYear = create.SchoolYear,
-        AsOf = create.Invoice.AsOf,
-        Prepared = time,
-        ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
-        ToPDE = create.Invoice.ToPDE,
-        SchoolDistrictAun = create.Invoice.SchoolDistrictAun,
-      };
+			// build config
+			var config = new InvoiceReporter.Config
+			{
+				Scope = create.Invoice.Scope,
+				InvoiceNumber = create.Name,
+				SchoolYear = create.SchoolYear,
+				AsOf = create.Invoice.AsOf,
+				Prepared = time,
+				ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
+				ToPDE = create.Invoice.ToPDE,
+				SchoolDistrictAun = create.Invoice.SchoolDistrictAun,
+			};
 
-      // generate data
-      var invoice = reporter.GenerateReport(config);
+			// generate data
+			var invoice = reporter.GenerateReport(config);
 
-      // compose workbook
-      var wb = new Workbook(new MemoryStream(invoiceTemplate.Content));
-      InitializeWorkbookSheetPrinterMargins(wb);
+			// compose workbook
+			var wb = new Workbook(new MemoryStream(invoiceTemplate.Content));
+			InitializeWorkbookSheetPrinterMargins(wb);
 
-      if (invoice.Students.Count > 0) {
-        CloneInvoiceSheets(wb, invoice.Students.Count, invoiceTemplate);
-      }
-      else {
-        wb.Worksheets.RemoveAt(1);
-      }
+			if (invoice.Students.Count > 0)
+			{
+				CloneInvoiceSheets(wb, invoice.Students.Count, invoiceTemplate);
+			}
+			else
+			{
+				wb.Worksheets.RemoveAt(1);
+			}
 
-      // generate xlsx
-      var data = JsonConvert.SerializeObject(invoice);
-      wb = _exporter.Export(wb, JsonConvert.DeserializeObject(data));
+			// generate xlsx
+			var data = JsonConvert.SerializeObject(invoice);
+			wb = _exporter.Export(wb, JsonConvert.DeserializeObject(data));
 
-      var stamp = new Random(DateTime.Now.Millisecond).Next();
- 
-      // create report
-      Report report;
-      using (var xlsxms = new MemoryStream())
-      using (var pdfms = new MemoryStream())
-      {
-        // wb.Write(ms);
-        wb.Save(xlsxms, new XlsSaveOptions(SaveFormat.Xlsx));
-        wb.CalculateFormula();
-        wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
+			var stamp = new Random(DateTime.Now.Millisecond).Next();
 
-        report = new Report
-        {
-          Type = ReportType.Invoice,
-          Name = $"{create.Invoice.Scope}_{create.Name}_{stamp}",
-          SchoolYear = create.Invoice.Scope != null && create.Invoice.Scope.Length > 0 ? GenerateSchoolYear(create.Invoice.Scope) : create.SchoolYear,
+			// create report
+			Report report;
+			using (var xlsxms = new MemoryStream())
+			using (var pdfms = new MemoryStream())
+			{
+				// wb.Write(ms);
+				wb.Save(xlsxms, new XlsSaveOptions(SaveFormat.Xlsx));
+				wb.CalculateFormula();
+				wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
+
+				report = new Report
+				{
+					Type = ReportType.Invoice,
+					Name = $"{create.Invoice.Scope}_{create.Name}_{stamp}",
+					SchoolYear = create.Invoice.Scope != null && create.Invoice.Scope.Length > 0 ? GenerateSchoolYear(create.Invoice.Scope) : create.SchoolYear,
 					Scope = create.Invoice.Scope,
 					Approved = false,
 					Created = time,
@@ -420,7 +413,7 @@ namespace api.Controllers
 				}
 
 				if (invoice.Students.Count > 0)
-					CloneStudentItemizationSheets(wb, invoice.Students.Count, i,  invoice.SchoolDistrict.Name, invoiceTemplate);
+					CloneStudentItemizationSheets(wb, invoice.Students.Count, i, invoice.SchoolDistrict.Name, invoiceTemplate);
 			}
 
 			if (invoices[0].Students.Count == 0)
@@ -458,7 +451,23 @@ namespace api.Controllers
 				// wb.Write(ms);
 				wb.Save(ms, new XlsSaveOptions(SaveFormat.Xlsx));
 				wb.CalculateFormula();
-				wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
+				try
+				{
+					wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
+				}
+				catch (CellsException e)
+				{
+					var rgx = new Regex(@"'.*'");
+					var match = rgx.Match(e.Message);
+					Console.WriteLine($"match: {match}");
+					foreach (char c in match.ToString())
+					{
+						Console.Write($"{((int)c).ToString("x")} ");
+					}
+					Console.Write("\n");
+
+					throw;
+				}
 
 				report = new Report
 				{
