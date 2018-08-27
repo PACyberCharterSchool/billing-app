@@ -205,15 +205,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.selectedCreateTemplateName = template.name;
   }
 
-  // getInvoiceBillingMonths(): string[] {
-  //   if (this.allBulkReports) {
-  //     const years = this.allBulkReports.filter((obj, pos, arr) => {
-  //       return arr.map(mo => mo['created']).indexOf(obj['created']) === pos;
-  //     });
-  //     return years.map(y => y.created.toString());
-  //   }
-  // }
-
   getSchoolYears(): string[] {
     return this.academicYearsService.getAcademicYears();
   }
@@ -259,22 +250,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     );
   }
 
-  // public downloadActivityByFormat(report: Report, format: string) {
-  //   this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
-  //     data => {
-  //       console.log('InvoiceListComponent.downloadActivityByFormat():  data is ', data);
-  //       if (format.toLowerCase().includes('excel')) {
-  //         this.fileSaverService.saveStudentActivityAsExcelFile(data, report);
-  //       } else {
-  //         this.fileSaverService.saveStudentActivityAsPDFFile(data, report);
-  //       }
-  //     },
-  //     error => {
-  //       console.log('InvoiceListComponent.downloadActivityByFormat():  error is ', error);
-  //     }
-  //   );
-  // }
-
   public downloadInvoiceByFormat(report: Report, format: string) {
     this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
@@ -308,77 +283,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     );
   }
 
-  // downloadInvoice(invoice: Report) {
-  //   this.reportsService.getInvoiceByName(invoice.name).subscribe(
-  //     data => {
-  //       console.log('InvoicesListComponent.downloadInvoice(): data is', data);
-  //       invoice.xlsx = data;
-  //       this.fileSaverService.saveInvoiceAsExcelFile(data, invoice);
-  //     },
-  //     error => {
-  //       console.log('InvoicesListComponent.downloadInvoice(): error is', error);
-  //       invoice.data = error.error.text;
-  //     }
-  //   );
-  // }
-
-  // downloadStudentActivity(bulkDownloadContent) {
-  //   const modal = this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' });
-  //   this.downloadType = 'students';
-  //   modal.result.then(
-  //     (result) => {
-  //       this.spinnerMsg = 'Generating student activity data.  Please wait...';
-  //       this.ngxSpinnerService.show();
-
-  //       this.reportsService.getInvoiceStudentActivityDataBulk(
-  //         this.selectedDownloadSchoolYear,
-  //         this.selectedDownloadStatus === 'Approved').subscribe(
-  //         data => {
-  //           console.log('InvoiceListComponent.downloadStudentActivity():  data is ', data);
-  //           this.ngxSpinnerService.hide();
-  //         },
-  //         error => {
-  //           console.log('InvoiceListComponent.downloadStudentActivity():  error is ', error);
-  //           this.ngxSpinnerService.hide();
-  //         }
-  //       );
-  //     },
-  //     (reason) => {
-  //       console.log('InvoiceListComponent.downloadStudentActivity(): reason is ', reason);
-  //     }
-  //   );
-  // }
-
-  // doDownload() {
-  //   if (this.downloadType === 'invoices') {
-  //     this.reportsService.getBulkInvoices(
-  //       this.selectedDownloadSchoolYear).subscribe(
-  //         data => {
-  //           console.log('InvoicesListComponent.doDownload(): data is ', data);
-  //           this.ngxSpinnerService.hide();
-  //           this.fileSaverService.saveDataAsExcelFile(data, 'BulkInvoices');
-  //         },
-  //         error => {
-  //           console.log('InvoicesListComponent.doDownload(): error is ', error);
-  //           this.ngxSpinnerService.hide();
-  //         }
-  //     );
-  //   } else {
-  //     this.reportsService.getInvoiceStudentActivityDataBulk(
-  //       this.selectedDownloadSchoolYear,
-  //       this.selectedDownloadStatus === 'Approved' ? true : false).subscribe(
-  //         data => {
-  //           console.log('InvoicesListComponent.doDownload(): data is ', data);
-  //           this.ngxSpinnerService.hide();
-  //           this.fileSaverService.saveDataAsExcelFile(data, 'BulkStudentActivity');
-  //         },
-  //         error => {
-  //           console.log('InvoicesListComponent.doDownload(): error is ', error);
-  //           this.ngxSpinnerService.hide();
-  //         }
-  //     );
-  //   }
-  // }
 
   private generateBulkInvoiceName(schoolYear: string, scope: string): string {
     return 'BulkInvoice_' + scope + '_' + schoolYear;
