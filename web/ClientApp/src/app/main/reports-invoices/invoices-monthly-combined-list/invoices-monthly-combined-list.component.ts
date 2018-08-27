@@ -23,8 +23,6 @@ import { NgxSpinnerService } from 'ngx-spinner';
   styleUrls: ['./invoices-monthly-combined-list.component.scss']
 })
 export class InvoicesMonthlyCombinedListComponent implements OnInit {
-  private reports: Report[];
-  private allReports: Report[];
   public bulkReports: Report[];
   private allBulkReports: Report[];
   private skip: number;
@@ -43,15 +41,15 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   private selectedCreateSchoolYear: string;
   private selectedDownloadSchoolYear: string;
   private selectedDownloadStatus: string;
-  private selectedTemplate: Template;
-  private selectedTemplateName: string;
   public selectedFilterSchoolYear: string;
   public selectedFilterStatus: string;
   private downloadType: string;
   private spinnerMsg: string;
   private templates: Template[];
+  public selectedCreateTemplate: Template;
+  public selectedCreateTemplateName: string;
   public selectedCurrentScope: string;
-  public selectedCreatedScope: string;
+  public selectedCreateScope: string;
   public scopes: string[];
   public selectedAsOfBillingDate: string;
   public selectedDownloadFormat: string;
@@ -70,12 +68,14 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.selectedTemplateName = 'Select Bulk Invoice Template';
+    this.selectedCreateTemplateName = 'Select Bulk Invoice Template';
     this.selectedCreateSchoolYear = 'Select Academic Year';
     this.selectedCurrentScope = 'Select billing period';
+    this.selectedCreateScope = 'Select billing period';
     this.spinnerMsg = 'Loading bulk invoices.  Please wait...';
+
     this.ngxSpinnerService.show();
-    this.reportsService.getBulkInvoices(null).subscribe(
+    this.reportsService.getBulkInvoices(null, null).subscribe(
       data => {
         console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
         this.bulkReports = this.allBulkReports = data['reports'];
@@ -84,16 +84,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       error => {
         console.log('InvoicesListComponent.ngOnInit(): error is ', error);
         this.ngxSpinnerService.hide();
-      }
-    );
-
-    this.reportsService.getInvoices(null, null, null, null).subscribe(
-      data => {
-        console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
-        this.reports = this.allReports = data['reports'];
-      },
-      error => {
-        console.log('InvoicesListComponent.ngOnInit(): error is ', error);
       }
     );
 
@@ -188,12 +178,15 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
   filterByScope(scope: string): void {
     this.selectedCurrentScope = scope;
-    this.reportsService.getActivities(null, null, scope, null).subscribe(
+    this.ngxSpinnerService.show();
+    this.reportsService.getBulkInvoices(null, scope).subscribe(
       data => {
-        this.reports = this.allReports = data['reports'];
+        this.bulkReports = this.allBulkReports = data['reports'];
+        this.ngxSpinnerService.hide();
       },
       error => {
         console.log('StudentActivityListComponent.filterByScope():  error is ', error);
+        this.ngxSpinnerService.hide();
       }
     );
   }
@@ -203,37 +196,25 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.bulkReports = this.allBulkReports.filter((r) => (r.type === ReportType.Invoice && r.schoolYear === year));
   }
 
-  filterByApprovedStatus(status: string) {
-    this.selectedFilterStatus = status;
-    this.bulkReports = this.allBulkReports.filter((r) => {
-      if (r.type === ReportType.Invoice &&
-        r.approved === (status === 'Approved')) {
-          return true;
-        }
-        return false;
-    });
-  }
-
   selectCreatedScope(scope: string): void {
-    this.selectedCreatedScope = scope;
+    this.selectedCreateScope = scope;
   }
 
-  getInvoiceBillingMonths(): string[] {
-    if (this.allReports) {
-      const years = this.allReports.filter((obj, pos, arr) => {
-        return arr.map(mo => mo['created']).indexOf(obj['created']) === pos;
-      });
-      return years.map(y => y.created.toString());
-    }
+  selectCreatedTemplate(template: Template): void {
+    this.selectedCreateTemplate = template;
+    this.selectedCreateTemplateName = template.name;
   }
+
+  // getInvoiceBillingMonths(): string[] {
+  //   if (this.allBulkReports) {
+  //     const years = this.allBulkReports.filter((obj, pos, arr) => {
+  //       return arr.map(mo => mo['created']).indexOf(obj['created']) === pos;
+  //     });
+  //     return years.map(y => y.created.toString());
+  //   }
+  // }
 
   getSchoolYears(): string[] {
-    // if (this.allReports) {
-    //   const years = this.allReports.filter((obj, pos, arr) => {
-    //     return arr.map(mo => mo['schoolYear']).indexOf(obj['schoolYear']) === pos;
-    //   });
-    //   return years.map(y => y.schoolYear);
-    // }
     return this.academicYearsService.getAcademicYears();
   }
 
@@ -243,13 +224,13 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.reportsService.createBulkInvoice(
       {
         'schoolYear': this.selectedCreateSchoolYear.replace(/\s+/g, ''),
-        'name': this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedCreatedScope),
-        'templateId': this.selectedTemplate.id,
+        'name': this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope),
+        'templateId': this.selectedCreateTemplate.id,
         'bulkInvoice': {
           'asOf': this.selectedAsOfBillingDate,
           'toSchoolDistrict': this.selectedAsOfBillingDate,
           'toPDE': this.selectedAsOfBillingDate,
-          'scope': this.selectedCreatedScope
+          'scope': this.selectedCreateScope
         }
       }
     ).subscribe(
@@ -278,21 +259,21 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     );
   }
 
-  public downloadActivityByFormat(report: Report, format: string) {
-    this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
-      data => {
-        console.log('InvoiceListComponent.downloadStudentActivityByFormat():  data is ', data);
-        if (format.toLowerCase().includes('excel')) {
-          this.fileSaverService.saveStudentActivityAsExcelFile(data, report);
-        } else {
-          this.fileSaverService.saveStudentActivityAsPDFFile(data, report);
-        }
-      },
-      error => {
-        console.log('InvoiceListComponent.downloadStudentActivityByFormat():  error is ', error);
-      }
-    );
-  }
+  // public downloadActivityByFormat(report: Report, format: string) {
+  //   this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
+  //     data => {
+  //       console.log('InvoiceListComponent.downloadActivityByFormat():  data is ', data);
+  //       if (format.toLowerCase().includes('excel')) {
+  //         this.fileSaverService.saveStudentActivityAsExcelFile(data, report);
+  //       } else {
+  //         this.fileSaverService.saveStudentActivityAsPDFFile(data, report);
+  //       }
+  //     },
+  //     error => {
+  //       console.log('InvoiceListComponent.downloadActivityByFormat():  error is ', error);
+  //     }
+  //   );
+  // }
 
   public downloadInvoiceByFormat(report: Report, format: string) {
     this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
@@ -312,6 +293,10 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
   displayCreateBulkInvoiceDialog(bulkCreateContent): void {
     const modal = this.ngbModal.open(bulkCreateContent, { centered: true, size: 'sm' });
+    this.selectedCreateSchoolYear = 'Select Academic Year';
+    this.selectedCreateScope = 'Select Billing Period';
+    this.selectedCreateTemplateName = 'Select Template';
+
     modal.result.then(
       (result) => {
         console.log('InvoicesListComponent.createBulkInvoice(): result is ', result);
@@ -323,80 +308,77 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     );
   }
 
-  downloadInvoice(invoice: Report) {
-    this.reportsService.getInvoiceByName(invoice.name).subscribe(
-      data => {
-        console.log('InvoicesListComponent.downloadInvoice(): data is', data);
-        invoice.xlsx = data;
-        this.fileSaverService.saveInvoiceAsExcelFile(data, invoice);
-      },
-      error => {
-        console.log('InvoicesListComponent.downloadInvoice(): error is', error);
-        invoice.data = error.error.text;
-      }
-    );
-  }
+  // downloadInvoice(invoice: Report) {
+  //   this.reportsService.getInvoiceByName(invoice.name).subscribe(
+  //     data => {
+  //       console.log('InvoicesListComponent.downloadInvoice(): data is', data);
+  //       invoice.xlsx = data;
+  //       this.fileSaverService.saveInvoiceAsExcelFile(data, invoice);
+  //     },
+  //     error => {
+  //       console.log('InvoicesListComponent.downloadInvoice(): error is', error);
+  //       invoice.data = error.error.text;
+  //     }
+  //   );
+  // }
 
-  downloadStudentActivity(bulkDownloadContent) {
-    const modal = this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' });
-    this.downloadType = 'students';
-    this.selectedDownloadSchoolYear = 'Select School Year';
-    this.selectedDownloadStatus = 'Approval Status';
+  // downloadStudentActivity(bulkDownloadContent) {
+  //   const modal = this.ngbModal.open(bulkDownloadContent, { centered: true, size: 'sm' });
+  //   this.downloadType = 'students';
+  //   modal.result.then(
+  //     (result) => {
+  //       this.spinnerMsg = 'Generating student activity data.  Please wait...';
+  //       this.ngxSpinnerService.show();
 
-    modal.result.then(
-      (result) => {
-        this.spinnerMsg = 'Generating student activity data.  Please wait...';
-        this.ngxSpinnerService.show();
+  //       this.reportsService.getInvoiceStudentActivityDataBulk(
+  //         this.selectedDownloadSchoolYear,
+  //         this.selectedDownloadStatus === 'Approved').subscribe(
+  //         data => {
+  //           console.log('InvoiceListComponent.downloadStudentActivity():  data is ', data);
+  //           this.ngxSpinnerService.hide();
+  //         },
+  //         error => {
+  //           console.log('InvoiceListComponent.downloadStudentActivity():  error is ', error);
+  //           this.ngxSpinnerService.hide();
+  //         }
+  //       );
+  //     },
+  //     (reason) => {
+  //       console.log('InvoiceListComponent.downloadStudentActivity(): reason is ', reason);
+  //     }
+  //   );
+  // }
 
-        this.reportsService.getInvoiceStudentActivityDataBulk(
-          this.selectedDownloadSchoolYear,
-          this.selectedDownloadStatus === 'Approved').subscribe(
-          data => {
-            console.log('InvoiceListComponent.downloadStudentActivity():  data is ', data);
-            this.ngxSpinnerService.hide();
-          },
-          error => {
-            console.log('InvoiceListComponent.downloadStudentActivity():  error is ', error);
-            this.ngxSpinnerService.hide();
-          }
-        );
-      },
-      (reason) => {
-        console.log('InvoiceListComponent.downloadStudentActivity(): reason is ', reason);
-      }
-    );
-  }
-
-  doDownload() {
-    if (this.downloadType === 'invoices') {
-      this.reportsService.getBulkInvoices(
-        this.selectedDownloadSchoolYear).subscribe(
-          data => {
-            console.log('InvoicesListComponent.doDownload(): data is ', data);
-            this.ngxSpinnerService.hide();
-            this.fileSaverService.saveDataAsExcelFile(data, 'BulkInvoices');
-          },
-          error => {
-            console.log('InvoicesListComponent.doDownload(): error is ', error);
-            this.ngxSpinnerService.hide();
-          }
-      );
-    } else {
-      this.reportsService.getInvoiceStudentActivityDataBulk(
-        this.selectedDownloadSchoolYear,
-        this.selectedDownloadStatus === 'Approved' ? true : false).subscribe(
-          data => {
-            console.log('InvoicesListComponent.doDownload(): data is ', data);
-            this.ngxSpinnerService.hide();
-            this.fileSaverService.saveDataAsExcelFile(data, 'BulkStudentActivity');
-          },
-          error => {
-            console.log('InvoicesListComponent.doDownload(): error is ', error);
-            this.ngxSpinnerService.hide();
-          }
-      );
-    }
-  }
+  // doDownload() {
+  //   if (this.downloadType === 'invoices') {
+  //     this.reportsService.getBulkInvoices(
+  //       this.selectedDownloadSchoolYear).subscribe(
+  //         data => {
+  //           console.log('InvoicesListComponent.doDownload(): data is ', data);
+  //           this.ngxSpinnerService.hide();
+  //           this.fileSaverService.saveDataAsExcelFile(data, 'BulkInvoices');
+  //         },
+  //         error => {
+  //           console.log('InvoicesListComponent.doDownload(): error is ', error);
+  //           this.ngxSpinnerService.hide();
+  //         }
+  //     );
+  //   } else {
+  //     this.reportsService.getInvoiceStudentActivityDataBulk(
+  //       this.selectedDownloadSchoolYear,
+  //       this.selectedDownloadStatus === 'Approved' ? true : false).subscribe(
+  //         data => {
+  //           console.log('InvoicesListComponent.doDownload(): data is ', data);
+  //           this.ngxSpinnerService.hide();
+  //           this.fileSaverService.saveDataAsExcelFile(data, 'BulkStudentActivity');
+  //         },
+  //         error => {
+  //           console.log('InvoicesListComponent.doDownload(): error is ', error);
+  //           this.ngxSpinnerService.hide();
+  //         }
+  //     );
+  //   }
+  // }
 
   private generateBulkInvoiceName(schoolYear: string, scope: string): string {
     return 'BulkInvoice_' + scope + '_' + schoolYear;
@@ -408,11 +390,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
   private selectDownloadStatus(status: string): void {
     this.selectedDownloadStatus = status;
-  }
-
-  private selectTemplate(template: Template): void {
-    this.selectedTemplate = template;
-    this.selectedTemplateName = template.name;
   }
 
   private selectBillingMonth(billingDate: string): void {

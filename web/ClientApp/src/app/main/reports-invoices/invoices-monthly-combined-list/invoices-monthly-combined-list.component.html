@@ -14,12 +14,6 @@
             <button class='dropdown-item' *ngFor='let scope of scopes' (click)='filterByScope(scope)'>{{scope}}</button>
           </div>
         </div>
-        <!-- <div ngbDropdown class="d-inline-block">
-          <button class="btn btn-outline-primary" id="dropdownStatus" ngbDropdownToggle>{{selectedFilterStatus}}</button>
-          <div ngbDropdownMenu aria-labelledby="dropdownStatus">
-            <button class='dropdown-item' *ngFor='let status of statuses' (click)='filterByApprovedStatus(status)'>{{status}}</button>
-          </div>
-        </div> -->
       </div>
     </div>
   </div>
@@ -50,13 +44,6 @@
     </table>
   </div>
 </div>
-<!-- <div class='row invoices-footer-row align-items-center'>
-  <div class='col-12 invoices-back-col'>
-    <a class='btn btn-primary' [routerLink]='["/reports-invoices", { outlets: { "action": ["home"] } }]'></a>
-      <span class='fa'></span> Reports & Invoices
-    </a>
-  </div>
-</div> -->
 <ng-template #bulkCreateContent let-c='close' let-d='dismiss'>
   <div class='modal-header'>
     <h4 class='modal-title'>Create Combined Invoice</h4>
@@ -64,52 +51,46 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class='modal-body'>
-    <div class='row align-items-center'>
-      <div class='col-12 text-center'>
-        <form #createBulkForm (ngSubmit)="c('creating'); create()">
-          <div class='form-group'>
-            <div ngbDropdown class="d-inline-block">
-              <button type='button' class="btn btn-outline-primary" id="dropdownDownloadSchoolYear" ngbDropdownToggle>{{selectedCreateSchoolYear}}</button>
-              <div ngbDropdownMenu aria-labelledby="dropdownDownloadSchoolYear">
-                <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='selectSchoolYear(year)'>{{year}}</button>
+  <form #createBulkForm (ngSubmit)="c('creating'); create()">
+    <div class='modal-body'>
+      <div class='row align-items-center'>
+        <div class='col-12 text-center'>
+            <div class='form-group'>
+              <div ngbDropdown class="d-inline-block">
+                <button type='button' class="btn btn-outline-primary" id="dropdownDownloadSchoolYear" ngbDropdownToggle>{{selectedCreateSchoolYear}}</button>
+                <div ngbDropdownMenu aria-labelledby="dropdownDownloadSchoolYear">
+                  <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='selectSchoolYear(year)'>{{year}}</button>
+                </div>
               </div>
             </div>
-          </div>
-          <div class='form-group'>
-            <div ngbDropdown class="d-inline-block">
-              <button type='button' class="btn btn-outline-primary" id="dropdownCreateScopes" ngbDropdownToggle>{{selectedCreatedScope}}</button>
-              <div ngbDropdownMenu aria-labelledby="dropdownCreateScopes">
-                <button type='button' class='dropdown-item' *ngFor='let scope of scopes' (click)='selectCreatedScope(scope)'>{{scope}}</button>
+            <div class='form-group'>
+              <div ngbDropdown class="d-inline-block">
+                <button type='button' class="btn btn-outline-primary" id="dropdownCreateScopes" ngbDropdownToggle>{{selectedCreateScope}}</button>
+                <div ngbDropdownMenu aria-labelledby="dropdownCreateScopes">
+                  <button type='button' class='dropdown-item' *ngFor='let scope of scopes' (click)='selectCreatedScope(scope)'>{{scope}}</button>
+                </div>
               </div>
             </div>
-          </div>
-          <!-- <div class='form-group'>
-            <div ngbDropdown class="d-inline-block">
-              <button type='button' class="btn btn-outline-primary" id="dropdownDownloadSchoolYear" ngbDropdownToggle>{{selectedAsOfBillingDate}}</button>
-              <div ngbDropdownMenu aria-labelledby="dropdownDownloadSchoolYear">
-                <button type='button' class='dropdown-item' *ngFor='let month of getInvoiceBillingMonths()' (click)='selectBillingMonth(month)'>{{month}}</button>
+            <div class='form-group'>
+              <div ngbDropdown class="d-inline-block">
+                <button type='button' class="btn btn-outline-primary" id="dropdownTemplateType" ngbDropdownToggle>{{selectedCreateTemplateName}}</button>
+                <div ngbDropdownMenu aria-labelledby="dropdownTemplateType">
+                  <button type='button' class='dropdown-item' *ngFor='let template of filterBulkTemplates()' (click)='selectCreatedTemplate(template)'>{{template.name}}</button>
+                </div>
               </div>
             </div>
-          </div> -->
-          <div class='form-group'>
-            <div ngbDropdown class="d-inline-block">
-              <button type='button' class="btn btn-outline-primary" id="dropdownTemplateType" ngbDropdownToggle>{{selectedTemplateName}}</button>
-              <div ngbDropdownMenu aria-labelledby="dropdownTemplateType">
-                <button type='button' class='dropdown-item' *ngFor='let template of filterBulkTemplates(templates)' (click)='selectTemplate(template)'>{{template.name}}</button>
-              </div>
-            </div>
-          </div>
-          <div class='form-group offset-2'>
-            <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
-            <button type='submit' class='btn btn-primary'>CREATE</button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
-  </div>
-  <div class='modal-footer'>
-  </div>
+    <div class='modal-footer'>
+      <div class='row align-items-right'>
+        <div class='col-12'>
+          <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
+          <button type='submit' class='btn btn-primary'>CREATE</button>
+        </div>
+      </div>
+    </div>
+  </form>
 </ng-template>
 <ng-template #downloadFormatContent let-c='close' let-d='dismiss'>
   <div class='modal-header'>
@@ -128,13 +109,15 @@
           </div>
         </div>
       </div>
-      <div class='form-group offset-2'>
+    </div>
+  </div>
+  <div class='modal-footer'>
+    <div class='row align-items-right'>
+      <div class='col-12'>
         <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
         <button type='button' class='btn btn-primary' (click)='c("Selected")'>SELECT</button>
       </div>
     </div>
-  </div>
-  <div class='modal-footer'>
   </div>
 </ng-template>
 <ngx-spinner size='large' loadingText='Generating PACBILL invoices.  Please wait...' type='timer'></ngx-spinner>

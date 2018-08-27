@@ -63,25 +63,27 @@
 }
 
 .modal-body {
-  div.col-md-12 {
-    form {
+  .row {
+    div.col-12 {
       div.form-group {
-        // display: flex;
-        // align-items: center;
-        // justify-content: center;
-
         div.d-inline-block {
           width: 100%;
 
           button {
             width: 100%;
-          }
-
-          div {
-            width: 100%;
+            overflow-x: hidden;
           }
         }
       }
     }
   }
+
+  // .d-inline-block {
+  //   width: 100%;
+  //   div {
+  //     button {
+  //       overflow-x: scroll;
+  //     }
+  //   }
+  // }
 }
