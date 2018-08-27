@@ -161,7 +161,6 @@ namespace api.Controllers
 				wb.Worksheets.AddCopy(1);
 
 				var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
-				Console.WriteLine($"CloneStudentItemizationSheets():  name is {districtName.Substring(0, Math.Min(districtName.Length, 15))} St. Info({s + 1})");
 				sheet.Name = $"{districtName.Substring(0, Math.Min(districtName.Length, 15))} St. Info({s + 1})";
 				Cells cells = sheet.Cells;
 
@@ -228,13 +227,13 @@ namespace api.Controllers
 			// of the index values are calculated from the first index cell.
 			switch (template.SchoolYear)
 			{
-				case "2017 - 2018":
+				case "2017-2018":
 					if (template.ReportType == ReportType.Invoice)
 						sequenceNumberRow = 13;
 					else
 						sequenceNumberRow = 13;
 					break;
-				case "2018 - 2019":
+				case "2018-2019":
 					if (template.ReportType == ReportType.Invoice)
 						sequenceNumberRow = 12;
 					else
