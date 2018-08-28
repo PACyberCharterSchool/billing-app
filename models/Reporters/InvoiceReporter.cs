@@ -63,11 +63,13 @@ namespace models.Reporters
 			$"{LastName}, {FirstName}{(string.IsNullOrEmpty(MiddleInitial) ? "" : $" {MiddleInitial}")}";
 		public string Street1 { get; set; }
 		public string Street2 { get; set; }
-		public string Address1 => $"{Street1}{(string.IsNullOrEmpty(Street2) ? "" : $" {Street2}")}";
+		public string Address1 => $"{Street1}";
 		public string City { get; set; }
 		public string State { get; set; }
 		public string ZipCode { get; set; }
-		public string Address2 => $"{City}, {State} {ZipCode}";
+		public string CityStateZipCode => $"{City}, {State} {ZipCode}";
+		public string Address2 => $"{(string.IsNullOrEmpty(Street2) ? $"{CityStateZipCode}" : $"{Street2}")}";
+		public string Address3 => $"{(string.IsNullOrEmpty(Street2) ? "" : $"{CityStateZipCode}")}";
 		public DateTime DateOfBirth { get; set; }
 		public string Grade { get; set; }
 		public DateTime FirstDay { get; set; }
@@ -332,7 +334,7 @@ namespace models.Reporters
 				WHERE HeaderId = (
 					SELECT Id
 					FROM StudentRecordsHeaders
-					WHERE Scope = @Scope 
+					WHERE Scope = @Scope
 				)
 				AND SchoolDistrictId = @Aun
 				AND StudentEnrollmentDate <= datefromparts(2018, 9, 30)

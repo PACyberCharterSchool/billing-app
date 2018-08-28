@@ -408,9 +408,7 @@ namespace api.Controllers
 				var invoice = invoices[i];
 
 				if (i > 0)
-				{
 					CloneInvoiceSummarySheet(wb, i, invoice.SchoolDistrict.Name);
-				}
 
 				if (invoice.Students.Count > 0)
 					CloneStudentItemizationSheets(wb, invoice.Students.Count, i, invoice.SchoolDistrict.Name, invoiceTemplate);
