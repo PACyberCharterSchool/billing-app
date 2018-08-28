@@ -11,7 +11,7 @@ namespace models
 	public interface IStudentRecordRepository
 	{
 		StudentRecordsHeader Get(string scope, int skip = 0, int take = 0, string filter = null);
-		IList<string> GetScopes();
+		IList<string> GetScopes(bool? locked = null);
 		bool IsLocked(string scope);
 		void Lock(string scope);
 		StudentRecord Update(StudentRecord update);
@@ -54,8 +54,15 @@ namespace models
 			return header;
 		}
 
-		public IList<string> GetScopes()
-			=> _context.StudentRecordsHeaders.Select(h => h.Scope).ToList();
+		public IList<string> GetScopes(bool? locked = null)
+		{
+			var scopes = _context.StudentRecordsHeaders.AsQueryable();
+
+			if (locked != null)
+				scopes = scopes.Where(h => h.Locked == locked.Value);
+
+			return scopes.Select(h => h.Scope).ToList();
+		}
 
 		public bool IsLocked(string scope)
 		 => _context.StudentRecordsHeaders.Where(r => r.Scope == scope).Select(r => r.Locked).SingleOrDefault();
