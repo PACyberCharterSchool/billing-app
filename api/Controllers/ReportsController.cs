@@ -128,6 +128,10 @@ namespace api.Controllers
 			wb.Worksheets.AddCopy(0);
 			var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
 			sheet.Name = $"{districtName.Substring(0, Math.Min(districtName.Length, 17))} Summary Info";
+
+			// all subsequent pages will be numbered starting from here
+			sheet.PageSetup.FirstPageNumber = 1;
+
 			Cells cells = sheet.Cells;
 			for (int r = 0; r < cells.MaxDataRow + 1; r++)
 			{
