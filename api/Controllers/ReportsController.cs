@@ -137,17 +137,20 @@ namespace api.Controllers
 			{
 				for (int c = 0; c < cells.MaxDataColumn + 1; c++)
 				{
-					if (!(cells[r, c].Type == CellValueType.IsString))
+					var cell = cells[r, c];
+					if (!(cell.Type == CellValueType.IsString))
 						continue;
+
+					var value = cell.StringValue;
 					const string pattern = @"Districts\[(\d+)\]";
-					var matches = Regex.Matches(cells[r, c].StringValue, pattern);
+					var matches = Regex.Matches(value, pattern);
 					if (matches.Count > 0)
 					{
 						var match = matches[0];
 						var i = int.Parse(match.Groups[1].Value);
 
-						cells[r, c].Value = Regex.Replace(cells[r, c].StringValue, pattern, $"Districts[{districtIndex}]");
-						cells[r, c].PutValue(cells[r, c].StringValue);
+						cell.Value = Regex.Replace(value, pattern, $"Districts[{districtIndex}]");
+						cell.PutValue(value);
 					}
 				}
 			}
