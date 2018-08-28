@@ -423,7 +423,11 @@ namespace api.Controllers
 			var data = new
 			{
 				SchoolYear = create.SchoolYear,
+				FirstYear = int.Parse(create.SchoolYear.Split("-")[0]),
+				SecondYear = int.Parse(create.SchoolYear.Split("-")[1]),
 				AsOf = create.BulkInvoice.AsOf,
+				AsOfMonth = create.BulkInvoice.AsOf.ToString("MMMM"),
+				AsOfYear = create.BulkInvoice.AsOf.Year,
 				Prepared = time,
 				ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
 				ToPDE = create.BulkInvoice.ToPDE,
