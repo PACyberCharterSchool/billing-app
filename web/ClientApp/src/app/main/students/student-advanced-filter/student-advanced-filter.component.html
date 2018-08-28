@@ -2,7 +2,7 @@
   <div class='col-auto advanced-school-district-col'>
     <h6>School District</h6>
     <div ngbDropdown class='d-inline-block'>
-      <button ngbDropdownToggle class='btn btn-outline-primary' id='schoolDistrictDropdown'>Select</button>
+      <button ngbDropdownToggle class='btn btn-outline-primary' id='schoolDistrictDropdown'>{{selectedSchoolDistrict}}</button>
       <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='schoolDistrictDropdown'>
         <button class='dropdown-item' *ngFor='let sd of schoolDistricts' (click)='filterBySchoolDistrict(sd.aun)'>{{sd.name}}</button>
       </div>
@@ -11,7 +11,7 @@
   <div class='col-auto advanced-grade-col'>
     <h6>Grade</h6>
     <div ngbDropdown class='d-inline-block'>
-      <button class='btn btn-outline-primary' id='gradeDropdown' ngbDropdownToggle>Grade</button>
+      <button class='btn btn-outline-primary' id='gradeDropdown' ngbDropdownToggle>{{selectedGrade}}</button>
       <div ngbDropdownMenu aria-labelled-by='gradeDropdown'>
         <button class='dropdown-item' *ngFor='let grade of grades' (click)='filterByGrade(grade)'>{{grade}}</button>
       </div>
@@ -36,7 +36,7 @@
   <div class='col-auto advanced-iep-col'>
     <h6>IEP</h6>
     <div ngbDropdown class='d-inline-block'>
-      <button class='btn btn-outline-primary' id='iepDropdown' ngbDropdownToggle>IEP</button>
+      <button class='btn btn-outline-primary' id='iepDropdown' ngbDropdownToggle>{{selectedIep}}</button>
       <div ngbDropdownMenu aria-labelled-by='iepDropdown'>
         <button class='dropdown-item' (click)='filterByIep(true)'>Yes</button>
         <button class='dropdown-item' (click)='filterByIep(false)'>No</button>

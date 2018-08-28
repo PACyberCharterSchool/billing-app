@@ -26,6 +26,9 @@ export class StudentAdvancedFilterComponent implements OnInit {
   public enrollmentDate: Date;
   public withdrawalDate: Date;
   public studentRecords: StudentRecord[];
+  public selectedGrade: string;
+  public selectedSchoolDistrict: string;
+  public selectedIep: string;
 
   @Input() schoolDistricts: SchoolDistrict[];
   @Input() allStudentRecords: StudentRecord[];
@@ -47,6 +50,9 @@ export class StudentAdvancedFilterComponent implements OnInit {
   @Output() studentsUpdated: EventEmitter<StudentRecord[]> = new EventEmitter();
 
   ngOnInit() {
+    this.selectedGrade = 'Select';
+    this.selectedSchoolDistrict = 'Select';
+    this.selectedIep = 'Select';
   }
 
   public initAllFilterControls(): void {
@@ -58,6 +64,9 @@ export class StudentAdvancedFilterComponent implements OnInit {
     this.studentDatepickerDOBComponent.model = null;
     this.studentDatepickerEnrollmentComponent.model = null;
     this.studentDatepickerWithdrawalComponent.model = null;
+    this.selectedGrade = 'Select';
+    this.selectedSchoolDistrict = 'Select';
+    this.selectedIep = 'Select';
   }
 
   public dateSelectedDOBDateHandler(date: Date) {
@@ -137,6 +146,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
   }
 
   filterBySchoolDistrict(schoolId: number) {
+    this.selectedSchoolDistrict = this.schoolDistricts.find((s) => s.aun === schoolId).name;
     this.ngxSpinnerService.show();
     this.studentRecordsService.getHeaderByScopeBySchoolDistrict(this.scope, schoolId).subscribe(
       data => {
@@ -152,6 +162,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
 
   filterByGrade(grade: number) {
     if (grade) {
+      this.selectedGrade = grade.toString();
       this.ngxSpinnerService.show();
       this.studentRecordsService.getHeaderByScopeByGrade(this.scope, grade).subscribe(
         data => {
@@ -185,6 +196,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
   }
 
   filterByIep(iep: boolean) {
+    this.selectedIep = iep ? 'Yes' : 'No';
     this.ngxSpinnerService.show();
     this.studentRecordsService.getHeaderByScopeByIep(this.scope, iep).subscribe(
       data => {
