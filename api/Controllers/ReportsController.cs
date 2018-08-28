@@ -504,7 +504,7 @@ namespace api.Controllers
 			{ }
 		}
 
-		public Report CreateStudentInformation(CreateReport create)
+		private Report CreateStudentInformation(CreateReport create)
 		{
 			var sourceReport = _reports.Get(create.Name);
 			if (sourceReport == null)
@@ -537,7 +537,7 @@ namespace api.Controllers
 			return report;
 		}
 
-		public Report CreateBulkStudentInformation(CreateReport create)
+		private Report CreateBulkStudentInformation(CreateReport create)
 		{
 			var type = create.BulkStudentInformation.Type;
 			var reports = _reports.GetMany(
