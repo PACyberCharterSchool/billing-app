@@ -7,53 +7,53 @@ div.col-12 {
     }
   }
 
-  div.modal-body {
-    div.col-12 {
-      padding: 0;
+  form {
+    div.modal-body {
+      div.col-12 {
+        padding: 0;
 
-      form {
-        div.form-group {
-          display: flex;
-          div.col-6 {
-            align-items: center;
-            display: flex;
-            padding-left: 0;
-            padding-right: 0;
-
-            input#typeahead-school-district {
-              width: 170px;
-              position: relative;
-              left: 33px;
-            }
-          }
-
-          .dropdown-ctrl-col, .datepicker-ctrl-col {
-            div.d-inline-block {
-              width: 100%;
-
-              button {
-                width: 100%;
-                overflow: hidden;
-              }
-
-              div.dropdown-menu {
-                height: 120px;
-                overflow-y: scroll;
-                width: 100%;
-              }
-            }
-          }
+        table {
+          border: 1px solid #d4d4d4;
         }
       }
-
-      table {
-        border: 1px solid #d4d4d4;
-      }
     }
-  }
 
   div.modal-footer {
     display: flex;
     align-items: center;
+  }
+
+    div.form-group {
+      display: flex;
+      div.col-6 {
+        align-items: center;
+        display: flex;
+        padding-left: 0;
+        padding-right: 0;
+
+        input#typeahead-school-district {
+          width: 170px;
+          position: relative;
+          left: 33px;
+        }
+      }
+
+      .dropdown-ctrl-col, .datepicker-ctrl-col {
+        div.d-inline-block {
+          width: 100%;
+
+          button {
+            width: 100%;
+            overflow: hidden;
+          }
+
+          div.dropdown-menu {
+            height: 120px;
+            overflow-y: scroll;
+            width: 100%;
+          }
+        }
+      }
+    }
   }
 }

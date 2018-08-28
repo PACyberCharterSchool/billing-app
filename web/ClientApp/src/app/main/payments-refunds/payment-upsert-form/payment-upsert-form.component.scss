@@ -4,44 +4,43 @@
   }
 }
 
-.modal-body {
-  div.col-md-12 {
-    padding: 0;
+form {
+  div.form-group {
+    display: flex;
 
-    form {
-      div.form-group {
-        display: flex;
+    #collapse-split-amt {
+      width: 100%;
 
-        #collapse-split-amt {
+      #split-payment-amt-input {
+        top: -60%;
+        left: 50%;
+      }
+    }
+
+    div.col-md-6 {
+      display: flex;
+      align-items: center;
+      padding-left: 0;
+      padding-right: 0;
+
+      div.d-inline-block {
+        width: 100%;
+
+        button {
           width: 100%;
-
-          #split-payment-amt-input {
-            top: -60%;
-            left: 50%;
-          }
         }
 
-        div.col-md-6 {
-          display: flex;
-          align-items: center;
-          padding-left: 0;
-          padding-right: 0;
-
-          div.d-inline-block {
-            width: 100%;
-
-            button {
-              width: 100%;
-            }
-
-            div.dropdown-menu {
-              height: 120px;
-              overflow-y: scroll;
-              width: 100%;
-            }
-          }
+        div.dropdown-menu {
+          height: 120px;
+          overflow-y: scroll;
+          width: 100%;
         }
       }
+    }
+  }
+  .modal-body {
+    div.col-md-12 {
+      padding: 0;
     }
   }
 }

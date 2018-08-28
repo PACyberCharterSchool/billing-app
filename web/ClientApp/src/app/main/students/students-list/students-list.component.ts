@@ -105,6 +105,7 @@ export class StudentsListComponent implements OnInit {
     this.studentRecordsService.postLockStudentData(this.currentScope).subscribe(
       response => {
         this.spinnerService.hide();
+        this.resetStudentList();
       },
       error => {
         this.spinnerService.hide();

@@ -28,7 +28,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 })
 export class InvoiceCreateFormComponent implements OnInit {
   private invoiceTemplate: string;
-  public asOfDate;
+  // public asOfDate;
   public toSchoolDistrictDate;
   public toPDEDate;
   private studentTemplate: string;
@@ -196,7 +196,8 @@ export class InvoiceCreateFormComponent implements OnInit {
       schoolYear: this.selectedSchoolYear.replace(/\s+/g, ''),
       templateId: this.selectedInvoiceTemplate.id,
       invoice: {
-        asOf: new Date(`${this.asOfDate.month}/${this.asOfDate.day}/${this.asOfDate.year}`),
+        // asOf: new Date(`${this.asOfDate.month}/${this.asOfDate.day}/${this.asOfDate.year}`),
+        asOf: new Date(Date.now()).toLocaleDateString('en-US'),
         toSchoolDistrict: new Date(`${this.toSchoolDistrictDate.month}/${this.toSchoolDistrictDate.day}/${this.toSchoolDistrictDate.year}`),
         toPDE: new Date(`${this.toPDEDate.month}/${this.toPDEDate.day}/${this.toPDEDate.year}`),
         schoolDistrictAun: +this.selectedSchoolDistrict.aun,
@@ -212,7 +213,8 @@ export class InvoiceCreateFormComponent implements OnInit {
       schoolYear: this.selectedSchoolYear.replace(/\s+/g, ''),
       templateId: this.selectedInvoiceTemplate.id,
       invoice: {
-        asOf: new Date(`${this.asOfDate.month}/${this.asOfDate.day}/${this.asOfDate.year}`),
+        // asOf: new Date(`${this.asOfDate.month}/${this.asOfDate.day}/${this.asOfDate.year}`),
+        asOf: new Date(Date.now()).toLocaleDateString('en-US'),
         toSchoolDistrict: new Date(`${this.toSchoolDistrictDate.month}/${this.toSchoolDistrictDate.day}/${this.toSchoolDistrictDate.year}`),
         toPDE: new Date(`${this.toPDEDate.month}/${this.toPDEDate.day}/${this.toPDEDate.year}`),
         scope: this.selectedScope.replace(/\s+/g, '')

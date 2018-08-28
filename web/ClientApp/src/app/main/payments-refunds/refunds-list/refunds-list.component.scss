@@ -35,17 +35,18 @@
 }
 
 .refunds-list-row {
-  height: calc(100% - 142px);
+  height: calc(100% - 102px);
 
   .refund-list-col {
     height: 100%;
 
     table {
+      height: 100%;
       thead {
-        height: 85px;
+        height: 17%;
       }
       tbody: {
-        height: calc(100% - 85px);
+        // height: 90%;
       }
     }
 

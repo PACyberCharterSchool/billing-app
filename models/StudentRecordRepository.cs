@@ -62,7 +62,7 @@ namespace models
 
 		public void Lock(string scope)
 		{
-			var header = _context.StudentRecordsHeaders.Single();
+			var header = _context.StudentRecordsHeaders.Where(r => r.Scope == scope).Single();
 			header.Locked = true;
 			_context.Update(header);
 		}
