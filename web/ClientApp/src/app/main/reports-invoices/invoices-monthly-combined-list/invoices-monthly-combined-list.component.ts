@@ -212,8 +212,10 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   create(): void {
     this.spinnerMsg = 'Creating bulk invoice.  Please wait...';
     this.ngxSpinnerService.show();
+    this.selectedAsOfBillingDate = new Date(Date.now()).toLocaleDateString('en-US');
     this.reportsService.createBulkInvoice(
       {
+        'reportType': 'BulkInvoice',
         'schoolYear': this.selectedCreateSchoolYear.replace(/\s+/g, ''),
         'name': this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope),
         'templateId': this.selectedCreateTemplate.id,

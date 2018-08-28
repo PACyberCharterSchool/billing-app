@@ -55,9 +55,9 @@ export class StudentAdvancedFilterComponent implements OnInit {
     this.endDate = null;
     this.enrollmentDate = null;
     this.withdrawalDate = null;
-    this.studentDatepickerDOBComponent.date = null;
-    this.studentDatepickerEnrollmentComponent.date = null;
-    this.studentDatepickerWithdrawalComponent.date = null;
+    this.studentDatepickerDOBComponent.model = null;
+    this.studentDatepickerEnrollmentComponent.model = null;
+    this.studentDatepickerWithdrawalComponent.model = null;
   }
 
   public dateSelectedDOBDateHandler(date: Date) {
