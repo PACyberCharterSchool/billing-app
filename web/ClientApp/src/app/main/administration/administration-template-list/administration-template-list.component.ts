@@ -151,7 +151,7 @@ export class AdministrationTemplateListComponent implements OnInit {
       const formData = new FormData();
       formData.append('content', this.selectedTemplateFile[0], this.selectedTemplateFile[0].name);
       formData.append('type', this.selectedTemplateType.type);
-      formData.append('year', this.selectedSchoolYear);
+      formData.append('year', this.selectedSchoolYear.replace(/\s+/g, ''));
       this.templatesService.putTemplatesByTypeAndByYear(formData).subscribe(
         data => {
           console.log('ApplicationTemplateListComponent.doImport():  data is ', data['template']);

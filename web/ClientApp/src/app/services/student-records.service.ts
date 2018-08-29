@@ -135,7 +135,7 @@ export class StudentRecordsService {
     if (Number(search)) {
       query = `(StudentId eq ${search})`;
     } else {
-      query = `((StudentFirstName eq ${search}) or (StudentLastName eq ${search}))`;
+      query = `((StudentFirstName has ${search}) or (StudentLastName has ${search}))`;
     }
     const url: string = this.apiSSRUrl + `/header/${scope}?Filter=${query}`;
     return url;
