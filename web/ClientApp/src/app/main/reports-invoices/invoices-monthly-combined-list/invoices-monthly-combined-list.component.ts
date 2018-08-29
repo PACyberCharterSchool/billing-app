@@ -253,9 +253,11 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   public downloadInvoiceByFormat(report: Report, format: string) {
+    this.ngxSpinnerService.show();
     this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
         console.log('InvoiceListComponent.downloadInvoiceByFormat():  data is ', data);
+        this.ngxSpinnerService.hide();
         if (format.toLowerCase().includes('excel')) {
           this.fileSaverService.saveInvoiceAsExcelFile(data, report);
         } else {
@@ -263,6 +265,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
         }
       },
       error => {
+        this.ngxSpinnerService.hide();
         console.log('InvoiceListComponent.downloadInvoiceByFormat():  error is ', error);
       }
     );
@@ -284,7 +287,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       }
     );
   }
-
 
   private generateBulkInvoiceName(schoolYear: string, scope: string): string {
     return 'BulkInvoice_' + scope + '_' + schoolYear;
