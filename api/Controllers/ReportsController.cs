@@ -435,6 +435,8 @@ namespace api.Controllers
 				AsOf = create.BulkInvoice.AsOf,
 				AsOfMonth = create.BulkInvoice.AsOf.ToString("MMMM"),
 				AsOfYear = create.BulkInvoice.AsOf.Year,
+				ScopeMonth = new DateTime(DateTime.Now.Year, int.Parse(create.BulkInvoice.Scope.Substring(5, 2)), 1).ToString("MMMM"),
+				ScopeYear = int.Parse(create.BulkInvoice.Scope.Substring(0, 4)),
 				Prepared = time,
 				ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
 				ToPDE = create.BulkInvoice.ToPDE,

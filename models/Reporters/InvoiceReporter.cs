@@ -88,6 +88,9 @@ namespace models.Reporters
 		public DateTime AsOf { get; set; }
 		public string AsOfMonth => AsOf.ToString("MMMM");
 		public int AsOfYear => AsOf.Year;
+		public string Scope { get; set; }
+		public string ScopeMonth => new DateTime(DateTime.Now.Year, int.Parse(Scope.Substring(5, 2)), 1).ToString("MMMM");
+		public int ScopeYear => int.Parse(Scope.Substring(0, 4));
 		public DateTime Prepared { get; set; }
 		public DateTime ToSchoolDistrict { get; set; }
 		public DateTime ToPDE { get; set; }
@@ -383,6 +386,7 @@ namespace models.Reporters
 				Number = config.InvoiceNumber,
 				SchoolYear = config.SchoolYear,
 				AsOf = config.AsOf,
+				Scope = config.Scope,
 				Prepared = config.Prepared,
 				ToSchoolDistrict = config.ToSchoolDistrict,
 				ToPDE = config.ToPDE,
