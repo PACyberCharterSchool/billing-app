@@ -18,7 +18,7 @@ import {
   NgbCalendar,
   NgbDateParserFormatter,
   NgbDateAdapter,
-  NgbDropdownConfig
+  NgbDropdownConfig,
 } from '@ng-bootstrap/ng-bootstrap';
 
 import { RefundsService } from '../../../services/refunds.service';

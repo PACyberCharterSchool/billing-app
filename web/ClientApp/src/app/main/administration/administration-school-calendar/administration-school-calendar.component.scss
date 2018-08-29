@@ -1,7 +1,7 @@
 .calendar-title-row {
   height: 62px;
-  margin-bottom: 15px;
-  padding-top: 25px;
+  padding-bottom: 10px;
+  padding-top: 5px;
 
   .calendar-title-col {
     h4 {
@@ -31,22 +31,25 @@
 }
 
 .calendar-select-row {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .calendar-list-row {
-  height: calc(100% - 60px);
+  height: calc(100% - 72px);
 
   div.col-12 {
     height: 100%;
 
     table {
+      // height: 100%;
+      padding: 0;
+      margin: 0;
       thead {
-        height: 60px;
+        height: 10%;
       }
 
       tbody {
-        height: calc(100% - 60px);
+        height: 85%;
       }
     }
 

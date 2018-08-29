@@ -46,7 +46,7 @@ export class StudentActivityListComponent implements OnInit {
     this.skip = 0;
 
     this.ngxSpinnerService.show();
-    this.studentRecordsService.getHeaders().subscribe(
+    this.studentRecordsService.getHeaders(null).subscribe(
       data => {
         this.scopes = data['scopes'];
         this.selectedScope = this.scopes[0];

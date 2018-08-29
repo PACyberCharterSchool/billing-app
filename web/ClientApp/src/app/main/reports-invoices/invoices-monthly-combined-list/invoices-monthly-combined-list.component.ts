@@ -97,7 +97,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       }
     );
 
-    this.studentRecordsService.getHeaders().subscribe(
+    this.studentRecordsService.getHeaders(true).subscribe(
       data => {
         console.log(`InvoicesListComponent.ngOnInit(): data is ${data}.`);
         this.scopes = data['scopes'];

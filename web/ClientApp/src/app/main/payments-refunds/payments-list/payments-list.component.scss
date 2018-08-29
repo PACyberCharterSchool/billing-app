@@ -1,12 +1,12 @@
 .payments-title-row {
   height: 62px;
   padding-bottom: 10px;
-
+  padding-top: 5px;
   div.col-2 {
     color: #58a917;
   }
 
-  div.col-6 {
+  div.col-7 {
     input[type='text'] {
       line-height: 14px;
       padding: 6px 2px;
@@ -33,18 +33,18 @@
 }
 
 .payments-list-row {
-  height: calc(100% - 142px);
+  height: calc(100% - 102px);
 
   .payment-list-col {
     height: 100%;
 
     table {
       thead {
-        height: 130px;
+        height: 17%;
       }
 
       tbody {
-        height: calc(100% - 130px);
+        height: 83%;
       }
     }
 

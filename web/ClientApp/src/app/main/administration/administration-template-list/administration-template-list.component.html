@@ -35,13 +35,6 @@
     <p *ngIf='templates?.length === 0'>No templates have been imported.</p>
   </div>
 </div>
-<!-- <div class='row template-footer-row'>
-  <div class='col back-to-admin-col'>
-    <a class='btn btn-primary' [routerLink]='["/administration", { outlets: { "action": ["home"] } }]'>
-      <span class='fa'></span> Back to Administration
-    </a>
-  </div>
-</div> -->
 <ng-template #importTemplateContent let-c='close' let-d='dismiss'>
   <div class='modal-header'>
     <h4 class='modal-title'>Import Template</h4>

@@ -37,7 +37,7 @@ export class AdministrationImportStudentDataComponent implements OnInit {
 
   ngOnInit() {
     this.currentScope = 'Select billing period...';
-    this.ssrImportService.getHeaders().subscribe(
+    this.ssrImportService.getHeaders(null).subscribe(
       data => {
         this.scopes = data['scopes'];
       },

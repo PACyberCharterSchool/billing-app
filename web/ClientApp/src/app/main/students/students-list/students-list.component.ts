@@ -65,7 +65,7 @@ export class StudentsListComponent implements OnInit {
     }
 
   ngOnInit() {
-    this.studentRecordsService.getHeaders().subscribe(
+    this.studentRecordsService.getHeaders(null).subscribe(
       data => {
         console.log('StudentsListComponent.ngOnInit(): data is ', data['scopes']);
         this.scopes = data['scopes'];
@@ -172,7 +172,7 @@ export class StudentsListComponent implements OnInit {
   }
 
   resetStudentList() {
-    this.studentRecordsService.getHeaders().subscribe(
+    this.studentRecordsService.getHeaders(null).subscribe(
       data => {
         console.log('StudentsListComponent.resetStudentList(): data is ', data['scopes']);
         this.scopes = data['scopes'];
@@ -195,20 +195,26 @@ export class StudentsListComponent implements OnInit {
 
   filterStudentListByNameOrId() {
     if (this.searchText) {
-      this.studentRecords = this.studentRecords.filter((s) => {
-        if (s.studentLastName.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          s.studentId.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          s.studentFirstName.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          s.schoolDistrictName.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          s.studentState.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          s.studentStreet1.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          s.studentStreet2.toLowerCase().includes(this.searchText.toLowerCase()) ||
-          s.studentCity.toLowerCase().includes(this.searchText.toLowerCase())) {
-            return true;
-        }
+      // this.studentRecords = this.studentRecords.filter((s) => {
+      //   if (s.studentLastName.toLowerCase().includes(this.searchText.toLowerCase()) ||
+      //     s.studentId.toLowerCase().includes(this.searchText.toLowerCase()) ||
+      //     s.studentFirstName.toLowerCase().includes(this.searchText.toLowerCase()) ||
+      //     s.schoolDistrictName.toLowerCase().includes(this.searchText.toLowerCase()) ||
+      //     s.studentState.toLowerCase().includes(this.searchText.toLowerCase()) ||
+      //     s.studentStreet1.toLowerCase().includes(this.searchText.toLowerCase()) ||
+      //     s.studentStreet2.toLowerCase().includes(this.searchText.toLowerCase()) ||
+      //     s.studentCity.toLowerCase().includes(this.searchText.toLowerCase())) {
+      //       return true;
+      //   }
 
-        return false;
-      });
+      this.studentRecordsService.getHeaderByScopeByNameById(this.currentScope, this.searchText).subscribe(
+        data => {
+          this.studentRecords = data['header']['records'];
+        },
+        error => {
+          console.log('StudentListComponent.filterStudentsByNameOrId(): error is ', error);
+        }
+      );
     }
   }
 

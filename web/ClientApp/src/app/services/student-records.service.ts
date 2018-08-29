@@ -28,8 +28,8 @@ export class StudentRecordsService {
     return this.httpClient.post<any>(url, this.headers);
   }
 
-  public getHeaders(): Observable<StudentRecordsHeader[]> {
-    const url = this.apiSSRUrl + `/scopes`;
+  public getHeaders(locked: boolean): Observable<StudentRecordsHeader[]> {
+    const url = this.apiSSRUrl + `/scopes` + (locked !== null ? `?Locked=${locked}` : ``);
     return this.httpClient.get<StudentRecordsHeader[]>(url, this.headers);
     // return Observable.of(studentRecordsHeaders);
   }
@@ -123,5 +123,21 @@ export class StudentRecordsService {
     delete record.lastUpdated;
 
     return this.httpClient.put<StudentRecord>(url, record, this.headers);
+  }
+
+  public getHeaderByScopeByNameById(scope: string, search: string): Observable<StudentRecordsHeader> {
+    const url: string = this.buildStudentsNameAndIdQuery(scope, search);
+    return this.httpClient.get<StudentRecordsHeader>(url, this.headers);
+  }
+
+  private buildStudentsNameAndIdQuery(scope: string, search: string): string {
+    let query: string;
+    if (Number(search)) {
+      query = `(StudentId eq ${search})`;
+    } else {
+      query = `((StudentFirstName eq ${search}) or (StudentLastName eq ${search}))`;
+    }
+    const url: string = this.apiSSRUrl + `/header/${scope}?Filter=${query}`;
+    return url;
   }
 }

@@ -1,6 +1,6 @@
 <div class='row refunds-title-row align-items-center'>
   <div class='col-2'><h4>Refunds</h4></div>
-  <div class='col-6 search-refund-col'>
+  <div class='col-7 search-refund-col'>
     <input type='text' [(ngModel)]='searchText' />
     <button type='button' class='btn btn-primary' (click)='filterRefundRecords()'>SEARCH</button>
     <button type='button' class='btn btn-outline-primary' (click)='resetRefundRecords()'>RESET</button>
@@ -31,10 +31,3 @@
     <p *ngIf='refunds?.length <= 0'>No refunds have been submitted.</p>
   </div>
 </div>
-<!-- <div class='row refunds-footer-row align-items-center'>
-  <div class='col-12 refund-action-col'>
-    <a class='btn btn-primary' [routerLink]='["/payments-refunds", { outlets: { "action": ["home"] } }]'>
-      <span class='fa'></span> Back to Payments & Refunds
-    </a>
-  </div>
-</div> -->
