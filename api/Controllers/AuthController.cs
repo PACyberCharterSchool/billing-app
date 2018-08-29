@@ -1,3 +1,5 @@
+// #define FAKE_LOGIN
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
@@ -57,9 +59,15 @@ namespace api.Controllers
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
-			// LdapUser user = new LdapUser("RA1", "Rivers Agile 1", "ADM");
-			LdapUser user = new LdapUser();
 
+			#if FAKE_LOGIN
+			LdapUser user = await Task.Run(() => new LdapUser("RA1", "Rivers Agile 1", "ADM"));
+			#else
+			LdapUser user = new LdapUser();
+			#endif
+
+			#if FAKE_LOGIN
+			#else
 			try
 			{
 				user = await Task.Run(() => _ldap.GetUser(args.Username, args.Password));
@@ -74,6 +82,7 @@ namespace api.Controllers
 				_logger.LogWarning($"exception: {e}");
 				return Unauthorized();
 			}
+			#endif
 
 			return Ok(new TokenResponse(new JwtSecurityTokenHandler().WriteToken(_jwt.BuildToken(new[]{
 				new Claim(JwtRegisteredClaimNames.Sub, user.Username),
