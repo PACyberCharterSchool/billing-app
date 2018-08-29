@@ -27,16 +27,24 @@ namespace api.Controllers
 			_logger = logger;
 		}
 
+		public class GetScopesArgs
+		{
+			public bool? Locked { get; set; }
+		}
+
 		public struct ScopesResponse
 		{
 			public IList<string> Scopes { get; set; }
 		}
+
 		[HttpGet("scopes")]
 		[Authorize(Policy = "STD+")]
 		[ProducesResponseType(200)]
-		public async Task<IActionResult> GetScopes()
+		public async Task<IActionResult> GetScopes([FromQuery]GetScopesArgs args)
 		{
-			var scopes = await Task.Run(() => _records.GetScopes());
+			var scopes = await Task.Run(() => _records.GetScopes(
+				locked: args.Locked
+			));
 			return new ObjectResult(new ScopesResponse
 			{
 				Scopes = scopes,

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using api.Common;
 using api.Dtos;
 using models;
+using System.Text.RegularExpressions;
 
 namespace api.Controllers
 {
@@ -83,8 +84,8 @@ namespace api.Controllers
 				year: args.SchoolYear
 			));
 
-      if (templates == null)
-        templates = new List<TemplateMetadata>();
+			if (templates == null)
+				templates = new List<TemplateMetadata>();
 
 			return new ObjectResult(new TemplatesResponse
 			{
@@ -106,6 +107,9 @@ namespace api.Controllers
 		{
 			if (!ReportType.Values().Contains(type))
 				return new BadRequestObjectResult(new ErrorResponse($"Invalid ReportType '{type}'."));
+
+			if (!new Regex(@"^\d{4}-\d{4}$").IsMatch(year))
+				return new BadRequestObjectResult(new ErrorResponse($"Invalid SchoolYear '{year}'"));
 
 			if (content == null)
 				return new BadRequestObjectResult(
