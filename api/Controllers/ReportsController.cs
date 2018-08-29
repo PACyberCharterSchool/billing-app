@@ -148,9 +148,7 @@ namespace api.Controllers
 					{
 						var match = matches[0];
 						var i = int.Parse(match.Groups[1].Value);
-
-						cell.Value = Regex.Replace(value, pattern, $"Districts[{districtIndex}]");
-						cell.PutValue(value);
+						cell.PutValue(Regex.Replace(value, pattern, $"Districts[{districtIndex}]"));
 					}
 				}
 			}
@@ -204,9 +202,7 @@ namespace api.Controllers
 							{
 								var match = matches[0];
 								var i = int.Parse(match.Groups[1].Value);
-
-								cell.Value = Regex.Replace(cell.StringValue, pattern, $"Students[{(i + ((s + adj) * per))}]");
-								cell.PutValue(cell.StringValue);
+								cell.PutValue(Regex.Replace(cell.StringValue, pattern, $"Students[{(i + ((s + adj) * per))}]"));
 							}
 						}
 
@@ -217,9 +213,7 @@ namespace api.Controllers
 							{
 								var match = matches[0];
 								var i = int.Parse(match.Groups[1].Value);
-
-								cell.Value = Regex.Replace(cell.StringValue, pattern, $"Districts[{districtIndex}]");
-								cell.PutValue(cell.StringValue);
+								cell.PutValue(Regex.Replace(cell.StringValue, pattern, $"Districts[{districtIndex}]"));
 							}
 						}
 					}
@@ -283,9 +277,7 @@ namespace api.Controllers
 						{
 							var match = matches[0];
 							var i = int.Parse(match.Groups[1].Value);
-
-							value = Regex.Replace(value, pattern, $"Students[{(i + ((s + 1) * per))}]");
-							cell.PutValue(value);
+							cell.PutValue(Regex.Replace(value, pattern, $"Students[{(i + ((s + 1) * per))}]"));
 						}
 					}
 				}
@@ -448,7 +440,7 @@ namespace api.Controllers
 					RegularEnrollments = i.RegularEnrollments,
 					SpecialEnrollments = i.SpecialEnrollments,
 					Transactions = i.Transactions
-				})
+				}),
 			};
 
 			var json = JsonConvert.SerializeObject(data);
@@ -470,7 +462,6 @@ namespace api.Controllers
 				{
 					var rgx = new Regex(@"'.*'");
 					var match = rgx.Match(e.Message);
-					Console.WriteLine($"match: {match}");
 					foreach (char c in match.ToString())
 					{
 						Console.Write($"{((int)c).ToString("x")} ");
