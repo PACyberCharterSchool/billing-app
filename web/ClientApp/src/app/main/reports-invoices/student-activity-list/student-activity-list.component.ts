@@ -106,18 +106,20 @@ export class StudentActivityListComponent implements OnInit {
 
   filterByScope(scope: string): void {
     this.selectedScope = scope;
+    this.ngxSpinnerService.show();
     this.reportsService.getActivities(null, null, scope, null).subscribe(
       data => {
         this.reports = this.allReports = data['reports'];
+        this.ngxSpinnerService.hide();
       },
       error => {
         console.log('StudentActivityListComponent.filterByScope():  error is ', error);
+        this.ngxSpinnerService.hide();
       }
     );
   }
 
   filterStudentActivityReports(): void {
-
   }
 
   private generateBulkActivityName(schoolYear: string, asOfDate: string): string {
