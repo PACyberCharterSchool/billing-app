@@ -9,6 +9,8 @@ import { Globals } from '../../../globals';
 
 import { NgbModal, NgbActiveModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
+import { NgxSpinnerService } from 'ngx-spinner';
+
 import {
   AdministrationPaymentRateUpdateFormComponent
 } from '../administration-payment-rate-update-form/administration-payment-rate-update-form.component';
@@ -34,18 +36,25 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     private schoolDistrictService: SchoolDistrictService,
     private utilitiesService: UtilitiesService,
     private ngbModal: NgbModal,
+    private ngxSpinnerService: NgxSpinnerService,
     private ngbActiveModal: NgbActiveModal
   ) {
-    this.model  = new SchoolDistrict();
+    this.model = new SchoolDistrict();
     this.property = 'name';
     this.direction = 1;
   }
 
   ngOnInit() {
+    this.ngxSpinnerService.show();
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
         this.schoolDistricts = this.allSchoolDistricts = data['schoolDistricts'];
         console.log('AdministrationPaymentRateListComponent.ngOnInit(): school districts are ', data['schoolDistricts']);
+        this.ngxSpinnerService.hide();
+      },
+      error => {
+        console.log('AdministrationPaymentRateListComponent.ngOnInit(): error is ', error);
+        this.ngxSpinnerService.hide();
       }
     );
   }
@@ -115,7 +124,7 @@ export class AdministrationPaymentRateListComponent implements OnInit {
   }
 
   private isFloat(n): boolean {
-      return n === +n && n !== (n|0);
+    return n === +n && n !== (n | 0);
   }
 
   private isCurrency(v: any): boolean {
@@ -147,14 +156,14 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     const modal = this.ngbModal.open(AdministrationPaymentRateUpdateFormComponent, { centered: true });
     modal.componentInstance.schoolDistrict = sd;
     modal.result.then(
-       (result) => {
-         this.refreshSchoolDistrictList();
-         console.log(`Closed with: ${result}.`);
-       },
-       (reason) => {
-         this.refreshSchoolDistrictList();
-         console.log(`Dismissed: ${this.getDismissReasons(reason)}.`);
-       }
+      (result) => {
+        this.refreshSchoolDistrictList();
+        console.log(`Closed with: ${result}.`);
+      },
+      (reason) => {
+        this.refreshSchoolDistrictList();
+        console.log(`Dismissed: ${this.getDismissReasons(reason)}.`);
+      }
     );
   }
 
@@ -204,11 +213,11 @@ export class AdministrationPaymentRateListComponent implements OnInit {
 
   private getDismissReasons(reason: any) {
     if (reason === ModalDismissReasons.ESC) {
-        return 'by pressing ESC';
+      return 'by pressing ESC';
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-        return 'by clicking on backdrop.';
+      return 'by clicking on backdrop.';
     } else {
-        return `with ${reason}.`;
+      return `with ${reason}.`;
     }
   }
 }

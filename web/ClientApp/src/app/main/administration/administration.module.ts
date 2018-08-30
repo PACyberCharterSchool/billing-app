@@ -22,6 +22,7 @@ import { AdministrationTemplateListComponent } from './administration-template-l
 
 import { NgbModule, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { NgxCurrencyModule } from 'ngx-currency';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     AdministrationRoutingModule,
     SharedModule,
     NgbModule,
-    NgxSpinnerModule
+    NgxSpinnerModule,
+    NgxCurrencyModule
   ],
   providers: [ NgbActiveModal ],
   entryComponents: [ AdministrationPaymentRateUpdateFormComponent ]

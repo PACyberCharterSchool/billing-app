@@ -10,8 +10,8 @@
     </div>
   </div>
 </div>
-<div class='row school-district-action-row align-items-center'>
-  <div class='col-2 offset-10'>
+<div class='row school-district-action-row align-items-center justify-content-left'>
+  <div class='col-2'>
     <button type='button' class='btn btn-primary' (click)='importSchoolDistricts(importSchoolDistrictsContent)'>BULK IMPORT</button>
   </div>
 </div>
@@ -28,20 +28,14 @@
       </thead>
       <tbody>
         <tr *ngFor='let sd of schoolDistricts | orderBy: {property: property, direction: direction}' (click)='editSchoolDistrictPaymentRate(sd)'>
-          <td *ngFor='let v of listDisplayableValues(sd)'>{{isCurrency(v) ? (v | normalizeFieldValue | currency) : (v | normalizeFieldValue)}}</td>
+          <td *ngFor='let v of listDisplayableValues(sd)' placeholder='top' ngbTooltip='{{v | normalizeFieldValue}}'>{{isCurrency(v) ? (v | normalizeFieldValue | currency) : (v | normalizeFieldValue)}}</td>
         </tr>
       </tbody>
     </table>
     <p *ngIf='schoolDistricts?.length == 0'>No school district records have been imported.</p>
   </div>
 </div>
-<!-- <div class='row school-district-footer-row align-items-center'>
-  <div class='col-12 school-district-rates-action-col'>
-    <a class='btn btn-primary' [routerLink]='["/administration", { outlets: { "action": ["home"] } }]'>
-      <span class='fa'></span> Back to Administration
-    </a>
-  </div>
-</div> -->
+<ngx-spinner size='large' loadingText='Retrieving student records for scope {{currentScope}} from PACBill database.  Please wait...' type='timer'></ngx-spinner>
 <ng-template #importSchoolDistrictsContent let-c='close' let-d='dismiss'>
   <div class='col-md-12'>
     <div class='modal-header'>
@@ -77,4 +71,3 @@
     </div>
   </div>
 </ng-template>
-
