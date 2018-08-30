@@ -38,7 +38,7 @@
       </thead>
       <tbody>
         <tr *ngFor='let report of reports | orderBy: {property: property, direction: direction}'>
-          <td *ngFor='let v of listDisplayableValues(report)'>{{v | normalizeFieldValue}}</td>
+          <td *ngFor='let v of listDisplayableValues(report)' placement='top' ngbTooltip='{{v | normalizeFieldValue}}'>{{v | normalizeFieldValue}}</td>
           <td>
             <button class='dropdown-item btn btn-primary' (click)='displayDownloadFormatDialog(downloadFormatContent, "invoice", report)'>Download</button>
           </td>

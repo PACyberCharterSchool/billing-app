@@ -37,7 +37,7 @@
       </thead>
       <tbody>
         <tr *ngFor='let report of bulkReports | orderBy: {property: property, direction: direction}'>
-          <td *ngFor='let v of listDisplayableValues(report)'>{{v | normalizeFieldValue}}</td>
+          <td *ngFor='let v of listDisplayableValues(report)' placement='top' ngbTooltip='{{v | normalizeFieldValue}}'>{{v | normalizeFieldValue}}</td>
           <td><button type='button' class='btn btn-primary' (click)='displayDownloadFormatDialog(downloadFormatContent, report)'>Download</button></td>
         </tr>
       </tbody>
