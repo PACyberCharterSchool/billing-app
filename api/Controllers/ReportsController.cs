@@ -342,6 +342,9 @@ namespace api.Controllers
 				wb.Worksheets.RemoveAt(1);
 			}
 
+			foreach (var sheet in wb.Worksheets)
+				sheet.PageSetup.SetFooter(1, "&P");
+
 			// generate xlsx
 			var data = JsonConvert.SerializeObject(invoice);
 			wb = _exporter.Export(wb, JsonConvert.DeserializeObject(data));
