@@ -419,6 +419,9 @@ namespace api.Controllers
 			}
 			// generate xlsx
 
+			foreach (var sheet in wb.Worksheets)
+				sheet.PageSetup.SetFooter(1, "&P");
+
 			var data = new
 			{
 				SchoolYear = create.SchoolYear,
