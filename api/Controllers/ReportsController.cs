@@ -460,22 +460,7 @@ namespace api.Controllers
 				// wb.Write(ms);
 				wb.Save(ms, new XlsSaveOptions(SaveFormat.Xlsx));
 				wb.CalculateFormula();
-				try
-				{
-					wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
-				}
-				catch (CellsException e)
-				{
-					var rgx = new Regex(@"'.*'");
-					var match = rgx.Match(e.Message);
-					foreach (char c in match.ToString())
-					{
-						Console.Write($"{((int)c).ToString("x")} ");
-					}
-					Console.Write("\n");
-
-					throw;
-				}
+				wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
 
 				report = new Report
 				{
