@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using CsvHelper;
+using Aspose.Cells;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
@@ -141,7 +142,6 @@ namespace api.Controllers
 				return reader.GetRecords<SchoolDistrict>().ToList();
 			}
 		}
-
 		private static IList<SchoolDistrict> XlsxToDistricts(Stream stream)
 		{
 			var wb = new XSSFWorkbook(stream);
@@ -152,6 +152,9 @@ namespace api.Controllers
 			var nameIndex = header.Cells.FindIndex(c => c.StringCellValue == "School District");
 			var rateIndex = header.Cells.FindIndex(c => c.StringCellValue.Contains("Nonspecial"));
 			var specialRateIndex = header.Cells.FindIndex(c => c.StringCellValue.Contains("Special"));
+			var alternateRateIndex = header.Cells.FindIndex(c => c.StringCellValue.Contains("AlternateNonspecial"));
+			var alternateSpecialRateIndex = header.Cells.FindIndex(c => c.StringCellValue.Contains("AlternateSpecial"));
+			var paymentTypeIndex = header.Cells.FindIndex(c => c.StringCellValue == "PaymentType");
 
 			var districts = new List<SchoolDistrict>();
 			for (var i = 1; i <= sheet.LastRowNum; i++)
@@ -166,6 +169,8 @@ namespace api.Controllers
 					Name = row.GetCell(nameIndex).StringCellValue,
 					Rate = (decimal)row.GetCell(rateIndex).NumericCellValue,
 					SpecialEducationRate = (decimal)row.GetCell(specialRateIndex).NumericCellValue,
+					AlternateRate = (decimal)row.GetCell(alternateRateIndex).NumericCellValue,
+					AlternateSpecialEducationRate = (decimal)row.GetCell(alternateSpecialRateIndex).NumericCellValue
 				});
 			}
 
