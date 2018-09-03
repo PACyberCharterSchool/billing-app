@@ -13,6 +13,8 @@ import { SchoolDistrict } from '../../../models/school-district.model';
 })
 export class AdministrationPaymentRateUpdateFormComponent implements OnInit {
 
+  public paymentType: string;
+
   @Input() schoolDistrict: SchoolDistrict;
 
   constructor(
@@ -21,13 +23,14 @@ export class AdministrationPaymentRateUpdateFormComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.paymentType = this.schoolDistrict.paymentType === 'Check' ? 'SD' : 'PDE';
   }
 
   onSubmit() {
     console.log('AdministrationPaymentRateUpdateComponent.onSubmit():  schoolDistrict is ', this.schoolDistrict);
     this.schoolDistrict['aun'] = this.schoolDistrict.aun;
     this.schoolDistrict['name'] = this.schoolDistrict.name;
-    this.schoolDistrict['paymentType'] = this.schoolDistrict.paymentType === 'SD' ? 'Check' : 'UniPay';
+    this.schoolDistrict['paymentType'] = this.paymentType === 'SD' ? 'Check' : 'ACH';
     this.schoolDistrictService.updateSchoolDistrict(this.schoolDistrict).subscribe(
       data => {
         this.ngbActiveModal.close('success');

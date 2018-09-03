@@ -146,7 +146,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
   }
 
   filterBySchoolDistrict(schoolId: number) {
-    this.selectedSchoolDistrict = this.schoolDistricts.find((s) => s.aun === schoolId).name;
+    this.selectedSchoolDistrict = this.schoolDistricts.find((s) => +s.aun === schoolId).name;
     this.ngxSpinnerService.show();
     this.studentRecordsService.getHeaderByScopeBySchoolDistrict(this.scope, schoolId).subscribe(
       data => {

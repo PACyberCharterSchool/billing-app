@@ -3,7 +3,7 @@
     <h3>School Districts</h3>
   </div>
   <div class='col-9 search-payment-col'>
-    <div class='col-md-12'>
+    <div class='col-12'>
       <input type='text' [(ngModel)]='searchText' />
       <button type='button' class='btn btn-primary' (click)='filterSchoolDistrictRecords()'>SEARCH</button>
       <button type='button' class='btn btn-outline-primary' (click)='resetSchoolDistrictRecords()'>RESET</button>
@@ -28,16 +28,24 @@
       </thead>
       <tbody>
         <tr *ngFor='let sd of schoolDistricts | orderBy: {property: property, direction: direction}' (click)='editSchoolDistrictPaymentRate(sd)'>
-          <td *ngFor='let v of listDisplayableValues(sd)' placeholder='top' ngbTooltip='{{v | normalizeFieldValue}}'>{{isCurrency(v) ? (v | normalizeFieldValue | currency) : (v | normalizeFieldValue)}}</td>
+          <td>{{sd.aun | normalizeFieldValue}}</td>
+          <td placeholder='top' ngbTooltip='{{sd.name | normalizeFieldValue}}'>{{sd.name}}</td>
+          <td>{{sd.rate | normalizeFieldValue | currency}}</td>
+          <td>{{sd.alternateRate | normalizeFieldValue | currency}}</td>
+          <td>{{sd.specialEducationRate | normalizeFieldValue | currency}}</td>
+          <td>{{sd.alternateSpecialEducationRate | normalizeFieldValue | currency}}</td>
+          <td>{{sd.paymentType === 'Check' ? 'SD' : 'PDE'}}</td>
+          <td>{{sd.created | date: 'MM/dd/yyyy'}}</td>
+          <td>{{sd.lastUpdated | date: 'MM/dd/yyyy'}}</td>
         </tr>
       </tbody>
     </table>
     <p *ngIf='schoolDistricts?.length == 0'>No school district records have been imported.</p>
   </div>
 </div>
-<ngx-spinner size='large' loadingText='Retrieving student records for scope {{currentScope}} from PACBill database.  Please wait...' type='timer'></ngx-spinner>
+<ngx-spinner size='large' loadingText='Retrieving school district records from PACBill database.  Please wait...' type='timer'></ngx-spinner>
 <ng-template #importSchoolDistrictsContent let-c='close' let-d='dismiss'>
-  <div class='col-md-12'>
+  <div class='col-12'>
     <div class='modal-header'>
       <h4 class='modal-title'>Bulk Import School Districts</h4>
       <button type='button' class='close' aria-label='Close' (click)="d('Cross click')">
@@ -46,11 +54,11 @@
     </div>
     <div class='modal-body'>
       <form #selectSchoolDistrictsForm (ngSubmit)='c("Import clicked."); doImport()'>
-        <div class='form-group col-md-12'>
-          <div class='col-md-6'>
+        <div class='form-group col-12'>
+          <div class='col-6'>
             <label>Select school district data file:</label>
           </div>
-          <div class='col-md-6'>
+          <div class='col-6'>
             <input type='file'
               [(ngModel)]='fileName'
               [ngModelOptions]='{standalone: true}'
@@ -59,8 +67,8 @@
               />
           </div>
         </div>
-        <div class='form-group col-md-12'>
-          <div class='col-md-4 offset-md-8'>
+        <div class='form-group col-12'>
+          <div class='col-4 offset-md-8'>
             <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
             <button type='submit' class='btn btn-primary'>IMPORT</button>
           </div>

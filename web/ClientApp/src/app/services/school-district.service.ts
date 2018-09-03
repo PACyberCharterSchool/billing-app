@@ -55,7 +55,7 @@ export class SchoolDistrictService {
       alternateRate: +sd.alternateRate,
       specialEducationRate: +sd.specialEducationRate,
       alternateSpecialEducationRate: +sd.alternateSpecialEducationRate,
-      paymentType: sd.paymentType
+      paymentType: sd.paymentType === 'Check' ? 'Check' : 'ACH'
     });
 
     return reqBodyObj;
@@ -75,5 +75,4 @@ export class SchoolDistrictService {
 
     return schoolDistrictData;
   }
-
 }

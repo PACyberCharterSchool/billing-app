@@ -16,6 +16,9 @@ namespace api.Controllers
 				TypeConverterOption.NumberStyles(NumberStyles.Currency);
 			Map(d => d.SpecialEducationRate).Index(4).
 				TypeConverterOption.NumberStyles(NumberStyles.Currency);
+			Map(d => d.AlternateRate).Index(5).TypeConverterOption.NumberStyles(NumberStyles.Currency);
+			Map(d => d.AlternateSpecialEducationRate).Index(6).TypeConverterOption.NumberStyles(NumberStyles.Currency);
+			Map(d => d.PaymentType).Name("PaymentType");
 		}
 	}
 }
