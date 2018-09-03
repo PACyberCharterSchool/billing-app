@@ -521,8 +521,8 @@ namespace api.Controllers
 			using (var xlsxStream = new MemoryStream())
 			using (var pdfStream = new MemoryStream())
 			{
-				wb.Save(xlsxStream, SaveFormat.Xlsx);
 				wb.CalculateFormula();
+				wb.Save(xlsxStream, SaveFormat.Xlsx);
 				wb.Save(pdfStream, SaveFormat.Pdf);
 
 				report = new Report
@@ -562,8 +562,8 @@ namespace api.Controllers
 			using (var xlsxStream = new MemoryStream())
 			using (var pdfStream = new MemoryStream())
 			{
-				wb.Save(xlsxStream, SaveFormat.Xlsx);
 				wb.CalculateFormula();
+				wb.Save(xlsxStream, SaveFormat.Xlsx);
 				wb.Save(pdfStream, SaveFormat.Pdf);
 
 				report = new Report
