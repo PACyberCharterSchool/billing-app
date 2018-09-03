@@ -353,9 +353,8 @@ namespace api.Controllers
 			using (var xlsxms = new MemoryStream())
 			using (var pdfms = new MemoryStream())
 			{
-				// wb.Write(ms);
-				wb.Save(xlsxms, new XlsSaveOptions(SaveFormat.Xlsx));
 				wb.CalculateFormula();
+				wb.Save(xlsxms, new XlsSaveOptions(SaveFormat.Xlsx));
 				wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
 
 				report = new Report
