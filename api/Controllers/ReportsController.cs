@@ -397,6 +397,9 @@ namespace api.Controllers
 
 			var invoices = reports.Select(r => JsonConvert.DeserializeObject<Invoice>(r.Data)).OrderBy(i => i.SchoolDistrict.Name).ToList();
 
+			DateTime toSchoolDate = new DateTime();
+			DateTime toPDEDate = new DateTime();
+
 			// compose workbook
 			var wb = new Workbook(new MemoryStream(invoiceTemplate.Content));
 			InitializeWorkbookSheetPrinterMargins(wb);
@@ -404,6 +407,12 @@ namespace api.Controllers
 			for (int i = 0; i < invoices.Count; i++)
 			{
 				var invoice = invoices[i];
+
+				if (i == 0)
+				{
+					toSchoolDate = invoice.ToSchoolDistrict;
+					toPDEDate = invoice.ToPDE;
+				}
 
 				if (i > 0)
 					CloneInvoiceSummarySheet(wb, i, invoice.SchoolDistrict.Name);
@@ -429,10 +438,8 @@ namespace api.Controllers
 				ScopeMonth = new DateTime(DateTime.Now.Year, int.Parse(create.BulkInvoice.Scope.Substring(5, 2)), 1).ToString("MMMM"),
 				ScopeYear = int.Parse(create.BulkInvoice.Scope.Substring(0, 4)),
 				Prepared = time,
-				// ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
-				ToSchoolDistrict = Convert.ToDateTime("09-05-2018"), 
-				// ToPDE = create.BulkInvoice.ToPDE,
-				ToPDE = Convert.ToDateTime("09-25-2018"),
+				ToSchoolDistrict = toSchoolDate,
+				ToPDE = toPDEDate,
 				Districts = invoices.Select(i => new
 				{
 					Number = i.Number,
