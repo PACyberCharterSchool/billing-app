@@ -392,64 +392,42 @@ namespace api.Controllers
 
 		private Report CreateBulkInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
 		{
-			var reports = _reports.GetMany(
-				type: ReportType.FromString("Invoice"),
-				// year: create.SchoolYear,
-				scope: create.BulkInvoice.Scope,
-				approved: create.BulkInvoice.Approved
-			).ToList();
-
-			var invoices = reports.Select(r => JsonConvert.DeserializeObject<Invoice>(r.Data)).OrderBy(i => i.SchoolDistrict.Name).ToList();
+			var reporter = _reporters.CreateBulkInvoiceReporter(_context);
+			var invoice = reporter.GenerateReport(new BulkInvoiceReporter.Config
+			{
+				SchoolYear = create.SchoolYear,
+				Scope = create.BulkInvoice.Scope,
+				Prepared = time,
+				AsOf = create.BulkInvoice.AsOf,
+				ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
+				ToPDE = create.BulkInvoice.ToPDE,
+			});
 
 			// compose workbook
 			var wb = new Workbook(new MemoryStream(invoiceTemplate.Content));
 			InitializeWorkbookSheetPrinterMargins(wb);
-			Console.WriteLine($"ReportsController.CreateBulkInvoice():  number of invoices is {invoices.Count}.");
-			for (int i = 0; i < invoices.Count; i++)
+
+			var districts = invoice.Districts.ToList();
+			for (int i = 0; i < districts.Count; i++)
 			{
-				var invoice = invoices[i];
+				var district = districts[i];
 
 				if (i > 0)
-					CloneInvoiceSummarySheet(wb, i, invoice.SchoolDistrict.Name);
+					CloneInvoiceSummarySheet(wb, i, district.SchoolDistrict.Name);
 
-				if (invoice.Students.Count > 0)
-					CloneStudentItemizationSheets(wb, invoice.Students.Count, i, invoice.SchoolDistrict.Name, invoiceTemplate);
+				var studentCount = district.Students.Count();
+				if (studentCount > 0)
+					CloneStudentItemizationSheets(wb, studentCount, i, district.SchoolDistrict.Name, invoiceTemplate);
 			}
 
-			if (invoices[0].Students.Count == 0)
-			{
+			if (districts[0].Students.Count() == 0)
 				wb.Worksheets.RemoveAt(1);
-			}
-			// generate xlsx
 
 			foreach (var sheet in wb.Worksheets)
 				sheet.PageSetup.SetFooter(1, "&P");
 
-			var data = new
-			{
-				SchoolYear = create.SchoolYear,
-				FirstYear = int.Parse(create.SchoolYear.Split("-")[0]),
-				SecondYear = int.Parse(create.SchoolYear.Split("-")[1]),
-				AsOf = create.BulkInvoice.AsOf,
-				AsOfMonth = create.BulkInvoice.AsOf.ToString("MMMM"),
-				AsOfYear = create.BulkInvoice.AsOf.Year,
-				ScopeMonth = new DateTime(DateTime.Now.Year, int.Parse(create.BulkInvoice.Scope.Substring(5, 2)), 1).ToString("MMMM"),
-				ScopeYear = int.Parse(create.BulkInvoice.Scope.Substring(0, 4)),
-				Prepared = time,
-				ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
-				ToPDE = create.BulkInvoice.ToPDE,
-				Districts = invoices.Select(i => new
-				{
-					Number = i.Number,
-					SchoolDistrict = i.SchoolDistrict,
-					Students = i.Students,
-					RegularEnrollments = i.RegularEnrollments,
-					SpecialEnrollments = i.SpecialEnrollments,
-					Transactions = i.Transactions
-				}),
-			};
-
-			var json = JsonConvert.SerializeObject(data);
+			// generate xlsx
+			var json = JsonConvert.SerializeObject(invoice);
 			wb = _exporter.Export(wb, JsonConvert.DeserializeObject(json));
 
 			// create report

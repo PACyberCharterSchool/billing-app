@@ -53,9 +53,10 @@ namespace models.Reporters
 
 	public class InvoiceStudent
 	{
+		public int SchoolDistrictAun { get; set; }
 		// TODO(Erik): what do we display if null?
 		public ulong? PASecuredID { get; set; }
-		public int PACyberID { get; set; }
+		public string PACyberID { get; set; }
 		public string FirstName { get; set; }
 		public string MiddleInitial { get; set; }
 		public string LastName { get; set; }
@@ -140,7 +141,7 @@ namespace models.Reporters
 		private static DateTime EndOfMonth(int year, int month) =>
 			new DateTime(year, month, DateTime.DaysInMonth(year, month));
 
-		bool AreEnrollmentAndWithdrawalInSameMonth(IGrouping<int, InvoiceStudent> group)
+		bool AreEnrollmentAndWithdrawalInSameMonth(IGrouping<string, InvoiceStudent> group)
 		{
 			// this assumes to never run in a group where there is a single entry...
 			var activityDates = group.OrderBy(s => s.FirstDay).Select(s => new { s.FirstDay, s.LastDay }).ToList();
@@ -340,11 +341,11 @@ namespace models.Reporters
 					WHERE Scope = @Scope
 				)
 				AND SchoolDistrictId = @Aun
-				AND StudentEnrollmentDate <= datefromparts(2018, 9, 30)
+				AND StudentEnrollmentDate <= @End
 				AND (
 					StudentWithdrawalDate IS NULL
 					OR (
-						StudentWithdrawalDate >= datefromparts(2017, 7, 1)
+						StudentWithdrawalDate >= @Start
 						AND (
 							StudentWithdrawalDate != StudentEnrollmentDate
 							OR (
