@@ -429,8 +429,10 @@ namespace api.Controllers
 				ScopeMonth = new DateTime(DateTime.Now.Year, int.Parse(create.BulkInvoice.Scope.Substring(5, 2)), 1).ToString("MMMM"),
 				ScopeYear = int.Parse(create.BulkInvoice.Scope.Substring(0, 4)),
 				Prepared = time,
-				ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
-				ToPDE = create.BulkInvoice.ToPDE,
+				// ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
+				ToSchoolDistrict = Convert.ToDateTime("09-05-2018"), 
+				// ToPDE = create.BulkInvoice.ToPDE,
+				ToPDE = Convert.ToDateTime("09-25-2018"),
 				Districts = invoices.Select(i => new
 				{
 					Number = i.Number,
