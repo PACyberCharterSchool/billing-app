@@ -125,8 +125,8 @@ namespace api.Controllers
 				Name = update.Name,
 				Rate = update.Rate,
 				AlternateRate = update.AlternateRate,
-        SpecialEducationRate = update.SpecialEducationRate,
-        AlternateSpecialEducationRate = update.AlternateSpecialEducationRate,
+				SpecialEducationRate = update.SpecialEducationRate,
+				AlternateSpecialEducationRate = update.AlternateSpecialEducationRate,
 				PaymentType = update.PaymentType,
 			};
 			await Task.Run(() => _context.SaveChanges(() => _schoolDistricts.CreateOrUpdate(district)));
@@ -152,9 +152,7 @@ namespace api.Controllers
 			var nameIndex = header.Cells.FindIndex(c => c.StringCellValue == "School District");
 			var rateIndex = header.Cells.FindIndex(c => c.StringCellValue.Contains("Nonspecial"));
 			var specialRateIndex = header.Cells.FindIndex(c => c.StringCellValue.Contains("Special"));
-			var alternateRateIndex = header.Cells.FindIndex(c => c.StringCellValue.Contains("AlternateNonspecial"));
-			var alternateSpecialRateIndex = header.Cells.FindIndex(c => c.StringCellValue.Contains("AlternateSpecial"));
-			var paymentTypeIndex = header.Cells.FindIndex(c => c.StringCellValue == "PaymentType");
+			var typeIndex = header.Cells.FindIndex(c => c.StringCellValue == "Type");
 
 			var districts = new List<SchoolDistrict>();
 			for (var i = 1; i <= sheet.LastRowNum; i++)
@@ -163,14 +161,14 @@ namespace api.Controllers
 				if (row == null || row.Cells.All(c => c.CellType == CellType.Blank))
 					continue;
 
+				var ptype = row.GetCell(typeIndex).StringCellValue;
 				districts.Add(new SchoolDistrict
 				{
 					Aun = (int)row.GetCell(aunIndex).NumericCellValue,
 					Name = row.GetCell(nameIndex).StringCellValue,
 					Rate = (decimal)row.GetCell(rateIndex).NumericCellValue,
 					SpecialEducationRate = (decimal)row.GetCell(specialRateIndex).NumericCellValue,
-					AlternateRate = (decimal)row.GetCell(alternateRateIndex).NumericCellValue,
-					AlternateSpecialEducationRate = (decimal)row.GetCell(alternateSpecialRateIndex).NumericCellValue
+					PaymentType = string.IsNullOrWhiteSpace(ptype) ? null : SchoolDistrictPaymentType.FromString(ptype),
 				});
 			}
 
