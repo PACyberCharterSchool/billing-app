@@ -22,11 +22,11 @@ namespace api.Controllers
 		{
 			Map(d => d.Aun).Name("AUN");
 			Map(d => d.Name).Name("School District");
-			Map(d => d.Rate).Index(2).
+			Map(d => d.Rate).Name("Nonspecial").
 				TypeConverterOption.NumberStyles(NumberStyles.Currency);
-			Map(d => d.SpecialEducationRate).Index(3).
+			Map(d => d.SpecialEducationRate).Name("Special").
 				TypeConverterOption.NumberStyles(NumberStyles.Currency);
-			Map(d => d.PaymentType).Index(4).TypeConverter<SchoolDistrictPaymentTypeConverter>();
+			Map(d => d.PaymentType).Name("PaymentType").TypeConverter<SchoolDistrictPaymentTypeConverter>();
 		}
 	}
 }
