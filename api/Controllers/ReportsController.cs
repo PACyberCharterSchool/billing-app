@@ -630,60 +630,6 @@ namespace api.Controllers
 			});
 		}
 
-		[HttpPost("bulk")]
-		[Authorize(Policy = "PAY+")]
-		[ProducesResponseType(typeof(ReportResponse), 200)]
-		[ProducesResponseType(typeof(ErrorsResponse), 400)]
-		[ProducesResponseType(409)]
-		[ProducesResponseType(424)]
-		[SwaggerResponse(statusCode: 501, description: "Not Implemented")] // Swashbuckle sees this as "Server Error".
-		public async Task<IActionResult> CreateBulk([FromBody]CreateReport create) => await Create(create);
-
-		public class GetActivityArgs
-		{
-			public string Name { get; set; }
-			public string SchoolYear { get; set; }
-		}
-
-		[HttpGet("activity/name")]
-		[Authorize(Policy = "PAY+")]
-		[Produces(ContentTypes.XLSX, ContentTypes.PDF)]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(typeof(ErrorsResponse), 400)]
-		[ProducesResponseType(404)]
-		public async Task<IActionResult> GetActivity([FromQuery]GetActivityArgs args)
-			=> await Create(new CreateReport
-			{
-				Name = args.Name,
-				ReportType = ReportType.StudentInformation.Value,
-				SchoolYear = args.SchoolYear,
-			});
-
-		public class GetBulkActivityArgs : GetActivityArgs
-		{
-			public string Type { get; set; }
-			public bool? Approved { get; set; }
-		}
-
-		[HttpGet("activity")]
-		[Authorize(Policy = "PAY+")]
-		[Produces(ContentTypes.XLSX, ContentTypes.PDF)]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(typeof(ErrorsResponse), 400)]
-		[ProducesResponseType(404)]
-		public async Task<IActionResult> GetBulkActivity([FromQuery]GetBulkActivityArgs args)
-			=> await Create(new CreateReport
-			{
-				Name = args.Name,
-				ReportType = ReportType.BulkStudentInformation.Value,
-				SchoolYear = args.SchoolYear,
-				BulkStudentInformation = new CreateBulkStudentInformationReport
-				{
-					Type = args.Type,
-					Approved = args.Approved,
-				},
-			});
-
 		public class CreateManyInvoiceReports
 		{
 			[Required]
