@@ -56,18 +56,18 @@ namespace models.Reporters
 				}).ToList();
 
 		// TODO(Erik): filter by school district aun
-		private IList<InvoiceStudent> GetInvoiceStudents(string scope, DateTime start, DateTime end)
+		private IList<InvoiceStudent> GetInvoiceStudents(int[] auns, string scope, DateTime start, DateTime end)
 		{
-			var headerId = _context.StudentRecordsHeaders.Where(h => h.Scope == scope).Select(h => h.Id).First();
+			var headerId = _context.StudentRecordsHeaders.Where(h => h.Scope == scope).Select(h => h.Id).Single();
 
 			return _context.StudentRecords.
 				Where(r => r.Header.Id == headerId).
+				Where(r => auns.Contains(r.SchoolDistrictId)).
 				Where(r => r.StudentEnrollmentDate <= end && (
 					r.StudentWithdrawalDate == null || (
-						r.StudentWithdrawalDate >= start &&
-						r.StudentWithdrawalDate != r.StudentEnrollmentDate || (
-							r.StudentWithdrawalDate == r.StudentEnrollmentDate &&
-							r.StudentCurrentIep.HasValue && (
+						r.StudentWithdrawalDate >= start && (
+							r.StudentWithdrawalDate != r.StudentEnrollmentDate || (
+								r.StudentWithdrawalDate == r.StudentEnrollmentDate &&
 								r.StudentCurrentIep.Value.Month == r.StudentEnrollmentDate.Month &&
 								r.StudentCurrentIep.Value.Day == r.StudentEnrollmentDate.Day
 							)
@@ -275,8 +275,9 @@ namespace models.Reporters
 			var auns = districts.Select(d => d.Aun).ToArray();
 
 			var students = GetInvoiceStudents(
+				auns,
 				bulk.Scope,
-				 new DateTime(bulk.FirstYear, 7, 1),
+				new DateTime(bulk.FirstYear, 7, 1),
 				EndOfMonth(bulk.AsOf.Year, bulk.AsOf.Month));
 			var transactions = GetInvoiceTransactions(
 				auns,
