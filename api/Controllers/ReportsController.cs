@@ -89,6 +89,11 @@ namespace api.Controllers
 
 			public DateTime ToPDE { get; set; }
 
+			public IList<int> Auns { get; set; }
+
+			[JsonConverter(typeof(SchoolDistrictPaymentTypeJsonConverter))]
+			public SchoolDistrictPaymentType PaymentType { get; set; }
+
 			public bool Approved { get; set; }
 		}
 
@@ -401,6 +406,8 @@ namespace api.Controllers
 				AsOf = create.BulkInvoice.AsOf,
 				ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
 				ToPDE = create.BulkInvoice.ToPDE,
+				Auns = create.BulkInvoice.Auns,
+				PaymentType = create.BulkInvoice.PaymentType,
 			});
 
 			// compose workbook

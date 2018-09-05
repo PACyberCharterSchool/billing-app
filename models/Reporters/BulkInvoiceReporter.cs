@@ -41,9 +41,18 @@ namespace models.Reporters
 			_context = context;
 		}
 
-		private IList<InvoiceSchoolDistrict> GetInvoiceSchoolDistricts()
-			=> _context.SchoolDistricts.
-				OrderBy(d => d.Name).
+		private IList<InvoiceSchoolDistrict> GetInvoiceSchoolDistricts(
+			IList<int> auns = null,
+			SchoolDistrictPaymentType paymentType = null)
+		{
+			var dd = _context.SchoolDistricts.AsQueryable();
+			if (auns != null && auns.Count > 0)
+				dd = dd.Where(d => auns.Contains(d.Aun));
+
+			if (paymentType != null)
+				dd = dd.Where(d => d.PaymentType == paymentType);
+
+			return dd.OrderBy(d => d.Name).
 				Select(d => new InvoiceSchoolDistrict
 				{
 					Id = d.Id,
@@ -54,8 +63,9 @@ namespace models.Reporters
 						d.AlternateSpecialEducationRate.Value :
 						d.SpecialEducationRate,
 				}).ToList();
+		}
 
-		private IList<InvoiceStudent> GetInvoiceStudents(int[] auns, string scope, DateTime start, DateTime end)
+		private IList<InvoiceStudent> GetInvoiceStudents(IList<int> auns, string scope, DateTime start, DateTime end)
 		{
 			var headerId = _context.StudentRecordsHeaders.Where(h => h.Scope == scope).Select(h => h.Id).Single();
 
@@ -123,7 +133,7 @@ namespace models.Reporters
 			new DateTime(year, month, DateTime.DaysInMonth(year, month));
 
 		private IDictionary<int, InvoiceTransactions> GetInvoiceTransactions(
-			int[] auns,
+			IList<int> auns,
 			string schoolYear,
 			int firstYear,
 			int secondYear,
@@ -196,7 +206,7 @@ namespace models.Reporters
 		}
 
 		private Dictionary<int, (InvoiceEnrollments Regular, InvoiceEnrollments Special)> GetInvoiceEnrollments(
-			int[] auns,
+			IList<int> auns,
 			IList<InvoiceStudent> allStudents,
 			int firstYear,
 			int secondYear,
@@ -268,10 +278,13 @@ namespace models.Reporters
 			return result;
 		}
 
-		private IList<BulkInvoiceSchoolDistrict> GetBulkInvoiceSchoolDistricts(BulkInvoice bulk)
+		private IList<BulkInvoiceSchoolDistrict> GetBulkInvoiceSchoolDistricts(
+			BulkInvoice bulk,
+			IList<int> auns = null,
+			SchoolDistrictPaymentType paymentType = null)
 		{
-			var districts = GetInvoiceSchoolDistricts();
-			var auns = districts.Select(d => d.Aun).ToArray();
+			var districts = GetInvoiceSchoolDistricts(auns, paymentType);
+			auns = districts.Select(d => d.Aun).ToList();
 
 			var students = GetInvoiceStudents(
 				auns,
@@ -313,6 +326,8 @@ namespace models.Reporters
 			public DateTime AsOf { get; set; }
 			public DateTime ToSchoolDistrict { get; set; }
 			public DateTime ToPDE { get; set; }
+			public IList<int> Auns { get; set; }
+			public SchoolDistrictPaymentType PaymentType { get; set; }
 		}
 
 		public BulkInvoice GenerateReport(Config config)
@@ -327,7 +342,7 @@ namespace models.Reporters
 				ToPDE = config.ToPDE,
 			};
 
-			bulk.Districts = GetBulkInvoiceSchoolDistricts(bulk);
+			bulk.Districts = GetBulkInvoiceSchoolDistricts(bulk, config.Auns, config.PaymentType);
 
 			return bulk;
 		}
