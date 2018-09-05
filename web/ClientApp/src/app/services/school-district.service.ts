@@ -58,6 +58,14 @@ export class SchoolDistrictService {
       paymentType: sd.paymentType === 'Check' ? 'Check' : 'ACH'
     });
 
+    if (+sd.alternateRate === 0.0) {
+      delete reqBodyObj.alternateRate;
+    }
+
+    if (+sd.alternateSpecialEducationRate === 0.0) {
+      delete reqBodyObj.alternateSpecialEducationRate;
+    }
+
     return reqBodyObj;
   }
 

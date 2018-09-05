@@ -31,6 +31,15 @@ export class AdministrationPaymentRateUpdateFormComponent implements OnInit {
     this.schoolDistrict['aun'] = this.schoolDistrict.aun;
     this.schoolDistrict['name'] = this.schoolDistrict.name;
     this.schoolDistrict['paymentType'] = this.paymentType === 'SD' ? 'Check' : 'ACH';
+
+    if (+this.schoolDistrict.alternateRate === 0.0) {
+      delete this.schoolDistrict['alternateRate'];
+    }
+
+    if (+this.schoolDistrict.alternateSpecialEducationRate === 0.0) {
+      delete this.schoolDistrict['alternateSpecialEducationRate'];
+    }
+
     this.schoolDistrictService.updateSchoolDistrict(this.schoolDistrict).subscribe(
       data => {
         this.ngbActiveModal.close('success');
@@ -42,5 +51,4 @@ export class AdministrationPaymentRateUpdateFormComponent implements OnInit {
       }
     );
   }
-
 }

@@ -14,8 +14,6 @@ using System.Threading.Tasks;
 
 using CsvHelper;
 using Aspose.Cells;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 
 using api.Dtos;
 using models;
@@ -144,30 +142,38 @@ namespace api.Controllers
 		}
 		private static IList<SchoolDistrict> XlsxToDistricts(Stream stream)
 		{
-			var wb = new XSSFWorkbook(stream);
-			var sheet = wb.GetSheetAt(0);
+			var wb = new Workbook(stream);
+			var sheet = wb.Worksheets[0];
+			int r, aunIndex, nameIndex, rateIndex, specialRateIndex, typeIndex;
+			FindOptions fopts = new FindOptions();
+			fopts.LookAtType = LookAtType.EntireContent;
+			fopts.LookInType = LookInType.Values;
 
-			var header = sheet.GetRow(0);
-			var aunIndex = header.Cells.FindIndex(c => c.StringCellValue == "AUN");
-			var nameIndex = header.Cells.FindIndex(c => c.StringCellValue == "School District");
-			var rateIndex = header.Cells.FindIndex(c => c.StringCellValue.Contains("Nonspecial"));
-			var specialRateIndex = header.Cells.FindIndex(c => c.StringCellValue.Contains("Special"));
-			var typeIndex = header.Cells.FindIndex(c => c.StringCellValue == "Type");
+			Cell cell = sheet.Cells.Find("AUN", null, fopts);
+			aunIndex = cell.Column;
+			cell = sheet.Cells.Find("School District", null, fopts);
+			nameIndex = cell.Column;
+			cell = sheet.Cells.Find("Nonspecial", null, fopts);
+			rateIndex = cell.Column;
+			cell = sheet.Cells.Find("Special", null, fopts);
+			specialRateIndex = cell.Column;
+			cell = sheet.Cells.Find("PaymentType", null, fopts);
+			typeIndex = cell.Column;
 
 			var districts = new List<SchoolDistrict>();
-			for (var i = 1; i <= sheet.LastRowNum; i++)
+			for (var i = 1; i <= sheet.Cells.MaxDataRow; i++)
 			{
-				var row = sheet.GetRow(i);
-				if (row == null || row.Cells.All(c => c.CellType == CellType.Blank))
+				var row = sheet.Cells.GetRow(i);
+				if (row == null || row.IsBlank)
 					continue;
 
-				var ptype = row.GetCell(typeIndex).StringCellValue;
+				var ptype = sheet.Cells[i, typeIndex].StringValue;
 				districts.Add(new SchoolDistrict
 				{
-					Aun = (int)row.GetCell(aunIndex).NumericCellValue,
-					Name = row.GetCell(nameIndex).StringCellValue,
-					Rate = (decimal)row.GetCell(rateIndex).NumericCellValue,
-					SpecialEducationRate = (decimal)row.GetCell(specialRateIndex).NumericCellValue,
+					Aun = (int) sheet.Cells[i, aunIndex].IntValue,
+					Name = sheet.Cells[i, nameIndex].StringValue,
+					Rate = (decimal)sheet.Cells[i, rateIndex].DoubleValue,
+					SpecialEducationRate = (decimal)sheet.Cells[i, specialRateIndex].DoubleValue,
 					PaymentType = string.IsNullOrWhiteSpace(ptype) ? null : SchoolDistrictPaymentType.FromString(ptype),
 				});
 			}

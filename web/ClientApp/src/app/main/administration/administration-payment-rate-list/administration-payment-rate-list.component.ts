@@ -172,7 +172,7 @@ export class AdministrationPaymentRateListComponent implements OnInit {
       importData.append(
         'file',
         this.selectedBulkImportFile[0],
-        this.selectedBulkImportFile[0].name
+        // this.selectedBulkImportFile[0].name
       );
 
       this.ngxSpinnerService.show();
