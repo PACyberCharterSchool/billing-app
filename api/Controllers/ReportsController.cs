@@ -343,6 +343,9 @@ namespace api.Controllers
 				wb.Worksheets.RemoveAt(1);
 			}
 
+			foreach (var sheet in wb.Worksheets)
+				sheet.PageSetup.SetFooter(1, "&P");
+
 			// generate xlsx
 			var data = JsonConvert.SerializeObject(invoice);
 			wb = _exporter.Export(wb, JsonConvert.DeserializeObject(data));
@@ -429,6 +432,9 @@ namespace api.Controllers
 			}
 			// generate xlsx
 
+			foreach (var sheet in wb.Worksheets)
+				sheet.PageSetup.SetFooter(1, "&P");
+
 			var data = new
 			{
 				SchoolYear = create.SchoolYear,
@@ -466,22 +472,7 @@ namespace api.Controllers
 				// wb.Write(ms);
 				wb.Save(ms, new XlsSaveOptions(SaveFormat.Xlsx));
 				wb.CalculateFormula();
-				try
-				{
-					wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
-				}
-				catch (CellsException e)
-				{
-					var rgx = new Regex(@"'.*'");
-					var match = rgx.Match(e.Message);
-					foreach (char c in match.ToString())
-					{
-						Console.Write($"{((int)c).ToString("x")} ");
-					}
-					Console.Write("\n");
-
-					throw;
-				}
+				wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
 
 				report = new Report
 				{
