@@ -55,7 +55,6 @@ namespace models.Reporters
 						d.SpecialEducationRate,
 				}).ToList();
 
-		// TODO(Erik): filter by school district aun
 		private IList<InvoiceStudent> GetInvoiceStudents(int[] auns, string scope, DateTime start, DateTime end)
 		{
 			var headerId = _context.StudentRecordsHeaders.Where(h => h.Scope == scope).Select(h => h.Id).Single();
