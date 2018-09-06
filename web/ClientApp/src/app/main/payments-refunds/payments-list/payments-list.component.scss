@@ -42,11 +42,11 @@
       height: 100%;
 
       thead {
-        height: 18%;
+        height: 94px;
       }
 
       tbody {
-        height: 82%;
+        height: calc(100% - 94px);
       }
     }
 

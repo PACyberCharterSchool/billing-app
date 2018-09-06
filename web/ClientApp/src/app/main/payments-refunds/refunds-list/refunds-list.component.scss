@@ -44,10 +44,10 @@
     table {
       height: 100%;
       thead {
-        height: 17%;
+        height: 60px;
       }
       tbody: {
-        height: 83%;
+        height: calc(100% - 60px);
       }
     }
 
