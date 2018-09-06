@@ -24,7 +24,14 @@
       </thead>
       <tbody infiniteScroll>
         <tr *ngFor='let refund of refunds | orderBy: {property: property, direction: direction}' (click)='editRefund(refund)'>
-          <td *ngFor='let v of listDisplayableValues(refund)'>{{v | normalizeFieldValue}}</td>
+          <td>{{refund.amount | currency}}</td>
+          <td>{{refund.checkNumber}}</td>
+          <td>{{refund.date | date: 'MM/dd/yyyy'}}</td>
+          <td>{{refund.schoolYear}}</td>
+          <td>{{refund.username}}</td>
+          <td>{{refund.created | date: 'MM/dd/yyyy'}}</td>
+          <td>{{refund.lastUpdated | date: 'MM/dd/yyyy'}}</td>
+          <td>{{refund.schoolDistrict.name}}</td>
         </tr>
       </tbody>
     </table>
