@@ -24,7 +24,7 @@ export class PaymentUpsertFormComponent implements OnInit {
   public selectedSchoolDistrict: SchoolDistrict;
   public selectedAcademicYear: string;
   public selectedAcademicYearSplit: string;
-  private paymentType: string;
+  public paymentType: string;
   public externalId: string;
   public schoolYears: string[];
   public isSplit: boolean;
