@@ -1,4 +1,4 @@
-<div class='col-md-12'>
+<div class='col-12'>
   <div class='modal-header'>
     <h4 class="modal-title">{{op | titlecase}} Payment</h4>
     <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('cancel')">
@@ -7,51 +7,51 @@
   </div>
   <form #paymentUpsertForm='ngForm' (ngSubmit)='upsertPayment()'>
     <div class='modal-body'>
-      <div class='col-md-12 payment-not-upserted-error' [style.visibility]="upsertError ? 'visible' : 'hidden'">
+      <div class='col-12 payment-not-upserted-error' [style.visibility]="upsertError ? 'visible' : 'hidden'">
         Payment error:  {{upsertError}}
       </div>
-      <div class='col-md-12'>
+      <div class='col-12'>
           <div class='form-group' *ngIf='op === "create"'>
-            <div class='col-md-6'></div>
-            <div class='col-md-6'>
+            <div class='col-6'></div>
+            <div class='col-6'>
               <button type='button' class='btn btn-outline-primary' (click)='isSplit = !isSplit' [attr.aria-expanded]="!isSplit" aria-controls="collapseSplit">SPLIT</button>
             </div>
           </div>
-          <div class='form-group col-md-12'>
-            <div class='col-md-6'>
+          <div class='form-group col-12'>
+            <div class='col-6'>
               <label>School District Name</label>
             </div>
-            <div class='col-md-6'>
+            <div class='col-6'>
               <label for='typeahead-school-district'></label>
               <input id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='schoolDistrictNameModel' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
             </div>
           </div>
           <div class='form-group'>
-            <div class='col-md-6'>
+            <div class='col-6'>
               <label>AUN#</label>
             </div>
-            <div class='col-md-6'>
+            <div class='col-6'>
               <span>{{selectedSchoolDistrict?.aun}}</span>
             </div>
           </div>
           <div class='form-group'>
-            <div class='col-md-6'>
+            <div class='col-6'>
               <label>Payment Amount</label>
             </div>
-            <div class='col-md-6'>
+            <div class='col-6'>
               <input currencyMask class='form-control' id='paymentAmount' name='paymentAmount' [(ngModel)]='amount' required #paymentAmount='ngModel' />
             </div>
           </div>
           <div class='form-group'>
-            <div class='col-md-6 offset-md-6'>
+            <div class='col-6 offset-6'>
               <div [style.visibility]="paymentAmount.invalid && (paymentAmount.dirty || paymentAmount.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid payment amount</div>
             </div>
           </div>
           <div class='form-group'>
-            <div class='col-md-6'>
+            <div class='col-6'>
               <label>Payment Date</label>
             </div>
-            <div class='col-md-6'>
+            <div class='col-6'>
               <div class='input-group'>
                 <input class='form-control' placeholder='mm-dd-yyyy'
                         name='dp' [(ngModel)]='dateModel' ngbDatepicker #d='ngbDatepicker' (ngModelChange)='onDateChanged()'>
@@ -64,11 +64,11 @@
             </div>
           </div>
           <div class='form-group'>
-            <div class='col-md-6'>
+            <div class='col-6'>
               Payment Type
             </div>
-            <div class='col-md-6'>
-              <div class='btn-group btn-group-toggle' ngbRadioGroup name='paymentType' [(ngModel)]='paymentTypeModel' [ngModelOptions]='{standalone: true}'>
+            <div class='col-6'>
+              <div class='btn-group btn-group-toggle' ngbRadioGroup name='paymentType' [(ngModel)]='paymentType' [ngModelOptions]='{standalone: true}'>
                 <label class='btn-primary' ngbButtonLabel>
                   <input type='checkbox' ngbButton type='radio' value='check' for='paymentType' />SD
                 </label>
@@ -79,18 +79,19 @@
             </div>
           </div>
           <div class='form-group'>
-            <div class='col-md-6'>
+            <div class='col-6'>
               <label>Check # or UniPay Id</label>
             </div>
-            <div class='col-md-6'>
-              <input type='text' class='form-control' id='payment-type' name='payment-type' [(ngModel)]='paymentTypeId' [ngModelOptions]="{standalone: true}" required #paymentTypeValue='ngModel' />
+            <div class='col-6'>
+              <!-- <input type='text' class='form-control' id='payment-type' name='payment-type' [(ngModel)]='paymentTypeId' [ngModelOptions]="{standalone: true}" required #paymentTypeValue='ngModel' /> -->
+              <input type='text' class='form-control' name='payment-type' [(ngModel)]='checkNumber' [ngModelOptions]='{standalone: true}' required />
             </div>
           </div>
           <div class='form-group'>
-            <div class='col-md-6'>
+            <div class='col-6'>
               <label>Academic Year</label>
             </div>
-            <div class='col-md-6'>
+            <div class='col-6'>
               <div ngbDropdown class='d-inline-block'>
                 <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown'>{{selectedAcademicYear}}</button>
                 <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown'>
@@ -103,27 +104,27 @@
             <hr>
             <div class='form-group'>
               <div id='collapse-split-amt' [ngbCollapse]='!isSplit'>
-                <div class='col-md-6'>
+                <div class='col-6'>
                   <label>Split Amount</label>
                 </div>
-                <div class='col-md-6' id='split-payment-amt-input'>
-                  <input type='number' class='form-control' id='split-amount' name='split-amount' [(ngModel)]='splitAmount' />
+                <div class='col-6' id='split-payment-amt-input'>
+                  <input currencyMask class='form-control' id='split-amount' name='split-amount' [(ngModel)]='splitAmount' />
                 </div>
               </div>
             </div>
             <div class='form-group'>
-              <div class='col-md-6'>
+              <div class='col-6'>
                 <label>Date</label>
               </div>
-              <div class='col-md-6'>
+              <div class='col-6'>
                 <label>{{date | date:'MM-dd-yyyy'}}</label>
               </div>
             </div>
             <div class='form-group'>
-              <div class='col-md-6'>
+              <div class='col-6'>
                 <label>Academic Year</label>
               </div>
-              <div class='col-md-6'>
+              <div class='col-6'>
                 <div ngbDropdown class='d-inline-block'>
                   <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown2'>{{selectedAcademicYearSplit}}</button>
                   <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown2'>

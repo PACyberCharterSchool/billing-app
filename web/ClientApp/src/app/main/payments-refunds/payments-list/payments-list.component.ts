@@ -168,5 +168,4 @@ export class PaymentsListComponent implements OnInit {
   private updateScrollingSkip() {
     this.skip += this.globals.take;
   }
-
 }
