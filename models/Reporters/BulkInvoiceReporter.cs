@@ -126,12 +126,6 @@ namespace models.Reporters
 				("June", 6),
 			};
 
-		private static bool IsBeforeAsOf(DateTime asOf, int month) =>
-			month >= 7 && month >= asOf.Month || month < 7 && month <= asOf.Month;
-
-		private static DateTime EndOfMonth(int year, int month) =>
-			new DateTime(year, month, DateTime.DaysInMonth(year, month));
-
 		private IDictionary<int, InvoiceTransactions> GetInvoiceTransactions(
 			IList<int> auns,
 			string schoolYear,
@@ -165,7 +159,7 @@ namespace models.Reporters
 				foreach (var month in _months)
 				{
 					var property = typeof(InvoiceTransactions).GetProperty(month.Name);
-					if (!IsBeforeAsOf(asOf, month.Number))
+					if (asOf.IsBefore(month.Number))
 					{
 						property.SetValue(transactions, new InvoiceTransaction());
 						continue;
@@ -173,7 +167,7 @@ namespace models.Reporters
 
 					var year = month.Number >= 7 ? firstYear : secondYear;
 					var start = new DateTime(year, month.Number, 1);
-					var end = EndOfMonth(year, month.Number);
+					var end = start.EndOfMonth();
 
 					property.SetValue(transactions, new InvoiceTransaction
 					{
@@ -228,11 +222,11 @@ namespace models.Reporters
 
 					DateTime end;
 					if (new[] { 7, 8, 9 }.Contains(month.Number))
-						end = EndOfMonth(year, 9);
+						end = new DateTime(year, 9, 1).EndOfMonth();
 					else
-						end = EndOfMonth(year, month.Number);
+						end = new DateTime(year, month.Number, 1).EndOfMonth();
 
-					if (end > EndOfMonth(asOf.Year, asOf.Month) && end.Month != 9)
+					if (end > asOf.EndOfMonth() && end.Month != 9)
 					{
 						regularEnrollments[month.Name] = regularCount;
 						specialEnrollments[month.Name] = specialCount;
@@ -290,7 +284,7 @@ namespace models.Reporters
 				auns,
 				bulk.Scope,
 				new DateTime(bulk.FirstYear, 7, 1),
-				EndOfMonth(bulk.AsOf.Year, bulk.AsOf.Month));
+				bulk.AsOf.EndOfMonth());
 			var transactions = GetInvoiceTransactions(
 				auns,
 				bulk.SchoolYear,

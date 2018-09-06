@@ -7,6 +7,7 @@ namespace models.Reporters
 	{
 		IReporter<Invoice, InvoiceReporter.Config> CreateInvoiceReporter(PacBillContext context);
 		IReporter<BulkInvoice, BulkInvoiceReporter.Config> CreateBulkInvoiceReporter(PacBillContext context);
+		IReporter<BulkStudentInformation, BulkStudentInformationReporter.Config> CreateBulkStudentInformationReporter(PacBillContext context);
 	}
 
 	public class ReporterFactory : IReporterFactory
@@ -16,5 +17,8 @@ namespace models.Reporters
 
 		public IReporter<Invoice, InvoiceReporter.Config> CreateInvoiceReporter(PacBillContext context)
 			=> new InvoiceReporter(context);
+
+		public IReporter<BulkStudentInformation, BulkStudentInformationReporter.Config> CreateBulkStudentInformationReporter(PacBillContext context)
+			=> new BulkStudentInformationReporter(context);
 	}
 }

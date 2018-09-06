@@ -83,10 +83,13 @@ namespace api.Controllers
 			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
 			public string Scope { get; set; }
 
+			[Required]
 			public DateTime AsOf { get; set; }
 
+			[Required]
 			public DateTime ToSchoolDistrict { get; set; }
 
+			[Required]
 			public DateTime ToPDE { get; set; }
 
 			public IList<int> Auns { get; set; }
@@ -99,11 +102,14 @@ namespace api.Controllers
 
 		public class CreateBulkStudentInformationReport
 		{
-			public string Type { get; set; }
-
+			[Required]
+			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
 			public string Scope { get; set; }
 
-			public bool? Approved { get; set; }
+			[Required]
+			public DateTime AsOf { get; set; }
+
+			public IList<int> Auns { get; set; }
 		}
 
 		public class CreateReport
@@ -484,55 +490,102 @@ namespace api.Controllers
 			{ }
 		}
 
+		private static IList<string> studentInformationColumns = new List<string>
+		{
+			"Number",
+			"SchoolDistrict",
+			"StudentName",
+			"Address",
+			"CityStateZip",
+			"BirthDate",
+			"GradeLevel",
+			"FirstDateEducated",
+			"LastDateEducated",
+			"SPED",
+			"CurrentIEP",
+			"PriorIEP",
+		};
+
 		private Report CreateStudentInformation(CreateReport create)
 		{
-			var sourceReport = _reports.Get(create.Name);
-			if (sourceReport == null)
-				throw new NotFoundException(typeof(Report), create.Name);
+			throw new NotImplementedException();
+			// var sourceReport = _reports.Get(create.Name);
+			// if (sourceReport == null)
+			// 	throw new NotFoundException(typeof(Report), create.Name);
 
-			var name = create.Name + "_ACTIVITY";
-			var wb = BuildActivityWorkbook(name, new[] { sourceReport });
+			// var name = create.Name + "_ACTIVITY";
+			// var wb = BuildActivityWorkbook(name, new[] { sourceReport });
 
-			Report report;
-			using (var xlsxStream = new MemoryStream())
-			using (var pdfStream = new MemoryStream())
-			{
-				wb.Save(xlsxStream, SaveFormat.Xlsx);
-				wb.CalculateFormula();
-				wb.Save(pdfStream, SaveFormat.Pdf);
+			// Report report;
+			// using (var xlsxStream = new MemoryStream())
+			// using (var pdfStream = new MemoryStream())
+			// {
+			// 	wb.Save(xlsxStream, SaveFormat.Xlsx);
+			// 	wb.CalculateFormula();
+			// 	wb.Save(pdfStream, SaveFormat.Pdf);
 
-				report = new Report
-				{
-					Type = ReportType.StudentInformation,
-					SchoolYear = create.SchoolYear,
-					Scope = sourceReport.Scope,
-					Name = name,
-					Approved = true,
-					Created = DateTime.Now,
-					Xlsx = xlsxStream.ToArray(),
-					Pdf = pdfStream.ToArray(),
-				};
-			}
+			// 	report = new Report
+			// 	{
+			// 		Type = ReportType.StudentInformation,
+			// 		SchoolYear = create.SchoolYear,
+			// 		Scope = sourceReport.Scope,
+			// 		Name = name,
+			// 		Approved = true,
+			// 		Created = DateTime.Now,
+			// 		Xlsx = xlsxStream.ToArray(),
+			// 		Pdf = pdfStream.ToArray(),
+			// 	};
+			// }
 
-			return report;
+			// return report;
 		}
 
 		private Report CreateBulkStudentInformation(CreateReport create)
 		{
-			var type = create.BulkStudentInformation.Type;
-			var reports = _reports.GetMany(
-				// type: type == null ? null : ReportType.FromString(type),
-				type: ReportType.FromString("Invoice"),
-				year: create.SchoolYear,
-				scope: create.BulkStudentInformation.Scope,
-				approved: create.BulkStudentInformation.Approved
-			);
+			var reporter = _reporters.CreateBulkStudentInformationReporter(_context);
+			var result = reporter.GenerateReport(new BulkStudentInformationReporter.Config
+			{
+				Scope = create.BulkStudentInformation.Scope,
+				AsOf = create.BulkStudentInformation.AsOf,
+				Auns = create.BulkStudentInformation.Auns,
+			});
 
-			if (reports == null)
-				throw new NotFoundException();
+			var wb = new Workbook();
+			var ws = wb.Worksheets[0];
 
-			var name = create.Name;
-			var wb = BuildActivityWorkbook(name, reports);
+			// column headers
+			for (var i = 0; i < studentInformationColumns.Count; i++)
+				ws.Cells[0, i].PutValue(studentInformationColumns[i]);
+
+			var students = result.Students.ToList();
+			ws.Cells.InsertRows(1, students.Count);
+			for (var i = 0; i < students.Count; i++)
+			{
+				var cells = ws.Cells;
+				var student = students[i];
+
+				var r = i + 1;
+				var c = 0;
+				cells[r, c++].PutValue(i);
+				cells[r, c++].PutValue(student.SchoolDistrictName);
+				cells[r, c++].PutValue(student.FullName);
+				cells[r, c++].PutValue(student.Address1);
+				cells[r, c++].PutValue(student.CityStateZipCode);
+				cells[r, c++].PutValue(student.DateOfBirth);
+				cells[r, c++].PutValue(student.Grade);
+				cells[r, c++].PutValue(student.FirstDay);
+				cells[r, c++].PutValue(student.LastDay);
+				cells[r, c++].PutValue(student.IsSpecialEducation ? "Y" : "N");
+				cells[r, c++].PutValue(student.CurrentIep);
+				cells[r, c++].PutValue(student.FormerIep);
+			}
+
+			var style = wb.CreateStyle();
+			style.Number = 14;
+			var styleFlag = new StyleFlag();
+			styleFlag.NumberFormat = true;
+			foreach (var c in new[] { 5, 7, 8, 10, 11 })
+				wb.Worksheets[0].Cells.Columns[c].ApplyStyle(style, styleFlag);
 
 			Report report;
 			using (var xlsxStream = new MemoryStream())
@@ -546,10 +599,11 @@ namespace api.Controllers
 				{
 					Type = ReportType.BulkStudentInformation,
 					SchoolYear = create.SchoolYear,
-					Name = name,
+					Name = create.Name,
 					Approved = true,
 					Created = DateTime.Now,
 					Scope = create.BulkStudentInformation.Scope,
+					Data = JsonConvert.SerializeObject(result),
 					Xlsx = xlsxStream.ToArray(),
 					Pdf = pdfStream.ToArray(),
 				};
@@ -709,107 +763,6 @@ namespace api.Controllers
 
 		private static readonly object _lock = new object();
 
-		public delegate string HeaderMapper(string key);
-
-		public static string MapStudentActivityHeaderKeyToValue(string key)
-		{
-			Dictionary<string, string> _labels = new Dictionary<string, string>
-			{
-				{ "Number", "Number" },
-				{ "SchoolDistrict","School District" },
-				{ "StudentName","Student Name" },
-				{ "Address", "Address" },
-				{ "CityStateZip", "City, State Zip" },
-				{ "BirthDate", "Birth Date" },
-				{ "GradeLevel", "Grade Level" },
-				{ "FirstDateEducated", "First Date Educated" },
-				{ "LastDateEducated", "Last Date Educated" },
-				{ "SPED", "SPED" },
-				{ "CurrentIEP", "Current IEP" },
-				{ "PriorIEP", "Prior IEP" }
-			};
-
-			string value;
-			if (_labels.TryGetValue(key, out value))
-			{
-				return value;
-			}
-
-			return null;
-		}
-
-		private DataTable BuildStudentActivityDataTable(IEnumerable<Report> invoices)
-		{
-			DataTable studentActivityDataTable = new DataTable();
-
-			AddColumnsToStudentActivityDataTable(studentActivityDataTable);
-
-			foreach (var invoice in invoices)
-			{
-				var students = JObject.Parse(invoice.Data)["Students"];
-				var schoolDistrict = JObject.Parse(invoice.Data)["SchoolDistrict"];
-				var studentsJSONStr = JsonConvert.SerializeObject(students);
-
-				DataTable dt = GetDataTableFromJsonString(studentsJSONStr);
-
-				// we only want the student data...
-				AddRowsToStudentActivityDataTable(studentActivityDataTable, dt, (JObject)schoolDistrict);
-			}
-
-			return studentActivityDataTable;
-		}
-
-		private void AddColumnsToStudentActivityDataTable(DataTable dt)
-		{
-			dt.Columns.Add("Number", typeof(uint));
-			dt.Columns.Add("SchoolDistrict", typeof(string));
-			dt.Columns.Add("StudentName", typeof(string));
-			dt.Columns.Add("Address", typeof(string));
-			dt.Columns.Add("CityStateZip", typeof(string));
-			dt.Columns.Add("BirthDate", typeof(DateTime));
-			dt.Columns.Add("GradeLevel", typeof(string));
-			dt.Columns.Add("FirstDateEducated", typeof(DateTime));
-			dt.Columns.Add("LastDateEducated", typeof(DateTime));
-			dt.Columns.Add("SPED", typeof(string));
-			dt.Columns.Add("CurrentIEP", typeof(DateTime));
-			dt.Columns.Add("PriorIEP", typeof(DateTime));
-			dt.AcceptChanges();
-		}
-
-		private void AddRowsToStudentActivityDataTable(DataTable dtDest, DataTable dt, JObject schoolDistrict)
-		{
-			int i = 0;
-			foreach (var row in dt.Rows)
-			{
-				AddRowToStudentActivityDataTable(dtDest, (DataRow)row, schoolDistrict, ++i);
-			}
-		}
-
-		private void AddRowToStudentActivityDataTable(DataTable dtDest, DataRow row, JObject schoolDistrict, int index)
-		{
-			DataRow newRow = dtDest.NewRow();
-
-			newRow["Number"] = index;
-			newRow["SchoolDistrict"] = schoolDistrict["Name"];
-			newRow["StudentName"] = row["LastName"] + ", " + row["FirstName"] + " " + row["MiddleInitial"];
-			newRow["Address"] = row["Address1"];
-			newRow["CityStateZip"] = row["Address2"];
-			newRow["BirthDate"] = row["DateOfBirth"];
-			newRow["GradeLevel"] = row["Grade"];
-			newRow["FirstDateEducated"] = row["FirstDay"];
-			newRow["LastDateEducated"] = row["LastDay"];
-			newRow["SPED"] = row["IsSpecialEducation"].ToString() == "True" ? "Y" : "N";
-			newRow["CurrentIEP"] = row["CurrentIep"];
-			newRow["PriorIEP"] = row["FormerIep"];
-
-			dtDest.Rows.Add(newRow);
-		}
-
-		private DataTable GetDataTableFromJsonString(string json)
-		{
-			return JsonConvert.DeserializeObject<DataTable>(json);
-		}
-
 		[HttpPost("many")]
 		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportsResponse), 200)]
@@ -908,22 +861,6 @@ namespace api.Controllers
 				return StatusCode(406);
 
 			return new FileStreamResult(stream, accept) { FileDownloadName = report.Name };
-		}
-
-		private Workbook BuildActivityWorkbook(string name, IEnumerable<Report> reports)
-		{
-			var data = BuildStudentActivityDataTable(reports);
-			Workbook wb = new Workbook();
-
-			wb.Worksheets[0].Cells.ImportDataTable(data, true, 0, 0, true, false);
-			var style = wb.CreateStyle();
-			style.Number = 14;
-			var styleFlag = new StyleFlag();
-			styleFlag.NumberFormat = true;
-			foreach (var c in new[] { 5, 7, 8, 10, 11 })
-				wb.Worksheets[0].Cells.Columns[c].ApplyStyle(style, styleFlag);
-
-			return wb;
 		}
 
 		public class GetManyArgs
