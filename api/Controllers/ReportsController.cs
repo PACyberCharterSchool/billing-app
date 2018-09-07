@@ -842,7 +842,7 @@ namespace api.Controllers
 
 		[HttpGet("{name}")]
 		[Authorize(Policy = "PAY+")]
-		[Produces(ContentTypes.XLSX, ContentTypes.PDF)]
+		[Produces(ContentTypes.XLSX, ContentTypes.PDF, ContentTypes.JSON)]
 		[ProducesResponseType(404)]
 		[ProducesResponseType(406)]
 		public async Task<IActionResult> Get(string name)
@@ -864,6 +864,10 @@ namespace api.Controllers
 				{
 					stream = new MemoryStream(report.Pdf);
 					break;
+				}
+				else if (v.Contains(ContentTypes.JSON))
+				{
+					return new JsonResult(JsonConvert.DeserializeObject(report.Data));
 				}
 			}
 			if (stream == null)
