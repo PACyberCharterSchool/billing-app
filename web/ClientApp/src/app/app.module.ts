@@ -34,7 +34,9 @@ import { FileSaverService } from './services/file-saver.service';
 
 import { TokenInterceptor } from './interceptors/token.interceptor';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbDatepickerConfig, NgbDateParserFormatter } from '@ng-bootstrap/ng-bootstrap';
+import { NgbPACDateParserFormatter } from './shared/ngb-pac-date-parser-formatter';
+
 
 import { Globals } from './globals';
 
@@ -80,7 +82,8 @@ const pacbillProviders = [
   UtilitiesService,
   ReportsService,
   TemplatesService,
-  SpreadsheetService
+  SpreadsheetService,
+  { provide: NgbDateParserFormatter, useClass: NgbPACDateParserFormatter }
 ];
 
 @NgModule({

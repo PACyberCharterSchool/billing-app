@@ -22,8 +22,6 @@ import { MatMenuModule, MatIconModule, MatButtonModule, MatSidenavModule } from 
 import { MatFormFieldModule, MatFormFieldControl, MatInputModule } from '@angular/material';
 import { MatMenu } from '@angular/material';
 
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
 @NgModule({
   declarations: [
     ContentAreaComponent,
@@ -45,13 +43,13 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     MatInputModule,
     MatMenuModule,
     MatSidenavModule,
-    NgbModule,
     StudentsModule,
     AdministrationModule,
     ReportsInvoicesModule,
     PaymentsRefundsModule
   ],
-  providers: []
+  providers: [
+  ]
 })
 
 export class MainModule { }

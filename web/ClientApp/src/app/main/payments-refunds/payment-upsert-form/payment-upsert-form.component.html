@@ -23,7 +23,12 @@
             </div>
             <div class='col-6'>
               <label for='typeahead-school-district'></label>
-              <input id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='schoolDistrictNameModel' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
+              <input required id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='schoolDistrictNameModel' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
+            </div>
+          </div>
+          <div class='form-group' *ngIf='schoolDistrictNameModel?.invalid && (schoolDistrictNameModel?.dirty || schoolDistrictNameModel?.touched)'>
+            <div class='col-6 offset-6'>
+              <div [style.visibility]="schoolDistrictNameModel?.invalid && (schoolDistrictNameModel?.dirty || schoolDistrictNameModel?.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid school district name </div>
             </div>
           </div>
           <div class='form-group'>
@@ -42,7 +47,7 @@
               <input currencyMask class='form-control' id='paymentAmount' name='paymentAmount' [(ngModel)]='amount' required #paymentAmount='ngModel' />
             </div>
           </div>
-          <div class='form-group'>
+          <div class='form-group' *ngIf='paymentAmount.invalid && (paymentAmount.dirty || paymentAmount.touched)'>
             <div class='col-6 offset-6'>
               <div [style.visibility]="paymentAmount.invalid && (paymentAmount.dirty || paymentAmount.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid payment amount</div>
             </div>
@@ -53,8 +58,8 @@
             </div>
             <div class='col-6'>
               <div class='input-group'>
-                <input class='form-control' placeholder='mm-dd-yyyy'
-                        name='dp' [(ngModel)]='dateModel' ngbDatepicker #d='ngbDatepicker' (ngModelChange)='onDateChanged()'>
+                <input class='form-control' required placeholder='mm-dd-yyyy'
+                  name='dp' [(ngModel)]='dateModel' ngbDatepicker #d='ngbDatepicker' (ngModelChange)='onDateChanged()' value='{{date | date: "MM/dd/yyyy"' />
                 <div class='input-group-append'>
                   <button class='btn btn-outline-secondary' (click)='d.toggle()' type='button'>
                     <i class="fa fa-calendar fa-2x"></i>
@@ -65,25 +70,9 @@
           </div>
           <div class='form-group'>
             <div class='col-6'>
-              Payment Type
-            </div>
-            <div class='col-6'>
-              <div class='btn-group btn-group-toggle' ngbRadioGroup name='paymentType' [(ngModel)]='paymentType' [ngModelOptions]='{standalone: true}'>
-                <label class='btn-primary' ngbButtonLabel>
-                  <input type='checkbox' ngbButton type='radio' value='check' for='paymentType' />SD
-                </label>
-                <label class='btn-primary' ngbButtonLabel>
-                  <input type='checkbox' ngbButton type='radio' value='unipay' for='paymentType' />PDE
-                </label>
-              </div>
-            </div>
-          </div>
-          <div class='form-group'>
-            <div class='col-6'>
               <label>Check # or UniPay Id</label>
             </div>
             <div class='col-6'>
-              <!-- <input type='text' class='form-control' id='payment-type' name='payment-type' [(ngModel)]='paymentTypeId' [ngModelOptions]="{standalone: true}" required #paymentTypeValue='ngModel' /> -->
               <input type='text' class='form-control' name='payment-type' [(ngModel)]='checkNumber' [ngModelOptions]='{standalone: true}' required />
             </div>
           </div>
