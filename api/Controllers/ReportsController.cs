@@ -557,27 +557,32 @@ namespace api.Controllers
 			for (var i = 0; i < studentInformationColumns.Count; i++)
 				ws.Cells[0, i].PutValue(studentInformationColumns[i]);
 
-			var students = result.Students.ToList();
-			ws.Cells.InsertRows(1, students.Count);
-			for (var i = 0; i < students.Count; i++)
+			var districtGroups = result.Students.GroupBy(s => s.SchoolDistrictName);
+			var r = 1;
+			foreach (var group in districtGroups)
 			{
-				var cells = ws.Cells;
-				var student = students[i];
+				var students = group.ToList();
+				for (var i = 0; i < students.Count; i++)
+				{
+					var student = students[i];
 
-				var r = i + 1;
-				var c = 0;
-				cells[r, c++].PutValue(i);
-				cells[r, c++].PutValue(student.SchoolDistrictName);
-				cells[r, c++].PutValue(student.FullName);
-				cells[r, c++].PutValue(student.Address1);
-				cells[r, c++].PutValue(student.CityStateZipCode);
-				cells[r, c++].PutValue(student.DateOfBirth);
-				cells[r, c++].PutValue(student.Grade);
-				cells[r, c++].PutValue(student.FirstDay);
-				cells[r, c++].PutValue(student.LastDay);
-				cells[r, c++].PutValue(student.IsSpecialEducation ? "Y" : "N");
-				cells[r, c++].PutValue(student.CurrentIep);
-				cells[r, c++].PutValue(student.FormerIep);
+					var c = 0;
+					var cells = ws.Cells;
+					cells[r, c++].PutValue(i + 1);
+					cells[r, c++].PutValue(student.SchoolDistrictName);
+					cells[r, c++].PutValue(student.FullName);
+					cells[r, c++].PutValue(student.Address1);
+					cells[r, c++].PutValue(student.CityStateZipCode);
+					cells[r, c++].PutValue(student.DateOfBirth);
+					cells[r, c++].PutValue(student.Grade);
+					cells[r, c++].PutValue(student.FirstDay);
+					cells[r, c++].PutValue(student.LastDay);
+					cells[r, c++].PutValue(student.IsSpecialEducation ? "Y" : "N");
+					cells[r, c++].PutValue(student.CurrentIep);
+					cells[r, c++].PutValue(student.FormerIep);
+
+					r++;
+				}
 			}
 
 			var style = wb.CreateStyle();
@@ -585,7 +590,7 @@ namespace api.Controllers
 			var styleFlag = new StyleFlag();
 			styleFlag.NumberFormat = true;
 			foreach (var c in new[] { 5, 7, 8, 10, 11 })
-				wb.Worksheets[0].Cells.Columns[c].ApplyStyle(style, styleFlag);
+				ws.Cells.Columns[c].ApplyStyle(style, styleFlag);
 
 			Report report;
 			using (var xlsxStream = new MemoryStream())
