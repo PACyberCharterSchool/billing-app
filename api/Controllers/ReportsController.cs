@@ -553,9 +553,20 @@ namespace api.Controllers
 			var wb = new Workbook();
 			var ws = wb.Worksheets[0];
 
+			var style = wb.CreateStyle();
+			style.Number = 14;
+			var styleFlag = new StyleFlag();
+			styleFlag.NumberFormat = true;
+
 			// column headers
 			for (var i = 0; i < studentInformationColumns.Count; i++)
-				ws.Cells[0, i].PutValue(studentInformationColumns[i]);
+			{
+				var column = studentInformationColumns[i];
+				ws.Cells[0, i].PutValue(column);
+
+				if (new[] { "BirthDate", "FirstDateEducated", "LastDateEducated", "CurrentIEP", "PriorIEP" }.Contains(column))
+					ws.Cells.Columns[i].ApplyStyle(style, styleFlag);
+			}
 
 			var districtGroups = result.Students.GroupBy(s => s.SchoolDistrictName);
 			var r = 1;
@@ -584,13 +595,6 @@ namespace api.Controllers
 					r++;
 				}
 			}
-
-			var style = wb.CreateStyle();
-			style.Number = 14;
-			var styleFlag = new StyleFlag();
-			styleFlag.NumberFormat = true;
-			foreach (var c in new[] { 5, 7, 8, 10, 11 })
-				ws.Cells.Columns[c].ApplyStyle(style, styleFlag);
 
 			Report report;
 			using (var xlsxStream = new MemoryStream())
