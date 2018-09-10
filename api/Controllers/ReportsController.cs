@@ -100,6 +100,20 @@ namespace api.Controllers
 			public bool Approved { get; set; }
 		}
 
+		public class CreateStudentInformationReport
+		{
+			[Required]
+			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
+			public string Scope { get; set; }
+
+			[Required]
+			public DateTime AsOf { get; set; }
+
+			[Required]
+			[Range(100000000, 999999999)]
+			public int SchoolDistrictAun { get; set; }
+		}
+
 		public class CreateBulkStudentInformationReport
 		{
 			[Required]
@@ -132,6 +146,7 @@ namespace api.Controllers
 
 			public CreateInvoiceReport Invoice { get; set; }
 			public CreateBulkInvoiceReport BulkInvoice { get; set; }
+			public CreateStudentInformationReport StudentInformation { get; set; }
 			public CreateBulkStudentInformationReport BulkStudentInformation { get; set; }
 		}
 
@@ -410,40 +425,6 @@ namespace api.Controllers
 			"PriorIEP",
 		};
 
-		private Report CreateStudentInformation(CreateReport create)
-		{
-			throw new NotImplementedException();
-			// var sourceReport = _reports.Get(create.Name);
-			// if (sourceReport == null)
-			// 	throw new NotFoundException(typeof(Report), create.Name);
-
-			// var name = create.Name + "_ACTIVITY";
-			// var wb = BuildActivityWorkbook(name, new[] { sourceReport });
-
-			// Report report;
-			// using (var xlsxStream = new MemoryStream())
-			// using (var pdfStream = new MemoryStream())
-			// {
-			// 	wb.Save(xlsxStream, SaveFormat.Xlsx);
-			// 	wb.CalculateFormula();
-			// 	wb.Save(pdfStream, SaveFormat.Pdf);
-
-			// 	report = new Report
-			// 	{
-			// 		Type = ReportType.StudentInformation,
-			// 		SchoolYear = create.SchoolYear,
-			// 		Scope = sourceReport.Scope,
-			// 		Name = name,
-			// 		Approved = true,
-			// 		Created = DateTime.Now,
-			// 		Xlsx = xlsxStream.ToArray(),
-			// 		Pdf = pdfStream.ToArray(),
-			// 	};
-			// }
-
-			// return report;
-		}
-
 		private Report CreateBulkStudentInformation(CreateReport create)
 		{
 			var reporter = _reporters.CreateBulkStudentInformationReporter(_context);
@@ -525,6 +506,27 @@ namespace api.Controllers
 			return report;
 		}
 
+		private Report CreateStudentInformation(CreateReport create)
+		{
+			var report = CreateBulkStudentInformation(new CreateReport
+			{
+				ReportType = create.ReportType,
+				Name = create.Name,
+				SchoolYear = create.SchoolYear,
+				TemplateId = create.TemplateId,
+
+				BulkStudentInformation = new CreateBulkStudentInformationReport
+				{
+					Scope = create.StudentInformation.Scope,
+					AsOf = create.StudentInformation.AsOf,
+					Auns = new[] { create.StudentInformation.SchoolDistrictAun },
+				},
+			});
+
+			report.Type = ReportType.StudentInformation;
+			return report;
+		}
+
 		[HttpPost]
 		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportResponse), 200)]
@@ -563,6 +565,9 @@ namespace api.Controllers
 				}
 				else if (create.ReportType == ReportType.StudentInformation.Value)
 				{
+					if (create.StudentInformation == null)
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create student information without 'student information' config."));
+
 					report = CreateStudentInformation(create);
 				}
 				else if (create.ReportType == ReportType.BulkStudentInformation.Value)
