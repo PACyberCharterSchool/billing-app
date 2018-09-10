@@ -32,45 +32,35 @@ namespace models.Reporters
 			if (auns != null && auns.Count > 0)
 				records = records.Where(r => auns.Contains(r.SchoolDistrictId));
 
-			return records.Where(r => r.StudentEnrollmentDate <= end && (
-				r.StudentWithdrawalDate == null || (
-					r.StudentWithdrawalDate >= start && (
-						r.StudentWithdrawalDate != r.StudentEnrollmentDate || (
-							r.StudentWithdrawalDate == r.StudentEnrollmentDate &&
-							r.StudentCurrentIep.Value.Month == r.StudentEnrollmentDate.Month &&
-							r.StudentCurrentIep.Value.Day == r.StudentEnrollmentDate.Day
-						)
-					)
-				)
-			)).
-			OrderBy(r => r.SchoolDistrictName).
-			ThenBy(r => r.StudentLastName).
-			ThenBy(r => r.StudentFirstName).
-			ThenBy(r => r.StudentMiddleInitial).
-			ThenBy(r => r.StudentEnrollmentDate).
-			ThenBy(r => r.StudentWithdrawalDate).
-			Select(r => new BulkStudentInformationStudent
-			{
-				SchoolDistrictAun = r.SchoolDistrictId,
-				SchoolDistrictName = r.SchoolDistrictName,
-				PASecuredID = r.StudentPaSecuredId,
-				PACyberID = r.StudentId,
-				FirstName = r.StudentFirstName,
-				MiddleInitial = r.StudentMiddleInitial,
-				LastName = r.StudentLastName,
-				Street1 = r.StudentStreet1,
-				Street2 = r.StudentStreet2,
-				City = r.StudentCity,
-				State = r.StudentState,
-				ZipCode = r.StudentZipCode,
-				DateOfBirth = r.StudentDateOfBirth,
-				Grade = r.StudentGradeLevel,
-				FirstDay = r.StudentEnrollmentDate,
-				LastDay = r.StudentWithdrawalDate,
-				IsSpecialEducation = r.StudentIsSpecialEducation,
-				CurrentIep = r.StudentCurrentIep,
-				FormerIep = r.StudentFormerIep,
-			}).ToList();
+			return records.Enrolled(start, end).
+				OrderBy(r => r.SchoolDistrictName).
+				ThenBy(r => r.StudentLastName).
+				ThenBy(r => r.StudentFirstName).
+				ThenBy(r => r.StudentMiddleInitial).
+				ThenBy(r => r.StudentEnrollmentDate).
+				ThenBy(r => r.StudentWithdrawalDate).
+				Select(r => new BulkStudentInformationStudent
+				{
+					SchoolDistrictAun = r.SchoolDistrictId,
+					SchoolDistrictName = r.SchoolDistrictName,
+					PASecuredID = r.StudentPaSecuredId,
+					PACyberID = r.StudentId,
+					FirstName = r.StudentFirstName,
+					MiddleInitial = r.StudentMiddleInitial,
+					LastName = r.StudentLastName,
+					Street1 = r.StudentStreet1,
+					Street2 = r.StudentStreet2,
+					City = r.StudentCity,
+					State = r.StudentState,
+					ZipCode = r.StudentZipCode,
+					DateOfBirth = r.StudentDateOfBirth,
+					Grade = r.StudentGradeLevel,
+					FirstDay = r.StudentEnrollmentDate,
+					LastDay = r.StudentWithdrawalDate,
+					IsSpecialEducation = r.StudentIsSpecialEducation,
+					CurrentIep = r.StudentCurrentIep,
+					FormerIep = r.StudentFormerIep,
+				}).ToList();
 		}
 
 		public class Config

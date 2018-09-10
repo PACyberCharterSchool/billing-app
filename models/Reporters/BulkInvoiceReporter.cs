@@ -142,17 +142,7 @@ namespace models.Reporters
 			return _context.StudentRecords.
 				Where(r => r.Header.Id == headerId).
 				Where(r => auns.Contains(r.SchoolDistrictId)).
-				Where(r => r.StudentEnrollmentDate <= end && (
-					r.StudentWithdrawalDate == null || (
-						r.StudentWithdrawalDate >= start && (
-							r.StudentWithdrawalDate != r.StudentEnrollmentDate || (
-								r.StudentWithdrawalDate == r.StudentEnrollmentDate &&
-								r.StudentCurrentIep.Value.Month == r.StudentEnrollmentDate.Month &&
-								r.StudentCurrentIep.Value.Day == r.StudentEnrollmentDate.Day
-							)
-						)
-					)
-				)).
+				Enrolled(start, end).
 				OrderBy(r => r.StudentLastName).
 				ThenBy(r => r.StudentFirstName).
 				ThenBy(r => r.StudentMiddleInitial).
