@@ -286,6 +286,27 @@ namespace api.Controllers
 			return year;
 		}
 
+		private void InitializeWorkbookSheetPrinterMargins(Workbook wb)
+		{
+			for (int i = 0; i < wb.Worksheets.Count; i++)
+			{
+				var sheet = wb.Worksheets[i];
+				if (sheet != null)
+				{
+					// make certain the printer margins for each sheet are zeroed out, lest
+					// we have ugly issues when printing them out.
+					sheet.PageSetup.HeaderMargin = 0.0;
+					sheet.PageSetup.FooterMargin = 0.0;
+					sheet.PageSetup.TopMargin = 0.0;
+					sheet.PageSetup.TopMargin = 0.0;
+					sheet.PageSetup.LeftMargin = 0.0;
+					sheet.PageSetup.RightMargin = 0.0;
+					sheet.PageSetup.HeaderMargin = 0.0;
+					sheet.PageSetup.FooterMargin = 0.0;
+				}
+			}
+		}
+
 		private Report CreateBulkInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
 		{
 			var reporter = _reporters.CreateBulkInvoiceReporter(_context);
@@ -804,27 +825,6 @@ namespace api.Controllers
 		public struct ReportsResponse
 		{
 			public IList<ReportDto> Reports { get; set; }
-		}
-
-		private void InitializeWorkbookSheetPrinterMargins(Workbook wb)
-		{
-			for (int i = 0; i < wb.Worksheets.Count; i++)
-			{
-				var sheet = wb.Worksheets[i];
-				if (sheet != null)
-				{
-					// make certain the printer margins for each sheet are zeroed out, lest
-					// we have ugly issues when printing them out.
-					sheet.PageSetup.HeaderMargin = 0.0;
-					sheet.PageSetup.FooterMargin = 0.0;
-					sheet.PageSetup.TopMargin = 0.0;
-					sheet.PageSetup.TopMargin = 0.0;
-					sheet.PageSetup.LeftMargin = 0.0;
-					sheet.PageSetup.RightMargin = 0.0;
-					sheet.PageSetup.HeaderMargin = 0.0;
-					sheet.PageSetup.FooterMargin = 0.0;
-				}
-			}
 		}
 
 		[HttpGet]
