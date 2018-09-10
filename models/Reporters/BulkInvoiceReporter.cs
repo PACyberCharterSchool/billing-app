@@ -6,6 +6,76 @@ using System.Linq;
 
 namespace models.Reporters
 {
+	public class InvoiceSchoolDistrict
+	{
+		public int Id { get; set; }
+		public int Aun { get; set; }
+		public string Name { get; set; }
+		public decimal RegularRate { get; set; }
+		public decimal SpecialRate { get; set; }
+	}
+
+	public class InvoiceEnrollments : Dictionary<string, int> { }
+
+	public class InvoicePayment
+	{
+		public string Type { get; set; }
+		public string CheckNumber { get; set; }
+		public decimal? CheckAmount { get; set; }
+		public decimal? UniPayAmount { get; set; }
+		public DateTime Date { get; set; }
+	}
+
+	public class InvoiceTransaction
+	{
+		public InvoicePayment Payment { get; set; }
+		public decimal? Refund { get; set; }
+	}
+
+	public class InvoiceTransactions
+	{
+		public InvoiceTransaction July { get; set; }
+		public InvoiceTransaction August { get; set; }
+		public InvoiceTransaction September { get; set; }
+		public InvoiceTransaction October { get; set; }
+		public InvoiceTransaction November { get; set; }
+		public InvoiceTransaction December { get; set; }
+		public InvoiceTransaction January { get; set; }
+		public InvoiceTransaction February { get; set; }
+		public InvoiceTransaction March { get; set; }
+		public InvoiceTransaction April { get; set; }
+		public InvoiceTransaction May { get; set; }
+		public InvoiceTransaction June { get; set; }
+	}
+
+	public class InvoiceStudent
+	{
+		public int SchoolDistrictAun { get; set; }
+		public ulong? PASecuredID { get; set; }
+		public string PACyberID { get; set; }
+		public string FirstName { get; set; }
+		public string MiddleInitial { get; set; }
+		public string LastName { get; set; }
+		public string FullName
+			=> $"{LastName}, {FirstName}{(string.IsNullOrEmpty(MiddleInitial) ? "" : $" {MiddleInitial}")}";
+		public string Street1 { get; set; }
+		public string Street2 { get; set; }
+		public string Address1 => $"{Street1}";
+		public string City { get; set; }
+		public string State { get; set; }
+		public string ZipCode { get; set; }
+		public string CityStateZipCode => $"{City}, {State} {ZipCode}";
+		public string Address2 => $"{(string.IsNullOrEmpty(Street2) ? $"{CityStateZipCode}" : $"{Street2}")}";
+		public string Address3 => $"{(string.IsNullOrEmpty(Street2) ? "" : $"{CityStateZipCode}")}";
+		public DateTime DateOfBirth { get; set; }
+		public string Grade { get; set; }
+		public DateTime FirstDay { get; set; }
+		public DateTime? LastDay { get; set; }
+		public bool IsSpecialEducation { get; set; }
+		public DateTime? CurrentIep { get; set; }
+		public DateTime? FormerIep { get; set; }
+	}
+
 	public class BulkInvoiceSchoolDistrict
 	{
 		public InvoiceSchoolDistrict SchoolDistrict { get; set; }

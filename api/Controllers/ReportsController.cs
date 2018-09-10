@@ -126,6 +126,7 @@ namespace api.Controllers
 			[RegularExpression(@"^\d{4}\-\d{4}$")]
 			public string SchoolYear { get; set; }
 
+			// TODO(Erik): get rid of this: use ReportType/SchoolYear
 			[Range(1, int.MaxValue)]
 			public int? TemplateId { get; set; }
 
@@ -246,55 +247,6 @@ namespace api.Controllers
 			return 13;
 		}
 
-		private void CloneInvoiceSheets(Workbook wb, int count, Template template)
-		{
-			const int per = 8;
-
-			var numSheets = (int)count / per + (count % per == 0 ? 0 : 1);
-			for (var s = 0; s < numSheets - 1; s++)
-			{
-				wb.Worksheets.AddCopy(1);
-
-				var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
-				Cells cells = sheet.Cells;
-				sheet.Name = $"Individual Student Inform. {s + 1}";
-
-				for (int r = 0; r < cells.MaxDataRow + 1; r++)
-				{
-					Row row = cells.Rows[r];
-					if (row.IsBlank)
-						continue;
-
-					for (int c = 0; c < cells.MaxDataColumn + 1; c++)
-					{
-						var cell = cells[r, c];
-						if (cell.Value == null)
-							continue;
-
-						if (r == GetRowIndexForFirstStudentItemization(template) && c == 1) // Number column
-						{
-							cell.PutValue(((s + 1) * per) + 1);
-							continue;
-						}
-
-						if (!(cell.Type == CellValueType.IsString))
-							continue;
-
-						var value = cell.StringValue;
-
-						const string pattern = @"Students\[(\d+)\]";
-						var matches = Regex.Matches(value, pattern);
-						if (matches.Count > 0)
-						{
-							var match = matches[0];
-							var i = int.Parse(match.Groups[1].Value);
-							cell.PutValue(Regex.Replace(value, pattern, $"Students[{(i + ((s + 1) * per))}]"));
-						}
-					}
-				}
-			}
-		}
-
 		private string GenerateSchoolYear(string scope)
 		{
 			string year;
@@ -318,88 +270,6 @@ namespace api.Controllers
 
 			return year;
 		}
-
-		private Report CreateInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
-		{
-			// get reporter
-			var reporter = _reporters.CreateInvoiceReporter(_context);
-
-			// build config
-			var config = new InvoiceReporter.Config
-			{
-				Scope = create.Invoice.Scope,
-				InvoiceNumber = create.Name,
-				SchoolYear = create.SchoolYear,
-				AsOf = create.Invoice.AsOf,
-				Prepared = time,
-				ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
-				ToPDE = create.Invoice.ToPDE,
-				SchoolDistrictAun = create.Invoice.SchoolDistrictAun,
-			};
-
-			// generate data
-			var invoice = reporter.GenerateReport(config);
-
-			// compose workbook
-			var wb = new Workbook(new MemoryStream(invoiceTemplate.Content));
-			InitializeWorkbookSheetPrinterMargins(wb);
-
-			if (invoice.Students.Count > 0)
-			{
-				CloneInvoiceSheets(wb, invoice.Students.Count, invoiceTemplate);
-			}
-			else
-			{
-				wb.Worksheets.RemoveAt(1);
-			}
-
-			foreach (var sheet in wb.Worksheets)
-				sheet.PageSetup.SetFooter(1, "&P");
-
-			// generate xlsx
-			var data = JsonConvert.SerializeObject(invoice);
-			wb = _exporter.Export(wb, JsonConvert.DeserializeObject(data));
-
-			var stamp = new Random(DateTime.Now.Millisecond).Next();
-
-			// create report
-			Report report;
-			using (var xlsxms = new MemoryStream())
-			using (var pdfms = new MemoryStream())
-			{
-				// wb.Write(ms);
-				wb.Save(xlsxms, new XlsSaveOptions(SaveFormat.Xlsx));
-				wb.CalculateFormula();
-				wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
-
-				report = new Report
-				{
-					Type = ReportType.Invoice,
-					Name = $"{create.Invoice.Scope}_{create.Name}_{stamp}",
-					SchoolYear = create.Invoice.Scope != null && create.Invoice.Scope.Length > 0 ? GenerateSchoolYear(create.Invoice.Scope) : create.SchoolYear,
-					Scope = create.Invoice.Scope,
-					Approved = false,
-					Created = time,
-					Data = data,
-					Xlsx = xlsxms.ToArray(),
-					Pdf = pdfms.ToArray()
-				};
-			}
-
-			return report;
-		}
-
-		private Report CreateInvoice(DateTime time, CreateReport create)
-		{
-			// get template
-			var invoiceTemplate = _templates.Get(create.TemplateId.Value);
-			if (invoiceTemplate == null)
-				throw new MissingTemplateException(create.TemplateId.Value);
-
-			return CreateInvoice(time, invoiceTemplate, create);
-		}
-
-		private Report CreateInvoice(CreateReport create) => CreateInvoice(DateTime.Now, create);
 
 		private Report CreateBulkInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
 		{
@@ -489,6 +359,40 @@ namespace api.Controllers
 				base($"Could not find template with Id '{templateId}'.")
 			{ }
 		}
+
+		private Report CreateInvoice(DateTime time, Template template, CreateReport create)
+		{
+			var report = CreateBulkInvoice(time, template, new CreateReport
+			{
+				ReportType = create.ReportType,
+				Name = create.Name,
+				SchoolYear = create.SchoolYear,
+				TemplateId = create.TemplateId,
+
+				BulkInvoice = new CreateBulkInvoiceReport
+				{
+					Scope = create.Invoice.Scope,
+					AsOf = create.Invoice.AsOf,
+					ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
+					ToPDE = create.Invoice.ToPDE,
+					Auns = new[] { create.Invoice.SchoolDistrictAun },
+				},
+			});
+
+			report.Type = ReportType.Invoice;
+			return report;
+		}
+
+		private Report CreateInvoice(DateTime time, CreateReport create)
+		{
+			var template = _templates.Get(create.TemplateId.Value);
+			if (template == null)
+				throw new MissingTemplateException(create.TemplateId.Value);
+
+			return CreateInvoice(time, template, create);
+		}
+
+		private Report CreateInvoice(CreateReport create) => CreateInvoice(DateTime.Now, create);
 
 		private static IList<string> studentInformationColumns = new List<string>
 		{
