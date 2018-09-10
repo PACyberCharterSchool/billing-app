@@ -24,15 +24,15 @@ export class PaymentUpsertFormComponent implements OnInit {
   public selectedSchoolDistrict: SchoolDistrict;
   public selectedAcademicYear: string;
   public selectedAcademicYearSplit: string;
-  private paymentType: string;
-  public paymentTypeId: string;
+  public externalId: string;
   public schoolYears: string[];
   public isSplit: boolean;
   public date: Date;
   public dateModel: any;
-  public paymentTypeModel = { 'check': false, 'unipay': false };
+  public dateString: string;
   public schoolDistrictNameModel: string;
   public upsertError: string;
+  public checkNumber: string;
 
   @Input() op: string;
   @Input() schoolDistricts: SchoolDistrict[];
@@ -49,8 +49,6 @@ export class PaymentUpsertFormComponent implements OnInit {
   ngOnInit() {
     console.log('op is ', this.op);
     console.log('schoolDistricts are ', this.schoolDistricts);
-
-    this.paymentTypeModel = { 'check': false, 'unipay': false };
 
     this.schoolYears = this.academicYearsService.getAcademicYears();
 
@@ -74,29 +72,27 @@ export class PaymentUpsertFormComponent implements OnInit {
     this.schoolDistrictNameModel = this.paymentRecord.schoolDistrict.name;
     this.amount = this.paymentRecord.amount;
     this.splitAmount = this.paymentRecord.splitAmount;
-    this.paymentType = this.paymentRecord.type;
 
     const date = new Date(this.paymentRecord.date);
+    this.dateModel = { 'month': date.getMonth() + 1, 'day': date.getDate(), 'year': date.getFullYear() };
 
-    this.dateModel = { 'month': date.getMonth(), 'day': date.getDate(), 'year': date.getFullYear() };
     this.selectedAcademicYear = this.paymentRecord.schoolYear;
     this.selectedAcademicYearSplit = this.paymentRecord.schoolYearSplit;
-    this.paymentTypeId = this.paymentRecord.paymentId;
-    this.paymentTypeModel = this.paymentType === 'SD' ? { 'check': true, 'unipay': false } : { 'check': false, 'unipay': true };
+    this.checkNumber = this.paymentRecord.externalId;
     this.isSplit = this.paymentRecord.split === 2 ? true : false ;
   }
 
   updatePaymentRecord() {
     this.paymentRecord.schoolDistrict = this.selectedSchoolDistrict;
     this.paymentRecord.amount = this.amount;
-    this.paymentRecord.externalId = this.paymentTypeId;
+    this.paymentRecord.externalId  = this.checkNumber;
     this.paymentRecord.splitAmount = this.splitAmount;
-    this.paymentRecord.type = this.paymentTypeModel.check ? PaymentType.Check : PaymentType.UniPay;
+    this.paymentRecord.type = PaymentType.Check;
     this.paymentRecord.date = new Date(`${this.dateModel.month}/${this.dateModel.day}/${this.dateModel.year}`);
-    this.paymentRecord.schoolYear = this.selectedAcademicYear;
-    this.paymentRecord.schoolYearSplit = this.selectedAcademicYearSplit;
+    this.paymentRecord.schoolYear = this.selectedAcademicYear !== null ? this.selectedAcademicYear.replace(/\s+/g, '') : null;
+    this.paymentRecord.schoolYearSplit =
+      this.selectedAcademicYearSplit !== null ? this.selectedAcademicYearSplit.replace(/s\+/g, '') : null;
     this.paymentRecord.split = this.isSplit ? 2 : 1;
-    this.paymentRecord.schoolYearSplit = this.selectedAcademicYearSplit;
   }
 
   upsertPayment() {

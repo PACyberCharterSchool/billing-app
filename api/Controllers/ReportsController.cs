@@ -290,6 +290,7 @@ namespace api.Controllers
 		{
 			for (int i = 0; i < wb.Worksheets.Count; i++)
 			{
+<<<<<<< HEAD
 				var sheet = wb.Worksheets[i];
 				if (sheet != null)
 				{
@@ -304,6 +305,25 @@ namespace api.Controllers
 					sheet.PageSetup.HeaderMargin = 0.0;
 					sheet.PageSetup.FooterMargin = 0.0;
 				}
+=======
+				wb.CalculateFormula();
+				wb.Save(xlsxms, new XlsSaveOptions(SaveFormat.Xlsx));
+				wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
+
+				report = new Report
+				{
+					Type = ReportType.Invoice,
+					Name = $"{create.Invoice.Scope}_{create.Name}_{stamp}",
+					SchoolYear = create.Invoice.Scope != null && create.Invoice.Scope.Length > 0 ? GenerateSchoolYear(create.Invoice.Scope) : create.SchoolYear,
+					Scope = create.Invoice.Scope,
+					Approved = false,
+					// Created = time,
+					Created = new DateTime(DateTime.Now.Year, 9, 4),
+					Data = data,
+					Xlsx = xlsxms.ToArray(),
+					Pdf = pdfms.ToArray()
+				};
+>>>>>>> development
 			}
 		}
 
@@ -322,6 +342,9 @@ namespace api.Controllers
 				PaymentType = create.BulkInvoice.PaymentType,
 			});
 
+			DateTime toSchoolDate = new DateTime();
+			DateTime toPDEDate = new DateTime();
+
 			// compose workbook
 			var wb = new Workbook(new MemoryStream(invoiceTemplate.Content));
 			InitializeWorkbookSheetPrinterMargins(wb);
@@ -330,6 +353,12 @@ namespace api.Controllers
 			for (int i = 0; i < districts.Count; i++)
 			{
 				var district = districts[i];
+
+				if (i == 0)
+				{
+					toSchoolDate = invoice.ToSchoolDistrict;
+					toPDEDate = invoice.ToPDE;
+				}
 
 				if (i > 0)
 					CloneInvoiceSummarySheet(wb, i, district.SchoolDistrict.Name);
@@ -345,8 +374,36 @@ namespace api.Controllers
 			foreach (var sheet in wb.Worksheets)
 				sheet.PageSetup.SetFooter(1, "&P");
 
+<<<<<<< HEAD
 			// generate xlsx
 			var json = JsonConvert.SerializeObject(invoice);
+=======
+			var data = new
+			{
+				SchoolYear = create.SchoolYear,
+				FirstYear = int.Parse(create.SchoolYear.Split("-")[0]),
+				SecondYear = int.Parse(create.SchoolYear.Split("-")[1]),
+				AsOf = create.BulkInvoice.AsOf,
+				AsOfMonth = create.BulkInvoice.AsOf.ToString("MMMM"),
+				AsOfYear = create.BulkInvoice.AsOf.Year,
+				ScopeMonth = new DateTime(DateTime.Now.Year, int.Parse(create.BulkInvoice.Scope.Substring(5, 2)), 1).ToString("MMMM"),
+				ScopeYear = int.Parse(create.BulkInvoice.Scope.Substring(0, 4)),
+				Prepared = time,
+				ToSchoolDistrict = toSchoolDate,
+				ToPDE = toPDEDate,
+				Districts = invoices.Select(i => new
+				{
+					Number = i.Number,
+					SchoolDistrict = i.SchoolDistrict,
+					Students = i.Students,
+					RegularEnrollments = i.RegularEnrollments,
+					SpecialEnrollments = i.SpecialEnrollments,
+					Transactions = i.Transactions
+				}),
+			};
+
+			var json = JsonConvert.SerializeObject(data);
+>>>>>>> development
 			wb = _exporter.Export(wb, JsonConvert.DeserializeObject(json));
 
 			// create report
@@ -400,10 +457,16 @@ namespace api.Controllers
 		{
 			var report = CreateBulkInvoice(time, template, new CreateReport
 			{
+<<<<<<< HEAD
 				ReportType = create.ReportType,
 				Name = create.Name,
 				SchoolYear = create.SchoolYear,
 				TemplateId = create.TemplateId,
+=======
+				wb.CalculateFormula();
+				wb.Save(xlsxStream, SaveFormat.Xlsx);
+				wb.Save(pdfStream, SaveFormat.Pdf);
+>>>>>>> development
 
 				BulkInvoice = new CreateBulkInvoiceReport
 				{
@@ -506,8 +569,8 @@ namespace api.Controllers
 			using (var xlsxStream = new MemoryStream())
 			using (var pdfStream = new MemoryStream())
 			{
-				wb.Save(xlsxStream, SaveFormat.Xlsx);
 				wb.CalculateFormula();
+				wb.Save(xlsxStream, SaveFormat.Xlsx);
 				wb.Save(pdfStream, SaveFormat.Pdf);
 
 				report = new Report

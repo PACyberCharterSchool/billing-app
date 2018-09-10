@@ -1,15 +1,23 @@
 form {
-  .form-group {
-    div.col-6 {
-      div.col-12 {
-        margin-bottom: 10px;
+  .modal-body {
+    div.col-12 {
+      .form-group {
+        div.col-6 {
+          padding: 0;
+          margin-bottom: 10px;
+          input {
+            width: 100%;
+            font-size: 16px;
+          }
+        }
       }
     }
+  }
 
+  .model-footer {
     button {
       font-family: 'Museo Sans';
       font-size: 14px;
     }
   }
 }
-

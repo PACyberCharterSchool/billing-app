@@ -15,6 +15,7 @@ import {
   AdministrationPaymentRateUpdateFormComponent
 } from '../administration-payment-rate-update-form/administration-payment-rate-update-form.component';
 
+
 @Component({
   selector: 'app-administration-payment-rate-list',
   templateUrl: './administration-payment-rate-list.component.html',
@@ -48,7 +49,7 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     this.ngxSpinnerService.show();
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
-        this.schoolDistricts = this.allSchoolDistricts = data['schoolDistricts'];
+        this.schoolDistricts = this.allSchoolDistricts = this.convertCurrencyValues(data['schoolDistricts']);
         console.log('AdministrationPaymentRateListComponent.ngOnInit(): school districts are ', data['schoolDistricts']);
         this.ngxSpinnerService.hide();
       },
@@ -57,6 +58,23 @@ export class AdministrationPaymentRateListComponent implements OnInit {
         this.ngxSpinnerService.hide();
       }
     );
+  }
+
+  private convertCurrencyValues(schoolDistricts: SchoolDistrict[]): SchoolDistrict[] {
+    if (schoolDistricts) {
+      const setSchoolDistrictRates: (sd: SchoolDistrict) => SchoolDistrict = function(sd: SchoolDistrict): SchoolDistrict {
+        sd.rate = (+sd.rate).toFixed(2);
+        sd.alternateRate = (+sd.alternateRate).toFixed(2);
+        sd.specialEducationRate = (+sd.specialEducationRate).toFixed(2);
+        sd.alternateSpecialEducationRate = (+sd.alternateSpecialEducationRate).toFixed(2);
+
+        return sd;
+      };
+
+      const converted: SchoolDistrict[] = schoolDistricts.map(setSchoolDistrictRates);
+
+      return converted;
+    }
   }
 
   sort(property) {
@@ -91,7 +109,7 @@ export class AdministrationPaymentRateListComponent implements OnInit {
   getAdditionalSchoolDistricts($event) {
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
-        this.schoolDistricts = this.schoolDistricts.concat(data['schoolDistricts']);
+        this.schoolDistricts = this.schoolDistricts.concat(this.convertCurrencyValues(data['schoolDistricts']));
         console.log('AdministrationPaymentRateListComponent.getPayments():  school districts are ', this.schoolDistricts);
       },
       error => {
@@ -114,26 +132,6 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     }
   }
 
-  listDisplayableValues(sd: SchoolDistrict): Object[] {
-    if (sd) {
-      const vkeys = this.listDisplayableFields();
-      const selected = this.utilitiesService.pick(sd, vkeys);
-
-      return this.utilitiesService.objectValues(selected);
-    }
-  }
-
-  private isFloat(n): boolean {
-    return n === +n && n !== (n | 0);
-  }
-
-  private isCurrency(v: any): boolean {
-    if (v !== null) {
-      return this.isFloat(v);
-    }
-    return false;
-  }
-
   selectSchoolDistrict(sd: SchoolDistrict) {
     this.model = sd;
   }
@@ -141,7 +139,7 @@ export class AdministrationPaymentRateListComponent implements OnInit {
   refreshSchoolDistrictList() {
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
-        this.schoolDistricts = this.allSchoolDistricts = data['schoolDistricts'];
+        this.schoolDistricts = this.allSchoolDistricts = this.convertCurrencyValues(data['schoolDistricts']);
         console.log('success');
       },
       error => {
@@ -174,17 +172,20 @@ export class AdministrationPaymentRateListComponent implements OnInit {
       importData.append(
         'file',
         this.selectedBulkImportFile[0],
-        this.selectedBulkImportFile[0].name
+        // this.selectedBulkImportFile[0].name
       );
 
+      this.ngxSpinnerService.show();
       this.schoolDistrictService.updateSchoolDistricts(importData).subscribe(
         data => {
           console.log('AdministrationPaymentRateListComponent.bulkImportSchoolDistricts():  ', data['schoolDistricts']);
           this.schoolDistricts = this.allSchoolDistricts = data['schoolDistricts'];
+          this.ngxSpinnerService.hide();
           this.ngbActiveModal.close('Update successful');
         },
         error => {
           console.log('AdministrationPaymentRateListComponent.bulkImportSchoolDistricts():  ', error);
+          this.ngxSpinnerService.hide();
           this.refreshSchoolDistrictList();
           this.ngbActiveModal.dismiss('Updated failed');
         }

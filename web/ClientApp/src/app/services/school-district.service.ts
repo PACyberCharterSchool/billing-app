@@ -55,8 +55,16 @@ export class SchoolDistrictService {
       alternateRate: +sd.alternateRate,
       specialEducationRate: +sd.specialEducationRate,
       alternateSpecialEducationRate: +sd.alternateSpecialEducationRate,
-      paymentType: sd.paymentType
+      paymentType: sd.paymentType === 'Check' ? 'Check' : 'ACH'
     });
+
+    if (+sd.alternateRate === 0.0) {
+      delete reqBodyObj.alternateRate;
+    }
+
+    if (+sd.alternateSpecialEducationRate === 0.0) {
+      delete reqBodyObj.alternateSpecialEducationRate;
+    }
 
     return reqBodyObj;
   }
@@ -75,5 +83,4 @@ export class SchoolDistrictService {
 
     return schoolDistrictData;
   }
-
 }

@@ -39,12 +39,14 @@
     height: 100%;
 
     table {
+      height: 100%;
+
       thead {
-        height: 17%;
+        height: 94px;
       }
 
       tbody {
-        height: 83%;
+        height: calc(100% - 94px);
       }
     }
 
