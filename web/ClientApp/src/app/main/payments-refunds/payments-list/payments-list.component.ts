@@ -14,6 +14,7 @@ import { PaymentUpsertFormComponent } from '../payment-upsert-form/payment-upser
 import { Globals } from '../../../globals';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { pseudoRandomBytes } from 'crypto';
 
 @Component({
   selector: 'app-payments-list',
@@ -56,6 +57,21 @@ export class PaymentsListComponent implements OnInit {
     );
   }
 
+  isSplitPayment(payment: Payment): boolean {
+    return this.allPayments.filter((p) => p.paymentId === payment.paymentId).length > 1;
+  }
+
+  getPaymentAmount(payment: Payment): number {
+    const payments: Payment[] = this.allPayments.filter((p) => p.paymentId === payment.paymentId);
+    let sum = 0;
+
+    if (payments.length > 1) {
+      sum = payments.reduce((acc, p) => acc + p.amount, 0);
+    }
+
+    return sum;
+  }
+
   sort(property) {
     this.isDescending = !this.isDescending; // change the direction
     this.property = property;
@@ -89,7 +105,8 @@ export class PaymentsListComponent implements OnInit {
   refreshPaymentList() {
     this.paymentsService.getPayments(this.skip).subscribe(
       data => {
-        this.allPayments = this.payments = data['payments'];
+        this.allPayments = data['payments'];
+        this.payments = data['payments'].filter((p) => p.split === 1);
         console.log('PaymentsListComponent.ngOnInit(): payments are ', this.allPayments);
       },
       error => {
@@ -151,7 +168,7 @@ export class PaymentsListComponent implements OnInit {
   listDisplayableFields() {
     if (this.allPayments) {
       const fields = this.utilitiesService.objectKeys(this.allPayments[0]);
-      const rejected = ['id', 'paymentId'];
+      const rejected = ['id', 'paymentId', 'type'];
       return fields.filter((i) => !rejected.includes(i));
     }
   }

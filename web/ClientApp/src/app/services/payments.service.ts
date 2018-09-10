@@ -28,6 +28,11 @@ export class PaymentsService {
     return this.httpClient.get<Payment[]>(url, this.headers);
   }
 
+  public getPaymentsByPaymentId(paymentId: string): Observable<Payment[]> {
+    const url = this.apiPaymentsUrl + `/${paymentId}`;
+    return this.httpClient.get<Payment[]>(url, this.headers);
+  }
+
   public createPayment(payment: Payment): Observable<Payment> {
     const url = this.apiPaymentsUrl;
     const reqBody = this.buildPaymentRequestBodyObject(payment);

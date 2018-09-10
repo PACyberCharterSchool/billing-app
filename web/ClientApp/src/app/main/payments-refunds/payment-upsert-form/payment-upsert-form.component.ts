@@ -19,6 +19,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./payment-upsert-form.component.scss']
 })
 export class PaymentUpsertFormComponent implements OnInit {
+  private paymentId: string;
   public amount: number;
   public splitAmount: number;
   public selectedSchoolDistrict: SchoolDistrict;
@@ -33,6 +34,7 @@ export class PaymentUpsertFormComponent implements OnInit {
   public schoolDistrictNameModel: string;
   public upsertError: string;
   public checkNumber: string;
+  public payment: Payment;
 
   @Input() op: string;
   @Input() schoolDistricts: SchoolDistrict[];
@@ -67,32 +69,49 @@ export class PaymentUpsertFormComponent implements OnInit {
     }
   }
 
+  initPaymentRecord(payments: Object[]): void {
+    if (payments) {
+      this.paymentId = payments[0]['paymentId'];
+      this.isSplit = payments.length > 1;
+      this.date = payments[0]['date'];
+      this.externalId = payments[0]['externalId'];
+      this.schoolDistrictNameModel = payments[0]['schoolDistrict']['name'];
+      this.amount = payments[0]['amount'];
+      this.selectedAcademicYear = payments[0]['schoolYear'];
+
+      if (payments.length > 1) {
+        this.splitAmount = payments[1]['amount'];
+        this.selectedAcademicYearSplit = payments[1]['schoolYear'];
+      }
+
+      const date = new Date(this.paymentRecord.date);
+      this.dateModel = { 'month': date.getMonth() + 1, 'day': date.getDate(), 'year': date.getFullYear() };
+
+      this.checkNumber = this.paymentRecord.externalId;
+    }
+  }
+
   updatePaymentComponentValues() {
-    this.selectedSchoolDistrict = this.paymentRecord.schoolDistrict;
-    this.schoolDistrictNameModel = this.paymentRecord.schoolDistrict.name;
-    this.amount = this.paymentRecord.amount;
-    this.splitAmount = this.paymentRecord.splitAmount;
-
-    const date = new Date(this.paymentRecord.date);
-    this.dateModel = { 'month': date.getMonth() + 1, 'day': date.getDate(), 'year': date.getFullYear() };
-
-    this.selectedAcademicYear = this.paymentRecord.schoolYear;
-    this.selectedAcademicYearSplit = this.paymentRecord.schoolYearSplit;
-    this.checkNumber = this.paymentRecord.externalId;
-    this.isSplit = this.paymentRecord.split === 2 ? true : false ;
+    this.paymentsService.getPaymentsByPaymentId(this.paymentRecord.paymentId).subscribe(
+      data => {
+        this.initPaymentRecord(data['payments']);
+      },
+      error => {
+        console.log('PaymentUpsertFormComponent.ngOnInit():  error is ', error);
+      }
+    );
   }
 
   updatePaymentRecord() {
     this.paymentRecord.schoolDistrict = this.selectedSchoolDistrict;
+    this.paymentRecord.split = this.isSplit ? 2 : 1;
     this.paymentRecord.amount = this.amount;
-    this.paymentRecord.externalId  = this.checkNumber;
     this.paymentRecord.splitAmount = this.splitAmount;
+    this.paymentRecord.externalId  = this.checkNumber;
     this.paymentRecord.type = PaymentType.Check;
     this.paymentRecord.date = new Date(`${this.dateModel.month}/${this.dateModel.day}/${this.dateModel.year}`);
-    this.paymentRecord.schoolYear = this.selectedAcademicYear !== null ? this.selectedAcademicYear.replace(/\s+/g, '') : null;
-    this.paymentRecord.schoolYearSplit =
-      this.selectedAcademicYearSplit !== null ? this.selectedAcademicYearSplit.replace(/s\+/g, '') : null;
-    this.paymentRecord.split = this.isSplit ? 2 : 1;
+    this.paymentRecord.schoolYear = this.selectedAcademicYear ? this.selectedAcademicYear.replace(/\s+/g, '') : null;
+    this.paymentRecord.schoolYearSplit = this.selectedAcademicYearSplit ? this.selectedAcademicYearSplit.replace(/\s+/g, '') : null;
   }
 
   upsertPayment() {
@@ -135,7 +154,6 @@ export class PaymentUpsertFormComponent implements OnInit {
   }
 
   onDateChanged() {
-    // yes, that bit of math on the month value is necessary
     console.log('PaymentUpsertFormComponent.onDateChanged():  dateModel type is ', typeof(this.dateModel));
     console.log('PaymentUpsertFormComponent.onDateChanged(): dateModel is ', this.dateModel);
     this.date = new Date(`${this.dateModel.month}/${this.dateModel.day}/${this.dateModel.year}`);

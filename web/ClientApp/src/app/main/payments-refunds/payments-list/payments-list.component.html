@@ -24,15 +24,14 @@
       </thead>
       <tbody infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]='false'>
         <tr *ngFor='let payment of payments | orderBy: {property: property, direction: direction}' (click)='editPayment(payment)'>
-          <td>{{payment.split === 1 ? 'No' : 'Yes'}}</td>
-          <td>{{payment.date | date: 'MM/dd/yyyy'}}</td>
-          <td>{{payment.externalId}}</td>
-          <td>{{payment.type === 'Check' ? 'SD' : 'PDE'}}</td>
-          <td>{{payment.amount | currency}}</td>
-          <td>{{payment.schoolYear}}</td>
-          <td>{{payment.created | date: 'MM/dd/yyyy'}}</td>
-          <td>{{payment.lastUpdated | date: 'MM/dd/yyyy'}}</td>
-          <td placeholder='top' ngbTooltip='{{payment.schoolDistrict.name}}'>{{payment.schoolDistrict.name}}</td>
+          <td>{{isSplitPayment(payment) ? 'Yes' : 'No'}}</td>
+          <td>{{payment?.date | date: 'MM/dd/yyyy'}}</td>
+          <td>{{payment?.externalId}}</td>
+          <td>{{getPaymentAmount(payment) | currency}}</td>
+          <td>{{payment?.schoolYear}}</td>
+          <td>{{payment?.created | date: 'MM/dd/yyyy'}}</td>
+          <td>{{payment?.lastUpdated | date: 'MM/dd/yyyy'}}</td>
+          <td placeholder='top' ngbTooltip='{{payment?.schoolDistrict.name}}'>{{payment?.schoolDistrict.name}}</td>
         </tr>
       </tbody>
     </table>
