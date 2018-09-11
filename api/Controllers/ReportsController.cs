@@ -150,12 +150,26 @@ namespace api.Controllers
 			public CreateBulkStudentInformationReport BulkStudentInformation { get; set; }
 		}
 
+		private void StyleInvoiceWorksheet(Worksheet sheet)
+		{
+			sheet.PageSetup.SetFooter(1, "&P");
+			sheet.PageSetup.HeaderMargin = 0.0;
+			sheet.PageSetup.FooterMargin = 0.0;
+			sheet.PageSetup.TopMargin = 0.0;
+			sheet.PageSetup.TopMargin = 0.0;
+			sheet.PageSetup.LeftMargin = 0.0;
+			sheet.PageSetup.RightMargin = 0.0;
+			sheet.PageSetup.HeaderMargin = 0.0;
+			sheet.PageSetup.FooterMargin = 0.0;
+		}
+
 		private void CloneInvoiceSummarySheet(Workbook src, Workbook wb, int districtIndex, string districtName)
 		{
 			wb.Worksheets.Add();
 			var sheet = wb.Worksheets.Last();
 			sheet.Copy(src.Worksheets[0]);
 			sheet.Name = $"{districtName.Substring(0, Math.Min(districtName.Length, 17))} Summary Info";
+			StyleInvoiceWorksheet(sheet);
 
 			// all subsequent pages will be numbered starting from here
 			sheet.PageSetup.FirstPageNumber = 1;
@@ -197,16 +211,7 @@ namespace api.Controllers
 				var sheet = wb.Worksheets.Last();
 				sheet.Copy(src.Worksheets[1]);
 				sheet.Name = $"{districtName.Substring(0, Math.Min(districtName.Length, 15))} St. Info({s + 1})";
-
-				// TODO(Erik): this is done before we enter this function; remove these lines
-				sheet.PageSetup.HeaderMargin = 0.0;
-				sheet.PageSetup.FooterMargin = 0.0;
-				sheet.PageSetup.BottomMargin = 0.0;
-				sheet.PageSetup.TopMargin = 0.0;
-				sheet.PageSetup.LeftMargin = 0.0;
-				sheet.PageSetup.RightMargin = 0.0;
-				sheet.PageSetup.HeaderMargin = 0.0;
-				sheet.PageSetup.FooterMargin = 0.0;
+				StyleInvoiceWorksheet(sheet);
 
 				var cells = sheet.Cells;
 				for (int r = 0; r < cells.MaxDataRow + 1; r++)
@@ -273,27 +278,6 @@ namespace api.Controllers
 			return 13;
 		}
 
-		private void InitializeWorkbookSheetPrinterMargins(Workbook wb)
-		{
-			for (int i = 0; i < wb.Worksheets.Count; i++)
-			{
-				var sheet = wb.Worksheets[i];
-				if (sheet != null)
-				{
-					// make certain the printer margins for each sheet are zeroed out, lest
-					// we have ugly issues when printing them out.
-					sheet.PageSetup.HeaderMargin = 0.0;
-					sheet.PageSetup.FooterMargin = 0.0;
-					sheet.PageSetup.TopMargin = 0.0;
-					sheet.PageSetup.TopMargin = 0.0;
-					sheet.PageSetup.LeftMargin = 0.0;
-					sheet.PageSetup.RightMargin = 0.0;
-					sheet.PageSetup.HeaderMargin = 0.0;
-					sheet.PageSetup.FooterMargin = 0.0;
-				}
-			}
-		}
-
 		private Report CreateBulkInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
 		{
 			var reporter = _reporters.CreateBulkInvoiceReporter(_context);
@@ -312,7 +296,6 @@ namespace api.Controllers
 			// compose workbook
 			var source = new Workbook(new MemoryStream(invoiceTemplate.Content));
 			var wb = new Workbook();
-			InitializeWorkbookSheetPrinterMargins(wb);
 
 			var districts = invoice.Districts.ToList();
 			for (int i = 0; i < districts.Count; i++)
@@ -324,9 +307,6 @@ namespace api.Controllers
 				if (studentCount > 0)
 					CloneStudentItemizationSheets(source, wb, studentCount, i, district.SchoolDistrict.Name, invoiceTemplate);
 			}
-
-			foreach (var sheet in wb.Worksheets)
-				sheet.PageSetup.SetFooter(1, "&P");
 
 			// generate xlsx
 			var json = JsonConvert.SerializeObject(invoice);
