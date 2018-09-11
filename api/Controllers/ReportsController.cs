@@ -83,22 +83,47 @@ namespace api.Controllers
 			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
 			public string Scope { get; set; }
 
+			[Required]
 			public DateTime AsOf { get; set; }
 
+			[Required]
 			public DateTime ToSchoolDistrict { get; set; }
 
+			[Required]
 			public DateTime ToPDE { get; set; }
+
+			public IList<int> Auns { get; set; }
+
+			[JsonConverter(typeof(SchoolDistrictPaymentTypeJsonConverter))]
+			public SchoolDistrictPaymentType PaymentType { get; set; }
 
 			public bool Approved { get; set; }
 		}
 
-		public class CreateBulkStudentInformationReport
+		public class CreateStudentInformationReport
 		{
-			public string Type { get; set; }
-
+			[Required]
+			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
 			public string Scope { get; set; }
 
-			public bool? Approved { get; set; }
+			[Required]
+			public DateTime AsOf { get; set; }
+
+			[Required]
+			[Range(100000000, 999999999)]
+			public int SchoolDistrictAun { get; set; }
+		}
+
+		public class CreateBulkStudentInformationReport
+		{
+			[Required]
+			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
+			public string Scope { get; set; }
+
+			[Required]
+			public DateTime AsOf { get; set; }
+
+			public IList<int> Auns { get; set; }
 		}
 
 		public class CreateReport
@@ -115,11 +140,13 @@ namespace api.Controllers
 			[RegularExpression(@"^\d{4}\-\d{4}$")]
 			public string SchoolYear { get; set; }
 
+			// TODO(Erik): get rid of this: use ReportType/SchoolYear
 			[Range(1, int.MaxValue)]
 			public int? TemplateId { get; set; }
 
 			public CreateInvoiceReport Invoice { get; set; }
 			public CreateBulkInvoiceReport BulkInvoice { get; set; }
+			public CreateStudentInformationReport StudentInformation { get; set; }
 			public CreateBulkStudentInformationReport BulkStudentInformation { get; set; }
 		}
 
@@ -235,55 +262,6 @@ namespace api.Controllers
 			return 13;
 		}
 
-		private void CloneInvoiceSheets(Workbook wb, int count, Template template)
-		{
-			const int per = 8;
-
-			var numSheets = (int)count / per + (count % per == 0 ? 0 : 1);
-			for (var s = 0; s < numSheets - 1; s++)
-			{
-				wb.Worksheets.AddCopy(1);
-
-				var sheet = wb.Worksheets[wb.Worksheets.Count - 1];
-				Cells cells = sheet.Cells;
-				sheet.Name = $"Individual Student Inform. {s + 1}";
-
-				for (int r = 0; r < cells.MaxDataRow + 1; r++)
-				{
-					Row row = cells.Rows[r];
-					if (row.IsBlank)
-						continue;
-
-					for (int c = 0; c < cells.MaxDataColumn + 1; c++)
-					{
-						var cell = cells[r, c];
-						if (cell.Value == null)
-							continue;
-
-						if (r == GetRowIndexForFirstStudentItemization(template) && c == 1) // Number column
-						{
-							cell.PutValue(((s + 1) * per) + 1);
-							continue;
-						}
-
-						if (!(cell.Type == CellValueType.IsString))
-							continue;
-
-						var value = cell.StringValue;
-
-						const string pattern = @"Students\[(\d+)\]";
-						var matches = Regex.Matches(value, pattern);
-						if (matches.Count > 0)
-						{
-							var match = matches[0];
-							var i = int.Parse(match.Groups[1].Value);
-							cell.PutValue(Regex.Replace(value, pattern, $"Students[{(i + ((s + 1) * per))}]"));
-						}
-					}
-				}
-			}
-		}
-
 		private string GenerateSchoolYear(string scope)
 		{
 			string year;
@@ -308,98 +286,41 @@ namespace api.Controllers
 			return year;
 		}
 
-		private Report CreateInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
+		private void InitializeWorkbookSheetPrinterMargins(Workbook wb)
 		{
-			// get reporter
-			var reporter = _reporters.CreateInvoiceReporter(_context);
-
-			// build config
-			var config = new InvoiceReporter.Config
+			for (int i = 0; i < wb.Worksheets.Count; i++)
 			{
-				Scope = create.Invoice.Scope,
-				InvoiceNumber = create.Name,
-				SchoolYear = create.SchoolYear,
-				AsOf = create.Invoice.AsOf,
-				Prepared = time,
-				ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
-				ToPDE = create.Invoice.ToPDE,
-				SchoolDistrictAun = create.Invoice.SchoolDistrictAun,
-			};
-
-			// generate data
-			var invoice = reporter.GenerateReport(config);
-
-			// compose workbook
-			var wb = new Workbook(new MemoryStream(invoiceTemplate.Content));
-			InitializeWorkbookSheetPrinterMargins(wb);
-
-			if (invoice.Students.Count > 0)
-			{
-				CloneInvoiceSheets(wb, invoice.Students.Count, invoiceTemplate);
-			}
-			else
-			{
-				wb.Worksheets.RemoveAt(1);
-			}
-
-			foreach (var sheet in wb.Worksheets)
-				sheet.PageSetup.SetFooter(1, "&P");
-
-			// generate xlsx
-			var data = JsonConvert.SerializeObject(invoice);
-			wb = _exporter.Export(wb, JsonConvert.DeserializeObject(data));
-
-			var stamp = new Random(DateTime.Now.Millisecond).Next();
-
-			// create report
-			Report report;
-			using (var xlsxms = new MemoryStream())
-			using (var pdfms = new MemoryStream())
-			{
-				wb.CalculateFormula();
-				wb.Save(xlsxms, new XlsSaveOptions(SaveFormat.Xlsx));
-				wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));
-
-				report = new Report
+				var sheet = wb.Worksheets[i];
+				if (sheet != null)
 				{
-					Type = ReportType.Invoice,
-					Name = $"{create.Invoice.Scope}_{create.Name}_{stamp}",
-					SchoolYear = create.Invoice.Scope != null && create.Invoice.Scope.Length > 0 ? GenerateSchoolYear(create.Invoice.Scope) : create.SchoolYear,
-					Scope = create.Invoice.Scope,
-					Approved = false,
-					// Created = time,
-					Created = new DateTime(DateTime.Now.Year, 9, 4),
-					Data = data,
-					Xlsx = xlsxms.ToArray(),
-					Pdf = pdfms.ToArray()
-				};
+					// make certain the printer margins for each sheet are zeroed out, lest
+					// we have ugly issues when printing them out.
+					sheet.PageSetup.HeaderMargin = 0.0;
+					sheet.PageSetup.FooterMargin = 0.0;
+					sheet.PageSetup.TopMargin = 0.0;
+					sheet.PageSetup.TopMargin = 0.0;
+					sheet.PageSetup.LeftMargin = 0.0;
+					sheet.PageSetup.RightMargin = 0.0;
+					sheet.PageSetup.HeaderMargin = 0.0;
+					sheet.PageSetup.FooterMargin = 0.0;
+				}
 			}
-
-			return report;
 		}
-
-		private Report CreateInvoice(DateTime time, CreateReport create)
-		{
-			// get template
-			var invoiceTemplate = _templates.Get(create.TemplateId.Value);
-			if (invoiceTemplate == null)
-				throw new MissingTemplateException(create.TemplateId.Value);
-
-			return CreateInvoice(time, invoiceTemplate, create);
-		}
-
-		private Report CreateInvoice(CreateReport create) => CreateInvoice(DateTime.Now, create);
 
 		private Report CreateBulkInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
 		{
-			var reports = _reports.GetMany(
-				type: ReportType.FromString("Invoice"),
-				// year: create.SchoolYear,
-				scope: create.BulkInvoice.Scope,
-				approved: create.BulkInvoice.Approved
-			).ToList();
-
-			var invoices = reports.Select(r => JsonConvert.DeserializeObject<Invoice>(r.Data)).OrderBy(i => i.SchoolDistrict.Name).ToList();
+			var reporter = _reporters.CreateBulkInvoiceReporter(_context);
+			var invoice = reporter.GenerateReport(new BulkInvoiceReporter.Config
+			{
+				SchoolYear = create.SchoolYear,
+				Scope = create.BulkInvoice.Scope,
+				Prepared = time,
+				AsOf = create.BulkInvoice.AsOf,
+				ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
+				ToPDE = create.BulkInvoice.ToPDE,
+				Auns = create.BulkInvoice.Auns,
+				PaymentType = create.BulkInvoice.PaymentType,
+			});
 
 			DateTime toSchoolDate = new DateTime();
 			DateTime toPDEDate = new DateTime();
@@ -407,10 +328,11 @@ namespace api.Controllers
 			// compose workbook
 			var wb = new Workbook(new MemoryStream(invoiceTemplate.Content));
 			InitializeWorkbookSheetPrinterMargins(wb);
-			Console.WriteLine($"ReportsController.CreateBulkInvoice():  number of invoices is {invoices.Count}.");
-			for (int i = 0; i < invoices.Count; i++)
+
+			var districts = invoice.Districts.ToList();
+			for (int i = 0; i < districts.Count; i++)
 			{
-				var invoice = invoices[i];
+				var district = districts[i];
 
 				if (i == 0)
 				{
@@ -419,46 +341,21 @@ namespace api.Controllers
 				}
 
 				if (i > 0)
-					CloneInvoiceSummarySheet(wb, i, invoice.SchoolDistrict.Name);
+					CloneInvoiceSummarySheet(wb, i, district.SchoolDistrict.Name);
 
-				if (invoice.Students.Count > 0)
-					CloneStudentItemizationSheets(wb, invoice.Students.Count, i, invoice.SchoolDistrict.Name, invoiceTemplate);
+				var studentCount = district.Students.Count();
+				if (studentCount > 0)
+					CloneStudentItemizationSheets(wb, studentCount, i, district.SchoolDistrict.Name, invoiceTemplate);
 			}
 
-			if (invoices[0].Students.Count == 0)
-			{
+			if (districts[0].Students.Count() == 0)
 				wb.Worksheets.RemoveAt(1);
-			}
-			// generate xlsx
 
 			foreach (var sheet in wb.Worksheets)
 				sheet.PageSetup.SetFooter(1, "&P");
 
-			var data = new
-			{
-				SchoolYear = create.SchoolYear,
-				FirstYear = int.Parse(create.SchoolYear.Split("-")[0]),
-				SecondYear = int.Parse(create.SchoolYear.Split("-")[1]),
-				AsOf = create.BulkInvoice.AsOf,
-				AsOfMonth = create.BulkInvoice.AsOf.ToString("MMMM"),
-				AsOfYear = create.BulkInvoice.AsOf.Year,
-				ScopeMonth = new DateTime(DateTime.Now.Year, int.Parse(create.BulkInvoice.Scope.Substring(5, 2)), 1).ToString("MMMM"),
-				ScopeYear = int.Parse(create.BulkInvoice.Scope.Substring(0, 4)),
-				Prepared = time,
-				ToSchoolDistrict = toSchoolDate,
-				ToPDE = toPDEDate,
-				Districts = invoices.Select(i => new
-				{
-					Number = i.Number,
-					SchoolDistrict = i.SchoolDistrict,
-					Students = i.Students,
-					RegularEnrollments = i.RegularEnrollments,
-					SpecialEnrollments = i.SpecialEnrollments,
-					Transactions = i.Transactions
-				}),
-			};
-
-			var json = JsonConvert.SerializeObject(data);
+			// generate xlsx
+			var json = JsonConvert.SerializeObject(invoice);
 			wb = _exporter.Export(wb, JsonConvert.DeserializeObject(json));
 
 			// create report
@@ -508,55 +405,111 @@ namespace api.Controllers
 			{ }
 		}
 
-		private Report CreateStudentInformation(CreateReport create)
+		private Report CreateInvoice(DateTime time, Template template, CreateReport create)
 		{
-			var sourceReport = _reports.Get(create.Name);
-			if (sourceReport == null)
-				throw new NotFoundException(typeof(Report), create.Name);
-
-			var name = create.Name + "_ACTIVITY";
-			var wb = BuildActivityWorkbook(name, new[] { sourceReport });
-
-			Report report;
-			using (var xlsxStream = new MemoryStream())
-			using (var pdfStream = new MemoryStream())
+			var report = CreateBulkInvoice(time, template, new CreateReport
 			{
-				wb.CalculateFormula();
-				wb.Save(xlsxStream, SaveFormat.Xlsx);
-				wb.Save(pdfStream, SaveFormat.Pdf);
+				ReportType = create.ReportType,
+				Name = create.Name,
+				SchoolYear = create.SchoolYear,
+				TemplateId = create.TemplateId,
 
-				report = new Report
+				BulkInvoice = new CreateBulkInvoiceReport
 				{
-					Type = ReportType.StudentInformation,
-					SchoolYear = create.SchoolYear,
-					Scope = sourceReport.Scope,
-					Name = name,
-					Approved = true,
-					Created = DateTime.Now,
-					Xlsx = xlsxStream.ToArray(),
-					Pdf = pdfStream.ToArray(),
-				};
-			}
+					Scope = create.Invoice.Scope,
+					AsOf = create.Invoice.AsOf,
+					ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
+					ToPDE = create.Invoice.ToPDE,
+					Auns = new[] { create.Invoice.SchoolDistrictAun },
+				},
+			});
 
+			report.Type = ReportType.Invoice;
 			return report;
 		}
 
+		private Report CreateInvoice(DateTime time, CreateReport create)
+		{
+			var template = _templates.Get(create.TemplateId.Value);
+			if (template == null)
+				throw new MissingTemplateException(create.TemplateId.Value);
+
+			return CreateInvoice(time, template, create);
+		}
+
+		private Report CreateInvoice(CreateReport create) => CreateInvoice(DateTime.Now, create);
+
+		private static IList<string> studentInformationColumns = new List<string>
+		{
+			"Number",
+			"SchoolDistrict",
+			"StudentName",
+			"Address",
+			"CityStateZip",
+			"BirthDate",
+			"GradeLevel",
+			"FirstDateEducated",
+			"LastDateEducated",
+			"SPED",
+			"CurrentIEP",
+			"PriorIEP",
+		};
+
 		private Report CreateBulkStudentInformation(CreateReport create)
 		{
-			var type = create.BulkStudentInformation.Type;
-			var reports = _reports.GetMany(
-				// type: type == null ? null : ReportType.FromString(type),
-				type: ReportType.FromString("Invoice"),
-				year: create.SchoolYear,
-				scope: create.BulkStudentInformation.Scope,
-				approved: create.BulkStudentInformation.Approved
-			);
+			var reporter = _reporters.CreateBulkStudentInformationReporter(_context);
+			var result = reporter.GenerateReport(new BulkStudentInformationReporter.Config
+			{
+				Scope = create.BulkStudentInformation.Scope,
+				AsOf = create.BulkStudentInformation.AsOf,
+				Auns = create.BulkStudentInformation.Auns,
+			});
 
-			if (reports == null)
-				throw new NotFoundException();
+			var wb = new Workbook();
+			var ws = wb.Worksheets[0];
 
-			var name = create.Name;
-			var wb = BuildActivityWorkbook(name, reports);
+			var style = wb.CreateStyle();
+			style.Number = 14;
+			var styleFlag = new StyleFlag();
+			styleFlag.NumberFormat = true;
+
+			// column headers
+			for (var i = 0; i < studentInformationColumns.Count; i++)
+			{
+				var column = studentInformationColumns[i];
+				ws.Cells[0, i].PutValue(column);
+
+				if (new[] { "BirthDate", "FirstDateEducated", "LastDateEducated", "CurrentIEP", "PriorIEP" }.Contains(column))
+					ws.Cells.Columns[i].ApplyStyle(style, styleFlag);
+			}
+
+			var districtGroups = result.Students.GroupBy(s => s.SchoolDistrictName);
+			var r = 1;
+			foreach (var group in districtGroups)
+			{
+				var students = group.ToList();
+				for (var i = 0; i < students.Count; i++)
+				{
+					var student = students[i];
+
+					var c = 0;
+					var cells = ws.Cells;
+					cells[r, c++].PutValue(i + 1);
+					cells[r, c++].PutValue(student.SchoolDistrictName);
+					cells[r, c++].PutValue(student.FullName);
+					cells[r, c++].PutValue(student.Address1);
+					cells[r, c++].PutValue(student.CityStateZipCode);
+					cells[r, c++].PutValue(student.DateOfBirth);
+					cells[r, c++].PutValue(student.Grade);
+					cells[r, c++].PutValue(student.FirstDay);
+					cells[r, c++].PutValue(student.LastDay);
+					cells[r, c++].PutValue(student.IsSpecialEducation ? "Y" : "N");
+					cells[r, c++].PutValue(student.CurrentIep);
+					cells[r, c++].PutValue(student.FormerIep);
+
+					r++;
+				}
+			}
 
 			Report report;
 			using (var xlsxStream = new MemoryStream())
@@ -570,15 +523,37 @@ namespace api.Controllers
 				{
 					Type = ReportType.BulkStudentInformation,
 					SchoolYear = create.SchoolYear,
-					Name = name,
+					Name = create.Name,
 					Approved = true,
 					Created = DateTime.Now,
 					Scope = create.BulkStudentInformation.Scope,
+					Data = JsonConvert.SerializeObject(result),
 					Xlsx = xlsxStream.ToArray(),
 					Pdf = pdfStream.ToArray(),
 				};
 			}
 
+			return report;
+		}
+
+		private Report CreateStudentInformation(CreateReport create)
+		{
+			var report = CreateBulkStudentInformation(new CreateReport
+			{
+				ReportType = create.ReportType,
+				Name = create.Name,
+				SchoolYear = create.SchoolYear,
+				TemplateId = create.TemplateId,
+
+				BulkStudentInformation = new CreateBulkStudentInformationReport
+				{
+					Scope = create.StudentInformation.Scope,
+					AsOf = create.StudentInformation.AsOf,
+					Auns = new[] { create.StudentInformation.SchoolDistrictAun },
+				},
+			});
+
+			report.Type = ReportType.StudentInformation;
 			return report;
 		}
 
@@ -620,6 +595,9 @@ namespace api.Controllers
 				}
 				else if (create.ReportType == ReportType.StudentInformation.Value)
 				{
+					if (create.StudentInformation == null)
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create student information without 'student information' config."));
+
 					report = CreateStudentInformation(create);
 				}
 				else if (create.ReportType == ReportType.BulkStudentInformation.Value)
@@ -660,60 +638,6 @@ namespace api.Controllers
 				Report = new ReportDto(report),
 			});
 		}
-
-		[HttpPost("bulk")]
-		[Authorize(Policy = "PAY+")]
-		[ProducesResponseType(typeof(ReportResponse), 200)]
-		[ProducesResponseType(typeof(ErrorsResponse), 400)]
-		[ProducesResponseType(409)]
-		[ProducesResponseType(424)]
-		[SwaggerResponse(statusCode: 501, description: "Not Implemented")] // Swashbuckle sees this as "Server Error".
-		public async Task<IActionResult> CreateBulk([FromBody]CreateReport create) => await Create(create);
-
-		public class GetActivityArgs
-		{
-			public string Name { get; set; }
-			public string SchoolYear { get; set; }
-		}
-
-		[HttpGet("activity/name")]
-		[Authorize(Policy = "PAY+")]
-		[Produces(ContentTypes.XLSX, ContentTypes.PDF)]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(typeof(ErrorsResponse), 400)]
-		[ProducesResponseType(404)]
-		public async Task<IActionResult> GetActivity([FromQuery]GetActivityArgs args)
-			=> await Create(new CreateReport
-			{
-				Name = args.Name,
-				ReportType = ReportType.StudentInformation.Value,
-				SchoolYear = args.SchoolYear,
-			});
-
-		public class GetBulkActivityArgs : GetActivityArgs
-		{
-			public string Type { get; set; }
-			public bool? Approved { get; set; }
-		}
-
-		[HttpGet("activity")]
-		[Authorize(Policy = "PAY+")]
-		[Produces(ContentTypes.XLSX, ContentTypes.PDF)]
-		[ProducesResponseType(204)]
-		[ProducesResponseType(typeof(ErrorsResponse), 400)]
-		[ProducesResponseType(404)]
-		public async Task<IActionResult> GetBulkActivity([FromQuery]GetBulkActivityArgs args)
-			=> await Create(new CreateReport
-			{
-				Name = args.Name,
-				ReportType = ReportType.BulkStudentInformation.Value,
-				SchoolYear = args.SchoolYear,
-				BulkStudentInformation = new CreateBulkStudentInformationReport
-				{
-					Type = args.Type,
-					Approved = args.Approved,
-				},
-			});
 
 		public class CreateManyInvoiceReports
 		{
@@ -787,107 +711,6 @@ namespace api.Controllers
 
 		private static readonly object _lock = new object();
 
-		public delegate string HeaderMapper(string key);
-
-		public static string MapStudentActivityHeaderKeyToValue(string key)
-		{
-			Dictionary<string, string> _labels = new Dictionary<string, string>
-			{
-				{ "Number", "Number" },
-				{ "SchoolDistrict","School District" },
-				{ "StudentName","Student Name" },
-				{ "Address", "Address" },
-				{ "CityStateZip", "City, State Zip" },
-				{ "BirthDate", "Birth Date" },
-				{ "GradeLevel", "Grade Level" },
-				{ "FirstDateEducated", "First Date Educated" },
-				{ "LastDateEducated", "Last Date Educated" },
-				{ "SPED", "SPED" },
-				{ "CurrentIEP", "Current IEP" },
-				{ "PriorIEP", "Prior IEP" }
-			};
-
-			string value;
-			if (_labels.TryGetValue(key, out value))
-			{
-				return value;
-			}
-
-			return null;
-		}
-
-		private DataTable BuildStudentActivityDataTable(IEnumerable<Report> invoices)
-		{
-			DataTable studentActivityDataTable = new DataTable();
-
-			AddColumnsToStudentActivityDataTable(studentActivityDataTable);
-
-			foreach (var invoice in invoices)
-			{
-				var students = JObject.Parse(invoice.Data)["Students"];
-				var schoolDistrict = JObject.Parse(invoice.Data)["SchoolDistrict"];
-				var studentsJSONStr = JsonConvert.SerializeObject(students);
-
-				DataTable dt = GetDataTableFromJsonString(studentsJSONStr);
-
-				// we only want the student data...
-				AddRowsToStudentActivityDataTable(studentActivityDataTable, dt, (JObject)schoolDistrict);
-			}
-
-			return studentActivityDataTable;
-		}
-
-		private void AddColumnsToStudentActivityDataTable(DataTable dt)
-		{
-			dt.Columns.Add("Number", typeof(uint));
-			dt.Columns.Add("SchoolDistrict", typeof(string));
-			dt.Columns.Add("StudentName", typeof(string));
-			dt.Columns.Add("Address", typeof(string));
-			dt.Columns.Add("CityStateZip", typeof(string));
-			dt.Columns.Add("BirthDate", typeof(DateTime));
-			dt.Columns.Add("GradeLevel", typeof(string));
-			dt.Columns.Add("FirstDateEducated", typeof(DateTime));
-			dt.Columns.Add("LastDateEducated", typeof(DateTime));
-			dt.Columns.Add("SPED", typeof(string));
-			dt.Columns.Add("CurrentIEP", typeof(DateTime));
-			dt.Columns.Add("PriorIEP", typeof(DateTime));
-			dt.AcceptChanges();
-		}
-
-		private void AddRowsToStudentActivityDataTable(DataTable dtDest, DataTable dt, JObject schoolDistrict)
-		{
-			int i = 0;
-			foreach (var row in dt.Rows)
-			{
-				AddRowToStudentActivityDataTable(dtDest, (DataRow)row, schoolDistrict, ++i);
-			}
-		}
-
-		private void AddRowToStudentActivityDataTable(DataTable dtDest, DataRow row, JObject schoolDistrict, int index)
-		{
-			DataRow newRow = dtDest.NewRow();
-
-			newRow["Number"] = index;
-			newRow["SchoolDistrict"] = schoolDistrict["Name"];
-			newRow["StudentName"] = row["LastName"] + ", " + row["FirstName"] + " " + row["MiddleInitial"];
-			newRow["Address"] = row["Address1"];
-			newRow["CityStateZip"] = row["Address2"];
-			newRow["BirthDate"] = row["DateOfBirth"];
-			newRow["GradeLevel"] = row["Grade"];
-			newRow["FirstDateEducated"] = row["FirstDay"];
-			newRow["LastDateEducated"] = row["LastDay"];
-			newRow["SPED"] = row["IsSpecialEducation"].ToString() == "True" ? "Y" : "N";
-			newRow["CurrentIEP"] = row["CurrentIep"];
-			newRow["PriorIEP"] = row["FormerIep"];
-
-			dtDest.Rows.Add(newRow);
-		}
-
-		private DataTable GetDataTableFromJsonString(string json)
-		{
-			return JsonConvert.DeserializeObject<DataTable>(json);
-		}
-
 		[HttpPost("many")]
 		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportsResponse), 200)]
@@ -958,7 +781,7 @@ namespace api.Controllers
 
 		[HttpGet("{name}")]
 		[Authorize(Policy = "PAY+")]
-		[Produces(ContentTypes.XLSX, ContentTypes.PDF)]
+		[Produces(ContentTypes.XLSX, ContentTypes.PDF, ContentTypes.JSON)]
 		[ProducesResponseType(404)]
 		[ProducesResponseType(406)]
 		public async Task<IActionResult> Get(string name)
@@ -981,27 +804,15 @@ namespace api.Controllers
 					stream = new MemoryStream(report.Pdf);
 					break;
 				}
+				else if (v.Contains(ContentTypes.JSON))
+				{
+					return new JsonResult(JsonConvert.DeserializeObject(report.Data));
+				}
 			}
 			if (stream == null)
 				return StatusCode(406);
 
 			return new FileStreamResult(stream, accept) { FileDownloadName = report.Name };
-		}
-
-		private Workbook BuildActivityWorkbook(string name, IEnumerable<Report> reports)
-		{
-			var data = BuildStudentActivityDataTable(reports);
-			Workbook wb = new Workbook();
-
-			wb.Worksheets[0].Cells.ImportDataTable(data, true, 0, 0, true, false);
-			var style = wb.CreateStyle();
-			style.Number = 14;
-			var styleFlag = new StyleFlag();
-			styleFlag.NumberFormat = true;
-			foreach (var c in new[] { 5, 7, 8, 10, 11 })
-				wb.Worksheets[0].Cells.Columns[c].ApplyStyle(style, styleFlag);
-
-			return wb;
 		}
 
 		public class GetManyArgs
@@ -1023,27 +834,6 @@ namespace api.Controllers
 		public struct ReportsResponse
 		{
 			public IList<ReportDto> Reports { get; set; }
-		}
-
-		private void InitializeWorkbookSheetPrinterMargins(Workbook wb)
-		{
-			for (int i = 0; i < wb.Worksheets.Count; i++)
-			{
-				var sheet = wb.Worksheets[i];
-				if (sheet != null)
-				{
-					// make certain the printer margins for each sheet are zeroed out, lest
-					// we have ugly issues when printing them out.
-					sheet.PageSetup.HeaderMargin = 0.0;
-					sheet.PageSetup.FooterMargin = 0.0;
-					sheet.PageSetup.TopMargin = 0.0;
-					sheet.PageSetup.TopMargin = 0.0;
-					sheet.PageSetup.LeftMargin = 0.0;
-					sheet.PageSetup.RightMargin = 0.0;
-					sheet.PageSetup.HeaderMargin = 0.0;
-					sheet.PageSetup.FooterMargin = 0.0;
-				}
-			}
 		}
 
 		[HttpGet]
