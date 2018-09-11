@@ -9,12 +9,12 @@ export class Payment {
   id: number;
   paymentId: string;
   split: number;
-  splitAmount: number;
   date: Date;
   created: Date;
   externalId: string;
   type: PaymentType;
   amount: number;
+  splitAmount: number;
   schoolYear: string;
   schoolYearSplit: string;
   lastUpdated: Date;
