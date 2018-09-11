@@ -322,9 +322,6 @@ namespace api.Controllers
 				PaymentType = create.BulkInvoice.PaymentType,
 			});
 
-			DateTime toSchoolDate = new DateTime();
-			DateTime toPDEDate = new DateTime();
-
 			// compose workbook
 			var wb = new Workbook(new MemoryStream(invoiceTemplate.Content));
 			InitializeWorkbookSheetPrinterMargins(wb);
@@ -333,12 +330,6 @@ namespace api.Controllers
 			for (int i = 0; i < districts.Count; i++)
 			{
 				var district = districts[i];
-
-				if (i == 0)
-				{
-					toSchoolDate = invoice.ToSchoolDistrict;
-					toPDEDate = invoice.ToPDE;
-				}
 
 				if (i > 0)
 					CloneInvoiceSummarySheet(wb, i, district.SchoolDistrict.Name);
