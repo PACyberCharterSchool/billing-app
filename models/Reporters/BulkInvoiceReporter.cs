@@ -194,23 +194,14 @@ namespace models.Reporters
 			DateTime asOf)
 		{
 			var payments = _context.Payments.
+				Where(p => auns.Contains(p.SchoolDistrict.Aun)).
 				Where(p => p.SchoolYear == schoolYear).
-				Select(p => new InvoicePayment
-				{
-					Type = p.Type.Value,
-					CheckNumber = p.ExternalId,
-					CheckAmount = p.Type == PaymentType.Check ? (decimal?)p.Amount : null,
-					UniPayAmount = p.Type == PaymentType.UniPay ? (decimal?)p.Amount : null,
-					Date = p.Date,
-				}).ToList();
+				ToList();
 
 			var refunds = _context.Refunds.
+				Where(p => auns.Contains(p.SchoolDistrict.Aun)).
 				Where(r => r.SchoolYear == schoolYear).
-				Select(r => new
-				{
-					Amount = r.Amount,
-					Date = r.Date,
-				}).ToList();
+				ToList();
 
 			var result = new Dictionary<int, InvoiceTransactions>();
 			foreach (var aun in auns)
@@ -231,11 +222,23 @@ namespace models.Reporters
 
 					property.SetValue(transactions, new InvoiceTransaction
 					{
-						Payment = payments.SingleOrDefault(p => p.Date >= start && p.Date <= end),
+						Payment = payments.
+							Where(p => p.SchoolDistrict.Aun == aun).
+							Where(p => p.Date >= start && p.Date <= end).
+							Select(p => new InvoicePayment
+							{
+								Type = p.Type.Value,
+								CheckNumber = p.ExternalId,
+								CheckAmount = p.Type == PaymentType.Check ? (decimal?)p.Amount : null,
+								UniPayAmount = p.Type == PaymentType.UniPay ? (decimal?)p.Amount : null,
+								Date = p.Date,
+							}).
+							FirstOrDefault(),
 						Refund = refunds.
+							Where(r => r.SchoolDistrict.Aun == aun).
 							Where(r => r.Date >= start && r.Date <= end).
 							Select(r => (decimal?)r.Amount).
-							SingleOrDefault(),
+							FirstOrDefault(),
 					});
 				}
 
