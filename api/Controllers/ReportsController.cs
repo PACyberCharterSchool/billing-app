@@ -140,10 +140,6 @@ namespace api.Controllers
 			[RegularExpression(@"^\d{4}\-\d{4}$")]
 			public string SchoolYear { get; set; }
 
-			// TODO(Erik): get rid of this: use ReportType/SchoolYear
-			[Range(1, int.MaxValue)]
-			public int? TemplateId { get; set; }
-
 			public CreateInvoiceReport Invoice { get; set; }
 			public CreateBulkInvoiceReport BulkInvoice { get; set; }
 			public CreateStudentInformationReport StudentInformation { get; set; }
@@ -342,22 +338,15 @@ namespace api.Controllers
 		private Report CreateBulkInvoice(DateTime time, CreateReport create)
 		{
 			// get template
-			var invoiceTemplate = _templates.Get(create.TemplateId.Value);
+			var invoiceTemplate = _templates.Get(ReportType.BulkInvoice, create.SchoolYear);
 			if (invoiceTemplate == null)
-				throw new MissingTemplateException(create.TemplateId.Value);
+				throw new MissingTemplateException(ReportType.BulkInvoice, create.SchoolYear);
 
 
 			return CreateBulkInvoice(time, invoiceTemplate, create);
 		}
 
 		private Report CreateBulkInvoice(CreateReport create) => CreateBulkInvoice(DateTime.Now, create);
-
-		private class MissingTemplateException : Exception
-		{
-			public MissingTemplateException(int templateId) :
-				base($"Could not find template with Id '{templateId}'.")
-			{ }
-		}
 
 		private Report CreateInvoice(DateTime time, Template template, CreateReport create)
 		{
@@ -366,7 +355,6 @@ namespace api.Controllers
 				ReportType = create.ReportType,
 				Name = create.Name,
 				SchoolYear = create.SchoolYear,
-				TemplateId = create.TemplateId,
 
 				BulkInvoice = new CreateBulkInvoiceReport
 				{
@@ -384,9 +372,9 @@ namespace api.Controllers
 
 		private Report CreateInvoice(DateTime time, CreateReport create)
 		{
-			var template = _templates.Get(create.TemplateId.Value);
+			var template = _templates.Get(ReportType.BulkInvoice, create.SchoolYear);
 			if (template == null)
-				throw new MissingTemplateException(create.TemplateId.Value);
+				throw new MissingTemplateException(ReportType.BulkInvoice, create.SchoolYear);
 
 			return CreateInvoice(time, template, create);
 		}
@@ -497,7 +485,6 @@ namespace api.Controllers
 				ReportType = create.ReportType,
 				Name = create.Name,
 				SchoolYear = create.SchoolYear,
-				TemplateId = create.TemplateId,
 
 				BulkStudentInformation = new CreateBulkStudentInformationReport
 				{
@@ -532,18 +519,12 @@ namespace api.Controllers
 					if (create.Invoice == null)
 						return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without 'invoice' config."));
 
-					if (!create.TemplateId.HasValue)
-						return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without template ID."));
-
 					report = CreateInvoice(create);
 				}
 				else if (create.ReportType == ReportType.BulkInvoice.Value)
 				{
 					if (create.BulkInvoice == null)
 						return new BadRequestObjectResult(new ErrorsResponse("Cannot create bulk invoice without 'bulk invoice' config."));
-
-					if (!create.TemplateId.HasValue)
-						return new BadRequestObjectResult(new ErrorsResponse("Cannot create bulk invoice without template ID."));
 
 					report = CreateBulkInvoice(create);
 				}
@@ -618,18 +599,14 @@ namespace api.Controllers
 			[RegularExpression(@"^\d{4}\-\d{4}$")]
 			public string SchoolYear { get; set; }
 
-			[Required]
-			[Range(1, int.MaxValue)]
-			public int TemplateId { get; set; }
-
 			public CreateManyInvoiceReports Invoice { get; set; }
 		}
 
 		private IList<Report> CreateManyInvoices(CreateManyReports create)
 		{
-			var invoiceTemplate = _templates.Get(create.TemplateId);
+			var invoiceTemplate = _templates.Get(ReportType.BulkInvoice, create.SchoolYear);
 			if (invoiceTemplate == null)
-				throw new MissingTemplateException(create.TemplateId);
+				throw new MissingTemplateException(ReportType.BulkInvoice, create.SchoolYear);
 
 			var reports = new List<Report>();
 			var now = DateTime.Now;
@@ -647,7 +624,6 @@ namespace api.Controllers
 						ReportType = create.ReportType,
 						Name = $"{create.Invoice.Scope}_{sd.Name}_{stamp}",
 						SchoolYear = create.SchoolYear,
-						TemplateId = create.TemplateId,
 						Invoice = new CreateInvoiceReport
 						{
 							Scope = create.Invoice.Scope,
