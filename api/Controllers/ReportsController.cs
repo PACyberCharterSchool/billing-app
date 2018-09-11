@@ -140,14 +140,23 @@ namespace api.Controllers
 			[RegularExpression(@"^\d{4}\-\d{4}$")]
 			public string SchoolYear { get; set; }
 
-			// TODO(Erik): get rid of this: use ReportType/SchoolYear
-			[Range(1, int.MaxValue)]
-			public int? TemplateId { get; set; }
-
 			public CreateInvoiceReport Invoice { get; set; }
 			public CreateBulkInvoiceReport BulkInvoice { get; set; }
 			public CreateStudentInformationReport StudentInformation { get; set; }
 			public CreateBulkStudentInformationReport BulkStudentInformation { get; set; }
+		}
+
+		private void StyleInvoiceWorksheet(Worksheet sheet)
+		{
+			sheet.PageSetup.SetFooter(1, "&P");
+			sheet.PageSetup.HeaderMargin = 0.0;
+			sheet.PageSetup.FooterMargin = 0.0;
+			sheet.PageSetup.TopMargin = 0.0;
+			sheet.PageSetup.TopMargin = 0.0;
+			sheet.PageSetup.LeftMargin = 0.0;
+			sheet.PageSetup.RightMargin = 0.0;
+			sheet.PageSetup.HeaderMargin = 0.0;
+			sheet.PageSetup.FooterMargin = 0.0;
 		}
 
 		private void CloneInvoiceSummarySheet(Workbook src, Workbook wb, int districtIndex, string districtName)
@@ -156,6 +165,7 @@ namespace api.Controllers
 			var sheet = wb.Worksheets.Last();
 			sheet.Copy(src.Worksheets[0]);
 			sheet.Name = $"{districtName.Substring(0, Math.Min(districtName.Length, 17))} Summary Info";
+			StyleInvoiceWorksheet(sheet);
 
 			// all subsequent pages will be numbered starting from here
 			sheet.PageSetup.FirstPageNumber = 1;
@@ -197,16 +207,7 @@ namespace api.Controllers
 				var sheet = wb.Worksheets.Last();
 				sheet.Copy(src.Worksheets[1]);
 				sheet.Name = $"{districtName.Substring(0, Math.Min(districtName.Length, 15))} St. Info({s + 1})";
-
-				// TODO(Erik): this is done before we enter this function; remove these lines
-				sheet.PageSetup.HeaderMargin = 0.0;
-				sheet.PageSetup.FooterMargin = 0.0;
-				sheet.PageSetup.BottomMargin = 0.0;
-				sheet.PageSetup.TopMargin = 0.0;
-				sheet.PageSetup.LeftMargin = 0.0;
-				sheet.PageSetup.RightMargin = 0.0;
-				sheet.PageSetup.HeaderMargin = 0.0;
-				sheet.PageSetup.FooterMargin = 0.0;
+				StyleInvoiceWorksheet(sheet);
 
 				var cells = sheet.Cells;
 				for (int r = 0; r < cells.MaxDataRow + 1; r++)
@@ -273,27 +274,6 @@ namespace api.Controllers
 			return 13;
 		}
 
-		private void InitializeWorkbookSheetPrinterMargins(Workbook wb)
-		{
-			for (int i = 0; i < wb.Worksheets.Count; i++)
-			{
-				var sheet = wb.Worksheets[i];
-				if (sheet != null)
-				{
-					// make certain the printer margins for each sheet are zeroed out, lest
-					// we have ugly issues when printing them out.
-					sheet.PageSetup.HeaderMargin = 0.0;
-					sheet.PageSetup.FooterMargin = 0.0;
-					sheet.PageSetup.TopMargin = 0.0;
-					sheet.PageSetup.TopMargin = 0.0;
-					sheet.PageSetup.LeftMargin = 0.0;
-					sheet.PageSetup.RightMargin = 0.0;
-					sheet.PageSetup.HeaderMargin = 0.0;
-					sheet.PageSetup.FooterMargin = 0.0;
-				}
-			}
-		}
-
 		private Report CreateBulkInvoice(DateTime time, Template invoiceTemplate, CreateReport create)
 		{
 			var reporter = _reporters.CreateBulkInvoiceReporter(_context);
@@ -312,7 +292,6 @@ namespace api.Controllers
 			// compose workbook
 			var source = new Workbook(new MemoryStream(invoiceTemplate.Content));
 			var wb = new Workbook();
-			InitializeWorkbookSheetPrinterMargins(wb);
 
 			var districts = invoice.Districts.ToList();
 			for (int i = 0; i < districts.Count; i++)
@@ -324,9 +303,6 @@ namespace api.Controllers
 				if (studentCount > 0)
 					CloneStudentItemizationSheets(source, wb, studentCount, i, district.SchoolDistrict.Name, invoiceTemplate);
 			}
-
-			foreach (var sheet in wb.Worksheets)
-				sheet.PageSetup.SetFooter(1, "&P");
 
 			// generate xlsx
 			var json = JsonConvert.SerializeObject(invoice);
@@ -362,22 +338,15 @@ namespace api.Controllers
 		private Report CreateBulkInvoice(DateTime time, CreateReport create)
 		{
 			// get template
-			var invoiceTemplate = _templates.Get(create.TemplateId.Value);
+			var invoiceTemplate = _templates.Get(ReportType.BulkInvoice, create.SchoolYear);
 			if (invoiceTemplate == null)
-				throw new MissingTemplateException(create.TemplateId.Value);
+				throw new MissingTemplateException(ReportType.BulkInvoice, create.SchoolYear);
 
 
 			return CreateBulkInvoice(time, invoiceTemplate, create);
 		}
 
 		private Report CreateBulkInvoice(CreateReport create) => CreateBulkInvoice(DateTime.Now, create);
-
-		private class MissingTemplateException : Exception
-		{
-			public MissingTemplateException(int templateId) :
-				base($"Could not find template with Id '{templateId}'.")
-			{ }
-		}
 
 		private Report CreateInvoice(DateTime time, Template template, CreateReport create)
 		{
@@ -386,7 +355,6 @@ namespace api.Controllers
 				ReportType = create.ReportType,
 				Name = create.Name,
 				SchoolYear = create.SchoolYear,
-				TemplateId = create.TemplateId,
 
 				BulkInvoice = new CreateBulkInvoiceReport
 				{
@@ -404,9 +372,9 @@ namespace api.Controllers
 
 		private Report CreateInvoice(DateTime time, CreateReport create)
 		{
-			var template = _templates.Get(create.TemplateId.Value);
+			var template = _templates.Get(ReportType.BulkInvoice, create.SchoolYear);
 			if (template == null)
-				throw new MissingTemplateException(create.TemplateId.Value);
+				throw new MissingTemplateException(ReportType.BulkInvoice, create.SchoolYear);
 
 			return CreateInvoice(time, template, create);
 		}
@@ -517,7 +485,6 @@ namespace api.Controllers
 				ReportType = create.ReportType,
 				Name = create.Name,
 				SchoolYear = create.SchoolYear,
-				TemplateId = create.TemplateId,
 
 				BulkStudentInformation = new CreateBulkStudentInformationReport
 				{
@@ -552,18 +519,12 @@ namespace api.Controllers
 					if (create.Invoice == null)
 						return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without 'invoice' config."));
 
-					if (!create.TemplateId.HasValue)
-						return new BadRequestObjectResult(new ErrorsResponse("Cannot create invoice without template ID."));
-
 					report = CreateInvoice(create);
 				}
 				else if (create.ReportType == ReportType.BulkInvoice.Value)
 				{
 					if (create.BulkInvoice == null)
 						return new BadRequestObjectResult(new ErrorsResponse("Cannot create bulk invoice without 'bulk invoice' config."));
-
-					if (!create.TemplateId.HasValue)
-						return new BadRequestObjectResult(new ErrorsResponse("Cannot create bulk invoice without template ID."));
 
 					report = CreateBulkInvoice(create);
 				}
@@ -638,18 +599,14 @@ namespace api.Controllers
 			[RegularExpression(@"^\d{4}\-\d{4}$")]
 			public string SchoolYear { get; set; }
 
-			[Required]
-			[Range(1, int.MaxValue)]
-			public int TemplateId { get; set; }
-
 			public CreateManyInvoiceReports Invoice { get; set; }
 		}
 
 		private IList<Report> CreateManyInvoices(CreateManyReports create)
 		{
-			var invoiceTemplate = _templates.Get(create.TemplateId);
+			var invoiceTemplate = _templates.Get(ReportType.BulkInvoice, create.SchoolYear);
 			if (invoiceTemplate == null)
-				throw new MissingTemplateException(create.TemplateId);
+				throw new MissingTemplateException(ReportType.BulkInvoice, create.SchoolYear);
 
 			var reports = new List<Report>();
 			var now = DateTime.Now;
@@ -667,7 +624,6 @@ namespace api.Controllers
 						ReportType = create.ReportType,
 						Name = $"{create.Invoice.Scope}_{sd.Name}_{stamp}",
 						SchoolYear = create.SchoolYear,
-						TemplateId = create.TemplateId,
 						Invoice = new CreateInvoiceReport
 						{
 							Scope = create.Invoice.Scope,
