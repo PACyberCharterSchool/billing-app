@@ -262,30 +262,6 @@ namespace api.Controllers
 			return 13;
 		}
 
-		private string GenerateSchoolYear(string scope)
-		{
-			string year;
-
-			if (scope.Contains(@"\d{4}-\d{4}"))
-			{
-				year = scope;
-			}
-			else
-			{
-				var components = scope.Split('.');
-				if (new[] { 7, 8, 9, 10, 11, 12 }.Contains(int.Parse(components[1])))
-				{
-					year = $"{components[0]}-{int.Parse(components[0]) + 1}";
-				}
-				else
-				{
-					year = $"{int.Parse(components[0]) - 1}-{components[0]}";
-				}
-			}
-
-			return year;
-		}
-
 		private void InitializeWorkbookSheetPrinterMargins(Workbook wb)
 		{
 			for (int i = 0; i < wb.Worksheets.Count; i++)
