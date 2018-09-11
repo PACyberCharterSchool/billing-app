@@ -218,7 +218,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
         'reportType': 'BulkInvoice',
         'schoolYear': this.selectedCreateSchoolYear.replace(/\s+/g, ''),
         'name': this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope),
-        'templateId': this.selectedCreateTemplate.id,
+        // 'templateId': this.selectedCreateTemplate.id,
         'bulkInvoice': {
           'asOf': this.selectedAsOfBillingDate,
           'toSchoolDistrict': this.selectedAsOfBillingDate,

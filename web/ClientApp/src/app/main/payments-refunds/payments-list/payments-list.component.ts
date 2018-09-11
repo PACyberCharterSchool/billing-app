@@ -38,12 +38,13 @@ export class PaymentsListComponent implements OnInit {
     private schoolDistrictsService: SchoolDistrictService,
     private ngbModalService: NgbModal
   ) {
-    this.property = 'schoolDistrictName';
-    this.direction = 1;
-    this.skip = 0;
   }
 
   ngOnInit() {
+    this.property = 'schoolDistrictName';
+    this.direction = 1;
+    this.skip = 0;
+
     this.refreshPaymentList();
 
     this.schoolDistrictsService.getSchoolDistricts().subscribe(
@@ -67,6 +68,8 @@ export class PaymentsListComponent implements OnInit {
 
     if (payments.length > 1) {
       sum = payments.reduce((acc, p) => acc + p.amount, 0);
+    } else {
+      sum = payments[0].amount;
     }
 
     return sum;
@@ -100,6 +103,8 @@ export class PaymentsListComponent implements OnInit {
   resetPaymentRecords() {
     this.payments = this.allPayments;
     this.searchText = '';
+    this.skip = 0;
+    this.refreshPaymentList();
   }
 
   refreshPaymentList() {
@@ -118,8 +123,12 @@ export class PaymentsListComponent implements OnInit {
   getAdditionalPayments($event) {
     this.paymentsService.getPayments(this.skip).subscribe(
       data => {
-        this.payments = this.payments.concat(data['students']);
-        this.updateScrollingSkip();
+        if (data['payments'].length > 0) {
+          this.allPayments = this.allPayments.concat(data['payments']);
+          this.payments = this.payments.concat(data['payments'].filter((p) => p.split === 1));
+          this.updateScrollingSkip(data['payments'].length > this.globals.take ? this.globals.take : data['payments'].length);
+        }
+
         console.log('PaymentsListComponent.getPayments():  payments are ', this.payments);
       },
       error => {
@@ -162,7 +171,7 @@ export class PaymentsListComponent implements OnInit {
   }
 
   onScroll($event) {
-    this.getAdditionalPayments($event);
+    // this.getAdditionalPayments($event);
   }
 
   listDisplayableFields() {
@@ -182,7 +191,7 @@ export class PaymentsListComponent implements OnInit {
     }
   }
 
-  private updateScrollingSkip() {
-    this.skip += this.globals.take;
+  private updateScrollingSkip(updateSkip: number) {
+    this.skip += updateSkip;
   }
 }
