@@ -144,7 +144,7 @@ namespace api.Controllers
 		{
 			var wb = new Workbook(stream);
 			var sheet = wb.Worksheets[0];
-			int r, aunIndex, nameIndex, rateIndex, specialRateIndex, typeIndex;
+			int aunIndex, nameIndex, rateIndex, specialRateIndex, typeIndex;
 			FindOptions fopts = new FindOptions();
 			fopts.LookAtType = LookAtType.EntireContent;
 			fopts.LookInType = LookInType.Values;

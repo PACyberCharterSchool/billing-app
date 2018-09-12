@@ -102,12 +102,7 @@ export class PaymentUpsertFormComponent implements OnInit {
     );
   }
 
-  private updatePaymentRecord(): boolean {
-    if (this.selectedAcademicYear.replace(/\s+/g, '').toLowerCase() === this.selectedAcademicYearSplit.replace(/\s+/, '').toLowerCase()) {
-
-      return false;
-    }
-
+  private updatePaymentRecord(): void {
     this.paymentRecord.schoolDistrict = this.selectedSchoolDistrict;
     this.paymentRecord.split = this.isSplit ? 2 : 1;
     this.paymentRecord.amount = this.amount;
@@ -117,11 +112,9 @@ export class PaymentUpsertFormComponent implements OnInit {
     this.paymentRecord.date = new Date(`${this.dateModel.month}/${this.dateModel.day}/${this.dateModel.year}`);
     this.paymentRecord.schoolYear = this.selectedAcademicYear ? this.selectedAcademicYear.replace(/\s+/g, '') : null;
     this.paymentRecord.schoolYearSplit = this.selectedAcademicYearSplit ? this.selectedAcademicYearSplit.replace(/\s+/g, '') : null;
-
-    return true;
   }
 
-  upsertPayment() {
+  public onSubmit(): void {
     this.updatePaymentRecord();
     if (this.op === 'create') {
       this.paymentsService.createPayment(this.paymentRecord).subscribe(
