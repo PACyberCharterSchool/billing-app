@@ -135,17 +135,13 @@ export class ReportsService {
     return this.httpClient.get<any>(url, headers);
   }
 
-  // HTTP POST /api/activity/bulk
+  // HTTP POST /api/Reports
   public createBulkActivity(activityInfo: Object): Observable<Report> {
     activityInfo = Object.assign(activityInfo,
       {
         'reportType': 'BulkStudentInformation',
-        'bulkStudentInformation': {
-          'type': 'BulkStudentInformation',
-          'scope': activityInfo['bulkStudentInformation']['scope']
-        }
       });
-    const url = this.apiReportsUrl + '/bulk';
+    const url = this.apiReportsUrl;
     return this.httpClient.post<any>(url, activityInfo, this.headers);
 
     // return Observable.of(null);
