@@ -42,7 +42,6 @@ namespace api.Tests.Controllers
 		{
 			var create = new PaymentsController.CreateUpdatePayment
 			{
-				Date = DateTime.Now,
 				ExternalId = "bob",
 				Type = PaymentType.Check,
 				SchoolDistrictAun = 123456789,
@@ -52,11 +51,13 @@ namespace api.Tests.Controllers
 					{
 						Amount = 10m,
 						SchoolYear = "2017-2018",
+						Date = DateTime.Now
 					},
 					new PaymentsController.CreateUpdatePayment.Split
 					{
 						Amount = 20m,
 						SchoolYear = "2018-2019",
+						Date = DateTime.Now
 					},
 				}
 			};
@@ -73,7 +74,7 @@ namespace api.Tests.Controllers
 
 			_payments.Verify(ps => ps.CreateMany(It.Is<IList<Payment>>(l =>
 				l.Count == 2 &&
-					l[0].Date == create.Date &&
+					l[0].Date == create.Splits[0].Date &&
 					l[0].ExternalId == create.ExternalId &&
 					l[0].Type == create.Type &&
 					l[0].SchoolDistrict.Aun == create.SchoolDistrictAun &&
@@ -81,7 +82,7 @@ namespace api.Tests.Controllers
 					l[0].Amount == create.Splits[0].Amount &&
 					l[0].SchoolYear == create.Splits[0].SchoolYear &&
 
-					l[1].Date == create.Date &&
+					l[1].Date == create.Splits[1].Date &&
 					l[1].ExternalId == create.ExternalId &&
 					l[1].Type == create.Type &&
 					l[1].SchoolDistrict.Aun == create.SchoolDistrictAun &&
@@ -115,7 +116,6 @@ namespace api.Tests.Controllers
 		{
 			var create = new PaymentsController.CreateUpdatePayment
 			{
-				Date = DateTime.Now,
 				ExternalId = "bob",
 				Type = PaymentType.Check,
 				SchoolDistrictAun = 123456789,
@@ -125,6 +125,7 @@ namespace api.Tests.Controllers
 					{
 						Amount = 10m,
 						SchoolYear = "2017-2018",
+						Date = DateTime.Now
 					},
 				}
 			};
@@ -265,7 +266,6 @@ namespace api.Tests.Controllers
 		{
 			var update = new PaymentsController.CreateUpdatePayment
 			{
-				Date = DateTime.Now,
 				ExternalId = "bob",
 				Type = PaymentType.Check,
 				SchoolDistrictAun = 123456789,
@@ -275,11 +275,13 @@ namespace api.Tests.Controllers
 					{
 						Amount = 10m,
 						SchoolYear = "2017-2018",
+						Date = DateTime.Now
 					},
 					new PaymentsController.CreateUpdatePayment.Split
 					{
 						Amount = 20m,
 						SchoolYear = "2018-2019",
+						Date = DateTime.Now
 					},
 				}
 			};
@@ -295,7 +297,7 @@ namespace api.Tests.Controllers
 			_payments.Verify(ps => ps.UpdateMany(It.Is<IList<Payment>>(l =>
 				l.Count == 2 &&
 					l[0].PaymentId == paymentId &&
-					l[0].Date == update.Date &&
+					l[0].Date == update.Splits[0].Date &&
 					l[0].ExternalId == update.ExternalId &&
 					l[0].Type == update.Type &&
 					l[0].SchoolDistrict.Aun == update.SchoolDistrictAun &&
@@ -304,7 +306,7 @@ namespace api.Tests.Controllers
 					l[0].SchoolYear == update.Splits[0].SchoolYear &&
 
 					l[1].PaymentId == paymentId &&
-					l[1].Date == update.Date &&
+					l[1].Date == update.Splits[1].Date &&
 					l[1].ExternalId == update.ExternalId &&
 					l[1].Type == update.Type &&
 					l[1].SchoolDistrict.Aun == update.SchoolDistrictAun &&
@@ -338,7 +340,6 @@ namespace api.Tests.Controllers
 		{
 			var update = new PaymentsController.CreateUpdatePayment
 			{
-				Date = DateTime.Now,
 				ExternalId = "bob",
 				Type = PaymentType.Check,
 				SchoolDistrictAun = 123456789,
@@ -348,11 +349,13 @@ namespace api.Tests.Controllers
 					{
 						Amount = 10m,
 						SchoolYear = "2017-2018",
+						Date = DateTime.Now
 					},
 					new PaymentsController.CreateUpdatePayment.Split
 					{
 						Amount = 20m,
 						SchoolYear = "2018-2019",
+						Date = DateTime.Now
 					},
 				}
 			};
