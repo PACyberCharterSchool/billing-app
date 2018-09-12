@@ -145,12 +145,7 @@ namespace api.Controllers
 		{
 			var wb = new Workbook(stream);
 			var sheet = wb.Worksheets[0];
-<<<<<<< HEAD
 			var fopts = new FindOptions();
-=======
-			int aunIndex, nameIndex, rateIndex, specialRateIndex, typeIndex;
-			FindOptions fopts = new FindOptions();
->>>>>>> development
 			fopts.LookAtType = LookAtType.EntireContent;
 			fopts.LookInType = LookInType.Values;
 
