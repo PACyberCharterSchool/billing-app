@@ -21,6 +21,20 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { MatMenuModule, MatIconModule, MatButtonModule, MatSidenavModule } from '@angular/material';
 import { MatFormFieldModule, MatFormFieldControl, MatInputModule } from '@angular/material';
 import { MatMenu } from '@angular/material';
+import { NgxCurrencyModule } from 'ngx-currency';
+import { CurrencyMaskConfig, CURRENCY_MASK_CONFIG } from 'ngx-currency/src/currency-mask.config';
+
+export const CustomCurrencyMaskConfig: CurrencyMaskConfig = {
+    align: 'left',
+    allowNegative: false,
+    allowZero: true,
+    decimal: '.',
+    precision: 2,
+    prefix: '$',
+    suffix: '',
+    thousands: ',',
+    nullable: true
+};
 
 @NgModule({
   declarations: [
@@ -30,7 +44,7 @@ import { MatMenu } from '@angular/material';
     LoginTitleBarComponent,
     MainComponent,
     TitleBarComponent,
-    NavMenuComponent,
+    NavMenuComponent
   ],
   exports: [],
   imports: [
@@ -46,9 +60,11 @@ import { MatMenu } from '@angular/material';
     StudentsModule,
     AdministrationModule,
     ReportsInvoicesModule,
-    PaymentsRefundsModule
+    PaymentsRefundsModule,
+    NgxCurrencyModule
   ],
   providers: [
+    { provide: CURRENCY_MASK_CONFIG, useValue: CustomCurrencyMaskConfig }
   ]
 })
 

@@ -20,6 +20,13 @@ form {
           width: 100%;
         }
       }
+
+      div.row {
+        div.col-5 {
+          position: relative;
+          top: 5px;
+        }
+      }
     }
   }
 }
