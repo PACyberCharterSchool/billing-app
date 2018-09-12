@@ -194,9 +194,7 @@ export class InvoiceCreateFormComponent implements OnInit {
       reportType: ReportType.Invoice,
       name: this.selectedScope + '_INVOICE_' + this.selectedSchoolDistrict.name,
       schoolYear: this.selectedSchoolYear.replace(/\s+/g, ''),
-      templateId: this.selectedInvoiceTemplate.id,
       invoice: {
-        // asOf: new Date(`${this.asOfDate.month}/${this.asOfDate.day}/${this.asOfDate.year}`),
         asOf: new Date(Date.now()).toLocaleDateString('en-US'),
         toSchoolDistrict: new Date(`${this.toSchoolDistrictDate.month}/${this.toSchoolDistrictDate.day}/${this.toSchoolDistrictDate.year}`),
         toPDE: new Date(`${this.toPDEDate.month}/${this.toPDEDate.day}/${this.toPDEDate.year}`),
@@ -211,9 +209,7 @@ export class InvoiceCreateFormComponent implements OnInit {
     return {
       reportType: ReportType.Invoice,
       schoolYear: this.selectedSchoolYear.replace(/\s+/g, ''),
-      templateId: this.selectedInvoiceTemplate.id,
       invoice: {
-        // asOf: new Date(`${this.asOfDate.month}/${this.asOfDate.day}/${this.asOfDate.year}`),
         asOf: new Date(Date.now()).toLocaleDateString('en-US'),
         toSchoolDistrict: new Date(`${this.toSchoolDistrictDate.month}/${this.toSchoolDistrictDate.day}/${this.toSchoolDistrictDate.year}`),
         toPDE: new Date(`${this.toPDEDate.month}/${this.toPDEDate.day}/${this.toPDEDate.year}`),

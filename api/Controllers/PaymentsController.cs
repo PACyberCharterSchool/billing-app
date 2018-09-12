@@ -44,9 +44,6 @@ namespace api.Controllers
 		public struct CreateUpdatePayment
 		{
 			[Required]
-			public DateTime Date { get; set; }
-
-			[Required]
 			[MinLength(1)]
 			public string ExternalId { get; set; }
 
@@ -60,6 +57,9 @@ namespace api.Controllers
 
 			public struct Split
 			{
+				[Required]
+				public DateTime Date { get; set; }
+
 				[Required]
 				[Range(0, double.PositiveInfinity)]
 				public decimal Amount { get; set; }
@@ -95,7 +95,7 @@ namespace api.Controllers
 
 				payments.Add(new Payment
 				{
-					Date = create.Date,
+					Date = split.Date,
 					ExternalId = create.ExternalId,
 					Type = create.Type,
 					SchoolDistrict = _districts.GetByAun(create.SchoolDistrictAun),
@@ -168,7 +168,7 @@ namespace api.Controllers
 				payments.Add(new Payment
 				{
 					PaymentId = id,
-					Date = update.Date,
+					Date = split.Date,
 					ExternalId = update.ExternalId,
 					Type = update.Type,
 					SchoolDistrict = _districts.GetByAun(update.SchoolDistrictAun),

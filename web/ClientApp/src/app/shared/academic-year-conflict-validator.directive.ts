@@ -25,6 +25,8 @@ const academicYearConflictValidator: ValidatorFn = (control: AbstractControl): V
   const academicYear: AbstractControl = control.get('academicYear');
   const academicYearSplit: AbstractControl = control.get('academicYearSplit');
 
-  return academicYear && academicYearSplit && academicYear.value === academicYearSplit.value ?
+  return academicYear &&
+    academicYearSplit &&
+    academicYear.value.replace(/\s+/, '').toLowerCase() === academicYearSplit.value.replace(/\s+/, '').toLowerCase() ?
     { 'appAcademicYearConflictValidator': true } : null;
 };

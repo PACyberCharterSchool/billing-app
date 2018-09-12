@@ -61,9 +61,9 @@ export class PaymentsService {
   private fillSplitsColumn(payment: Payment) {
     let splits: Object[];
 
-    splits = [{ 'amount': payment.amount, 'schoolYear': payment.schoolYear.replace(/\s/g, '') }];
+    splits = [{ 'date': payment.date, 'amount': payment.amount, 'schoolYear': payment.schoolYear.replace(/\s/g, '') }];
     if (payment.splitAmount) {
-      splits.push({ 'amount': payment.splitAmount, 'schoolYear': payment.schoolYearSplit });
+      splits.push({ 'date': payment.date, 'amount': payment.splitAmount, 'schoolYear': payment.schoolYearSplit });
     }
 
     return splits;

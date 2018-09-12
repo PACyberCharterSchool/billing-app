@@ -28,7 +28,6 @@ export class StudentActivityListComponent implements OnInit {
   public selectedCreateScope: string;
   public selectedCreateSchoolYear: string;
   public spinnerMsg: string;
-  public selectedAsOfBillingDate: Date;
   public scopes: string[];
 
   constructor(
@@ -145,9 +144,7 @@ export class StudentActivityListComponent implements OnInit {
         'schoolYear': this.selectedCreateSchoolYear.replace(/\s+/g, ''),
         'name': this.generateBulkActivityName(this.selectedCreateSchoolYear, this.selectedCreateScope),
         'bulkStudentInformation': {
-          'asOf': this.selectedAsOfBillingDate,
-          'toSchoolDistrict': this.selectedAsOfBillingDate,
-          'toPDE': this.selectedAsOfBillingDate,
+          'asOf': new Date(Date.now()).toLocaleString('en-US'),
           'scope': this.selectedCreateScope
         }
       }
