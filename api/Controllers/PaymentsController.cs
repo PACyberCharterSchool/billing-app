@@ -13,6 +13,11 @@ using Newtonsoft.Json;
 
 using api.Dtos;
 using models;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using CsvHelper;
+using Aspose.Cells;
+using System.Text.RegularExpressions;
 
 namespace api.Controllers
 {
@@ -183,6 +188,124 @@ namespace api.Controllers
 			}
 
 			return Ok();
+		}
+
+		private static Dictionary<string, (int Number, bool First)> _months = new Dictionary<string, (int Number, bool First)>
+		{
+			{"July", (7, true)},
+			{"August", (8, true)},
+			{"September", (9, true)},
+			{"October", (10, true)},
+			{"November", (11, true)},
+			{"December", (12, true)},
+			{"January", (1, false)},
+			{"February", (2, false)},
+			{"March", (3, false)},
+			{"April", (4, false)},
+			{"May", (5, false)},
+			{"June", (6, false)},
+		};
+
+		private static IList<Payment> XlsxToPayments(ISchoolDistrictRepository districts, Stream stream)
+		{
+			var wb = new Workbook(stream);
+			var sheet = wb.Worksheets[0];
+
+			const int aunIndex = 0;
+			const int amountIndex = 3;
+
+			var amountHeader = sheet.Cells[0, amountIndex].StringValue.Trim();
+			const string pattern = @"^(\w+) (\d{4}).*$";
+			var matches = Regex.Matches(amountHeader, pattern);
+			if (matches.Count != 1)
+				throw new ArgumentException($"Column {amountIndex + 1} header has invalid format. Expected '{pattern}'.");
+
+			var groups = matches[0].Groups;
+			var month = _months[groups[1].Value];
+			var year = int.Parse(groups[2].Value);
+			string schoolYear;
+			if (month.First)
+				schoolYear = $"{year}-{year + 1}";
+			else
+				schoolYear = $"{year - 1}-{year}";
+
+			var payments = new List<Payment>();
+			for (var i = 1; i < sheet.Cells.MaxDataRow; i++)
+			{
+				var row = sheet.Cells.GetRow(i);
+				if (row == null || row.IsBlank)
+					continue;
+
+				payments.Add(new Payment
+				{
+					Split = 1,
+					Date = new DateTime(year, month.Number, 1),
+					ExternalId = "PDE",
+					Type = PaymentType.UniPay,
+					Amount = (decimal)sheet.Cells[i, amountIndex].DoubleValue,
+					SchoolYear = schoolYear,
+					SchoolDistrict = districts.GetByAun(sheet.Cells[i, aunIndex].IntValue),
+				});
+			}
+
+			return payments;
+		}
+
+		private static Dictionary<string, Func<ISchoolDistrictRepository, Stream, IList<Payment>>> _parsers =
+			new Dictionary<string, Func<ISchoolDistrictRepository, Stream, IList<Payment>>>
+			{
+				{"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", XlsxToPayments},
+			};
+
+		[HttpPut]
+		[Authorize(Policy = "PAY+")]
+		[ProducesResponseType(typeof(PaymentsResponse), 201)]
+		[ProducesResponseType(typeof(ErrorResponse), 400)]
+		[ProducesResponseType(typeof(ErrorResponse), 409)]
+		public async Task<IActionResult> Upload(IFormFile file)
+		{
+			if (file == null)
+				return new BadRequestObjectResult(
+					new ErrorResponse($"Could not find parameter named '{nameof(file)}'."));
+
+			if (!_parsers.ContainsKey(file.ContentType))
+				return new BadRequestObjectResult(
+					new ErrorResponse($"Invalid file Content-Type '{file.ContentType}'."));
+
+			var parse = _parsers[file.ContentType];
+			IList<Payment> payments;
+			try
+			{
+				payments = parse(_districts, file.OpenReadStream());
+			}
+			catch (ArgumentException e)
+			{
+				return new BadRequestObjectResult(new ErrorResponse(e));
+			}
+
+			using (var tx = _context.Database.BeginTransaction())
+			{
+				try
+				{
+					payments = await Task.Run(() => _context.SaveChanges(() => _payments.CreateMany(payments)));
+					tx.Commit();
+				}
+				catch (DbUpdateException)
+				{
+					tx.Rollback();
+					return new StatusCodeResult(409);
+				}
+				catch (Exception)
+				{
+					tx.Rollback();
+					throw;
+				}
+			}
+
+			return new CreatedResult($"/api/schooldistricts", new PaymentsResponse
+			{
+				Payments = payments.Select(p => new PaymentDto(p)).ToList(),
+			});
 		}
 	}
 }
