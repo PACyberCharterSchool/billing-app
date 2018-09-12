@@ -34,7 +34,7 @@ namespace models
 		private static string HashPayment(Payment payment)
 		{
 			var bytes = Encoding.UTF8.GetBytes(
-				$"{payment.Date}-{payment.ExternalId}-{payment.Type}-{payment.SchoolDistrict}");
+				$"{payment.Date}-{payment.ExternalId}-{payment.Type}-{payment.SchoolDistrict.Aun}");
 			var hash = SHA256.Create().ComputeHash(bytes);
 
 			var sb = new StringBuilder();
