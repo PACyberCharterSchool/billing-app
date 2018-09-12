@@ -140,25 +140,20 @@ namespace api.Controllers
 				return reader.GetRecords<SchoolDistrict>().ToList();
 			}
 		}
+
 		private static IList<SchoolDistrict> XlsxToDistricts(Stream stream)
 		{
 			var wb = new Workbook(stream);
 			var sheet = wb.Worksheets[0];
-			int r, aunIndex, nameIndex, rateIndex, specialRateIndex, typeIndex;
-			FindOptions fopts = new FindOptions();
+			var fopts = new FindOptions();
 			fopts.LookAtType = LookAtType.EntireContent;
 			fopts.LookInType = LookInType.Values;
 
-			Cell cell = sheet.Cells.Find("AUN", null, fopts);
-			aunIndex = cell.Column;
-			cell = sheet.Cells.Find("School District", null, fopts);
-			nameIndex = cell.Column;
-			cell = sheet.Cells.Find("Nonspecial", null, fopts);
-			rateIndex = cell.Column;
-			cell = sheet.Cells.Find("Special", null, fopts);
-			specialRateIndex = cell.Column;
-			cell = sheet.Cells.Find("PaymentType", null, fopts);
-			typeIndex = cell.Column;
+			var aunIndex = sheet.Cells.Find("AUN", null, fopts).Column;
+			var nameIndex = sheet.Cells.Find("School District", null, fopts).Column;
+			var rateIndex = sheet.Cells.Find("Nonspecial", null, fopts).Column;
+			var specialRateIndex = sheet.Cells.Find("Special", null, fopts).Column;
+			var typeIndex = sheet.Cells.Find("PaymentType", null, fopts).Column;
 
 			var districts = new List<SchoolDistrict>();
 			for (var i = 1; i <= sheet.Cells.MaxDataRow; i++)
@@ -170,7 +165,7 @@ namespace api.Controllers
 				var ptype = sheet.Cells[i, typeIndex].StringValue;
 				districts.Add(new SchoolDistrict
 				{
-					Aun = (int) sheet.Cells[i, aunIndex].IntValue,
+					Aun = (int)sheet.Cells[i, aunIndex].IntValue,
 					Name = sheet.Cells[i, nameIndex].StringValue,
 					Rate = (decimal)sheet.Cells[i, rateIndex].DoubleValue,
 					SpecialEducationRate = (decimal)sheet.Cells[i, specialRateIndex].DoubleValue,
