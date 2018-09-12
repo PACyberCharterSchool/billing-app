@@ -5,7 +5,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <form #refundUpsertForm='ngForm' (ngSubmit)='upsertRefund()'>
+  <form #refundUpsertForm='ngForm' (ngSubmit)='refundUpsertForm.form.valid && upsertRefund()'>
     <div class='modal-body'>
       <div class='col-md-12 payment-not-upserted-error' [style.visibility]="upsertError ? 'visible' : 'hidden'">
         Refund error:  {{upsertError}}
