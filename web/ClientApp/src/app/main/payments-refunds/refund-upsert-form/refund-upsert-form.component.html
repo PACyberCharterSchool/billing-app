@@ -5,7 +5,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <form #refundUpsertForm='ngForm' (ngSubmit)='refundUpsertForm.form.valid && upsertRefund()'>
+  <form #refundUpsertForm='ngForm' (ngSubmit)='refundUpsertForm.form.valid && onSubmit()'>
     <div class='modal-body'>
       <div class='col-md-12 payment-not-upserted-error' [style.visibility]="upsertError ? 'visible' : 'hidden'">
         Refund error:  {{upsertError}}
@@ -17,7 +17,7 @@
             </div>
             <div class='col-md-6'>
               <label for='typeahead-school-district'></label>
-              <input id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='selectedSchoolDistrictName' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
+              <input required id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='selectedSchoolDistrictName' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
             </div>
           </div>
           <div class='form-group'>
@@ -42,7 +42,7 @@
             </div>
             <div class='col-md-6'>
               <div class='input-group'>
-                <input class='form-control' placeholder='mm-dd-yyyy'
+                <input class='form-control' placeholder='mm-dd-yyyy' required
                         name='dp' [(ngModel)]='dateModel' ngbDatepicker #d='ngbDatepicker' (ngModelChange)='onDateChanged()'>
                 <div class='input-group-append'>
                   <button class='btn btn-outline-secondary' (click)='d.toggle()' type='button'>
@@ -66,7 +66,7 @@
             </div>
               <div class='col-md-6'>
                 <div ngbDropdown class='d-inline-block'>
-                <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown'>{{selectedAcademicYear}}</button>
+                <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown' required>{{selectedAcademicYear}}</button>
                 <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown'>
                   <button type='button' class='dropdown-item' *ngFor='let y of schoolYears' (click)='setSelectedAcademicYear(y)'>{{y}}</button>
                 </div>

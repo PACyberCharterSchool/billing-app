@@ -80,7 +80,7 @@ export class RefundUpsertFormComponent implements OnInit {
     this.selectedSchoolDistrictName = this.selectedSchoolDistrict.name;
   }
 
-  updateRefundRecord() {
+  private updateRefundRecord(): void {
     this.refundRecord.amount = this.amount;
     this.refundRecord.checkNumber = this.refundCheckNumber;
     this.refundRecord.schoolYear = this.selectedAcademicYear;
@@ -88,7 +88,7 @@ export class RefundUpsertFormComponent implements OnInit {
     this.refundRecord.schoolDistrict = this.schoolDistricts.find((sd) => sd.name === this.selectedSchoolDistrictName);
   }
 
-  upsertRefund() {
+  public onSubmit(): void {
     this.updateRefundRecord();
     if (this.op === 'create') {
       this.refundsService.createRefund(this.refundRecord).subscribe(
