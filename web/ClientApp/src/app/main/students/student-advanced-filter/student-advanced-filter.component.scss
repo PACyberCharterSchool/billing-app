@@ -1,6 +1,11 @@
-.advanced-school-district-col,
-.advanced-grade-col,
-.advanced-dob-col,
-.advanced-iep-col {
-  display: inline-block;
+div.row {
+  div.alert {
+    margin-top: 10px;
+    padding-top: 4px;
+    margin-bottom: 0;
+    padding-bottom: 4px;
+  }
+
+  padding-bottom: 4px;
+  padding-top: 4px;
 }

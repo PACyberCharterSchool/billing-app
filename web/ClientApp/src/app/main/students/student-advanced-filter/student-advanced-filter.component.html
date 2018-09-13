@@ -44,4 +44,7 @@
     </div>
   </div>
 </div>
+<div class='row align-items-center justify-content-center' *ngIf='!isEnrollmentDateValid()'>
+  <div [style.visibility]="isEnrollmentDateValid() ? 'hidden' : 'visible'" class='col-auto alert alert-danger'>{{advancedFilterErrorMsg}}</div>
+</div>
 <ngx-spinner size='large' loadingText='Retrieving student records for scope {{scope}} from PACBill database.  Please wait...' type='timer'></ngx-spinner>

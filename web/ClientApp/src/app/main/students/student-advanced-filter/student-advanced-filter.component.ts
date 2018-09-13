@@ -29,6 +29,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
   public selectedGrade: string;
   public selectedSchoolDistrict: string;
   public selectedIep: string;
+  public advancedFilterErrorMsg: string;
 
   @Input() schoolDistricts: SchoolDistrict[];
   @Input() allStudentRecords: StudentRecord[];
@@ -53,6 +54,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
     this.selectedGrade = 'Select';
     this.selectedSchoolDistrict = 'Select';
     this.selectedIep = 'Select';
+    this.advancedFilterErrorMsg = '';
   }
 
   public initAllFilterControls(): void {
@@ -67,6 +69,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
     this.selectedGrade = 'Select';
     this.selectedSchoolDistrict = 'Select';
     this.selectedIep = 'Select';
+    this.advancedFilterErrorMsg = '';
   }
 
   public dateSelectedDOBDateHandler(date: Date) {
@@ -89,17 +92,21 @@ export class StudentAdvancedFilterComponent implements OnInit {
     this.startDate = date;
     this.ngxSpinnerService.show();
     if (this.endDate) {
-      this.studentRecordsService.getHeaderByScopeByStartByEnd(this.scope, this.startDate, this.endDate).subscribe(
-        data => {
-          this.studentsUpdated.emit(data['header']['records']);
-          console.log('StudentAdvancedFilter.dateSelectedStartDateHandler():  data is ', data['header']['records']);
-          this.ngxSpinnerService.hide();
-        },
-        error => {
-          console.log('StudentAdvancedFilter.dateSelectedStartDateHandler():  error is ', error);
-          this.ngxSpinnerService.hide();
-        }
-      );
+      if (this.startDate <= this.endDate) {
+        this.studentRecordsService.getHeaderByScopeByStartByEnd(this.scope, this.startDate, this.endDate).subscribe(
+          data => {
+            this.studentsUpdated.emit(data['header']['records']);
+            console.log('StudentAdvancedFilter.dateSelectedStartDateHandler():  data is ', data['header']['records']);
+            this.ngxSpinnerService.hide();
+          },
+          error => {
+            console.log('StudentAdvancedFilter.dateSelectedStartDateHandler():  error is ', error);
+            this.ngxSpinnerService.hide();
+          }
+        );
+      } else {
+        this.ngxSpinnerService.hide();
+      }
     } else {
       this.studentRecordsService.getHeaderByScopeByStart(this.scope, this.startDate).subscribe(
         data => {
@@ -119,17 +126,21 @@ export class StudentAdvancedFilterComponent implements OnInit {
     this.endDate = date;
     this.ngxSpinnerService.show();
     if (this.startDate) {
-      this.studentRecordsService.getHeaderByScopeByStartByEnd(this.scope, this.startDate, date).subscribe(
-        data => {
-          console.log('StudentAdvancedFilterComponent.dateSelectedEndDateHandler():  data is ', data['header']['records']);
-          this.studentRecords = data['header']['records'];
-          this.ngxSpinnerService.hide();
-        },
-        error => {
-          console.log('StudentAdvancedFilterComponent.dateSelectedEndDateHandler():  error is ', error);
-          this.ngxSpinnerService.hide();
-        }
-      );
+      if (this.startDate <= this.endDate) {
+        this.studentRecordsService.getHeaderByScopeByStartByEnd(this.scope, this.startDate, date).subscribe(
+          data => {
+            console.log('StudentAdvancedFilterComponent.dateSelectedEndDateHandler():  data is ', data['header']['records']);
+            this.studentRecords = data['header']['records'];
+            this.ngxSpinnerService.hide();
+          },
+          error => {
+            console.log('StudentAdvancedFilterComponent.dateSelectedEndDateHandler():  error is ', error);
+            this.ngxSpinnerService.hide();
+          }
+        );
+      } else {
+        this.ngxSpinnerService.hide();
+      }
     } else {
       this.studentRecordsService.getHeaderByScopeByEnd(this.scope, date).subscribe(
         data => {
@@ -145,7 +156,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
     }
   }
 
-  filterBySchoolDistrict(schoolId: number) {
+  public filterBySchoolDistrict(schoolId: number) {
     this.selectedSchoolDistrict = this.schoolDistricts.find((s) => +s.aun === schoolId).name;
     this.ngxSpinnerService.show();
     this.studentRecordsService.getHeaderByScopeBySchoolDistrict(this.scope, schoolId).subscribe(
@@ -160,7 +171,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
     );
   }
 
-  filterByGrade(grade: number) {
+  public filterByGrade(grade: number) {
     if (grade) {
       this.selectedGrade = grade.toString();
       this.ngxSpinnerService.show();
@@ -178,7 +189,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
     }
   }
 
-  filterByDateOfBirth(dob: Date) {
+  public filterByDateOfBirth(dob: Date) {
     if (dob) {
       this.ngxSpinnerService.show();
       this.studentRecordsService.getHeaderByScopeByDob(this.scope, dob).subscribe(
@@ -195,7 +206,7 @@ export class StudentAdvancedFilterComponent implements OnInit {
     }
   }
 
-  filterByIep(iep: boolean) {
+  public filterByIep(iep: boolean) {
     this.selectedIep = iep ? 'Yes' : 'No';
     this.ngxSpinnerService.show();
     this.studentRecordsService.getHeaderByScopeByIep(this.scope, iep).subscribe(
@@ -209,5 +220,16 @@ export class StudentAdvancedFilterComponent implements OnInit {
         this.ngxSpinnerService.hide();
       }
     );
+  }
+
+  public isEnrollmentDateValid(): boolean {
+    const result: boolean =
+      (!this.startDate || (this.startDate && !this.endDate) || (this.startDate && this.endDate && this.startDate <= this.endDate));
+
+    if (!result) {
+      this.advancedFilterErrorMsg = 'Specified enrollment date is after withdrawal date.';
+    }
+
+    return result;
   }
 }
