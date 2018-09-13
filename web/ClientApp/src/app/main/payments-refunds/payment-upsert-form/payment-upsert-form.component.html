@@ -24,7 +24,7 @@
                 <label>School District Name</label>
               </div>
               <div class='col-5'>
-                <div [style.visibility]="typeaheadSchoolDistrict.invalid && (typeaheadSchoolDistrict.dirty || typeaheadSchoolDistrict.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+                <div [style.visibility]="((paymentUpsertForm.submitted && typeaheadSchoolDistrict.invalid) || (typeaheadSchoolDistrict.invalid && (typeaheadSchoolDistrict.dirty || typeaheadSchoolDistrict.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
               </div>
             </div>
           </div>
@@ -47,7 +47,7 @@
                 <label>Payment Amount</label>
               </div>
               <div class='col-5'>
-                <div [style.visibility]="paymentAmount.invalid && (paymentAmount.dirty || paymentAmount.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+                <div [style.visibility]="((paymentUpsertForm.submitted && paymentAmount.invalid) || (paymentAmount.invalid && (paymentAmount.dirty || paymentAmount.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
               </div>
             </div>
           </div>
@@ -62,7 +62,7 @@
                 <label>Payment Date</label>
               </div>
               <div class='col-5'>
-                <div [style.visibility]="dValue.invalid && (dValue.dirty || dValue.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+                <div [style.visibility]="((paymentUpsertForm.submitted && dValue.invalid) || (dValue.invalid && (dValue.dirty || dValue.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
               </div>
             </div>
           </div>
@@ -85,7 +85,7 @@
                 <label>Check # or UniPay Id</label>
               </div>
               <div class='col-5'>
-                <div [style.visibility]="paymentId.invalid && (paymentId.dirty || paymentId.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+                <div [style.visibility]="((paymentUpsertForm.submitted && paymentId.invalid) || (paymentId.invalid && (paymentId.dirty || paymentId.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
               </div>
             </div>
           </div>
@@ -124,7 +124,7 @@
                       <label>Split Amount</label>
                     </div>
                     <div class='col-5'>
-                      <div [style.visibility]="splitPaymentAmount.invalid && (splitPaymentAmount.dirty || splitPaymentAmount.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+                      <div [style.visibility]="((paymentUpsertForm.submitted && splitPaymentAmount.invalid) || (splitPaymentAmount.invalid && (splitPaymentAmount.dirty || splitPaymentAmount.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
                     </div>
                   </div>
                 </div>
@@ -168,7 +168,7 @@
     <div class='modal-footer'>
       <div class='form-group'>
         <button type='button' class='btn btn-outline' (click)='activeModal.close("Close click")'>CANCEL</button>
-        <button type='submit' class='btn btn-primary' [disabled]='!paymentUpsertForm.form.valid'>{{op | uppercase}}</button>
+        <button type='submit' class='btn btn-primary'>{{op | uppercase}}</button>
       </div>
     </div>
   </form>

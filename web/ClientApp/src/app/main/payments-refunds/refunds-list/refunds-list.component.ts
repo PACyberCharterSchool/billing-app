@@ -121,7 +121,7 @@ export class RefundsListComponent implements OnInit {
   }
 
   createRefund() {
-    const modal = this.ngbModalService.open(RefundUpsertFormComponent, { centered: true });
+    const modal = this.ngbModalService.open(RefundUpsertFormComponent, { centered: true, size: 'lg' });
     modal.componentInstance.op = 'create';
     modal.componentInstance.schoolDistricts = this.schoolDistricts;
 

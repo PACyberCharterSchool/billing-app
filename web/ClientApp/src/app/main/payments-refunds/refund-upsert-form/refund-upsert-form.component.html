@@ -16,7 +16,7 @@
             <label>School District Name</label>
           </div>
           <div class='col-3'>
-            <div [style.visibility]="schoolDistrictName.invalid && (schoolDistrictName.dirty || schoolDistrictName.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+            <div [style.visibility]="((refundUpsertForm.submitted && schoolDistrictName.invalid) || (schoolDistrictName.invalid && (schoolDistrictName.dirty || schoolDistrictName.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
           </div>
           <div class='col-6'>
             <input required id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='selectedSchoolDistrictName' #schoolDistrictName='ngModel' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
@@ -37,7 +37,7 @@
             <label>Refund Amount</label>
           </div>
           <div class='col-3'>
-            <div [style.visibility]="refundAmount.invalid && (refundAmount.dirty || refundAmount.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+            <div [style.visibility]="((refundUpsertForm.submitted && refundAmount.invalid) || (refundAmount.invalid && (refundAmount.dirty || refundAmount.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
           </div>
           <div class='col-6'>
             <input currencyMask class='form-control' id='refundAmount' name='refundAmount' [(ngModel)]='amount' required #refundAmount='ngModel' />
@@ -48,7 +48,7 @@
             <label>Refund Date</label>
           </div>
           <div class='col-3'>
-            <div [style.visibility]="paymentDate.invalid && (paymentDate.dirty || paymentDate.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+            <div [style.visibility]="((refundUpsertForm.submitted && paymentDate.invalid) || (paymentDate.invalid && (paymentDate.dirty || paymentDate.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
           </div>
           <div class='col-6'>
             <div class='input-group'>
@@ -67,7 +67,7 @@
             <label>SD #</label>
           </div>
           <div class='col-3'>
-            <div [style.visibility]="paymentId.invalid && (paymentId.dirty || paymentId.touched) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+            <div [style.visibility]="((refundUpsertForm.submitted && paymentId.invalid) || (paymentId.invalid && (paymentId.dirty || paymentId.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
           </div>
           <div class='col-6'>
             <input type='text' class='form-control' id='refund-check-number' name='refund-check-number' [(ngModel)]='refundCheckNumber' #paymentId='ngModel' required />
