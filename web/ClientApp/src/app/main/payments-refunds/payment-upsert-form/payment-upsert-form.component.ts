@@ -109,9 +109,10 @@ export class PaymentUpsertFormComponent implements OnInit {
   }
 
   private areAcademicYearsEqual(): boolean {
-    return this.selectedAcademicYear &&
-      this.selectedAcademicYearSplit &&
-      this.selectedAcademicYear.replace(/\s+/, '').toLowerCase() === this.selectedAcademicYearSplit.replace(/\s+/, '').toLowerCase();
+    const str1 = this.selectedAcademicYear.replace(/\s+/g, '').toLowerCase();
+    const str2 = this.selectedAcademicYearSplit.replace(/\s+/g, '').toLowerCase();
+    const result: boolean = str1 === str2;
+    return this.selectedAcademicYear && this.selectedAcademicYearSplit && result;
   }
 
   private updatePaymentRecord(): void {
