@@ -45,6 +45,26 @@ export class PaymentsService {
     return this.httpClient.put<Payment>(url, reqBody, this.headers);
   }
 
+  public updatePDEPayments(paymentData: FormData): Observable<Payment[]> {
+    const url = this.apiPaymentsUrl + `?file=${paymentData}`;
+    return this.httpClient.put<any>(url, this.serializePDEPaymentRequestBodyObject(paymentData));
+  }
+
+  private serializePDEPaymentRequestBodyObject(paymentData: FormData): Object {
+    Object.keys(paymentData).forEach(
+      k => {
+        const v = paymentData[k];
+        if (typeof(v) === 'object') {
+          paymentData.set(k, JSON.stringify(v));
+        } else {
+          paymentData.set(k, v);
+        }
+      }
+    );
+
+    return paymentData;
+  }
+
   private buildPaymentRequestBodyObject(payment: Payment) {
     const requestObject = Object.assign({}, {
       id: payment.paymentId,

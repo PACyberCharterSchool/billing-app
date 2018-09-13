@@ -7,14 +7,12 @@ import { SchoolDistrictService } from '../../../services/school-district.service
 import { Payment } from '../../../models/payment.model';
 import { SchoolDistrict } from '../../../models/school-district.model';
 
-import { NormalizeFieldNamePipe } from '../../../pipes/normalize-field-name.pipe';
-
 import { PaymentUpsertFormComponent } from '../payment-upsert-form/payment-upsert-form.component';
 
 import { Globals } from '../../../globals';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { pseudoRandomBytes } from 'crypto';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-payments-list',
@@ -30,12 +28,14 @@ export class PaymentsListComponent implements OnInit {
   public payments: Payment[];
   private schoolDistricts: SchoolDistrict[];
   private skip: number;
+  private selectedBulkImportFile;
 
   constructor(
     private globals: Globals,
     private utilitiesService: UtilitiesService,
     private paymentsService: PaymentsService,
     private schoolDistrictsService: SchoolDistrictService,
+    private ngxSpinnerService: NgxSpinnerService,
     private ngbModalService: NgbModal
   ) {
   }
@@ -188,6 +188,50 @@ export class PaymentsListComponent implements OnInit {
       const selected = this.utilitiesService.pick(payment, vkeys);
 
       return this.utilitiesService.objectValues(selected);
+    }
+  }
+
+  public importPDEPayments(dlgContent): void {
+    this.ngbModalService.open(dlgContent, { centered: true }).result.then(
+      (result) => {
+        this.refreshPaymentList();
+      },
+      (reason) => {
+        console.log('AdministrationTemplateListComponent.importTemplate():  reason is ', reason);
+      }
+    );
+  }
+
+  public setImportPaymentsUrl($event): void {
+    if ($event) {
+      if ($event.target.files && $event.target.files.length > 0) {
+        this.selectedBulkImportFile = $event.target.files;
+      }
+    }
+  }
+
+  doImport(): void {
+    if (this.selectedBulkImportFile) {
+      const importData = new FormData();
+
+      importData.append(
+        'file',
+        this.selectedBulkImportFile[0],
+      );
+
+      this.ngxSpinnerService.show();
+      this.paymentsService.updatePDEPayments(importData).subscribe(
+        data => {
+          console.log('PaymentListComponent.doImport():  ', data['schoolDistricts']);
+          this.ngxSpinnerService.hide();
+          this.refreshPaymentList();
+        },
+        error => {
+          console.log('PaymentListComponent.doImport():  ', error);
+          this.ngxSpinnerService.hide();
+          this.refreshPaymentList();
+        }
+      );
     }
   }
 
