@@ -6,31 +6,24 @@
 
 form {
   .modal-body {
-    div.col-md-12 {
+    div.col-12 {
       padding: 0;
-    }
-  }
 
-  div.form-group {
-    display: flex;
-
-    div.col-md-6 {
-      display: flex;
-      align-items: center;
-      padding-left: 0;
-      padding-right: 0;
-
-      div.d-inline-block {
-        width: 100%;
-
-        button {
-          width: 100%;
+      div.form-group {
+        div.col-3 {
+          div.alert {
+            position: relative;
+            top: 7px;
+          };
         }
 
-        div.dropdown-menu {
-          height: 120px;
-          overflow-y: scroll;
-          width: 100%;
+        div.col-6 {
+          div.d-inline-block {
+            width: 100%;
+            button#academicYearDropdown {
+              width: 100%;
+            }
+          }
         }
       }
     }

@@ -1,4 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ElementRef, ViewChildren } from '@angular/core';
+
+import { NgForm } from '@angular/forms';
 
 import { Observable } from 'rxjs/Observable';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
@@ -35,6 +37,8 @@ export class PaymentUpsertFormComponent implements OnInit {
   public upsertError: string;
   public checkNumber: string;
   public payment: Payment;
+  public academicYearVisibility: boolean;
+  public academicYearSplitVisibility: boolean;
 
   @Input() op: string;
   @Input() schoolDistricts: SchoolDistrict[];
@@ -51,6 +55,8 @@ export class PaymentUpsertFormComponent implements OnInit {
   ngOnInit() {
     console.log('op is ', this.op);
     console.log('schoolDistricts are ', this.schoolDistricts);
+    this.academicYearVisibility = false;
+    this.academicYearSplitVisibility = false;
 
     this.schoolYears = this.academicYearsService.getAcademicYears();
 
@@ -102,6 +108,12 @@ export class PaymentUpsertFormComponent implements OnInit {
     );
   }
 
+  private areAcademicYearsEqual(): boolean {
+    return this.selectedAcademicYear &&
+      this.selectedAcademicYearSplit &&
+      this.selectedAcademicYear.replace(/\s+/, '').toLowerCase() === this.selectedAcademicYearSplit.replace(/\s+/, '').toLowerCase();
+  }
+
   private updatePaymentRecord(): void {
     this.paymentRecord.schoolDistrict = this.selectedSchoolDistrict;
     this.paymentRecord.split = this.isSplit ? 2 : 1;
@@ -114,7 +126,13 @@ export class PaymentUpsertFormComponent implements OnInit {
     this.paymentRecord.schoolYearSplit = this.selectedAcademicYearSplit ? this.selectedAcademicYearSplit.replace(/\s+/g, '') : null;
   }
 
-  public onSubmit(): void {
+  public onSubmit(form: NgForm): void {
+    if (this.areAcademicYearsEqual()) {
+      this.academicYearSplitVisibility = true;
+      this.academicYearVisibility = true;
+      return;
+    }
+
     this.updatePaymentRecord();
     if (this.op === 'create') {
       this.paymentsService.createPayment(this.paymentRecord).subscribe(
@@ -147,10 +165,12 @@ export class PaymentUpsertFormComponent implements OnInit {
 
   setSelectedAcademicYear(year: string) {
     this.selectedAcademicYear = year;
+    this.academicYearVisibility = this.academicYearSplitVisibility = false;
   }
 
   setSelectedAcademicYearSplit(year: string) {
     this.selectedAcademicYearSplit = year;
+    this.academicYearSplitVisibility = this.academicYearVisibility = false;
   }
 
   onDateChanged() {
