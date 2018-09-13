@@ -20,7 +20,7 @@ import { PaymentsRefundsComponent } from './payments-refunds.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { NgxCurrencyModule } from 'ngx-currency';
-
+import { NgxSpinnerModule } from 'ngx-spinner';
 @NgModule({
   declarations: [
     PaymentsRefundsComponent,
@@ -38,7 +38,8 @@ import { NgxCurrencyModule } from 'ngx-currency';
     PaymentsRefundsRoutingModule,
     SharedModule,
     NgbModule,
-    NgxCurrencyModule
+    NgxCurrencyModule,
+    NgxSpinnerModule
   ],
   providers: [ ],
   entryComponents: [ PaymentUpsertFormComponent, RefundUpsertFormComponent ]

@@ -19,6 +19,7 @@ import { SchoolDistrictService } from '../../../services/school-district.service
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 import { NgbModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgxSpinnerModule } from 'ngx-spinner';
 
 describe('PaymentsComponent', () => {
   let component: PaymentsComponent;
@@ -27,7 +28,7 @@ describe('PaymentsComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ PaymentsComponent, PaymentsListComponent, NormalizeFieldNamePipe, NormalizeFieldValuePipe, OrderByPipe ],
-      imports: [ FormsModule, InfiniteScrollModule, NgbModule.forRoot(), RouterTestingModule ],
+      imports: [ FormsModule, InfiniteScrollModule, NgbModule.forRoot(), NgxSpinnerModule, RouterTestingModule ],
       providers: [ Globals, UtilitiesService, PaymentsService, SchoolDistrictService, HttpClient, HttpHandler, NgbModal ]
     })
     .compileComponents();

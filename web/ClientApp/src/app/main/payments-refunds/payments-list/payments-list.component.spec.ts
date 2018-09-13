@@ -23,6 +23,8 @@ import {
   NgbModal
 } from '@ng-bootstrap/ng-bootstrap';
 
+import { NgxSpinnerModule } from 'ngx-spinner';
+
 describe('PaymentsListComponent', () => {
   let component: PaymentsListComponent;
   let fixture: ComponentFixture<PaymentsListComponent>;
@@ -30,7 +32,7 @@ describe('PaymentsListComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ PaymentsListComponent, NormalizeFieldNamePipe, NormalizeFieldValuePipe, OrderByPipe ],
-      imports: [ FormsModule, InfiniteScrollModule, NgbModule.forRoot(), RouterTestingModule ],
+      imports: [ FormsModule, InfiniteScrollModule, NgbModule.forRoot(), NgxSpinnerModule, RouterTestingModule ],
       providers: [
         Globals,
         UtilitiesService,
