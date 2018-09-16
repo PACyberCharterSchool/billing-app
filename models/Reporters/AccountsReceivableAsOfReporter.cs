@@ -14,7 +14,6 @@ namespace models.Reporters
 		public string PaymentType { get; set; }
 		public decimal RegularEducationDue { get; set; }
 		public decimal SpecialEducationDue { get; set; }
-		// TODO(Erik): maybe use formulas for this stuff
 		public decimal TotalDue => RegularEducationDue + SpecialEducationDue;
 		public decimal PaidByDistrict { get; set; }
 		public decimal PaidByPDE { get; set; }
