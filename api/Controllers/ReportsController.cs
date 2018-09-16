@@ -162,11 +162,8 @@ namespace api.Controllers
 			sheet.PageSetup.HeaderMargin = 0.0;
 			sheet.PageSetup.FooterMargin = 0.0;
 			sheet.PageSetup.TopMargin = 0.0;
-			sheet.PageSetup.TopMargin = 0.0;
 			sheet.PageSetup.LeftMargin = 0.0;
 			sheet.PageSetup.RightMargin = 0.0;
-			sheet.PageSetup.HeaderMargin = 0.0;
-			sheet.PageSetup.FooterMargin = 0.0;
 		}
 
 		private void CloneInvoiceSummarySheet(Workbook src, Workbook wb, int districtIndex, string districtName)
@@ -522,14 +519,12 @@ namespace api.Controllers
 			var ws = wb.Worksheets[0];
 
 			ws.PageSetup.SetFooter(1, "Page &P of &N");
+			ws.PageSetup.SetFooter(2, result.AsOf.ToString("M/dd/yyyy"));
 			ws.PageSetup.HeaderMargin = 0.0;
 			ws.PageSetup.FooterMargin = 0.0;
-			ws.PageSetup.TopMargin = 0.0;
 			ws.PageSetup.TopMargin = 0.0;
 			ws.PageSetup.LeftMargin = 0.0;
 			ws.PageSetup.RightMargin = 0.0;
-			ws.PageSetup.HeaderMargin = 0.0;
-			ws.PageSetup.FooterMargin = 0.0;
 
 			var columnHeaders = new[] { "District", "Total Due", "Refunds", "Total Paid", "Net Due", "Payment Type" };
 
