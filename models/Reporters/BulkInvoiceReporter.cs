@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using models.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -217,22 +218,6 @@ namespace models.Reporters
 				}).ToList();
 		}
 
-		// TODO(Erik): use models/Common/Month.cs
-		private static readonly List<(string Name, int Number)> _months = new List<(string Name, int Number)>{
-				("July", 7),
-				("August", 8),
-				("September", 9),
-				("October", 10),
-				("November", 11),
-				("December", 12),
-				("January", 1),
-				("February", 2),
-				("March", 3),
-				("April", 4),
-				("May", 5),
-				("June", 6),
-			};
-
 		private IDictionary<int, InvoiceTransactions> GetInvoiceTransactions(
 			IList<int> auns,
 			string schoolYear,
@@ -256,7 +241,7 @@ namespace models.Reporters
 			foreach (var aun in auns)
 			{
 				var transactions = new InvoiceTransactions();
-				foreach (var month in _months)
+				foreach (var month in Month.AsEnumerable())
 				{
 					var property = typeof(InvoiceTransactions).GetProperty(month.Name);
 					if (asOf.IsBefore(month.Number))
@@ -331,7 +316,7 @@ namespace models.Reporters
 				var regularEnrollments = new InvoiceEnrollments();
 				var specialEnrollments = new InvoiceEnrollments();
 
-				foreach (var month in _months)
+				foreach (var month in Month.AsEnumerable())
 				{
 					var regularCount = 0;
 					var specialCount = 0;
