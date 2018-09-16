@@ -521,6 +521,16 @@ namespace api.Controllers
 			var wb = new Workbook();
 			var ws = wb.Worksheets[0];
 
+			ws.PageSetup.SetFooter(1, "Page &P of &N");
+			ws.PageSetup.HeaderMargin = 0.0;
+			ws.PageSetup.FooterMargin = 0.0;
+			ws.PageSetup.TopMargin = 0.0;
+			ws.PageSetup.TopMargin = 0.0;
+			ws.PageSetup.LeftMargin = 0.0;
+			ws.PageSetup.RightMargin = 0.0;
+			ws.PageSetup.HeaderMargin = 0.0;
+			ws.PageSetup.FooterMargin = 0.0;
+
 			var columnHeaders = new[] { "District", "Total Due", "Refunds", "Total Paid", "Net Due", "Payment Type" };
 
 			ws.Cells.Merge(0, 0, 3, columnHeaders.Length);
