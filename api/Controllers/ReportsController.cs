@@ -524,15 +524,17 @@ namespace api.Controllers
 			var columnHeaders = new[] { "District", "Total Due", "Refunds", "Total Paid", "Net Due", "Payment Type" };
 
 			ws.Cells.Merge(0, 0, 3, columnHeaders.Length);
-			ws.Cells[0, 0].PutValue($@"Pennsylvania Cyber Charter School
-			Accounts Receivable Summary Report
-			School Year {result.SchoolYear} as of {result.AsOf.ToString("MM/dd/yyyy")}");
+			ws.Cells[0, 0].PutValue("Pennsylvania Cyber Charter School\n" +
+				"Accounts Receivable Summary Report\n" +
+				$"School Year {result.SchoolYear} as of {result.AsOf.ToString("MM/dd/yyyy")}");
 			var headerStyle = new CellsFactory().CreateStyle();
 			headerStyle.HorizontalAlignment = TextAlignmentType.Center;
+			headerStyle.Font.IsBold = true;
 			ws.Cells[0, 0].SetStyle(headerStyle);
 
 			var columnHeaderStyle = new CellsFactory().CreateStyle();
-			columnHeaderStyle.BackgroundColor = Color.Gray;
+			columnHeaderStyle.Pattern = BackgroundType.Solid;
+			columnHeaderStyle.ForegroundColor = Color.DarkGray;
 			columnHeaderStyle.Font.IsBold = true;
 			columnHeaderStyle.HorizontalAlignment = TextAlignmentType.Center;
 
