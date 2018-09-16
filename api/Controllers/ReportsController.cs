@@ -563,6 +563,11 @@ namespace api.Controllers
 			var paymentTypeStyle = new CellsFactory().CreateStyle();
 			paymentTypeStyle.HorizontalAlignment = TextAlignmentType.Center;
 
+			var totalDue = 0m;
+			var totalRefunded = 0m;
+			var totalPaid = 0m;
+			var totalNetDue = 0m;
+
 			var r = 4;
 			foreach (var district in result.SchoolDistricts)
 			{
@@ -570,16 +575,39 @@ namespace api.Controllers
 				ws.Cells[r, c++].PutValue(district.Name);
 				ws.Cells[r, c++].PutValue(district.TotalDue);
 				ws.Cells[r, c - 1].SetStyle(numericSyle);
+				totalDue += district.TotalDue;
 				ws.Cells[r, c++].PutValue(district.Refunded);
 				ws.Cells[r, c - 1].SetStyle(numericSyle);
+				totalRefunded += district.Refunded;
 				ws.Cells[r, c++].PutValue(district.TotalPaid);
 				ws.Cells[r, c - 1].SetStyle(numericSyle);
+				totalPaid += district.TotalPaid;
 				ws.Cells[r, c++].PutValue(district.NetDue);
 				ws.Cells[r, c - 1].SetStyle(numericSyle);
+				totalNetDue += district.NetDue;
 				ws.Cells[r, c++].PutValue(district.PaymentType == SchoolDistrictPaymentType.Check.Value ? "SD" : "PDE");
 				ws.Cells[r, c - 1].SetStyle(paymentTypeStyle);
 				r++;
 			}
+
+			var totalsStyle = new CellsFactory().CreateStyle();
+			totalsStyle.HorizontalAlignment = TextAlignmentType.Right;
+			totalsStyle.Font.IsBold = true;
+			ws.Cells[r, 0].PutValue("Totals:");
+			ws.Cells[r, 0].SetStyle(totalsStyle);
+
+			var totalsNumericStyle = new CellsFactory().CreateStyle();
+			totalsNumericStyle.Copy(numericSyle);
+			totalsNumericStyle.SetBorder(BorderType.TopBorder, CellBorderType.Thin, Color.Black);
+
+			ws.Cells[r, 1].PutValue(totalDue);
+			ws.Cells[r, 1].SetStyle(totalsNumericStyle);
+			ws.Cells[r, 2].PutValue(totalRefunded);
+			ws.Cells[r, 2].SetStyle(totalsNumericStyle);
+			ws.Cells[r, 3].PutValue(totalPaid);
+			ws.Cells[r, 3].SetStyle(totalsNumericStyle);
+			ws.Cells[r, 4].PutValue(totalNetDue);
+			ws.Cells[r, 4].SetStyle(totalsNumericStyle);
 
 			Report report;
 			using (var xlsxStream = new MemoryStream())
