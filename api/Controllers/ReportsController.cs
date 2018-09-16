@@ -25,6 +25,7 @@ using api.Dtos;
 using models;
 using models.Reporters;
 using models.Reporters.Exporters;
+using System.Drawing;
 
 namespace api.Controllers
 {
@@ -126,6 +127,14 @@ namespace api.Controllers
 			public IList<int> Auns { get; set; }
 		}
 
+		public class CreateAccountsReceivableAsOfReport
+		{
+			[Required]
+			public DateTime AsOf { get; set; }
+
+			public IList<int> Auns { get; set; }
+		}
+
 		public class CreateReport
 		{
 			[EnumerationValidation(typeof(ReportType))]
@@ -144,6 +153,7 @@ namespace api.Controllers
 			public CreateBulkInvoiceReport BulkInvoice { get; set; }
 			public CreateStudentInformationReport StudentInformation { get; set; }
 			public CreateBulkStudentInformationReport BulkStudentInformation { get; set; }
+			public CreateAccountsReceivableAsOfReport AccountsReceivableAsOf { get; set; }
 		}
 
 		private void StyleInvoiceWorksheet(Worksheet sheet)
@@ -498,6 +508,77 @@ namespace api.Controllers
 			return report;
 		}
 
+		private Report CreateAccountsReceivableAsOf(CreateReport create)
+		{
+			var reporter = _reporters.CreateAccountsReceivableAsOfReporter(_context);
+			var result = reporter.GenerateReport(new AccountsReceivableAsOfReporter.Config
+			{
+				SchoolYear = create.SchoolYear,
+				AsOf = create.AccountsReceivableAsOf.AsOf,
+				Auns = create.AccountsReceivableAsOf.Auns,
+			});
+
+			var wb = new Workbook();
+			var ws = wb.Worksheets[0];
+
+			var columnHeaders = new[] { "District", "Total Due", "Refunds", "Total Paid", "Net Due", "Payment Type" };
+
+			ws.Cells.Merge(0, 0, 3, columnHeaders.Length);
+			ws.Cells[0, 0].PutValue($@"Pennsylvania Cyber Charter School
+			Accounts Receivable Summary Report
+			School Year {result.SchoolYear} as of {result.AsOf.ToString("MM/dd/yyyy")}");
+			var headerStyle = new CellsFactory().CreateStyle();
+			headerStyle.HorizontalAlignment = TextAlignmentType.Center;
+			ws.Cells[0, 0].SetStyle(headerStyle);
+
+			var columnHeaderStyle = new CellsFactory().CreateStyle();
+			columnHeaderStyle.BackgroundColor = Color.Gray;
+			columnHeaderStyle.Font.IsBold = true;
+			columnHeaderStyle.HorizontalAlignment = TextAlignmentType.Center;
+
+			for (var i = 0; i < columnHeaders.Length; i++)
+			{
+				ws.Cells[3, i].PutValue(columnHeaders[i]);
+				ws.Cells[3, i].SetStyle(columnHeaderStyle);
+			}
+
+			var r = 4;
+			foreach (var district in result.SchoolDistricts)
+			{
+				var c = 0;
+				ws.Cells[r, c++].PutValue(district.Name);
+				ws.Cells[r, c++].PutValue(district.TotalDue);
+				ws.Cells[r, c++].PutValue(district.Refunded);
+				ws.Cells[r, c++].PutValue(district.TotalPaid);
+				ws.Cells[r, c++].PutValue(district.NetDue);
+				ws.Cells[r, c++].PutValue(district.PaymentType);
+				r++;
+			}
+
+			Report report;
+			using (var xlsxStream = new MemoryStream())
+			using (var pdfStream = new MemoryStream())
+			{
+				wb.CalculateFormula();
+				wb.Save(xlsxStream, SaveFormat.Xlsx);
+				wb.Save(pdfStream, SaveFormat.Pdf);
+
+				report = new Report
+				{
+					Type = ReportType.AccountsReceivableAsOf,
+					SchoolYear = create.SchoolYear,
+					Name = create.Name,
+					Approved = true,
+					Created = DateTime.Now,
+					Data = JsonConvert.SerializeObject(result),
+					Xlsx = xlsxStream.ToArray(),
+					Pdf = pdfStream.ToArray(),
+				};
+			}
+
+			return report;
+		}
+
 		[HttpPost]
 		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportResponse), 200)]
@@ -541,6 +622,13 @@ namespace api.Controllers
 						return new BadRequestObjectResult(new ErrorsResponse("Cannot create bulk student information without 'bulk student information' config."));
 
 					report = CreateBulkStudentInformation(create);
+				}
+				else if (create.ReportType == ReportType.AccountsReceivableAsOf.Value)
+				{
+					if (create.AccountsReceivableAsOf == null)
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create accounts receivable as of without 'accounts receivable as of' config."));
+
+					report = CreateAccountsReceivableAsOf(create);
 				}
 				else
 				{

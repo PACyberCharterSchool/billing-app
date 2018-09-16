@@ -11,6 +11,7 @@ namespace models.Reporters
 		public int Id { get; set; }
 		public int Aun { get; set; }
 		public string Name { get; set; }
+		public string PaymentType { get; set; }
 		public decimal RegularRate { get; set; }
 		public decimal SpecialRate { get; set; }
 	}
@@ -46,6 +47,50 @@ namespace models.Reporters
 		public InvoiceTransaction April { get; set; }
 		public InvoiceTransaction May { get; set; }
 		public InvoiceTransaction June { get; set; }
+
+		private decimal GetValue(decimal? amount) => amount.HasValue ? amount.Value : 0;
+
+		public decimal CheckTotalPaid =>
+			GetValue(July?.Payment?.CheckAmount) +
+			GetValue(August?.Payment?.CheckAmount) +
+			GetValue(September?.Payment?.CheckAmount) +
+			GetValue(October?.Payment?.CheckAmount) +
+			GetValue(November?.Payment?.CheckAmount) +
+			GetValue(December?.Payment?.CheckAmount) +
+			GetValue(January?.Payment?.CheckAmount) +
+			GetValue(February?.Payment?.CheckAmount) +
+			GetValue(March?.Payment?.CheckAmount) +
+			GetValue(April?.Payment?.CheckAmount) +
+			GetValue(May?.Payment?.CheckAmount) +
+			GetValue(June?.Payment?.CheckAmount);
+
+		public decimal UniPayTotalPaid =>
+			GetValue(July?.Payment?.UniPayAmount) +
+			GetValue(August?.Payment?.UniPayAmount) +
+			GetValue(September?.Payment?.UniPayAmount) +
+			GetValue(October?.Payment?.UniPayAmount) +
+			GetValue(November?.Payment?.UniPayAmount) +
+			GetValue(December?.Payment?.UniPayAmount) +
+			GetValue(January?.Payment?.UniPayAmount) +
+			GetValue(February?.Payment?.UniPayAmount) +
+			GetValue(March?.Payment?.UniPayAmount) +
+			GetValue(April?.Payment?.UniPayAmount) +
+			GetValue(May?.Payment?.UniPayAmount) +
+			GetValue(June?.Payment?.UniPayAmount);
+
+		public decimal TotalRefunded =>
+			GetValue(July?.Refund) +
+			GetValue(August?.Refund) +
+			GetValue(September?.Refund) +
+			GetValue(October?.Refund) +
+			GetValue(November?.Refund) +
+			GetValue(December?.Refund) +
+			GetValue(January?.Refund) +
+			GetValue(February?.Refund) +
+			GetValue(March?.Refund) +
+			GetValue(April?.Refund) +
+			GetValue(May?.Refund) +
+			GetValue(June?.Refund);
 	}
 
 	public class InvoiceStudent
@@ -128,6 +173,7 @@ namespace models.Reporters
 					Id = d.Id,
 					Aun = d.Aun,
 					Name = d.Name,
+					PaymentType = d.PaymentType.Value,
 					RegularRate = d.AlternateRate != null ? d.AlternateRate.Value : d.Rate,
 					SpecialRate = d.AlternateSpecialEducationRate != null ?
 						d.AlternateSpecialEducationRate.Value :
@@ -171,6 +217,7 @@ namespace models.Reporters
 				}).ToList();
 		}
 
+		// TODO(Erik): use models/Common/Month.cs
 		private static readonly List<(string Name, int Number)> _months = new List<(string Name, int Number)>{
 				("July", 7),
 				("August", 8),

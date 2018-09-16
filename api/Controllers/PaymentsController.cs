@@ -190,6 +190,7 @@ namespace api.Controllers
 			return Ok();
 		}
 
+		// TODO(Erik): use models/Common/Month.cs
 		private static Dictionary<string, (int Number, bool First)> _months = new Dictionary<string, (int Number, bool First)>
 		{
 			{"July", (7, true)},
