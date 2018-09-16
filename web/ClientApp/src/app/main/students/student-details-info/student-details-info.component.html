@@ -9,7 +9,13 @@
           </div>
         </div>
         <div class='card-body'>
-          <form class='form' role='form' [formGroup]='studentDetailForm' (ngSubmit)='updateStudentInfo(confirmationContent)'>
+          <form
+            appEnrollmentWithdrawalDateConflictValidator
+            appFormerCurrentIepDateConflictValidator
+            class='form'
+            role='form'
+            [formGroup]='studentDetailForm'
+            (ngSubmit)='updateStudentInfo(confirmationContent)'>
             <div class='row'>
               <div class='col-6 form-group flex-nowrap' formGroupName='personalInfo'>
                 <h4>Personal Information</h4>
@@ -213,11 +219,13 @@
       <div class='col-12'>
         <p>{{updateOpMessage}}</p>
       </div>
-      <div class='align-items-center'>
-        <button type='button' class='btn btn-primary' (click)='c("OK click")'>OK</button>
-      </div>
     </div>
   </div>
   <div class='modal-footer'>
+    <div class='row align-items-end'>
+      <div class='col-12'>
+        <button type='button' class='btn btn-primary' (click)='c("OK click")'>OK</button>
+      </div>
+    </div>
   </div>
 </ng-template>

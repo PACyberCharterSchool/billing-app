@@ -182,7 +182,7 @@ export class StudentDetailsInfoComponent implements OnInit {
     this.student.schoolDistrictName = this.studentDetailForm.get('studentInfo.schoolDistrict').value;
     this.student.schoolDistrictId =
       this.schoolDistricts.find(
-        (s) => s.name.toLowerCase() === this.student.schoolDistrictName.toLowerCase()).id;
+        (s) => s.name.replace(/\s+/g, '').toLowerCase() === this.student.schoolDistrictName.replace(/\s+/g, '').toLowerCase()).id;
 
     if (this.studentDetailForm.get('studentInfo.currentIepDate').dirty) {
       if (!this.studentDetailForm.get('studentInfo.currentIepDate').value) {

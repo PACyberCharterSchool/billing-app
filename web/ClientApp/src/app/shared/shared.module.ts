@@ -8,6 +8,8 @@ import { OrderByPipe } from '../pipes/orderby.pipe';
 import { NormalizeFieldValuePipe } from '../pipes/normalize-field-value.pipe';
 import { InterpretAuditTypePipe } from '../pipes/interpret-audit-type.pipe';
 import { AcademicYearConflictValidatorDirective } from './academic-year-conflict-validator.directive';
+import { EnrollmentWithdrawalDateConflictValidatorDirective } from './enrollment-withdrawal-date-conflict-validator.directive';
+import { FormerCurrentIepDateConflictValidatorDirective } from './former-current-iep-date-conflict-validator.directive';
 
 @NgModule({
   declarations: [
@@ -15,7 +17,9 @@ import { AcademicYearConflictValidatorDirective } from './academic-year-conflict
     OrderByPipe,
     NormalizeFieldValuePipe,
     InterpretAuditTypePipe,
-    AcademicYearConflictValidatorDirective
+    AcademicYearConflictValidatorDirective,
+    EnrollmentWithdrawalDateConflictValidatorDirective,
+    FormerCurrentIepDateConflictValidatorDirective
   ],
   imports: [
     CommonModule,
@@ -27,7 +31,9 @@ import { AcademicYearConflictValidatorDirective } from './academic-year-conflict
     OrderByPipe,
     InterpretAuditTypePipe,
     InfiniteScrollModule,
-    AcademicYearConflictValidatorDirective
+    AcademicYearConflictValidatorDirective,
+    EnrollmentWithdrawalDateConflictValidatorDirective,
+    FormerCurrentIepDateConflictValidatorDirective
   ],
   providers: []
 })
