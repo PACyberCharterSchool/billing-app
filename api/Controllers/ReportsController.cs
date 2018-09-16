@@ -552,6 +552,9 @@ namespace api.Controllers
 				ws.Cells[3, i].SetStyle(columnHeaderStyle);
 			}
 
+			var paymentTypeStyle = new CellsFactory().CreateStyle();
+			paymentTypeStyle.HorizontalAlignment = TextAlignmentType.Center;
+
 			var r = 4;
 			foreach (var district in result.SchoolDistricts)
 			{
@@ -561,7 +564,8 @@ namespace api.Controllers
 				ws.Cells[r, c++].PutValue(district.Refunded);
 				ws.Cells[r, c++].PutValue(district.TotalPaid);
 				ws.Cells[r, c++].PutValue(district.NetDue);
-				ws.Cells[r, c++].PutValue(district.PaymentType);
+				ws.Cells[r, c++].PutValue(district.PaymentType == SchoolDistrictPaymentType.Check.Value ? "SD" : "PDE");
+				ws.Cells[r, c - 1].SetStyle(paymentTypeStyle);
 				r++;
 			}
 
