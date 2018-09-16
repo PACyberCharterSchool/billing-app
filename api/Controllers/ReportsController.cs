@@ -528,14 +528,22 @@ namespace api.Controllers
 
 			var columnHeaders = new[] { "District", "Total Due", "Refunds", "Total Paid", "Net Due", "Payment Type" };
 
-			ws.Cells.Merge(0, 0, 3, columnHeaders.Length);
-			ws.Cells[0, 0].PutValue("Pennsylvania Cyber Charter School\n" +
-				"Accounts Receivable Summary Report\n" +
-				$"School Year {result.SchoolYear} as of {result.AsOf.ToString("MM/dd/yyyy")}");
 			var headerStyle = new CellsFactory().CreateStyle();
 			headerStyle.HorizontalAlignment = TextAlignmentType.Center;
 			headerStyle.Font.IsBold = true;
+
+			// These are separate rows because the PDF isn't breaking lines
+			ws.Cells.Merge(0, 0, 1, columnHeaders.Length);
+			ws.Cells[0, 0].PutValue("Pennsylvania Cyber Charter School");
 			ws.Cells[0, 0].SetStyle(headerStyle);
+
+			ws.Cells.Merge(1, 0, 1, columnHeaders.Length);
+			ws.Cells[1, 0].PutValue("Accounts Receivable Summary Report");
+			ws.Cells[1, 0].SetStyle(headerStyle);
+
+			ws.Cells.Merge(2, 0, 1, columnHeaders.Length);
+			ws.Cells[2, 0].PutValue($"School Year {result.SchoolYear} as of {result.AsOf.ToString("MM/dd/yyyy")}");
+			ws.Cells[2, 0].SetStyle(headerStyle);
 
 			ws.Cells.SetRowHeightInch(3, 0.4);
 
