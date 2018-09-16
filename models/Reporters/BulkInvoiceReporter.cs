@@ -196,12 +196,14 @@ namespace models.Reporters
 			var payments = _context.Payments.
 				Where(p => auns.Contains(p.SchoolDistrict.Aun)).
 				Where(p => p.SchoolYear == schoolYear).
-				ToList();
+				GroupBy(p => p.SchoolDistrict.Aun).
+				ToDictionary(g => g.Key, g => g.ToList());
 
 			var refunds = _context.Refunds.
-				Where(p => auns.Contains(p.SchoolDistrict.Aun)).
+				Where(r => auns.Contains(r.SchoolDistrict.Aun)).
 				Where(r => r.SchoolYear == schoolYear).
-				ToList();
+				GroupBy(r => r.SchoolDistrict.Aun).
+				ToDictionary(g => g.Key, g => g.ToList());
 
 			var result = new Dictionary<int, InvoiceTransactions>();
 			foreach (var aun in auns)
@@ -220,26 +222,33 @@ namespace models.Reporters
 					var start = new DateTime(year, month.Number, 1);
 					var end = start.EndOfMonth();
 
-					property.SetValue(transactions, new InvoiceTransaction
+					var transaction = new InvoiceTransaction();
+					if (payments.ContainsKey(aun))
 					{
-						Payment = payments.
-							Where(p => p.SchoolDistrict.Aun == aun).
+						var districtPayments = payments[aun].
 							Where(p => p.Date >= start && p.Date <= end).
-							Select(p => new InvoicePayment
+							ToList();
+						if (districtPayments.Count > 0)
+							transaction.Payment = districtPayments.Select(p => new InvoicePayment
 							{
 								Type = p.Type.Value,
 								CheckNumber = p.ExternalId,
 								CheckAmount = p.Type == PaymentType.Check ? (decimal?)p.Amount : null,
 								UniPayAmount = p.Type == PaymentType.UniPay ? (decimal?)p.Amount : null,
 								Date = p.Date,
-							}).
-							FirstOrDefault(),
-						Refund = refunds.
-							Where(r => r.SchoolDistrict.Aun == aun).
+							}).First();
+					}
+
+					if (refunds.ContainsKey(aun))
+					{
+						var districtRefunds = refunds[aun].
 							Where(r => r.Date >= start && r.Date <= end).
-							Select(r => (decimal?)r.Amount).
-							FirstOrDefault(),
-					});
+							ToList();
+						if (districtRefunds.Count > 0)
+							transaction.Refund = districtRefunds.Select(r => (decimal?)r.Amount).First();
+
+						property.SetValue(transactions, transaction);
+					}
 				}
 
 				result.Add(aun, transactions);
