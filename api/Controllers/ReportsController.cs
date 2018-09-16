@@ -532,11 +532,19 @@ namespace api.Controllers
 			headerStyle.Font.IsBold = true;
 			ws.Cells[0, 0].SetStyle(headerStyle);
 
+			ws.Cells.SetRowHeightInch(3, 0.4);
+
+			ws.Cells.StandardWidthInch = 1;
+			ws.Cells.SetColumnWidthInch(0, 2);
+			ws.Cells.SetColumnWidthInch(5, 0.75);
+
 			var columnHeaderStyle = new CellsFactory().CreateStyle();
 			columnHeaderStyle.Pattern = BackgroundType.Solid;
 			columnHeaderStyle.ForegroundColor = Color.DarkGray;
 			columnHeaderStyle.Font.IsBold = true;
 			columnHeaderStyle.HorizontalAlignment = TextAlignmentType.Center;
+			columnHeaderStyle.VerticalAlignment = TextAlignmentType.Center;
+			columnHeaderStyle.IsTextWrapped = true;
 
 			for (var i = 0; i < columnHeaders.Length; i++)
 			{
