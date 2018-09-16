@@ -209,7 +209,7 @@ namespace api.Controllers
 			var month = Month.ByName()[groups[1].Value];
 			var year = int.Parse(groups[2].Value);
 			string schoolYear;
-			if (month.First)
+			if (month.FirstYear)
 				schoolYear = $"{year}-{year + 1}";
 			else
 				schoolYear = $"{year - 1}-{year}";
