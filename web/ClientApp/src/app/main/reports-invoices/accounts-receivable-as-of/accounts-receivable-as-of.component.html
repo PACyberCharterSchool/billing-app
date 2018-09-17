@@ -5,18 +5,6 @@
     <button type='button' class='btn btn-primary' (click)='filterAccountsReceivableAsOf()'>SEARCH</button>
     <button type='button' class='btn btn-outline-primary' (click)='refreshAcccountReceivableAsOfReports()'>RESET</button>
   </div>
-  <!-- <div class='col-1'>
-    <div class='row'>
-      <div class='col'>
-        <div ngbDropdown class="d-inline-block">
-          <button class="btn btn-outline-primary" id="dropdownScope" ngbDropdownToggle>{{selectedScope}}</button>
-          <div ngbDropdownMenu aria-labelledby="dropdownScope">
-            <button class='dropdown-item' *ngFor='let scope of scopes' (click)='filterByScope(scope)'>{{scope}}</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div> -->
 </div>
 <div class='row ar-asof-action-row align-items-center'>
   <div class='col-12'>
@@ -54,33 +42,21 @@
   <form #createBulkForm (ngSubmit)="c('creating'); onSubmit()">
     <div class='modal-body'>
       <div class='row align-items-center'>
-        <div class='col-12 text-center'>
-          <div class='row'>
-            <div class='form-group col-12'>
-              <div class='row align-items-center'>
-                <div class='col-12'>
-                  <!-- <div ngbDropdown class="d-inline-block">
-                    <button type='button' class="btn btn-outline-primary" id="dropdownCreateScope" ngbDropdownToggle>{{selectedCreateScope}}</button>
-                    <div ngbDropdownMenu aria-labelledby="dropdownCreateScope">
-                      <button type='button' class='dropdown-item' *ngFor='let scope of scopes' (click)='selectCreateScope(scope)'>{{scope}}</button>
-                    </div>
-                  </div> -->
+        <div class='form-group col-12'>
+          <div class='row align-items-center'>
+            <div class='col-6'>
+              <label>As Of</label>
+            </div>
+            <div class='col-6'>
+              <div class='input-group'>
+                <input required class='form-control' placeholder='mm-dd-yyyy' required
+                        name='dpAsOf' [(ngModel)]='asOfDate' ngbDatepicker #dAsOf='ngbDatepicker' (ngModelChange)='onDateChanged()'>
+                <div class='input-group-append'>
+                  <button class='btn btn-outline-secondary' (click)='dAsOf.toggle()' type='button'>
+                    <i class="fa fa-calendar fa-2x"></i>
+                  </button>
                 </div>
               </div>
-            </div>
-          </div>
-          <div class='row'>
-            <div class='form-group col-12'>
-              <div class='row'>
-                <div class='col-12'>
-                  <!-- <div ngbDropdown class="d-inline-block">
-                    <button type='button' class="btn btn-outline-primary" id="dropdownSchoolYear" ngbDropdownToggle>{{selectedCreateSchoolYear}}</button>
-                    <div ngbDropdownMenu aria-labelledby="dropdownSchoolYear">
-                      <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='selectSchoolYear(year)'>{{year}}</button>
-                  </div>
-                </div> -->
-              </div>
-            </div>
             </div>
           </div>
         </div>

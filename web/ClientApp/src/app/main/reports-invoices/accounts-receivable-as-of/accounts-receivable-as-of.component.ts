@@ -22,6 +22,7 @@ export class AccountsReceivableAsOfComponent implements OnInit {
   public direction: number;
   private isDescending: boolean;
   public searchText: string;
+  public asOfDate;
 
   constructor(
     private ngbModalService: NgbModal,
@@ -33,6 +34,9 @@ export class AccountsReceivableAsOfComponent implements OnInit {
 
   ngOnInit() {
     this.skip = 0;
+    this.reportsService.getAccountsReceivableAsOf().subscribe(
+
+    );
   }
 
   sort(property) {
