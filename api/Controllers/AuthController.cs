@@ -1,4 +1,4 @@
-// #define FAKE_LOGIN
+#define FAKE_LOGIN
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

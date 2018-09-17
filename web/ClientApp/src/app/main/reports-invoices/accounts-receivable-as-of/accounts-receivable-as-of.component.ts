@@ -35,7 +35,13 @@ export class AccountsReceivableAsOfComponent implements OnInit {
   ngOnInit() {
     this.skip = 0;
     this.reportsService.getAccountsReceivableAsOf().subscribe(
-
+      data => {
+        this.allReports = data['reports'];
+        console.log('AccountsReceivableAsOfComponent.ngOnInit():  reports are ', data['reports']);
+      },
+      error => {
+        console.log('AccountsReceivableAsOfComponent.ngOnInit():  error is ', error);
+      }
     );
   }
 
@@ -70,6 +76,22 @@ export class AccountsReceivableAsOfComponent implements OnInit {
     );
   }
 
+  private generateAccountsReceivableAsOfReportName(): string {
+
+  }
+
   public onSubmit(): void {
+    this.ngxSpinnerService.show();
+    this.reportsService.createAccountsReceivableAsOf(
+      this.generateAccountsReceivableAsOfReportName(),
+      this.schoolYear,
+      this.asOfDate).subscribe(
+        data => {
+
+        },
+        error => {
+
+        }
+      )
   }
 }
