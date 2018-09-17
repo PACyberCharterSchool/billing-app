@@ -5,12 +5,16 @@ namespace models.Reporters
 {
 	public interface IReporterFactory
 	{
+		IReporter<AccountsReceivableAsOf, AccountsReceivableAsOfReporter.Config> CreateAccountsReceivableAsOfReporter(PacBillContext context);
 		IReporter<BulkInvoice, BulkInvoiceReporter.Config> CreateBulkInvoiceReporter(PacBillContext context);
 		IReporter<BulkStudentInformation, BulkStudentInformationReporter.Config> CreateBulkStudentInformationReporter(PacBillContext context);
 	}
 
 	public class ReporterFactory : IReporterFactory
 	{
+		public IReporter<AccountsReceivableAsOf, AccountsReceivableAsOfReporter.Config> CreateAccountsReceivableAsOfReporter(PacBillContext context)
+			=> new AccountsReceivableAsOfReporter(context);
+
 		public IReporter<BulkInvoice, BulkInvoiceReporter.Config> CreateBulkInvoiceReporter(PacBillContext context)
 			=> new BulkInvoiceReporter(context);
 

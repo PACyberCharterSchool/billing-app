@@ -18,6 +18,7 @@ using System.IO;
 using CsvHelper;
 using Aspose.Cells;
 using System.Text.RegularExpressions;
+using models.Common;
 
 namespace api.Controllers
 {
@@ -190,22 +191,6 @@ namespace api.Controllers
 			return Ok();
 		}
 
-		private static Dictionary<string, (int Number, bool First)> _months = new Dictionary<string, (int Number, bool First)>
-		{
-			{"July", (7, true)},
-			{"August", (8, true)},
-			{"September", (9, true)},
-			{"October", (10, true)},
-			{"November", (11, true)},
-			{"December", (12, true)},
-			{"January", (1, false)},
-			{"February", (2, false)},
-			{"March", (3, false)},
-			{"April", (4, false)},
-			{"May", (5, false)},
-			{"June", (6, false)},
-		};
-
 		private static IList<Payment> XlsxToPayments(ISchoolDistrictRepository districts, Stream stream)
 		{
 			var wb = new Workbook(stream);
@@ -221,10 +206,10 @@ namespace api.Controllers
 				throw new ArgumentException($"Column {amountIndex + 1} header has invalid format. Expected '{pattern}'.");
 
 			var groups = matches[0].Groups;
-			var month = _months[groups[1].Value];
+			var month = Month.ByName()[groups[1].Value];
 			var year = int.Parse(groups[2].Value);
 			string schoolYear;
-			if (month.First)
+			if (month.FirstYear)
 				schoolYear = $"{year}-{year + 1}";
 			else
 				schoolYear = $"{year - 1}-{year}";

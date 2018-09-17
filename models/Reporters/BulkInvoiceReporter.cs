@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using models.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,6 +12,7 @@ namespace models.Reporters
 		public int Id { get; set; }
 		public int Aun { get; set; }
 		public string Name { get; set; }
+		public string PaymentType { get; set; }
 		public decimal RegularRate { get; set; }
 		public decimal SpecialRate { get; set; }
 	}
@@ -46,6 +48,50 @@ namespace models.Reporters
 		public InvoiceTransaction April { get; set; }
 		public InvoiceTransaction May { get; set; }
 		public InvoiceTransaction June { get; set; }
+
+		private decimal GetValue(decimal? amount) => amount.HasValue ? amount.Value : 0;
+
+		public decimal CheckTotalPaid =>
+			GetValue(July?.Payment?.CheckAmount) +
+			GetValue(August?.Payment?.CheckAmount) +
+			GetValue(September?.Payment?.CheckAmount) +
+			GetValue(October?.Payment?.CheckAmount) +
+			GetValue(November?.Payment?.CheckAmount) +
+			GetValue(December?.Payment?.CheckAmount) +
+			GetValue(January?.Payment?.CheckAmount) +
+			GetValue(February?.Payment?.CheckAmount) +
+			GetValue(March?.Payment?.CheckAmount) +
+			GetValue(April?.Payment?.CheckAmount) +
+			GetValue(May?.Payment?.CheckAmount) +
+			GetValue(June?.Payment?.CheckAmount);
+
+		public decimal UniPayTotalPaid =>
+			GetValue(July?.Payment?.UniPayAmount) +
+			GetValue(August?.Payment?.UniPayAmount) +
+			GetValue(September?.Payment?.UniPayAmount) +
+			GetValue(October?.Payment?.UniPayAmount) +
+			GetValue(November?.Payment?.UniPayAmount) +
+			GetValue(December?.Payment?.UniPayAmount) +
+			GetValue(January?.Payment?.UniPayAmount) +
+			GetValue(February?.Payment?.UniPayAmount) +
+			GetValue(March?.Payment?.UniPayAmount) +
+			GetValue(April?.Payment?.UniPayAmount) +
+			GetValue(May?.Payment?.UniPayAmount) +
+			GetValue(June?.Payment?.UniPayAmount);
+
+		public decimal TotalRefunded =>
+			GetValue(July?.Refund) +
+			GetValue(August?.Refund) +
+			GetValue(September?.Refund) +
+			GetValue(October?.Refund) +
+			GetValue(November?.Refund) +
+			GetValue(December?.Refund) +
+			GetValue(January?.Refund) +
+			GetValue(February?.Refund) +
+			GetValue(March?.Refund) +
+			GetValue(April?.Refund) +
+			GetValue(May?.Refund) +
+			GetValue(June?.Refund);
 	}
 
 	public class InvoiceStudent
@@ -128,6 +174,7 @@ namespace models.Reporters
 					Id = d.Id,
 					Aun = d.Aun,
 					Name = d.Name,
+					PaymentType = d.PaymentType.Value,
 					RegularRate = d.AlternateRate != null ? d.AlternateRate.Value : d.Rate,
 					SpecialRate = d.AlternateSpecialEducationRate != null ?
 						d.AlternateSpecialEducationRate.Value :
@@ -171,21 +218,6 @@ namespace models.Reporters
 				}).ToList();
 		}
 
-		private static readonly List<(string Name, int Number)> _months = new List<(string Name, int Number)>{
-				("July", 7),
-				("August", 8),
-				("September", 9),
-				("October", 10),
-				("November", 11),
-				("December", 12),
-				("January", 1),
-				("February", 2),
-				("March", 3),
-				("April", 4),
-				("May", 5),
-				("June", 6),
-			};
-
 		private IDictionary<int, InvoiceTransactions> GetInvoiceTransactions(
 			IList<int> auns,
 			string schoolYear,
@@ -196,18 +228,20 @@ namespace models.Reporters
 			var payments = _context.Payments.
 				Where(p => auns.Contains(p.SchoolDistrict.Aun)).
 				Where(p => p.SchoolYear == schoolYear).
-				ToList();
+				GroupBy(p => p.SchoolDistrict.Aun).
+				ToDictionary(g => g.Key, g => g.ToList());
 
 			var refunds = _context.Refunds.
-				Where(p => auns.Contains(p.SchoolDistrict.Aun)).
+				Where(r => auns.Contains(r.SchoolDistrict.Aun)).
 				Where(r => r.SchoolYear == schoolYear).
-				ToList();
+				GroupBy(r => r.SchoolDistrict.Aun).
+				ToDictionary(g => g.Key, g => g.ToList());
 
 			var result = new Dictionary<int, InvoiceTransactions>();
 			foreach (var aun in auns)
 			{
 				var transactions = new InvoiceTransactions();
-				foreach (var month in _months)
+				foreach (var month in Month.AsEnumerable())
 				{
 					var property = typeof(InvoiceTransactions).GetProperty(month.Name);
 					if (asOf.IsBefore(month.Number))
@@ -220,26 +254,33 @@ namespace models.Reporters
 					var start = new DateTime(year, month.Number, 1);
 					var end = start.EndOfMonth();
 
-					property.SetValue(transactions, new InvoiceTransaction
+					var transaction = new InvoiceTransaction();
+					if (payments.ContainsKey(aun))
 					{
-						Payment = payments.
-							Where(p => p.SchoolDistrict.Aun == aun).
+						var districtPayments = payments[aun].
 							Where(p => p.Date >= start && p.Date <= end).
-							Select(p => new InvoicePayment
+							ToList();
+						if (districtPayments.Count > 0)
+							transaction.Payment = districtPayments.Select(p => new InvoicePayment
 							{
 								Type = p.Type.Value,
 								CheckNumber = p.ExternalId,
 								CheckAmount = p.Type == PaymentType.Check ? (decimal?)p.Amount : null,
 								UniPayAmount = p.Type == PaymentType.UniPay ? (decimal?)p.Amount : null,
 								Date = p.Date,
-							}).
-							FirstOrDefault(),
-						Refund = refunds.
-							Where(r => r.SchoolDistrict.Aun == aun).
+							}).First();
+					}
+
+					if (refunds.ContainsKey(aun))
+					{
+						var districtRefunds = refunds[aun].
 							Where(r => r.Date >= start && r.Date <= end).
-							Select(r => (decimal?)r.Amount).
-							FirstOrDefault(),
-					});
+							ToList();
+						if (districtRefunds.Count > 0)
+							transaction.Refund = districtRefunds.Select(r => (decimal?)r.Amount).First();
+
+						property.SetValue(transactions, transaction);
+					}
 				}
 
 				result.Add(aun, transactions);
@@ -275,7 +316,7 @@ namespace models.Reporters
 				var regularEnrollments = new InvoiceEnrollments();
 				var specialEnrollments = new InvoiceEnrollments();
 
-				foreach (var month in _months)
+				foreach (var month in Month.AsEnumerable())
 				{
 					var regularCount = 0;
 					var specialCount = 0;
