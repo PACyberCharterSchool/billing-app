@@ -49,7 +49,7 @@ namespace api.Controllers
 			public DateTime Date { get; set; }
 
 			[Required]
-			[MinLength(1)]
+			[RegularExpression(@"^\d{4}\-\d{4}$")]
 			public string SchoolYear { get; set; }
 
 			[BindRequired]
