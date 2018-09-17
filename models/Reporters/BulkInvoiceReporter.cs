@@ -251,7 +251,7 @@ namespace models.Reporters
 					}
 
 					var year = month.Number >= 7 ? firstYear : secondYear;
-					var start = new DateTime(year, month.Number, 1);
+					var start = month.AsDateTime(year);
 					var end = start.EndOfMonth();
 
 					var transaction = new InvoiceTransaction();
