@@ -5,7 +5,7 @@ namespace models
 {
 	public static class AuditRecordActivity
 	{
-		public const string COMMIT_GENIUS = "CommitGenius";
+		public const string EDIT_STUDENT_RECORD = "EditStudentRecord";
 	}
 
 	public class AuditRecord
@@ -18,5 +18,10 @@ namespace models
 		[Required]
 		public string Activity { get; set; }
 		public DateTime Timestamp { get; set; }
+
+		public string Identifier { get; set; }
+		public string Field { get; set; }
+		public string Previous { get; set; }
+		public string Next { get; set; }
 	}
 }

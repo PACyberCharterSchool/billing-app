@@ -10,6 +10,7 @@ namespace models
 {
 	public interface IStudentRecordRepository
 	{
+		StudentRecord Get(int id);
 		StudentRecordsHeader Get(string scope, int skip = 0, int take = 0, string filter = null);
 		IList<string> GetScopes(bool? locked = null);
 		bool IsLocked(string scope);
@@ -29,6 +30,8 @@ namespace models
 			_parser = new FilterParser();
 			_logger = logger;
 		}
+
+		public StudentRecord Get(int id) => _context.StudentRecords.Single(r => r.Id == id);
 
 		public StudentRecordsHeader Get(string scope, int skip = 0, int take = 0, string filter = null)
 		{
@@ -76,21 +79,8 @@ namespace models
 
 		public StudentRecord Update(StudentRecord update)
 		{
-			var current = _context.StudentRecords.Single(r => r.Id == update.Id);
-			MergeProperties(current, update, new[] {
-				 nameof(StudentRecord.Id),
-				 nameof(StudentRecord.StudentId),
-				 nameof(StudentRecord.SchoolDistrictId),
-				 nameof(StudentRecord.SchoolDistrictName),
-				 nameof(StudentRecord.Header),
-				 nameof(StudentRecord.LastUpdated),
-				 nameof(StudentRecord.ActivitySchoolYear),
-				 nameof(StudentRecord.StudentPaSecuredId),
-			});
-			current.LastUpdated = DateTime.Now;
-			_context.Update(current);
-
-			return current;
+			_context.Update(update);
+			return update;
 		}
 	}
 }
