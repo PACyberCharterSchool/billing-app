@@ -9,6 +9,7 @@ import { InvoicesDigitalSignaturesListComponent } from './invoices-digital-signa
 import { InvoicesListComponent } from './invoices-list/invoices-list.component';
 import { InvoicesMonthlyCombinedListComponent } from './invoices-monthly-combined-list/invoices-monthly-combined-list.component';
 import { StudentActivityListComponent } from './student-activity-list/student-activity-list.component';
+import { AccountsReceivableAsOfComponent } from './accounts-receivable-as-of/accounts-receivable-as-of.component';
 
 import { AuthenticationGuardService } from '../../services/authentication-guard.service';
 
@@ -51,6 +52,12 @@ const reportsInvoicesRoutes: Routes = [
       {
         path: 'itemized-student-activity',
         component: StudentActivityListComponent,
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
+      },
+      {
+        path: 'as-of-date-reports',
+        component: AccountsReceivableAsOfComponent,
         outlet: 'action',
         canActivate: [ AuthenticationGuardService ]
       }

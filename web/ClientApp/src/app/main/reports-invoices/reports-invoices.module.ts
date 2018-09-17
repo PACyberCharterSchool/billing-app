@@ -14,6 +14,7 @@ import { InvoicePreviewFormComponent } from './invoice-preview-form/invoice-prev
 import { InvoiceExcelPreviewComponent } from './invoice-excel-preview/invoice-excel-preview.component';
 import { InvoicesMonthlyCombinedListComponent } from './invoices-monthly-combined-list/invoices-monthly-combined-list.component';
 import { StudentActivityListComponent } from './student-activity-list/student-activity-list.component';
+import { AccountsReceivableAsOfComponent } from './accounts-receivable-as-of/accounts-receivable-as-of.component';
 
 import { ExcelComponent } from './excel/excel.component';
 import { CellComponent } from './cell/cell.component';
@@ -38,7 +39,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     ExcelComponent,
     CellComponent,
     InvoicesMonthlyCombinedListComponent,
-    StudentActivityListComponent
+    StudentActivityListComponent,
+    AccountsReceivableAsOfComponent
   ],
   imports: [
     CommonModule,

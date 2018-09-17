@@ -1,0 +1,99 @@
+<div class='row ar-asof-title-row align-items-center'>
+  <div class='col-4'><h4>Accounts Receivable - As Of</h4></div>
+  <div class='col-7'>
+    <input type='text' [(ngModel)]='searchText' />
+    <button type='button' class='btn btn-primary' (click)='filterAccountsReceivableAsOf()'>SEARCH</button>
+    <button type='button' class='btn btn-outline-primary' (click)='refreshAcccountReceivableAsOfReports()'>RESET</button>
+  </div>
+  <!-- <div class='col-1'>
+    <div class='row'>
+      <div class='col'>
+        <div ngbDropdown class="d-inline-block">
+          <button class="btn btn-outline-primary" id="dropdownScope" ngbDropdownToggle>{{selectedScope}}</button>
+          <div ngbDropdownMenu aria-labelledby="dropdownScope">
+            <button class='dropdown-item' *ngFor='let scope of scopes' (click)='filterByScope(scope)'>{{scope}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+</div>
+<div class='row ar-asof-action-row align-items-center'>
+  <div class='col-12'>
+    <button type='button' class='btn btn-primary' (click)='displayCreateAccountsReceivableAsOfDialog(bulkCreateContent)'>CREATE</button>
+  </div>
+</div>
+<div class='row ar-asof-list-row align-items-center'>
+  <div class='col-12 ar-asof-list-col'>
+    <table class='table table-fixed table-striped'>
+      <thead>
+        <tr>
+          <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
+            {{k | normalizeFieldName}}
+            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+          </th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor='let report of reports | orderBy: {property: property, direction: direction}'>
+          <td *ngFor='let v of listDisplayableValues(report)'>{{v | normalizeFieldValue}}</td>
+          <td><button type='button' class='btn btn-primary' (click)='downloadAccountsReceivableAsOfReport(report)'>Download</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<ng-template #bulkCreateContent let-c='close' let-d='dismiss'>
+  <div class='modal-header'>
+    <h4 class='modal-title'>Create Accounts Receivable As Of Report</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form #createBulkForm (ngSubmit)="c('creating'); onSubmit()">
+    <div class='modal-body'>
+      <div class='row align-items-center'>
+        <div class='col-12 text-center'>
+          <div class='row'>
+            <div class='form-group col-12'>
+              <div class='row align-items-center'>
+                <div class='col-12'>
+                  <!-- <div ngbDropdown class="d-inline-block">
+                    <button type='button' class="btn btn-outline-primary" id="dropdownCreateScope" ngbDropdownToggle>{{selectedCreateScope}}</button>
+                    <div ngbDropdownMenu aria-labelledby="dropdownCreateScope">
+                      <button type='button' class='dropdown-item' *ngFor='let scope of scopes' (click)='selectCreateScope(scope)'>{{scope}}</button>
+                    </div>
+                  </div> -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class='row'>
+            <div class='form-group col-12'>
+              <div class='row'>
+                <div class='col-12'>
+                  <!-- <div ngbDropdown class="d-inline-block">
+                    <button type='button' class="btn btn-outline-primary" id="dropdownSchoolYear" ngbDropdownToggle>{{selectedCreateSchoolYear}}</button>
+                    <div ngbDropdownMenu aria-labelledby="dropdownSchoolYear">
+                      <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='selectSchoolYear(year)'>{{year}}</button>
+                  </div>
+                </div> -->
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='modal-footer'>
+      <div class='row d-flex justify-content-end'>
+        <div class='d-flex col-12 form-group justify-content-end'>
+          <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
+          <button type='submit' class='btn btn-primary'>CREATE</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</ng-template>
+<ngx-spinner size='large' loadingText='{{spinnerMsg}}' type='timer'></ngx-spinner>
