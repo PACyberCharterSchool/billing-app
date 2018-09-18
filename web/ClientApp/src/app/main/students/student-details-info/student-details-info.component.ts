@@ -74,65 +74,75 @@ export class StudentDetailsInfoComponent implements OnInit {
   initStudentDetailsForm(): void {
     this.studentDetailForm = this.fb.group({
       personalInfo: this.fb.group({
-        firstName: this.fb.control(this.student.studentFirstName),
-        lastName: this.fb.control(this.student.studentLastName),
+        firstName: this.fb.control(this.student.studentFirstName, Validators.required),
+        lastName: this.fb.control(this.student.studentLastName, Validators.required),
         middleInitial: this.fb.control(this.student.studentMiddleInitial),
-        dateOfBirth: this.fb.control(this.student.studentDateOfBirth)
+        dateOfBirth: this.fb.control(this.student.studentDateOfBirth, Validators.required)
       }),
       addressInfo: this.fb.group({
-        street1: this.fb.control(this.student.studentStreet1),
+        street1: this.fb.control(this.student.studentStreet1, Validators.required),
         street2: this.fb.control(this.student.studentStreet2),
-        city: this.fb.control(this.student.studentCity),
-        state: this.fb.control(this.student.studentState),
-        zip: this.fb.control(this.student.studentZipCode)
+        city: this.fb.control(this.student.studentCity, Validators.required),
+        state: this.fb.control(this.student.studentState, Validators.required),
+        zip: this.fb.control(this.student.studentZipCode, Validators.required)
       }),
       studentInfo: this.fb.group({
-        paSecuredId: this.fb.control(this.student.studentPaSecuredId),
-        gradeLevel: this.fb.control(this.student.studentGradeLevel),
-        enrollmentDate: this.fb.control(this.student.studentEnrollmentDate),
+        paSecuredId: this.fb.control(this.student.studentPaSecuredId, Validators.required),
+        gradeLevel: this.fb.control(this.student.studentGradeLevel, Validators.required),
+        enrollmentDate: this.fb.control(this.student.studentEnrollmentDate, Validators.required),
         withdrawalDate: this.fb.control(this.student.studentWithdrawalDate),
         spedStatus: this.fb.control(this.student.studentIsSpecialEducation),
         currentIepDate: this.fb.control(this.student.studentCurrentIep),
         formerIepDate: this.fb.control(this.student.studentFormerIep),
-        schoolDistrict: this.fb.control(this.student.schoolDistrictName)
+        schoolDistrict: this.fb.control(this.student.schoolDistrictName, Validators.required)
       })
     });
 
-    this.studentDetailForm.get('personalInfo.dateOfBirth').setValue({
-      year: new Date(this.student.studentDateOfBirth).getFullYear(),
-      month: new Date(this.student.studentDateOfBirth).getMonth(),
-      day: new Date(this.student.studentDateOfBirth).getDate()
-    });
+    if (this.student.studentDateOfBirth !== null) {
+      this.studentDetailForm.get('personalInfo.dateOfBirth').setValue({
+        year: new Date(this.student.studentDateOfBirth).getFullYear(),
+        month: new Date(this.student.studentDateOfBirth).getMonth(),
+        day: new Date(this.student.studentDateOfBirth).getDate()
+      });
+    }
 
-    this.studentDetailForm.get('studentInfo.enrollmentDate').setValue({
-      year: new Date(this.student.studentEnrollmentDate).getFullYear(),
-      month: new Date(this.student.studentEnrollmentDate).getMonth(),
-      day: new Date(this.student.studentEnrollmentDate).getDate()
-    });
+    if (this.student.studentEnrollmentDate !== null) {
+      this.studentDetailForm.get('studentInfo.enrollmentDate').setValue({
+        year: new Date(this.student.studentEnrollmentDate).getFullYear(),
+        month: new Date(this.student.studentEnrollmentDate).getMonth(),
+        day: new Date(this.student.studentEnrollmentDate).getDate()
+      });
+    }
 
-    this.studentDetailForm.get('studentInfo.withdrawalDate').setValue({
-      year: new Date(this.student.studentWithdrawalDate).getFullYear(),
-      month: new Date(this.student.studentWithdrawalDate).getMonth(),
-      day: new Date(this.student.studentWithdrawalDate).getDate()
-    });
+    if (this.student.studentWithdrawalDate !== null) {
+      this.studentDetailForm.get('studentInfo.withdrawalDate').setValue({
+        year: new Date(this.student.studentWithdrawalDate).getFullYear(),
+        month: new Date(this.student.studentWithdrawalDate).getMonth(),
+        day: new Date(this.student.studentWithdrawalDate).getDate()
+      });
+    }
 
-    this.studentDetailForm.get('studentInfo.currentIepDate').setValue({
-      year: new Date(this.student.studentCurrentIep).getFullYear(),
-      month: new Date(this.student.studentCurrentIep).getMonth(),
-      day: new Date(this.student.studentCurrentIep).getDate()
-    });
+    if (this.student.studentCurrentIep !== null) {
+      this.studentDetailForm.get('studentInfo.currentIepDate').setValue({
+        year: new Date(this.student.studentCurrentIep).getFullYear(),
+        month: new Date(this.student.studentCurrentIep).getMonth(),
+        day: new Date(this.student.studentCurrentIep).getDate()
+      });
+    }
 
-    this.studentDetailForm.get('studentInfo.formerIepDate').setValue({
-      year: new Date(this.student.studentFormerIep).getFullYear(),
-      month: new Date(this.student.studentFormerIep).getMonth(),
-      day: new Date(this.student.studentFormerIep).getDate()
-    });
+    if (this.student.studentFormerIep !== null) {
+      this.studentDetailForm.get('studentInfo.formerIepDate').setValue({
+        year: new Date(this.student.studentFormerIep).getFullYear(),
+        month: new Date(this.student.studentFormerIep).getMonth(),
+        day: new Date(this.student.studentFormerIep).getDate()
+      });
+    }
 
     this.studentDetailForm.get('studentInfo.spedStatus').setValue(this.student.studentIsSpecialEducation);
     this.studentDetailForm.get('studentInfo.schoolDistrict').setValue(this.student.schoolDistrictName);
   }
 
-  setSelectedSchoolDistrict($event) {
+  public setSelectedSchoolDistrict($event) {
     this.selectedSchoolDistrict = this.schoolDistricts.find((sd) => sd.name === $event.item);
   }
 

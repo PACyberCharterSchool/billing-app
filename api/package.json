@@ -19,11 +19,10 @@
     "gulp-docker": "0.0.12",
     "gulp-docker-dest": "^0.2.2",
     "gulp-shell": "^0.6.5",
-    "mssql": "^4.1.0"
+    "mssql": "^4.2.1"
   },
   "dependencies": {
     "gulp-dotenv": "^0.2.1",
-    "jshint": "^2.9.6",
-    "mssql": "^4.1.0"
+    "jshint": "^2.9.6"
   }
 }
