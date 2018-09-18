@@ -260,6 +260,7 @@ namespace models.Reporters
 						var districtPayments = payments[aun].
 							Where(p => p.Date >= start && p.Date <= end).
 							ToList();
+
 						if (districtPayments.Count > 0)
 							transaction.Payment = districtPayments.Select(p => new InvoicePayment
 							{
@@ -278,9 +279,9 @@ namespace models.Reporters
 							ToList();
 						if (districtRefunds.Count > 0)
 							transaction.Refund = districtRefunds.Select(r => (decimal?)r.Amount).First();
-
-						property.SetValue(transactions, transaction);
 					}
+
+					property.SetValue(transactions, transaction);
 				}
 
 				result.Add(aun, transactions);
