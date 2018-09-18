@@ -52,22 +52,26 @@ namespace models.Reporters
 				else if (month.FirstYear && !firstYear)
 					year--;
 
-				// TODO(Erik): returning too many scopes
-				if (month.AsDateTime(year) > july)
+				var dt = month.AsDateTime(year);
+				if (dt > july && dt <= asOf)
 					scopes.Add($"{year}.{month.Number:00}");
 			}
 
 			return scopes;
 		}
 
-		private IList<AccountsReceivableAsOfSchoolDistrict> GetSchoolDistricts(DateTime asOf, IList<int> auns = null)
+		private IList<AccountsReceivableAsOfSchoolDistrict> GetSchoolDistricts(
+			DateTime asOf,
+			string schoolYear,
+			IList<int> auns = null)
 		{
 			if (auns == null)
 				auns = GetAuns();
 
 			var scopes = ScopesFromAsOf(asOf);
 			var invoices = _context.Reports.
-				Where(r => (r.Type == ReportType.BulkInvoice || r.Type == ReportType.Invoice) && scopes.Contains(r.Scope)).
+				Where(r => scopes.Contains(r.Scope)).
+				Where(r => r.Type == ReportType.BulkInvoice || r.Type == ReportType.Invoice).
 				Select(r => JsonConvert.DeserializeObject<BulkInvoice>(r.Data)).
 				OrderByDescending(i => i.Prepared);
 
@@ -82,16 +86,44 @@ namespace models.Reporters
 				}
 			}
 
-			return districts.Values.OrderBy(d => d.SchoolDistrict.Name).Select(d => new AccountsReceivableAsOfSchoolDistrict
+			var payments = _context.Payments.
+				Where(p => auns.Contains(p.SchoolDistrict.Aun)).
+				Where(p => p.SchoolYear == schoolYear).
+				GroupBy(p => p.SchoolDistrict.Aun).
+				ToDictionary(g => g.Key, g => g.ToList());
+
+			var refunds = _context.Refunds.
+				Where(r => auns.Contains(r.SchoolDistrict.Aun)).
+				Where(r => r.SchoolYear == schoolYear).
+				GroupBy(r => r.SchoolDistrict.Aun).
+				ToDictionary(g => g.Key, g => g.ToList());
+
+			return districts.Values.OrderBy(d => d.SchoolDistrict.Name).Select(d =>
 			{
-				Aun = d.SchoolDistrict.Aun,
-				Name = d.SchoolDistrict.Name,
-				PaymentType = d.SchoolDistrict.PaymentType,
-				RegularEducationDue = d.SchoolDistrict.RegularRate * (d.RegularEnrollments.Values.Sum() / 12),
-				SpecialEducationDue = d.SchoolDistrict.SpecialRate * (d.SpecialEnrollments.Values.Sum() / 12),
-				PaidByDistrict = d.Transactions.CheckTotalPaid,
-				PaidByPDE = d.Transactions.UniPayTotalPaid,
-				Refunded = d.Transactions.TotalRefunded,
+				var check = 0m;
+				var unipay = 0m;
+				if (payments.ContainsKey(d.SchoolDistrict.Aun))
+				{
+					var pp = payments[d.SchoolDistrict.Aun];
+					check = pp.Where(p => p.Type == PaymentType.Check).Sum(p => p.Amount);
+					unipay = pp.Where(p => p.Type == PaymentType.UniPay).Sum(p => p.Amount);
+				}
+
+				var refund = 0m;
+				if (refunds.ContainsKey(d.SchoolDistrict.Aun))
+					refund = refunds[d.SchoolDistrict.Aun].Sum(r => r.Amount);
+
+				return new AccountsReceivableAsOfSchoolDistrict
+				{
+					Aun = d.SchoolDistrict.Aun,
+					Name = d.SchoolDistrict.Name,
+					PaymentType = d.SchoolDistrict.PaymentType,
+					RegularEducationDue = d.SchoolDistrict.RegularRate * ((decimal)d.RegularEnrollments.Values.Sum() / 12),
+					SpecialEducationDue = d.SchoolDistrict.SpecialRate * ((decimal)d.SpecialEnrollments.Values.Sum() / 12),
+					PaidByDistrict = check,
+					PaidByPDE = unipay,
+					Refunded = refund,
+				};
 			}).ToList();
 		}
 
@@ -108,7 +140,7 @@ namespace models.Reporters
 			{
 				SchoolYear = config.SchoolYear,
 				AsOf = config.AsOf,
-				SchoolDistricts = GetSchoolDistricts(config.AsOf, config.Auns),
+				SchoolDistricts = GetSchoolDistricts(config.AsOf, config.SchoolYear, config.Auns),
 			};
 
 			return report;
