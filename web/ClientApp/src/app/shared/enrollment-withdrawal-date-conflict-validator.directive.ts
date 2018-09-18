@@ -8,6 +8,8 @@ import {
   ValidatorFn
 } from '@angular/forms';
 
+import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+
 @Directive({
   selector: '[appEnrollmentWithdrawalDateConflictValidator]',
   providers: [{ provide: NG_VALIDATORS, useExisting: EnrollmentWithdrawalDateConflictValidatorDirective, multi: true }]
@@ -20,7 +22,7 @@ export class EnrollmentWithdrawalDateConflictValidatorDirective {
     return this.enrollmentWithdrawalDateConfictValidator(control);
   }
 
-  private dateCompare(o1: Object, o2: Object): number {
+  private dateCompare(o1: NgbDateStruct, o2: NgbDateStruct): number {
     if (!o1 && !o2) { return 0; }
     if (!o1) { return -1; }
     if (!o2) { return 1; }
@@ -37,7 +39,7 @@ export class EnrollmentWithdrawalDateConflictValidatorDirective {
     }
   }
 
-  private isValidDate(d: Object): boolean {
+  private isValidDate(d: NgbDateStruct): boolean {
     return d && !isNaN(d.year) && !isNaN(d.month) && !isNaN(d.day);
   }
 
