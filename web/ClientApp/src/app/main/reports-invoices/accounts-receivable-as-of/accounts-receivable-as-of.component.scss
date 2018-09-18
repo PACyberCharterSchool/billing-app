@@ -1,0 +1,61 @@
+.ar-asof-title-row {
+  height: 40px;
+  .col-4 {
+    h4 {
+      color: #58a917;
+    }
+  }
+
+  .col-7 {
+    input[type='text'] {
+      padding: 6px 2px;
+      line-height: 14px;
+      width: 70%;
+    }
+
+    input[type='text'] + button {
+      height: 2.37rem;
+      position: relative;
+      top: -2px;
+      left: -4px;
+    }
+
+    button.btn-outline-primary {
+      position: relative;
+      top: -2px;
+      left: -4px;
+    }
+  }
+}
+
+.ar-asof-action-row {
+  height: 40px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.ar-asof-list-row {
+  height: calc(100% - 80px);
+
+  .ar-asof-list-col {
+    height: 100%;
+
+    table {
+      height: 100%;
+
+      thead {
+        height: 60px;
+      }
+
+      tbody {
+        height: calc(100% - 60px);
+      }
+    }
+  }
+}
+
+.modal-header {
+  h4.modal-title {
+    color: #58a917;
+  }
+}

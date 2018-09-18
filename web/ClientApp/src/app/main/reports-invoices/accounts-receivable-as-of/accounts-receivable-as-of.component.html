@@ -1,0 +1,128 @@
+<div class='row ar-asof-title-row align-items-center'>
+  <div class='col-4'><h4>Accounts Receivable - As Of</h4></div>
+  <div class='col-7'>
+    <input type='text' [(ngModel)]='searchText' />
+    <button type='button' class='btn btn-primary' (click)='filterAccountsReceivableAsOf()'>SEARCH</button>
+    <button type='button' class='btn btn-outline-primary' (click)='refreshAcccountReceivableAsOfReports()'>RESET</button>
+  </div>
+</div>
+<div class='row ar-asof-action-row align-items-center'>
+  <div class='col-12'>
+    <button type='button' class='btn btn-primary' (click)='displayCreateAccountsReceivableAsOfDialog(createContent)'>CREATE</button>
+  </div>
+</div>
+<div class='row ar-asof-list-row align-items-center'>
+  <div class='col-12 ar-asof-list-col'>
+    <table class='table table-fixed table-striped'>
+      <thead>
+        <tr>
+          <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
+            {{k | normalizeFieldName}}
+            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+          </th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor='let report of reports | orderBy: {property: property, direction: direction}'>
+          <td *ngFor='let v of listDisplayableValues(report)'>{{v | normalizeFieldValue}}</td>
+          <td>
+            <button
+              type='button'
+              class='btn btn-primary'
+              (click)='displayDownloadAccountsReceivableAsOfFormatDialog(downloadReportTypeContent, report)'>
+              Download
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<ng-template #createContent let-c='close' let-d='dismiss'>
+  <div class='modal-header'>
+    <h4 class='modal-title'>Create Accounts Receivable As Of Report</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form #createForm (ngSubmit)="c('creating'); onCreateSubmit()">
+    <div class='modal-body'>
+      <div class='form-group row align-items-center'>
+        <div class='col-6'>
+          <label>As Of</label>
+        </div>
+        <div class='col-6'>
+          <div class='input-group'>
+            <input required class='form-control' placeholder='mm-dd-yyyy' required
+                    name='dpAsOf' [(ngModel)]='asOfDate' ngbDatepicker #dAsOf='ngbDatepicker' (ngModelChange)='onDateChanged()'>
+            <div class='input-group-append'>
+              <button class='btn btn-outline-secondary' (click)='dAsOf.toggle()' type='button'>
+                <i class="fa fa-calendar fa-2x"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class='form-group row align-items-center'>
+        <div class='col-6'>
+          <label>Academic Year</label>
+        </div>
+        <div class='col-6'>
+          <div ngbDropdown class='d-inline-block'>
+            <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown' required>{{selectedAcademicYear}}</button>
+            <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown'>
+              <button type='button' class='dropdown-item' *ngFor='let y of schoolYears' (click)='setSelectedAcademicYear(y)'>{{y}}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='modal-footer'>
+      <div class='row d-flex justify-content-end'>
+        <div class='d-flex col-12 form-group justify-content-end'>
+          <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
+          <button type='submit' class='btn btn-primary'>CREATE</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</ng-template>
+<ng-template #downloadReportTypeContent let-c='close' let-d='dismiss'>
+  <div class='modal-header'>
+    <h4 class='modal-title'>Download Format Type</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class='modal-body'>
+    <div class='form-group row align-items-center'>
+      <div class='col-6'>
+        <label>Download format</label>
+      </div>
+      <div class='col-6'>
+        <div ngbDropdown class="d-inline-block">
+          <button type='button' class="btn btn-outline-primary" id="dropdownDownloadFormat" ngbDropdownToggle>Format type</button>
+          <div ngbDropdownMenu aria-labelledby="dropdownDownloadFormat">
+            <button
+              type='button'
+              class='dropdown-item'
+              *ngFor='let format of downloadFormats'
+              (click)=setSelectedDownloadFormat(format)>
+              {{format}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class='modal-footer'>
+    <div class='row d-flex justify-content-end'>
+      <div class='d-flex col-12 form-group justify-content-end'>
+        <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
+        <button type='button' class='btn btn-primary' (click)='c("Download")'>DOWNLOAD</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ngx-spinner size='large' loadingText='{{spinnerMsg}}' type='timer'></ngx-spinner>

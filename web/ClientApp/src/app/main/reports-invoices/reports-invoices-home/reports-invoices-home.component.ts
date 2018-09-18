@@ -6,7 +6,7 @@ enum BUTTON_IDS {
   InvoicesBtn = 'invoices-btn',
   DigitalSignaturesBtn = 'digital-signatures-btn',
   AgingReportsBtn = 'aging-reports-btn',
-  AsOfDateReportsBtn = 'as-of-date-reports-btn',
+  AsOfDateReportsBtn = 'accounts-receivable-aod-report-btn',
   CSIUExportBtn = 'csiu-export-btn',
   ItemizedStudentActivityBtn = 'itemized-student-activity-btn',
   MonthlyCombinedInvoiceBtn = 'monthly-combined-invoice-btn'

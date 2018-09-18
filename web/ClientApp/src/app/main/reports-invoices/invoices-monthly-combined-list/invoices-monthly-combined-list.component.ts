@@ -139,7 +139,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   refreshInvoices(): void {
     this.spinnerMsg = 'Loading bulk invoices.  Please wait...';
     this.ngxSpinnerService.show();
-    this.reportsService.getReportsByInfo({
+    this.reportsService.getReportsByMeta({
       'Type': ReportType.BulkInvoice,
       'Name': '',
       'Approved': null,
