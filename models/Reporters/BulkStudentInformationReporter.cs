@@ -87,9 +87,12 @@ namespace models.Reporters
 		{
 			var result = new BulkStudentInformation { };
 
-			var firstDay = _context.Calendars.
-				Single(c => c.SchoolYear == SchoolYearFromScope(config.Scope)).
-				Days.Single(d => d.SchoolDay == 1).Date;
+			var schoolYear = SchoolYearFromScope(config.Scope);
+			var calendar = _context.Calendars.SingleOrDefault(c => c.SchoolYear == schoolYear);
+			if (calendar == null)
+				throw new MissingCalendarException(ReportType.BulkStudentInformation, schoolYear);
+
+			var firstDay = calendar.Days.Single(d => d.SchoolDay == 1).Date;
 
 			result.Students = GetInvoiceStudents(
 				config.Scope,

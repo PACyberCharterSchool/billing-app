@@ -9,15 +9,9 @@ namespace api.Controllers
 	{
 		public IList<string> Errors { get; }
 
-		public ErrorsResponse(IList<string> errors)
-		{
-			Errors = errors;
-		}
-
-		public ErrorsResponse(params string[] errors)
-		{
-			Errors = errors.ToList();
-		}
+		public ErrorsResponse(IList<string> errors) => Errors = errors;
+		public ErrorsResponse(params string[] errors) => Errors = errors.ToList();
+		public ErrorsResponse(Exception e) => Errors = new[] { e.Message };
 
 		private static IList<string> ModelStateToList(ModelStateDictionary modelState)
 		{
