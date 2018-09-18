@@ -384,10 +384,16 @@ namespace models.Reporters
 			var districts = GetInvoiceSchoolDistricts(auns, paymentType);
 			auns = districts.Select(d => d.Aun).ToList();
 
+			var calendar = _context.Calendars.SingleOrDefault(c => c.SchoolYear == bulk.SchoolYear);
+			if (calendar == null)
+				throw new MissingCalendarException(ReportType.BulkInvoice, bulk.SchoolYear);
+
+			var firstDay = calendar.Days.Single(d => d.SchoolDay == 1).Date;
+
 			var students = GetInvoiceStudents(
 				auns,
 				bulk.Scope,
-				new DateTime(bulk.FirstYear, 7, 1),
+				firstDay,
 				bulk.AsOf.EndOfMonth());
 			var transactions = GetInvoiceTransactions(
 				auns,
