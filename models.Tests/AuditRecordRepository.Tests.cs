@@ -40,7 +40,7 @@ namespace models.Tests
 			var record = new AuditRecord
 			{
 				Username = "Bob",
-				Activity = AuditRecordActivity.COMMIT_GENIUS,
+				Activity = AuditRecordActivity.EDIT_STUDENT_RECORD,
 			};
 
 			var time = DateTime.Now;

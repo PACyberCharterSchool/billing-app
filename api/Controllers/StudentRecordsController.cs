@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
@@ -18,6 +20,7 @@ using Aspose.Cells;
 using api.Common;
 
 using models;
+using static models.Common.PropertyMerger;
 
 namespace api.Controllers
 {
@@ -26,15 +29,18 @@ namespace api.Controllers
 	{
 		private readonly PacBillContext _context;
 		private readonly IStudentRecordRepository _records;
+		private readonly IAuditRecordRepository _audits;
 		private readonly ILogger<StudentRecordsController> _logger;
 
 		public StudentRecordsController(
 			PacBillContext context,
 			 IStudentRecordRepository records,
+			 IAuditRecordRepository audits,
 			 ILogger<StudentRecordsController> logger)
 		{
 			_context = context;
 			_records = records;
+			_audits = audits;
 			_logger = logger;
 		}
 
@@ -303,7 +309,46 @@ namespace api.Controllers
 				StudentFormerIep = update.StudentFormerIep,
 				StudentNorep = update.StudentNorep,
 			};
-			await Task.Run(() => _context.SaveChanges(() => _records.Update(record)));
+
+			var current = _records.Get(record.Id);
+			var delta = MergeProperties(current, record, new[] {
+				 nameof(StudentRecord.Id),
+				 nameof(StudentRecord.StudentId),
+				 nameof(StudentRecord.SchoolDistrictId),
+				 nameof(StudentRecord.SchoolDistrictName),
+				 nameof(StudentRecord.Header),
+				 nameof(StudentRecord.LastUpdated),
+				 nameof(StudentRecord.ActivitySchoolYear),
+				 nameof(StudentRecord.StudentPaSecuredId),
+			});
+
+			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+			using (var tx = _context.Database.BeginTransaction())
+			{
+				try
+				{
+					_records.Update(current);
+					_audits.CreateMany(delta.Select(d => new AuditRecord
+					{
+						Username = username,
+						Activity = AuditRecordActivity.EDIT_STUDENT_RECORD,
+						Timestamp = DateTime.Now,
+						Identifier = current.StudentId,
+						Field = d.Key,
+						Next = d.Value.Next,
+						Previous = d.Value.Previous,
+					}).ToList());
+					_context.SaveChanges();
+
+					tx.Commit();
+				}
+				catch (Exception)
+				{
+					tx.Rollback();
+					throw;
+				}
+			}
+
 			return Ok();
 		}
 	}
