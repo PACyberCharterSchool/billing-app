@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using models.Common;
+
 namespace models.Reporters
 {
 	public class BulkStudentInformationStudent : InvoiceStudent
@@ -70,19 +72,31 @@ namespace models.Reporters
 			public IList<int> Auns { get; set; }
 		}
 
-		private (int FirstYear, int SecondYear) SchoolYearFromScope(string scope)
+		private string SchoolYearFromScope(string scope)
 		{
-			return (int.Parse(scope.Substring(0, 4)), int.Parse(scope.Substring(5, 2)));
+			var year = int.Parse(scope.Substring(0, 4));
+			var month = int.Parse(scope.Substring(5, 2));
+
+			if (Month.ByNumber()[month].FirstYear)
+				return $"{year}-{year + 1}";
+			else
+				return $"{year - 1}-{year}";
 		}
 
 		public BulkStudentInformation GenerateReport(Config config)
 		{
 			var result = new BulkStudentInformation { };
 
-			var (firstYear, _) = SchoolYearFromScope(config.Scope);
+			var schoolYear = SchoolYearFromScope(config.Scope);
+			var calendar = _context.Calendars.SingleOrDefault(c => c.SchoolYear == schoolYear);
+			if (calendar == null)
+				throw new MissingCalendarException(ReportType.BulkStudentInformation, schoolYear);
+
+			var firstDay = calendar.Days.Single(d => d.SchoolDay == 1).Date;
+
 			result.Students = GetInvoiceStudents(
 				config.Scope,
-				new DateTime(firstYear, 7, 1),
+				firstDay,
 				config.AsOf.EndOfMonth(),
 				config.Auns
 			);

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
@@ -130,12 +129,10 @@ namespace api.Controllers
 			}
 
 			return dt;
-		}	
+		}
 
 		byte[] GenerateExcelData(DataTable dt)
 		{
-			byte[] result = null;
-
 			var wb = new Workbook();
 			var sheet = wb.Worksheets[0];
 
@@ -208,7 +205,7 @@ namespace api.Controllers
 			if (stream == null)
 				return StatusCode(406);
 
-			return new FileStreamResult(stream, accept) { FileDownloadName = args.ExcelFileName };	
+			return new FileStreamResult(stream, accept) { FileDownloadName = args.ExcelFileName };
 		}
 
 		[HttpPost("header/{scope}/lock")]
@@ -281,7 +278,7 @@ namespace api.Controllers
 		[ProducesResponseType(200)]
 		[ProducesResponseType(typeof(ErrorResponse), 400)]
 		[ProducesResponseType(422)]
-		public async Task<IActionResult> Update(string scope, int id, [FromBody]StudentRecordUpdate update)
+		public IActionResult Update(string scope, int id, [FromBody]StudentRecordUpdate update)
 		{
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));

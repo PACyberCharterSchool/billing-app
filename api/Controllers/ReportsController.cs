@@ -705,6 +705,10 @@ namespace api.Controllers
 				result.StatusCode = 424;
 				return result;
 			}
+			catch (MissingCalendarException e)
+			{
+				return new BadRequestObjectResult(new ErrorsResponse(e));
+			}
 			catch (NotFoundException e)
 			{
 				Console.WriteLine(e.Message);
