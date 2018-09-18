@@ -53,6 +53,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   public scopes: string[];
   public selectedAsOfBillingDate: string;
   public selectedDownloadFormat: string;
+  public invoiceRecipient;
 
   constructor(
     private globals: Globals,
@@ -69,9 +70,9 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
   ngOnInit() {
     this.selectedCreateTemplateName = 'Select Bulk Invoice Template';
-    this.selectedCreateSchoolYear = 'Select Academic Year';
+    // this.selectedCreateSchoolYear = 'Select Academic Year';
     this.selectedCurrentScope = 'Select billing period';
-    this.selectedCreateScope = 'Select billing period';
+    // this.selectedCreateScope = 'Select billing period';
     this.spinnerMsg = 'Loading bulk invoices.  Please wait...';
 
     this.ngxSpinnerService.show();
@@ -272,9 +273,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   displayCreateBulkInvoiceDialog(bulkCreateContent): void {
-    const modal = this.ngbModal.open(bulkCreateContent, { centered: true, size: 'sm' });
-    this.selectedCreateSchoolYear = 'Select Academic Year';
-    this.selectedCreateScope = 'Select Billing Period';
+    const modal = this.ngbModal.open(bulkCreateContent, { centered: true });
     this.selectedCreateTemplateName = 'Select Template';
 
     modal.result.then(

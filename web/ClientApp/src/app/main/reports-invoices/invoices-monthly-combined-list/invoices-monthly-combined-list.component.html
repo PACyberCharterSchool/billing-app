@@ -55,19 +55,47 @@
     <div class='modal-body'>
       <div class='row align-items-center'>
         <div class='col-12 text-center'>
-            <div class='form-group'>
-              <div ngbDropdown class="d-inline-block">
-                <button type='button' class="btn btn-outline-primary" id="dropdownDownloadSchoolYear" ngbDropdownToggle>{{selectedCreateSchoolYear}}</button>
-                <div ngbDropdownMenu aria-labelledby="dropdownDownloadSchoolYear">
-                  <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='selectSchoolYear(year)'>{{year}}</button>
+            <div class='form-group row align-items-center'>
+              <div class='col-6'>
+                <label>Select Academic Year</label>
+              </div>
+              <div class='col-6'>
+                <div ngbDropdown class="d-inline-block">
+                  <button type='button' class="btn btn-outline-primary" id="dropdownDownloadSchoolYear" ngbDropdownToggle>{{selectedCreateSchoolYear}}</button>
+                  <div ngbDropdownMenu aria-labelledby="dropdownDownloadSchoolYear">
+                    <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='selectSchoolYear(year)'>{{year}}</button>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class='form-group'>
-              <div ngbDropdown class="d-inline-block">
-                <button type='button' class="btn btn-outline-primary" id="dropdownCreateScopes" ngbDropdownToggle>{{selectedCreateScope}}</button>
-                <div ngbDropdownMenu aria-labelledby="dropdownCreateScopes">
-                  <button type='button' class='dropdown-item' *ngFor='let scope of scopes' (click)='selectCreatedScope(scope)'>{{scope}}</button>
+            <div class='form-group row align-items-center'>
+              <div class='col-6'>
+                <label>Select Billing Period</label>
+              </div>
+              <div class='col-6'>
+                <div ngbDropdown class="d-inline-block">
+                  <button type='button' class="btn btn-outline-primary" id="dropdownCreateScopes" ngbDropdownToggle>{{selectedCreateScope}}</button>
+                  <div ngbDropdownMenu aria-labelledby="dropdownCreateScopes">
+                    <button type='button' class='dropdown-item' *ngFor='let scope of scopes' (click)='selectCreatedScope(scope)'>{{scope}}</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class='form-group row align-items-center'>
+              <div class='col-6'>
+                <label>Select Invoice Recipient</label>
+              </div>
+              <div class='col-6'>
+                <div class='btn-group btn-group-toggle' ngbRadioGroup id='invoiceRecipient' name='invoiceRecipient' [(ngModel)]='invoiceRecipient'>
+                  <label ngbButtonLabel class='btn-primary'>
+                    <input ngbButton type="radio" value='SD'> Direct Pay SDs
+                  </label>
+                  <label ngbButtonLabel class='btn-primary'>
+                    <input ngbButton type="radio" value='PDE'> PDE
+                  </label>
+                  <label ngbButtonLabel class='btn-primary'>
+                    <input ngbButton type='radio' value='SSD' />Selected SDs
+                  </label>
                 </div>
               </div>
             </div>
