@@ -168,7 +168,9 @@ namespace api.Controllers
 
 		private void CloneInvoiceSummarySheet(Workbook src, Workbook wb, int districtIndex, string districtName)
 		{
-			wb.Worksheets.Add();
+			if (districtIndex > 0)
+				wb.Worksheets.Add();
+
 			var sheet = wb.Worksheets.Last();
 			sheet.Copy(src.Worksheets[0]);
 			sheet.Name = $"{districtName.Substring(0, Math.Min(districtName.Length, 17))} Summary Info";
