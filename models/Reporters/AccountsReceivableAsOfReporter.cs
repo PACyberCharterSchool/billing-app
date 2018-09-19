@@ -18,7 +18,7 @@ namespace models.Reporters
 		public decimal PaidByDistrict { get; set; }
 		public decimal PaidByPDE { get; set; }
 		public decimal Refunded { get; set; }
-		public decimal TotalPaid => (PaidByDistrict + PaidByPDE) - Refunded;
+		public decimal TotalPaid => PaidByDistrict + PaidByPDE - Refunded;
 		public decimal NetDue => TotalDue - TotalPaid;
 	}
 
