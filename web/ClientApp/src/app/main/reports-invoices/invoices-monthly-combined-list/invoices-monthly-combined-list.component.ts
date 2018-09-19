@@ -2,14 +2,18 @@ import { Component, OnInit } from '@angular/core';
 
 import { Report, ReportType } from '../../../models/report.model';
 import { Template } from '../../../models/template.model';
+import { SchoolDistrict } from '../../../models/school-district.model';
+import { PaymentType } from '../../../models/payment.model';
 
 import { Globals } from '../../../globals';
+
 import { ReportsService } from '../../../services/reports.service';
 import { UtilitiesService } from '../../../services/utilities.service';
 import { FileSaverService } from '../../../services/file-saver.service';
 import { TemplatesService } from '../../../services/templates.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
 import { StudentRecordsService } from '../../../services/student-records.service';
+import { SchoolDistrictService } from '../../../services/school-district.service';
 
 import { InvoiceCreateFormComponent } from '../invoice-create-form/invoice-create-form.component';
 
@@ -39,7 +43,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     'PDF'
   ];
   private selectedCreateSchoolYear: string;
-  private selectedDownloadSchoolYear: string;
   private selectedDownloadStatus: string;
   public selectedFilterSchoolYear: string;
   public selectedFilterStatus: string;
@@ -54,6 +57,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   public selectedAsOfBillingDate: string;
   public selectedDownloadFormat: string;
   public invoiceRecipient;
+  private schoolDistricts: SchoolDistrict[];
 
   constructor(
     private globals: Globals,
@@ -64,15 +68,14 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     private ngxSpinnerService: NgxSpinnerService,
     private academicYearsService: AcademicYearsService,
     private studentRecordsService: StudentRecordsService,
+    private schoolDistrictsService: SchoolDistrictService,
     private ngbModal: NgbModal,
     private ngbActiveModal: NgbActiveModal
   ) { }
 
   ngOnInit() {
     this.selectedCreateTemplateName = 'Select Bulk Invoice Template';
-    // this.selectedCreateSchoolYear = 'Select Academic Year';
     this.selectedCurrentScope = 'Select billing period';
-    // this.selectedCreateScope = 'Select billing period';
     this.spinnerMsg = 'Loading bulk invoices.  Please wait...';
 
     this.ngxSpinnerService.show();
@@ -107,6 +110,17 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
         console.log(`InvoicesListComponent.ngOnInit(): error is ${error}.`);
       }
     );
+
+    this.schoolDistrictsService.getSchoolDistricts().subscribe(
+      data => {
+        console.log('InvoicesListComponent.ngOnInit():  data is ', data);
+        this.schoolDistricts = data['schoolDistricts'];
+      },
+      error => {
+        console.log('InvoicesListComponent.ngOnInit():  error is ', error);
+      }
+    );
+
     this.selectedFilterSchoolYear = 'School Year';
     this.selectedFilterStatus = 'Status';
   }
@@ -210,21 +224,41 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     return this.academicYearsService.getAcademicYears();
   }
 
+  private getInvoiceRecipients(): number[] {
+    let auns: number[];
+
+    switch (this.invoiceRecipient) {
+      case 'SD':
+        auns = this.schoolDistricts.filter((sd) => sd.paymentType === PaymentType.Check).map((sd) => +sd.aun);
+        break;
+      case 'PDE':
+        auns = this.schoolDistricts.filter((sd) => sd.paymentType === 'ACH').map((sd) => +sd.aun);
+        break;
+      case 'SDS':
+        auns = null;
+        break;
+    }
+
+    return auns;
+  }
+
   create(): void {
     this.spinnerMsg = 'Creating bulk invoice.  Please wait...';
     this.ngxSpinnerService.show();
     this.selectedAsOfBillingDate = new Date(Date.now()).toLocaleDateString('en-US');
+    const auns: number[] = this.getInvoiceRecipients();
+
     this.reportsService.createBulkInvoice(
       {
         'reportType': 'BulkInvoice',
         'schoolYear': this.selectedCreateSchoolYear.replace(/\s+/g, ''),
         'name': this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope),
-        // 'templateId': this.selectedCreateTemplate.id,
         'bulkInvoice': {
           'asOf': this.selectedAsOfBillingDate,
           'toSchoolDistrict': this.selectedAsOfBillingDate,
           'toPDE': this.selectedAsOfBillingDate,
-          'scope': this.selectedCreateScope
+          'scope': this.selectedCreateScope,
+          'auns': auns
         }
       }
     ).subscribe(

@@ -2,11 +2,15 @@ import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 
 import { SchoolCalendarService } from '../../../services/school-calendar.service';
 import { UtilitiesService } from '../../../services/utilities.service';
+import { AcademicYearsService } from '../../../services/academic-years.service';
 
 import { Calendar } from '../../../models/calendar.model';
 import { CalendarDay } from '../../../models/calendar-day.model';
 
 import { Globals } from '../../../globals';
+
+import { NgxSpinnerService } from 'ngx-spinner';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-administration-school-calendar',
@@ -15,21 +19,24 @@ import { Globals } from '../../../globals';
 })
 export class AdministrationSchoolCalendarComponent implements OnInit {
   private schoolCalendar: Calendar;
-  public academicYear: string;
   private direction: number;
   private property: string;
   private isDescending: boolean;
   public days: CalendarDay[];
   public searchText: string;
-
-  @ViewChild('calendarFileSelector') calendarFileSelector: ElementRef;
+  private calendarImportFormData: FormData = new FormData();
+  public selectedAcademicYear: string;
+  public schoolYears: string[];
 
   constructor(
     private schoolCalendarService: SchoolCalendarService,
     private utilitiesService: UtilitiesService,
+    private academicYearsService: AcademicYearsService,
+    private ngxSpinnerService: NgxSpinnerService,
+    private ngbModal: NgbModal,
     private globals: Globals
   ) {
-    this.academicYear = globals.currentSchoolYear;
+    this.selectedAcademicYear = globals.currentSchoolYear;
     this.direction = 1;
     this.property = 'schoolDay';
   }
@@ -45,26 +52,8 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
         console.log('AdministrationSchoolCalendarComponent.ngOnInit(): error is ', error);
       }
     );
-  }
 
-  handleFileSelection($event) {
-    if ($event) {
-      if ($event.target.files && $event.target.files.length > 0) {
-        const files = $event.target.files;
-        const formData = new FormData();
-
-        formData.append('file', files[0], files[0].name);
-        this.schoolCalendarService.updateByYear(this.academicYear, formData).subscribe(
-          data => {
-            console.log('AdministrationSchoolCalendarComponent.handleFileSelection(): data is ', data['calendar']);
-            this.schoolCalendar = data['calendar'];
-          },
-          error => {
-            console.log('AdministrationSchoolCalendarComponent.handleFileSelection(): error is ', error);
-          }
-        );
-      }
-    }
+    this.schoolYears = this.academicYearsService.getAcademicYears();
   }
 
   sort(property) {
@@ -112,5 +101,43 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
 
   resetDays() {
     this.days = this.schoolCalendar.days;
+  }
+
+  public selectAcademicYear(year: string): void {
+    this.selectedAcademicYear = year;
+  }
+
+  private doCalendarImport(): void {
+    this.schoolCalendarService.updateByYear(this.selectedAcademicYear, this.calendarImportFormData).subscribe(
+      data => {
+        console.log('AdministrationSchoolCalendarComponent.handleFileSelection(): data is ', data['calendar']);
+        this.schoolCalendar = data['calendar'];
+      },
+      error => {
+        console.log('AdministrationSchoolCalendarComponent.handleFileSelection(): error is ', error);
+      }
+    );
+  }
+
+  handleFileSelection($event) {
+    if ($event) {
+      if ($event.target.files && $event.target.files.length > 0) {
+        const files = $event.target.files;
+
+        this.calendarImportFormData.append('file', files[0], files[0].name);
+      }
+    }
+  }
+
+  public importSchoolYearCalendar(importCalendarContent): void {
+    const modal = this.ngbModal.open(importCalendarContent, { centered: true });
+    modal.result.then(
+      (result) => {
+        this.doCalendarImport();
+      },
+      (response) => {
+        console.log('AdministrationSchoolCalendarComponent.importSchoolYearCalendar():  response is ', response);
+      }
+    );
   }
 }

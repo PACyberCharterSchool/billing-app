@@ -16,14 +16,14 @@ export class SchoolCalendarService {
     headers: new HttpHeaders({
       'Content-Type': 'application/json'
     })
-  };
+  };:w
 
   constructor(private httpClient: HttpClient) {
     this.apiSchoolCalendarUrl = '/api/Calendars';
   }
 
   getByYear(year: string): Observable<Calendar> {
-    const url = this.apiSchoolCalendarUrl + `/${year}`;
+    const url = this.apiSchoolCalendarUrl + `/${year.replace(/\s+/g, '')}`;
     return this.httpClient.get<Calendar>(url, this.headers);
   }
 
@@ -31,7 +31,7 @@ export class SchoolCalendarService {
     // NOTE: this request is specifically *not* sending a Content-Type HTTP request header
     // because Angular needs to form that value on it's own when sending a request of
     // Content-Type multipart/form-data
-    const url = this.apiSchoolCalendarUrl + `/${year}`;
+    const url = this.apiSchoolCalendarUrl + `/${year.replace(/\s+/g, '')}`;
     return this.httpClient.put<any>(url, formData);
   }
 }
