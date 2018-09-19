@@ -40,8 +40,8 @@
   </div>
   <div class='modal-body'>
     <div class='row align-items-center'>
-      <div class='col-6'>
-        <label for='calendar-file-selector'>Select Calendar File:</label>
+      <div class='col-6 justify-content-left'>
+        <label class='text-align-left' for='calendar-file-selector'>Select Calendar File:</label>
       </div>
       <div class='col-6'>
         <input
@@ -58,7 +58,7 @@
       </div>
       <div class='col-6'>
         <div ngbDropdown class='d-inline-block'>
-        <button ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown'></button>
+          <button ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown'></button>
           <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown'>
             <button class='dropdown-item' *ngFor='let y of schoolYears' (click)='selectAcademicYear(y)'>{{y}}</button>
           </div>

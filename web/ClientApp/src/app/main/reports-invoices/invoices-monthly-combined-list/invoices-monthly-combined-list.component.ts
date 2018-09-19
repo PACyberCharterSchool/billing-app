@@ -58,6 +58,8 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   public selectedDownloadFormat: string;
   public invoiceRecipient;
   private schoolDistricts: SchoolDistrict[];
+  public toSchoolDistrictDate;
+  public toPDEDate;
 
   constructor(
     private globals: Globals,
@@ -234,7 +236,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       case 'PDE':
         auns = this.schoolDistricts.filter((sd) => sd.paymentType === 'ACH').map((sd) => +sd.aun);
         break;
-      case 'SDS':
+      case 'All':
         auns = null;
         break;
     }
@@ -255,8 +257,14 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
         'name': this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope),
         'bulkInvoice': {
           'asOf': this.selectedAsOfBillingDate,
-          'toSchoolDistrict': this.selectedAsOfBillingDate,
-          'toPDE': this.selectedAsOfBillingDate,
+          'toSchoolDistrict': new Date(
+            this.toSchoolDistrictDate.year,
+            this.toSchoolDistrictDate.month - 1,
+            this.toSchoolDistrictDate.day).toLocaleDateString('en-US'),
+          'toPDE': new Date(
+            this.toPDEDate.year,
+            this.toPDEDate.month - 1,
+            this.toPDEDate.day).toLocaleDateString('en-US'),
           'scope': this.selectedCreateScope,
           'auns': auns
         }
@@ -319,6 +327,12 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
         console.log('InvoicesListComponent.createBulkInvoice(): reason is ', reason);
       }
     );
+  }
+
+  onIssuedSchoolDistrictDateChanged() {
+  }
+
+  onIssuedPDEDateChanged() {
   }
 
   private generateBulkInvoiceName(schoolYear: string, scope: string): string {

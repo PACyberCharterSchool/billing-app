@@ -60,12 +60,25 @@
   }
 }
 
+.modal-header {
+  h4 {
+    color:#58a719
+  }
+}
+
 .modal-body {
   .row {
-    margin-bottom: 10px;
+    margin-bottom: 30px;
     .col-6 {
       .d-inline-block {
         width: 100%;
+
+        .dropdown-toggle {
+          width: 100%;
+          .dropdown-menu {
+            width: 100%;
+          }
+        }
       }
     }
   }
