@@ -16,7 +16,7 @@ export class SchoolCalendarService {
     headers: new HttpHeaders({
       'Content-Type': 'application/json'
     })
-  };:w
+  };
 
   constructor(private httpClient: HttpClient) {
     this.apiSchoolCalendarUrl = '/api/Calendars';
