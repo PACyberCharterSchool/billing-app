@@ -45,7 +45,7 @@ export class RefundsService {
       amount: refund.amount,
       checkNumber: refund.checkNumber,
       date: refund.date,
-      schoolYear: refund.schoolYear,
+      schoolYear: refund.schoolYear.replace(/\s+/g, ''),
       schoolDistrictAun: +refund.schoolDistrict.aun
     });
 
