@@ -59,3 +59,14 @@
     }
   }
 }
+
+.modal-body {
+  .row {
+    margin-bottom: 10px;
+    .col-6 {
+      .d-inline-block {
+        width: 100%;
+      }
+    }
+  }
+}
