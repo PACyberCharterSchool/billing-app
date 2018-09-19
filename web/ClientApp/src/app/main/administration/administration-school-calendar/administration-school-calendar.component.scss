@@ -35,21 +35,20 @@
 }
 
 .calendar-list-row {
-  height: calc(100% - 72px);
+  height: calc(100% - 60px);
 
   div.col-12 {
     height: 100%;
 
     table {
-      // height: 100%;
       padding: 0;
       margin: 0;
       thead {
-        height: 10%;
+        height: 60px;
       }
 
       tbody {
-        height: 85%;
+        height: calc(100% - 60px);
       }
     }
 
