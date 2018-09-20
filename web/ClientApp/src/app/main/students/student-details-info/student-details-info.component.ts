@@ -101,7 +101,7 @@ export class StudentDetailsInfoComponent implements OnInit {
     if (this.student.studentDateOfBirth !== null) {
       this.studentDetailForm.get('personalInfo.dateOfBirth').setValue({
         year: new Date(this.student.studentDateOfBirth).getFullYear(),
-        month: new Date(this.student.studentDateOfBirth).getMonth(),
+        month: new Date(this.student.studentDateOfBirth).getMonth() + 1,
         day: new Date(this.student.studentDateOfBirth).getDate()
       });
     }
@@ -109,7 +109,7 @@ export class StudentDetailsInfoComponent implements OnInit {
     if (this.student.studentEnrollmentDate !== null) {
       this.studentDetailForm.get('studentInfo.enrollmentDate').setValue({
         year: new Date(this.student.studentEnrollmentDate).getFullYear(),
-        month: new Date(this.student.studentEnrollmentDate).getMonth(),
+        month: new Date(this.student.studentEnrollmentDate).getMonth() + 1,
         day: new Date(this.student.studentEnrollmentDate).getDate()
       });
     }
@@ -117,7 +117,7 @@ export class StudentDetailsInfoComponent implements OnInit {
     if (this.student.studentWithdrawalDate !== null) {
       this.studentDetailForm.get('studentInfo.withdrawalDate').setValue({
         year: new Date(this.student.studentWithdrawalDate).getFullYear(),
-        month: new Date(this.student.studentWithdrawalDate).getMonth(),
+        month: new Date(this.student.studentWithdrawalDate).getMonth() + 1,
         day: new Date(this.student.studentWithdrawalDate).getDate()
       });
     }
@@ -125,7 +125,7 @@ export class StudentDetailsInfoComponent implements OnInit {
     if (this.student.studentCurrentIep !== null) {
       this.studentDetailForm.get('studentInfo.currentIepDate').setValue({
         year: new Date(this.student.studentCurrentIep).getFullYear(),
-        month: new Date(this.student.studentCurrentIep).getMonth(),
+        month: new Date(this.student.studentCurrentIep).getMonth() + 1,
         day: new Date(this.student.studentCurrentIep).getDate()
       });
     }
@@ -133,7 +133,7 @@ export class StudentDetailsInfoComponent implements OnInit {
     if (this.student.studentFormerIep !== null) {
       this.studentDetailForm.get('studentInfo.formerIepDate').setValue({
         year: new Date(this.student.studentFormerIep).getFullYear(),
-        month: new Date(this.student.studentFormerIep).getMonth(),
+        month: new Date(this.student.studentFormerIep).getMonth() + 1,
         day: new Date(this.student.studentFormerIep).getDate()
       });
     }

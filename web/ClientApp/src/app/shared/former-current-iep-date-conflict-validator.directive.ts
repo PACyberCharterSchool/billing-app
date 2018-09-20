@@ -46,10 +46,10 @@ export class FormerCurrentIepDateConflictValidatorDirective {
     const formerDate: AbstractControl = control.get('studentInfo.formerIepDate');
     const currentDate: AbstractControl = control.get('studentInfo.currentIepDate');
 
-    if (currentDate && currentDate.value) {
-      return formerDate &&
-        formerDate.value &&
-        this.isValidDate(formerDate.value) &&
+    if (formerDate && formerDate.value) {
+      return currentDate &&
+        currentDate.value &&
+        this.isValidDate(currentDate.value) &&
         (this.dateCompare(formerDate.value, currentDate.value) === -1
           || this.dateCompare(formerDate.value, currentDate.value) === 0) ? null : { 'appFormerCurrentDateConflictValidator': true };
     }
