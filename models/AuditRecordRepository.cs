@@ -2,11 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace models
 {
 	public interface IAuditRecordRepository
 	{
+		IEnumerable<AuditRecord> GetMany();
 		AuditRecord Create(AuditRecord record);
 		AuditRecord Create(DateTime time, AuditRecord record);
 		IList<AuditRecord> CreateMany(IList<AuditRecord> records);
@@ -25,6 +27,7 @@ namespace models
 			_records = context.AuditRecords;
 			_logger = logger;
 		}
+		public IEnumerable<AuditRecord> GetMany() => _records.OrderBy(r => r.Timestamp);
 
 		public AuditRecord Create(AuditRecord record) => Create(DateTime.Now, record);
 
