@@ -335,8 +335,19 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   onIssuedPDEDateChanged() {
   }
 
+  private generateInvoiceRecipientFileNameTag(): string {
+    switch (this.invoiceRecipient) {
+      case 'SD':
+        return 'SD_Only';
+      case 'PDE':
+        return 'PDE_Only';
+      default:
+        return '';
+    }
+  }
+
   private generateBulkInvoiceName(schoolYear: string, scope: string): string {
-    return 'BulkInvoice_' + scope + '_' + schoolYear;
+    return 'BulkInvoice_' + scope + '_' + schoolYear + this.generateInvoiceRecipientFileNameTag();
   }
 
   private selectSchoolYear(year: string): void {

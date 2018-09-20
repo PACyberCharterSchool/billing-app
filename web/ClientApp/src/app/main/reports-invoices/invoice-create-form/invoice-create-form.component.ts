@@ -192,7 +192,7 @@ export class InvoiceCreateFormComponent implements OnInit {
   private buildInvoiceCreationInfo(): Object {
     return {
       reportType: ReportType.Invoice,
-      name: this.selectedScope + '_INVOICE_' + this.selectedSchoolDistrict.name,
+      name: this.selectedScope + this.selectedSchoolDistrict.name + '_INVOICE_',
       schoolYear: this.selectedSchoolYear.replace(/\s+/g, ''),
       invoice: {
         asOf: new Date(Date.now()).toLocaleDateString('en-US'),
