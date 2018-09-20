@@ -14,8 +14,12 @@ import { OrderByPipe } from '../../../pipes/orderby.pipe';
 
 import { SchoolCalendarService } from '../../../services/school-calendar.service';
 import { UtilitiesService } from '../../../services/utilities.service';
+import { AcademicYearsService } from '../../../services/academic-years.service';
 
 import { Globals } from '../../../globals';
+
+import { NgxSpinnerModule } from 'ngx-spinner';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 describe('AdministrationSchoolCalendarComponent', () => {
   let component: AdministrationSchoolCalendarComponent;
@@ -29,8 +33,8 @@ describe('AdministrationSchoolCalendarComponent', () => {
         NormalizeFieldValuePipe,
         OrderByPipe
       ],
-      imports: [ FormsModule ],
-      providers: [ SchoolCalendarService, UtilitiesService, HttpClient, HttpHandler, Globals ]
+      imports: [ FormsModule, NgxSpinnerModule, NgbModule.forRoot() ],
+      providers: [ SchoolCalendarService, UtilitiesService, HttpClient, HttpHandler, Globals, AcademicYearsService ]
     })
     .compileComponents();
   }));
