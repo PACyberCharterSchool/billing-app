@@ -96,7 +96,7 @@ export class PaymentsListComponent implements OnInit {
         }
         return false;
       }
-    );
+    ).filter((p) => p.split === 1);
     console.log('PaymentsListComponent.filterPaymentRecords():  payments is ', this.payments);
   }
 
