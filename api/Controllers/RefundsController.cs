@@ -41,7 +41,7 @@ namespace api.Controllers
 			[Range(0, double.PositiveInfinity)]
 			public decimal Amount { get; set; }
 
-			[Required]
+			// [Required]
 			[MinLength(1)]
 			public string CheckNumber { get; set; }
 
