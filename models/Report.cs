@@ -13,6 +13,8 @@ namespace models
 		public static readonly ReportType BulkStudentInformation = new ReportType("BulkStudentInformation");
 
 		public static readonly ReportType AccountsReceivableAsOf = new ReportType("AccountsReceivableAsOf");
+
+		public static readonly ReportType Csiu = new ReportType("Csiu");
 	}
 
 	public class ReportMetadata
