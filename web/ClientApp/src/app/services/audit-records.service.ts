@@ -26,7 +26,7 @@ export class AuditRecordsService {
   }
 
   getAll(skip: number): Observable<AuditRecord[]> {
-    const url = this.apiAuditRecordsUrl + `?skip=${skip}&take=${this.globals.take}`;
+    const url = this.apiAuditRecordsUrl;
     return this.httpClient.get<AuditRecord[]>(url, this.headers);
     // return Observable.of(auditRecords);
   }
