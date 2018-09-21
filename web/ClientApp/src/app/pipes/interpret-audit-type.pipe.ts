@@ -14,8 +14,8 @@ export class InterpretAuditTypePipe implements PipeTransform {
       case AuditRecordActivityType.UpdateInvoiceTemplate:
         v = 'Updated Invoice Template';
         break;
-      case AuditRecordActivityType.SchoolCalendars:
-        v = 'School Calendar';
+      case AuditRecordActivityType.UpdateSchoolCalendar:
+        v = 'Updated School Calendar';
         break;
       case AuditRecordActivityType.SchoolDistricts:
         v = 'School District';
