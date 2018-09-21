@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
 
 using api.Common;
 using api.Dtos;
@@ -24,13 +25,17 @@ namespace api.Controllers
 		private readonly ITemplateRepository _templates;
 		private readonly ILogger<TemplatesController> _logger;
 
+		private readonly IAuditRecordRepository _audits;
+
 		public TemplatesController(
 			PacBillContext context,
 			ITemplateRepository templates,
+			IAuditRecordRepository audits,
 			ILogger<TemplatesController> logger)
 		{
 			_context = context;
 			_templates = templates;
+			_audits = audits;
 			_logger = logger;
 		}
 
@@ -133,6 +138,32 @@ namespace api.Controllers
 			}
 
 			template = await Task.Run(() => _context.SaveChanges(() => _templates.CreateOrUpdate(template)));
+
+			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+			using (var tx = _context.Database.BeginTransaction())
+			{
+				try
+				{
+					_audits.Create(new AuditRecord {
+						Username = username,
+						Activity = AuditRecordActivity.UPDATE_TEMPLATE,
+						Timestamp = DateTime.Now,
+						Identifier = template.Id.ToString(),
+						Field = null,
+						Next = null,
+						Previous = null,
+					});
+					_context.SaveChanges();
+
+					tx.Commit();
+				}
+				catch (Exception)
+				{
+					tx.Rollback();
+					throw;
+				}
+			}
+
 			return new CreatedResult($"/api/templates/{template.ReportType}/{template.SchoolYear}", new TemplateResponse
 			{
 				Template = new TemplateDto(template),

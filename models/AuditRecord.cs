@@ -7,6 +7,7 @@ namespace models
 	{
 		public const string EDIT_STUDENT_RECORD = "EditStudentRecord";
 		public const string UPDATE_SCHOOL_CALENDAR = "UpdateSchoolCalendar";
+		public const string UPDATE_TEMPLATE = "UpdateTemplate";
 	}
 
 	public class AuditRecord
