@@ -43,6 +43,14 @@ export class ReportsService {
     return this.getReportsByMeta(reportMeta);
   }
 
+  public getCSIU(): Observable<Report[]> {
+    const reportMeta: Object = Object.assign({}, {
+      'Type': ReportType.CSIU,
+    });
+
+    return this.getReportsByMeta(reportMeta);
+  }
+
   // HTTP GET /api/reports/:name
   public getReportDataByFormat(report: Report, format: string): Observable<any> {
     const url = this.apiReportsUrl + `/${report.name}`;
