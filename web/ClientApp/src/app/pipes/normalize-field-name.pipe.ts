@@ -220,7 +220,6 @@ export class NormalizeFieldNamePipe implements PipeTransform {
       case 'field':
         fieldName = 'Field';
         break;
-      case ''
       default:
         fieldName = 'Column';
         break;
