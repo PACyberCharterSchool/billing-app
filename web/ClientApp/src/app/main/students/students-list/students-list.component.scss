@@ -1,4 +1,6 @@
 .base-search-tools-row {
+  height: 45px;
+
   .base-date-search-tools-col {
     margin: 0;
     padding: 0;
@@ -56,19 +58,21 @@
 }
 
 .advanced-search-tools-row {
+  height: 75px;
 }
 
 .student-list-view-row {
-  height: 100%;
+  height: calc(100% - 40px);
 
   div {
     table {
       height: 100%;
+
       thead {
-        height: 130px;
+        height: 95px;
       }
       tbody {
-        height: calc(100% - 130px);
+        height: calc(100% - 95px);
       }
     }
   }
