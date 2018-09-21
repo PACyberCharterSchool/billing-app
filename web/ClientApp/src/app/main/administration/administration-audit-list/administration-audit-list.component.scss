@@ -1,48 +1,50 @@
 .audits-title-row {
   height: 40px;
 
-  h4 {
-    color: #57a918;
+  div.col-2 {
+    h4 {
+      color: #57a918;
+    }
+  }
+
+  div.col-7 {
+    height: 100%;
+
+    input[type='text'] {
+      width: 70%;
+      height: 100%;
+      line-height: 16px;
+    }
+
+    button.btn-primary {
+      height: 100%;
+      position: relative;
+      top: -2px;
+      left: -4px;
+    }
+
+    button.btn-outline-primary {
+      height: 100%;
+      position: relative;
+      top: -1px;
+    }
   }
 }
 
 .audits-filter-row {
   height: 40px;
 
-  div.col-md-6 {
+  div.col-6 {
     height: 100%;
     padding-bottom: 4px;
-
-    div.col-md-12 {
-      height: 100%;
-
-      input[type='text'] {
-        width: 70%;
-        height: 100%;
-        line-height: 16px;
-      }
-
-      button.btn-primary {
-        height: 100%;
-        position: relative;
-        top: -2px;
-        left: -4px;
-      }
-
-      button.btn-outline-primary {
-        height: 100%;
-        position: relative;
-        top: -1px;
-      }
-    }
   }
 
 }
 
 .audits-list-row {
-  height: calc(100% - 40px);
+  height: calc(100% - 80px);
 
-  div.col-md-12 {
+  div.col-12 {
     height: 100%;
 
     table {

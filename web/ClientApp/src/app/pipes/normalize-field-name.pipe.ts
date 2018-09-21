@@ -214,6 +214,13 @@ export class NormalizeFieldNamePipe implements PipeTransform {
       case 'scope':
         fieldName = 'Billing Period';
         break;
+      case 'identifier':
+        fieldName = 'Identifier';
+        break;
+      case 'field':
+        fieldName = 'Field';
+        break;
+      case ''
       default:
         fieldName = 'Column';
         break;

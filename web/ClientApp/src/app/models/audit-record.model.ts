@@ -1,16 +1,17 @@
-export enum AuditRecordType {
-  InvoiceTemplates,
-  StudentRecords,
-  SchoolCalendars,
-  SchoolDistricts
+export enum AuditRecordActivityType {
+  UpdateInvoiceTemplate = 'UpdateInvoiceTemplate',
+  EditStudentRecord = 'EditStudentRecord',
+  SchoolCalendars = 'SchoolCalendars',
+  SchoolDistricts = 'SchoolDistricts'
 }
 
 export class AuditRecord {
   id: number;
   username: string;
   activity: string;
-  type: AuditRecordType;
   timestamp: Date;
-  oldValue: any;
-  newValue: any;
+  field: string;
+  identifier: string;
+  next: any;
+  previous: any;
 }

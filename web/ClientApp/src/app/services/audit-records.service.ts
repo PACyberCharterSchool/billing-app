@@ -2,73 +2,21 @@ import { Injectable } from '@angular/core';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { Observable } from 'rxjs';
+// import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 
-import { AuditRecord, AuditRecordType } from '../models/audit-record.model';
+import { AuditRecord, AuditRecordActivityType } from '../models/audit-record.model';
 
 import { Globals } from '../globals';
 
-let auditRecords: AuditRecord[] = [
-  {
-    id: 1,
-    username: 'RA2',
-    activity: 'Template Invoice Change',
-    type: AuditRecordType.InvoiceTemplates,
-    timestamp: new Date('Wed May 23 13:31:28 EDT 2018'),
-    oldValue: 'Individual Student 2017-2018',
-    newValue: 'Individual Student 2018-2019'
-  },
-  {
-    id: 2,
-    username: 'RA2',
-    activity: 'School District Change',
-    type: AuditRecordType.SchoolDistricts,
-    timestamp: new Date ('Fri May 25 13:35:43 EDT 2018'),
-    oldValue: 'Seneca Valley SD',
-    newValue: 'Mars SD'
-  },
-  {
-    id: 3,
-    username: 'RA1',
-    activity: 'School District Change',
-    type: AuditRecordType.InvoiceTemplates,
-    timestamp: new Date('Sat May 26 13:31:28 EDT 2018'),
-    oldValue: 'Penn Trafford SD',
-    newValue: 'Gateway SD'
-  },
-  {
-    id: 4,
-    username: 'RA1',
-    activity: 'Template Invoice Change',
-    type: AuditRecordType.InvoiceTemplates,
-    timestamp: new Date('Thu May 24 13:31:28 EDT 2018'),
-    oldValue: 'Individual PDE 2017-2018',
-    newValue: 'Individual PDE 2018-2019'
-  },
-  {
-    id: 5,
-    username: 'RA3',
-    activity: 'School District Change',
-    type: AuditRecordType.SchoolDistricts,
-    timestamp: new Date ('Fri May 25 13:35:43 EDT 2018'),
-    oldValue: 'Tionesta SD',
-    newValue: 'Happy Valley SD'
-  },
-  {
-    id: 6,
-    username: 'RA2',
-    activity: 'School District Change',
-    type: AuditRecordType.InvoiceTemplates,
-    timestamp: new Date('Mon May 21 13:31:28 EDT 2018'),
-    oldValue: 'Ellwood City SD',
-    newValue: 'Carkundle SD'
-  }
-];
-
 @Injectable()
 export class AuditRecordsService {
-
   private readonly apiAuditRecordsUrl;
+  private readonly headers = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json'
+    })
+  };
 
   constructor(
     private globals: Globals,
@@ -79,6 +27,7 @@ export class AuditRecordsService {
 
   getAll(skip: number): Observable<AuditRecord[]> {
     const url = this.apiAuditRecordsUrl + `?skip=${skip}&take=${this.globals.take}`;
-    return Observable.of(auditRecords);
+    return this.httpClient.get<AuditRecord[]>(url, this.headers);
+    // return Observable.of(auditRecords);
   }
 }
