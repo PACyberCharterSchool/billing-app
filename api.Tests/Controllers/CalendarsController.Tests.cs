@@ -23,7 +23,7 @@ namespace api.Tests.Controllers
 		private PacBillContext _context;
 		private Mock<ICalendarRepository> _calendars;
 		private ILogger<CalendarsController> _logger;
-
+		private Mock<IAuditRecordRepository> _audits;
 		private CalendarsController _uut;
 
 		[SetUp]
@@ -32,9 +32,10 @@ namespace api.Tests.Controllers
 			_context = new PacBillContext(new DbContextOptionsBuilder<PacBillContext>().
 				UseInMemoryDatabase("calendars-controller").Options);
 			_calendars = new Mock<ICalendarRepository>();
+			_audits = new Mock<IAuditRecordRepository>();
 			_logger = new TestLogger<CalendarsController>();
 
-			_uut = new CalendarsController(_context, _calendars.Object, _logger);
+			_uut = new CalendarsController(_context, _calendars.Object, _audits.Object, _logger);
 		}
 
 		[TearDown]
