@@ -25,6 +25,7 @@ import { HotTableModule, HotTableRegisterer } from '@handsontable/angular';
 import { SharedModule } from '../../shared/shared.module';
 
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { CsiuListComponent } from './csiu-list/csiu-list.component';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     CellComponent,
     InvoicesMonthlyCombinedListComponent,
     StudentActivityListComponent,
-    AccountsReceivableAsOfComponent
+    AccountsReceivableAsOfComponent,
+    CsiuListComponent
   ],
   imports: [
     CommonModule,
