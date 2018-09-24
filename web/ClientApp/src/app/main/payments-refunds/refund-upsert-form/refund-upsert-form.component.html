@@ -1,101 +1,94 @@
-<div class='col-12'>
-  <div class='modal-header'>
-    <h4 class="modal-title">{{op | titlecase}} Refund</h4>
-    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
+<div class='row align-items-center'>
+  <div class='col-12'>
+    <div class='modal-header'>
+      <h4 class="modal-title">{{op | titlecase}} Refund</h4>
+      <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   </div>
-  <form #refundUpsertForm='ngForm' (ngSubmit)='refundUpsertForm.form.valid && onSubmit()'>
-    <div class='modal-body'>
-      <div class='col-12 payment-not-upserted-error' [style.visibility]="upsertError ? 'visible' : 'hidden'">
-        Refund error:  {{upsertError}}
-      </div>
-      <div class='col-12'>
-        <div class='form-group row align-items-center'>
-          <div class='col-3'>
-            <label>School District Name</label>
-          </div>
-          <div class='col-3'>
-            <div [style.visibility]="((refundUpsertForm.submitted && schoolDistrictName.invalid) || (schoolDistrictName.invalid && (schoolDistrictName.dirty || schoolDistrictName.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
-          </div>
-          <div class='col-6'>
-            <input required id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='selectedSchoolDistrictName' #schoolDistrictName='ngModel' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
-          </div>
+  <div class='col-12'>
+    <form #refundUpsertForm='ngForm' (ngSubmit)='refundUpsertForm.form.valid && onSubmit()'>
+      <div class='modal-body'>
+        <div class='col-12 payment-not-upserted-error' [style.visibility]="upsertError ? 'visible' : 'hidden'">
+          Refund error:  {{upsertError}}
         </div>
-        <div class='form-group row align-items-center'>
-          <div class='col-3'>
-            <label>AUN#</label>
+        <div class='col-12'>
+          <div class='form-group row align-items-center'>
+            <div class='col-3'>
+              <label>School District Name</label>
+            </div>
+            <div class='col-3'>
+              <div [style.visibility]="((refundUpsertForm.submitted && schoolDistrictName.invalid) || (schoolDistrictName.invalid && (schoolDistrictName.dirty || schoolDistrictName.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+            </div>
+            <div class='col-6'>
+              <input required id='typeahead-school-district' type='text' class='form-control' [(ngModel)]='selectedSchoolDistrictName' #schoolDistrictName='ngModel' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
+            </div>
           </div>
-          <div class='col-3'>
+          <div class='form-group row align-items-center'>
+            <div class='col-3'>
+              <label>AUN#</label>
+            </div>
+            <div class='col-3'>
+            </div>
+            <div class='col-6'>
+              <span>{{selectedSchoolDistrict?.aun}}</span>
+            </div>
           </div>
-          <div class='col-6'>
-            <span>{{selectedSchoolDistrict?.aun}}</span>
+          <div class='form-group row align-items-center'>
+            <div class='col-3'>
+              <label>Refund Amount</label>
+            </div>
+            <div class='col-3'>
+              <div [style.visibility]="((refundUpsertForm.submitted && refundAmount.invalid) || (refundAmount.invalid && (refundAmount.dirty || refundAmount.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+            </div>
+            <div class='col-6'>
+              <input currencyMask class='form-control' id='refundAmount' name='refundAmount' [(ngModel)]='amount' required #refundAmount='ngModel' />
+            </div>
           </div>
-        </div>
-        <div class='form-group row align-items-center'>
-          <div class='col-3'>
-            <label>Refund Amount</label>
-          </div>
-          <div class='col-3'>
-            <div [style.visibility]="((refundUpsertForm.submitted && refundAmount.invalid) || (refundAmount.invalid && (refundAmount.dirty || refundAmount.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
-          </div>
-          <div class='col-6'>
-            <input currencyMask class='form-control' id='refundAmount' name='refundAmount' [(ngModel)]='amount' required #refundAmount='ngModel' />
-          </div>
-        </div>
-        <div class='form-group row align-items-center'>
-          <div class='col-3'>
-            <label>Refund Date</label>
-          </div>
-          <div class='col-3'>
-            <div [style.visibility]="((refundUpsertForm.submitted && paymentDate.invalid) || (paymentDate.invalid && (paymentDate.dirty || paymentDate.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
-          </div>
-          <div class='col-6'>
-            <div class='input-group'>
-              <input class='form-control' placeholder='mm-dd-yyyy' required
-                      name='dp' [(ngModel)]='dateModel' #paymentDate='ngModel' ngbDatepicker #d='ngbDatepicker' (ngModelChange)='onDateChanged()'>
-              <div class='input-group-append'>
-                <button class='btn btn-outline-secondary' (click)='d.toggle()' type='button'>
-                  <i class="fa fa-calendar fa-2x"></i>
-                </button>
+          <div class='form-group row align-items-center'>
+            <div class='col-3'>
+              <label>Refund Date</label>
+            </div>
+            <div class='col-3'>
+              <div [style.visibility]="((refundUpsertForm.submitted && paymentDate.invalid) || (paymentDate.invalid && (paymentDate.dirty || paymentDate.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+            </div>
+            <div class='col-6'>
+              <div class='input-group'>
+                <input class='form-control' placeholder='mm-dd-yyyy' required
+                        name='dp' [(ngModel)]='dateModel' #paymentDate='ngModel' ngbDatepicker #d='ngbDatepicker' (ngModelChange)='onDateChanged()'>
+                <div class='input-group-append'>
+                  <button class='btn btn-outline-secondary' (click)='d.toggle()' type='button'>
+                    <i class="fa fa-calendar fa-2x"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <!-- <div class='form-group row align-items-center'>
-          <div class='col-3'>
-            <label>SD #</label>
-          </div>
-          <div class='col-3'>
-            <div [style.visibility]="((refundUpsertForm.submitted && paymentId.invalid) || (paymentId.invalid && (paymentId.dirty || paymentId.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
-          </div>
-          <div class='col-6'>
-            <input type='text' class='form-control' id='refund-check-number' name='refund-check-number' [(ngModel)]='refundCheckNumber' #paymentId='ngModel' required />
-          </div>
-        </div> -->
-        <div class='form-group row align-items-center'>
-          <div class='col-3'>
-            <label>Academic Year</label>
-          </div>
-          <div class='col-3'>
-            <div [style.visibility]="'hidden'" class='alert alert-danger'>Invalid</div>
-          </div>
-          <div class='col-6'>
-            <div ngbDropdown class='d-inline-block'>
-            <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown' required>{{selectedAcademicYear}}</button>
-            <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown'>
-              <button type='button' class='dropdown-item' *ngFor='let y of schoolYears' (click)='setSelectedAcademicYear(y)'>{{y}}</button>
+          <div class='form-group row align-items-center'>
+            <div class='col-3'>
+              <label>Academic Year</label>
+            </div>
+            <div class='col-3'>
+              <div [style.visibility]="'hidden'" class='alert alert-danger'>Invalid</div>
+            </div>
+            <div class='col-6'>
+              <div ngbDropdown class='d-inline-block'>
+              <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown' required>{{selectedAcademicYear}}</button>
+              <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown'>
+                <button type='button' class='dropdown-item' *ngFor='let y of schoolYears' (click)='setSelectedAcademicYear(y)'>{{y}}</button>
+              </div>
+            </div>
             </div>
           </div>
-          </div>
         </div>
       </div>
-    </div>
-    <div class='modal-footer'>
-      <div class='form-group'>
-        <button type='button' class='btn btn-outline' (click)="activeModal.close('Close click')">CANCEL</button>
-        <button type='submit' class='btn btn-primary'>{{op | uppercase}}</button>
+      <div class='modal-footer'>
+        <div class='form-group'>
+          <button type='button' class='btn btn-outline' (click)="activeModal.close('Close click')">CANCEL</button>
+          <button type='submit' class='btn btn-primary'>{{op | uppercase}}</button>
+        </div>
       </div>
-    </div>
-  </form>
+    </form>
+  </div>
 </div>

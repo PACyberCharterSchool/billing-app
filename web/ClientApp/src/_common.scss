@@ -116,4 +116,18 @@ body, html {
     background-color: #fe4848;
     color: #ffffff;
   }
+
+  .modal-header {
+    background-color: #005a92;
+
+    .modal-title {
+      color: #ffffff;
+    }
+
+    button {
+      span {
+        color: #ffffff;
+      }
+    }
+  }
 }
