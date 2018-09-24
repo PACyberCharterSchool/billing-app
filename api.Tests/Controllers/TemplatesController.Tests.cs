@@ -25,6 +25,7 @@ namespace api.Tests.Controllers
 		private PacBillContext _context;
 		private Mock<ITemplateRepository> _templates;
 		private ILogger<TemplatesController> _logger;
+		private Mock<IAuditRecordRepository> _audits;
 
 		private TemplatesController _uut;
 
@@ -34,9 +35,10 @@ namespace api.Tests.Controllers
 			_context = new PacBillContext(new DbContextOptionsBuilder<PacBillContext>().
 				UseInMemoryDatabase("templates-controller").Options);
 			_templates = new Mock<ITemplateRepository>();
+			_audits = new Mock<IAuditRecordRepository>();
 			_logger = new TestLogger<TemplatesController>();
 
-			_uut = new TemplatesController(_context, _templates.Object, _logger);
+			_uut = new TemplatesController(_context, _templates.Object, _audits.Object, _logger);
 		}
 
 		[TearDown]

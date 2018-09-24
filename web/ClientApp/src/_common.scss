@@ -26,6 +26,8 @@ body, html {
     width: 100%;
 
     thead {
+      background-color: #005a92;
+      color: #ffffff;
       display: block;
       height: 7%;
 
@@ -113,5 +115,19 @@ body, html {
   .btn-validate {
     background-color: #fe4848;
     color: #ffffff;
+  }
+
+  .modal-header {
+    background-color: #005a92;
+
+    .modal-title {
+      color: #ffffff;
+    }
+
+    button {
+      span {
+        color: #ffffff;
+      }
+    }
   }
 }

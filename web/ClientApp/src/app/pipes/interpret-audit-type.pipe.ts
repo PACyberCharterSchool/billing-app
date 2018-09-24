@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { AuditRecordType } from '../models/audit-record.model';
+import { AuditRecordActivityType } from '../models/audit-record.model';
 
 @Pipe({
   name: 'interpretAuditType'
@@ -11,17 +11,17 @@ export class InterpretAuditTypePipe implements PipeTransform {
     let v = 'Unknown';
 
     switch (value) {
-      case AuditRecordType.InvoiceTemplates:
-        v = 'Invoice Template';
+      case AuditRecordActivityType.UpdateTemplate:
+        v = 'Updated Invoice Template';
         break;
-      case AuditRecordType.SchoolCalendars:
-        v = 'School Calendar';
+      case AuditRecordActivityType.UpdateSchoolCalendar:
+        v = 'Updated School Calendar';
         break;
-      case AuditRecordType.SchoolDistricts:
+      case AuditRecordActivityType.SchoolDistricts:
         v = 'School District';
         break;
-      case AuditRecordType.StudentRecords:
-        v = 'Student Records';
+      case AuditRecordActivityType.EditStudentRecord:
+        v = 'Edit Student Record';
         break;
     }
     return v;

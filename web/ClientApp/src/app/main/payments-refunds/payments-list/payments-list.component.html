@@ -42,6 +42,8 @@
   </div>
 </div>
 <ng-template #importPDEPaymentsContent let-c='close' let-d='dismiss'>
+
+<div class='row align-items-center'>
   <div class='col-12'>
     <div class='modal-header'>
       <h4 class='modal-title'>Import Payments to PDE</h4>
@@ -49,28 +51,31 @@
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
+  </div>
+  <div class='col-12'>
     <form #selectPDEPaymentsFileForm (ngSubmit)='c("Import clicked."); doImport()'>
       <div class='modal-body'>
-          <div class='form-group col-12'>
-            <div class='col-6'>
-              <label>Select payment data file:</label>
-            </div>
-            <div class='col-6'>
-              <input type='file'
-                [(ngModel)]='fileName'
-                [ngModelOptions]='{standalone: true}'
-                accept='text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                (change)='setImportPaymentsUrl($event)'
-                />
-            </div>
+        <div class='form-group col-12'>
+          <div class='col-6'>
+            <label>Select payment data file:</label>
           </div>
-      </div>
-      <div class='modal-footer'>
-        <div class='form-group'>
-          <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
-          <button type='submit' class='btn btn-primary'>IMPORT</button>
+          <div class='col-6'>
+            <input type='file'
+              [(ngModel)]='fileName'
+              [ngModelOptions]='{standalone: true}'
+              accept='text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+              (change)='setImportPaymentsUrl($event)'
+              />
+          </div>
         </div>
       </div>
-    </form>
+        <div class='modal-footer'>
+          <div class='form-group'>
+            <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
+            <button type='submit' class='btn btn-primary'>IMPORT</button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 </ng-template>

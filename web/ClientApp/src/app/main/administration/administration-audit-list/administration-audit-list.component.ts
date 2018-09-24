@@ -5,7 +5,7 @@ import { AuditRecordsService } from '../../../services/audit-records.service';
 
 import { Globals } from '../../../globals';
 
-import { AuditRecord, AuditRecordType } from '../../../models/audit-record.model';
+import { AuditRecord, AuditRecordActivityType } from '../../../models/audit-record.model';
 
 @Component({
   selector: 'app-administration-audit-list',
@@ -26,6 +26,7 @@ export class AdministrationAuditListComponent implements OnInit {
   public searchText: string;
   public column: any;
   public k: any;
+  public selectedAuditActivityType: string;
 
   constructor(
     private globals: Globals,
@@ -43,14 +44,14 @@ export class AdministrationAuditListComponent implements OnInit {
     this.auditRecordService.getAll(this.skip).subscribe(
       data => {
         console.log('AdministrationAuditListComponent.ngOnInit(): data is ', data);
-        this.allAudits = this.audits = data;
+        this.allAudits = this.audits = data['audits'];
         this.initAuditTypes();
       }
     );
   }
 
   initAuditTypes() {
-    const atypes = this.allAudits.map((a) => a.type);
+    const atypes = this.allAudits.map((a) => a.activity);
     this.auditTypes = this.utilitiesService.uniqueItemsInArray(atypes);
   }
 
@@ -61,7 +62,7 @@ export class AdministrationAuditListComponent implements OnInit {
   }
 
   filterAuditRecordsBySearch() {
-    this.audits= this.allAudits.filter(
+    this.audits = this.allAudits.filter(
       (i) => {
         const re = new RegExp(this.searchText, 'gi');
         if (
@@ -76,7 +77,8 @@ export class AdministrationAuditListComponent implements OnInit {
   }
 
   filterAuditRecordsBySelectedAuditType(type: any) {
-    this.audits = this.allAudits.filter((a) => a.type === type);
+    this.selectedAuditActivityType = type;
+    this.audits = this.allAudits.filter((a) => a.activity === type);
   }
 
   resetAuditRecords() {
@@ -86,7 +88,7 @@ export class AdministrationAuditListComponent implements OnInit {
 
   listDisplayableFields() {
     if (this.allAudits) {
-      const rejected = ['oldValue', 'newValue', 'type'];
+      const rejected = ['next', 'previous', 'type', 'id'];
       const fields = this.utilitiesService.objectKeys(this.allAudits[0]);
       if (fields) {
         return fields.filter((i) => !rejected.includes(i));

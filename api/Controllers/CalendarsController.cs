@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
 
 using CsvHelper;
 using NPOI.SS.UserModel;
@@ -22,15 +23,18 @@ namespace api.Controllers
 	{
 		private readonly PacBillContext _context;
 		private readonly ICalendarRepository _calendars;
+		private readonly IAuditRecordRepository _audits;
 		private readonly ILogger<CalendarsController> _logger;
 
 		public CalendarsController(
 			PacBillContext context,
 			ICalendarRepository calendars,
+			IAuditRecordRepository audits,
 			ILogger<CalendarsController> logger)
 		{
 			_context = context;
 			_calendars = calendars;
+			_audits = audits;
 			_logger = logger;
 		}
 
@@ -131,10 +135,34 @@ namespace api.Controllers
 				return new BadRequestObjectResult(
 					new ErrorResponse($"Invalid file Content-Type '{file.ContentType}'."));
 
-			var parse = _parsers[file.ContentType];
-			var calendar = parse(year, file.OpenReadStream());
+			var parse = _parsers[file.ContentType]; var calendar = parse(year, file.OpenReadStream());
 
 			calendar = await Task.Run(() => _context.SaveChanges(() => _calendars.CreateOrUpdate(calendar)));
+
+			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+			using (var tx = _context.Database.BeginTransaction())
+			{
+				try
+				{
+					_audits.Create(new AuditRecord {
+						Username = username,
+						Activity = AuditRecordActivity.UPDATE_SCHOOL_CALENDAR,
+						Timestamp = DateTime.Now,
+						Identifier = calendar.Id.ToString(),
+						Field = null,
+						Next = null,
+						Previous = null,
+					});
+					_context.SaveChanges();
+
+					tx.Commit();
+				}
+				catch (Exception)
+				{
+					tx.Rollback();
+					throw;
+				}
+			}
 
 			return new CreatedResult($"/api/calendars/{year}", new CalendarResponse
 			{

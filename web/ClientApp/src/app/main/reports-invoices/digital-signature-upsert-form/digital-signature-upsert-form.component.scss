@@ -1,39 +1,12 @@
-div.modal-header {
-  div.modal-title {
-    h4 {
-      color: #58a719;
-    }
-  }
-}
-
-div.modal-body {
-  form {
-    div.col-md-12 {
-      display: inline-flex;
-      padding: 0;
-
-      div.col-md-8 {
-        padding: 0 10px 0 0;
-
-        div.col-md-12 {
-          padding: 0 0 20px 0;
-
-          input[type='text'] {
-            width: 100%;
-          }
-        }
-      }
-
-      div.col-md-4 {
-        border: 1px solid #dddddd;
-        padding: 4px;
-
+form {
+  div.modal-body {
+    div.row {
+      div.col-12 {
         img.unassigned{
           background-color: #dddddd;
           height: 240px;
           object-fit: none;
           object-position: -115px -415px;
-          width: 100%;
         }
 
         img.assigned {
@@ -41,11 +14,6 @@ div.modal-body {
           width: 100%;
         }
       }
-
-      div.col-md-4.offset-md-8 {
-        border: none;
-      }
     }
   }
 }
-
