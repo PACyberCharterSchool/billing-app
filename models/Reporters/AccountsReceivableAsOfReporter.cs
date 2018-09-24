@@ -63,6 +63,7 @@ namespace models.Reporters
 
 		private BulkInvoice Deserialize(string data)
 		{
+			Console.WriteLine($"Data: {data}");
 			using (var tr = new StringReader(data))
 				return new JsonSerializer().Deserialize<BulkInvoice>(new JsonTextReader(tr));
 		}
@@ -80,7 +81,8 @@ namespace models.Reporters
 				Where(r => scopes.Contains(r.Scope)).
 				Where(r => r.Type == ReportType.BulkInvoice || r.Type == ReportType.Invoice).
 				Select(r => Deserialize(r.Data)).
-				OrderByDescending(i => i.Prepared);
+				OrderByDescending(i => i.Prepared).
+				ToList();
 
 			var districts = new Dictionary<int, BulkInvoiceSchoolDistrict>();
 			foreach (var i in invoices)
