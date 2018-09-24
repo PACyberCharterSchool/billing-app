@@ -63,7 +63,6 @@ namespace models.Reporters
 
 		private BulkInvoice Deserialize(string data)
 		{
-			Console.WriteLine($"Data: {data}");
 			using (var tr = new StringReader(data))
 				return new JsonSerializer().Deserialize<BulkInvoice>(new JsonTextReader(tr));
 		}
