@@ -69,11 +69,20 @@ namespace models.Reporters
 				auns = GetAuns();
 
 			var scopes = ScopesFromAsOf(asOf);
-			var invoices = _context.Reports.
+			// var invoices = _context.Reports.
+			// 	Where(r => scopes.Contains(r.Scope)).
+			// 	Where(r => r.Type == ReportType.BulkInvoice || r.Type == ReportType.Invoice).
+			// 	Select(r => JsonConvert.DeserializeObject<BulkInvoice>(r.Data)).
+			// 	OrderByDescending(i => i.Prepared);
+
+			var reports = _context.Reports.
 				Where(r => scopes.Contains(r.Scope)).
-				Where(r => r.Type == ReportType.BulkInvoice || r.Type == ReportType.Invoice).
-				Select(r => JsonConvert.DeserializeObject<BulkInvoice>(r.Data)).
-				OrderByDescending(i => i.Prepared);
+				Where(r => r.Type == ReportType.BulkInvoice || r.Type == ReportType.Invoice);
+
+			foreach (var r in reports)
+				Console.WriteLine($"{r.Name}: {r.Data}");
+
+			var invoices = reports.Select(r => JsonConvert.DeserializeObject<BulkInvoice>(r.Data)).OrderBy(i => i.Prepared);
 
 			var districts = new Dictionary<int, BulkInvoiceSchoolDistrict>();
 			foreach (var i in invoices)
