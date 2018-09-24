@@ -182,6 +182,8 @@ namespace api
 				AllowAnyHeader().
 				AllowCredentials());
 
+			app.UseDeveloperExceptionPage();
+
 			app.UseSwagger();
 			app.UseReDoc(o =>
 			{
