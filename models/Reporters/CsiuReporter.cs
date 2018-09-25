@@ -39,9 +39,8 @@ namespace models.Reporters
 				auns = GetAuns();
 
 			var first = new DateTime(asOf.Year, 1, 1);
-
 			var invoices = _context.Reports.
-				Where(r => r.Created >= first && r.Created <= asOf).
+				Where(r => r.Created >= first && r.Created <= asOf.AddDays(1)).
 				Where(r => r.Type == ReportType.BulkInvoice || r.Type == ReportType.Invoice).
 				Select(r => JsonConvert.DeserializeObject<BulkInvoice>(r.Data)).
 				OrderByDescending(i => i.Prepared);
@@ -68,10 +67,10 @@ namespace models.Reporters
 			var previous = new Amounts();
 			foreach (var d in districts)
 			{
-				GetAmounts(latest, d.Value[0]);
+				FillAmounts(latest, d.Value[0]);
 
 				if (d.Value.Count == 2)
-					GetAmounts(previous, d.Value[1]);
+					FillAmounts(previous, d.Value[1]);
 			}
 
 			latest.Regular -= previous.Regular;
@@ -86,37 +85,38 @@ namespace models.Reporters
 				new CsiuAccount
 				{
 					Number = "10-6944-000-000-00-000-000-000-0000",
-					Amount = latest.Regular,
+					Amount = latest.Regular.Round(),
 					Description = $"TBD - K-12 Reg Ed SD Revenue for {month}/{year}",
 				},
 				new CsiuAccount
 				{
 					Number = "10-6944-000-000-00-000-000-000-0000",
-					Amount = latest.Special,
+					Amount = latest.Special.Round(),
 					Description = $"TBD - K-12 Spec Ed SD Revenue for {month}/{year}",
 				},
 				new CsiuAccount
 				{
 					Number = $"10-0145-000-000-00-000-000-000-{schoolYear}",
-					Amount = latest.Received,
+					Amount = latest.Received.Round(),
 					Description = $"TBD - K-12 SD A/R for {month}/{year}",
 				},
 			};
 
-			void GetAmounts(Amounts a, BulkInvoiceSchoolDistrict d)
+			void FillAmounts(Amounts a, BulkInvoiceSchoolDistrict d)
 			{
-				a.Regular = -(d.SchoolDistrict.RegularRate * ((decimal)d.RegularEnrollments.Values.Sum() / 12));
-				a.Special = -(d.SchoolDistrict.SpecialRate * ((decimal)d.SpecialEnrollments.Values.Sum() / 12));
+				a.Regular -= d.SchoolDistrict.RegularRate * ((decimal)d.RegularEnrollments.Values.Sum() / 12);
+				a.Special -= d.SchoolDistrict.SpecialRate * ((decimal)d.SpecialEnrollments.Values.Sum() / 12);
 
-				var tt = d.Transactions.AsDictionary();
-				var check = tt.Values.
+				var tt = d.Transactions.AsDictionary().Values.Where(t => t.Payment != null || t.Refund.HasValue);
+				var check = tt.
 					Where(t => t.Payment != null && t.Payment.CheckAmount.HasValue).
 					Sum(t => t.Payment.CheckAmount.Value);
-				var unipay = tt.Values.
+				var unipay = tt.
 					Where(t => t.Payment != null && t.Payment.UniPayAmount.HasValue).
 					Sum(t => t.Payment.UniPayAmount.Value);
-				var refund = tt.Values.Sum(t => t.Refund.HasValue ? t.Refund.Value : 0);
-				a.Received = (check + unipay) - refund;
+				var refund = tt.
+					Sum(t => t.Refund.HasValue ? t.Refund.Value : 0);
+				a.Received += (check + unipay) - refund;
 			}
 
 			string SchoolYearFromAsOf()
