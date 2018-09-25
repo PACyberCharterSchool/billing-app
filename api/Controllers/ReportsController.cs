@@ -773,7 +773,7 @@ namespace api.Controllers
 				else if (create.ReportType == ReportType.Csiu.Value)
 				{
 					if (create.Csiu == null)
-						return new BadRequestObjectResult(new ErrorsResponse("Caanot create CSIU without 'csiu' config."));
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create CSIU without 'csiu' config."));
 
 					report = CreateCsiu(create);
 				}
