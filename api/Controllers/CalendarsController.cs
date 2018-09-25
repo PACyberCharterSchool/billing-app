@@ -117,13 +117,13 @@ namespace api.Controllers
 
 			// var header = sheet.GetRow(0);
 			// var dayIndex = header.Cells.FindIndex(c => c.StringCellValue == "DAY");
-			var dayIndex = CellsHelper.ColumnNameToIndex("DAY");
+			var dayIndex = sheet.Cells.Find("DAY", null, fopts).Column;
 			// var dateIndex = header.Cells.FindIndex(c => c.StringCellValue == "DATE");
-			var dateIndex = CellsHelper.ColumnNameToIndex("DATE");
+			var dateIndex = sheet.Cells.Find("DATE", null, fopts).Column;
 			// var schoolDayIndex = header.Cells.FindIndex(c => c.StringCellValue == "SCHOOL DAY");
-			var schoolDayIndex = CellsHelper.ColumnNameToIndex("SCHOOL DAY");
+			var schoolDayIndex = sheet.Cells.Find("SCHOOL DAY", null, fopts).Column;
 			// var membershipIndex = header.Cells.FindIndex(c => c.StringCellValue == "MEMBERSHIP");
-			var membershipIndex = CellsHelper.ColumnNameToIndex("MEMBERSHIP");
+			var membershipIndex = sheet.Cells.Find("MEMBERSHIP", null, fopts).Column;
 
 			var calendar = new Calendar
 			{

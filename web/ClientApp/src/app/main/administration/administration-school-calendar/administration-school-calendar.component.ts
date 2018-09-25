@@ -26,6 +26,7 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
   public searchText: string;
   private calendarImportFormData: FormData = new FormData();
   public selectedAcademicYear: string;
+  public selectedImportAcademicYear: string;
   public schoolYears: string[];
   public calendarSchoolYears: string[];
 
@@ -114,15 +115,16 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
     this.days = this.schoolCalendar.days;
   }
 
-  public selectAcademicYear(year: string): void {
-    this.selectedAcademicYear = year;
+  public selectImportAcademicYear(year: string): void {
+    this.selectedImportAcademicYear = year;
   }
 
   private doCalendarImport(): void {
-    this.schoolCalendarService.updateByYear(this.selectedAcademicYear, this.calendarImportFormData).subscribe(
+    this.schoolCalendarService.updateByYear(this.selectedImportAcademicYear, this.calendarImportFormData).subscribe(
       data => {
         console.log('AdministrationSchoolCalendarComponent.handleFileSelection(): data is ', data['calendar']);
         this.schoolCalendar = data['calendar'];
+        this.resetDays();
       },
       error => {
         console.log('AdministrationSchoolCalendarComponent.handleFileSelection(): error is ', error);
@@ -131,7 +133,18 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
   }
 
   public filterCalendarSchoolYear(year: string): void {
-
+    if (year) {
+      this.schoolCalendarService.getByYear(year).subscribe(
+        data => {
+          console.log('AdministrationSchoolCalendarComponent.ngOnInit(): school calendar is ', data['calendar']);
+          this.schoolCalendar = data['calendar'];
+          this.days = this.schoolCalendar.days;
+        },
+        error => {
+          console.log('AdministrationSchoolCalendar.filterCalendarSchoolYear():  error is ', error);
+        }
+      );
+    }
   }
 
   handleFileSelection($event) {
