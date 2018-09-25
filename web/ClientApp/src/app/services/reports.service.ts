@@ -190,4 +190,19 @@ export class ReportsService {
     });
     return this.httpClient.post<any>(url, reportMeta, this.headers);
   }
+
+  public createCSIU(name: string, schoolYear: string, asOf: Date, auns?: number[]): Observable<Report> {
+    const url: string = this.apiReportsUrl;
+    const reportMeta: Object = Object.assign({}, {
+      'reportType': ReportType.CSIU,
+      'schoolYear': schoolYear.replace(/\s+/g, ''),
+      'name': name,
+      'csiu': {
+        'asOf': new Date(Date.now()).toLocaleDateString('en-US'),
+        'auns': auns
+      }
+    });
+
+    return this.httpClient.post<any>(url, reportMeta, this.headers);
+  }
 }

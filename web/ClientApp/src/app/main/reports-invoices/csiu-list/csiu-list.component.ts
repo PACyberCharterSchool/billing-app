@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Report } from '../../../models/report.model';
+import { SchoolDistrict } from '../../../models/school-district.model';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -9,6 +10,7 @@ import { UtilitiesService } from '../../../services/utilities.service';
 import { ReportsService } from '../../../services/reports.service';
 import { FileSaverService } from '../../../services/file-saver.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
+import { SchoolDistrictService } from '../../../services/school-district.service';
 
 @Component({
   selector: 'app-csiu-list',
@@ -32,7 +34,8 @@ export class CsiuListComponent implements OnInit {
     'PDF'
   ];
   public spinnerMsg: string;
-
+  public auns: number[];
+  private schoolDistricts: SchoolDistrict[];
 
   constructor(
     private ngbModalService: NgbModal,
@@ -40,13 +43,25 @@ export class CsiuListComponent implements OnInit {
     private utilitiesService: UtilitiesService,
     private reportsService: ReportsService,
     private fileSaverService: FileSaverService,
-    private academicYearsService: AcademicYearsService
+    private academicYearsService: AcademicYearsService,
+    private schoolDistrictService: SchoolDistrictService
   ) { }
 
   ngOnInit() {
     this.skip = 0;
     this.spinnerMsg = '';
     this.schoolYears = this.academicYearsService.getAcademicYears();
+
+    this.schoolDistrictService.getSchoolDistricts().subscribe(
+      data => {
+        console.log('CsiuListComponent.ngOnInit():  data is ', data);
+        this.schoolDistricts = data['schoolDistricts'];
+      },
+      error => {
+        console.log('CsiuListComponent.ngOnInit():  error is ', error);
+      }
+    );
+
     this.refreshCSIUList();
   }
 
@@ -101,5 +116,33 @@ export class CsiuListComponent implements OnInit {
       (reason) => {
       }
     );
+  }
+
+  public onDateChanged($event): void {
+  }
+
+  private generateCSIUReportName(): string {
+    const d: Date = new Date(this.asOfDate.year, this.asOfDate.month + 1, this.asOfDate.day);
+    return `CSIU_${d.getMonth() - 1}${d.getFullYear()}_${this.selectedAcademicYear.replace(/\s+/g, '')}`;
+  }
+
+  public onCreateSubmit(): void {
+    this.reportsService.createCSIU(
+      this.generateCSIUReportName(),
+      this.selectedAcademicYear.replace(/\s+/g, ''),
+      this.asOfDate,
+      this.schoolDistricts.map((sd) => +sd.aun)).subscribe(
+        data => {
+          console.log('CsiuListComponent.onCreateSubmit():  data is ', data);
+          this.reports = this.allReports = data['reports'];
+        },
+        error => {
+          console.log('CsiuListComponent.onCreateSubmit():  error is ', error);
+        }
+      );
+  }
+
+  public setSelectedAcademicYear(year: string): void {
+    this.selectedAcademicYear = year;
   }
 }
