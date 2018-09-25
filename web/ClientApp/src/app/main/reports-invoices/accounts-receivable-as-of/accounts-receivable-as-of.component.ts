@@ -67,6 +67,24 @@ export class AccountsReceivableAsOfComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
+  public filterAccountsReceivableAsOfBySearch(): void {
+    if (this.searchText) {
+      this.reports = this.allReports.filter(
+        (i) => {
+          const re = new RegExp(this.searchText, 'gi');
+          if (
+            i.name.search(re) !== -1 ||
+            i.schoolYear.search(re) !== -1
+          ) {
+            return true;
+          }
+          return false;
+        }
+      );
+
+    }
+  }
+
   listDisplayableFields() {
     if (this.allReports) {
       const fields = this.utilitiesService.objectKeys(this.allReports[0]);

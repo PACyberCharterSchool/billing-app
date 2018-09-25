@@ -101,11 +101,11 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         break;
       case 'currentIep':
       case 'studentCurrentIep':
-        fieldName = 'Current IEP Date';
+        fieldName = 'Current IEP';
         break;
       case 'formerIep':
       case 'studentFormerIep':
-        fieldName = 'Former IEP Date';
+        fieldName = 'Former IEP';
         break;
       case 'startDate':
         fieldName = 'Start Date';
@@ -149,10 +149,10 @@ export class NormalizeFieldNamePipe implements PipeTransform {
         fieldName = 'Payment Id';
         break;
       case 'studentEnrollmentDate':
-        fieldName = 'Enrollment Date';
+        fieldName = 'Enrollment';
         break;
       case 'studentWithdrawalDate':
-        fieldName = 'Withdrawal Date';
+        fieldName = 'Withdrawal';
         break;
       case 'studentIsSpecialEducation':
         fieldName = 'Special Ed.?';

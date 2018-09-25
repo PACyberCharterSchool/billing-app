@@ -43,13 +43,12 @@ export class DigitalSignatureUpsertFormComponent implements OnInit {
         error => {
           console.log('DigitalSignatureUpsertFormComponent.ngOnInit(): error is ', error);
         }
-      )
+      );
     }
 
     if (this.digitalSignature) {
       this.updateDigitalSignatureComponentValues();
-    }
-    else {
+    } else {
       this.digitalSignature = new DigitalSignature();
       this.imageUrl = this.globals.sprite2X;
       this.isImageAssigned = false;
@@ -63,8 +62,7 @@ export class DigitalSignatureUpsertFormComponent implements OnInit {
     if (this.digitalSignature.imgData) {
       this.imageUrl = 'data:image/png;base64,' + this.digitalSignature.imgData;
       this.isImageAssigned = true;
-    }
-    else {
+    } else {
       this.isImageAssigned = false;
     }
   }
@@ -97,19 +95,18 @@ export class DigitalSignatureUpsertFormComponent implements OnInit {
         }
       );
 
-    }
-    else if (this.op === 'update') {
+    } else if (this.op === 'update') {
       console.log('DigitalSignatureUpsertFormComponent.upsertDigitalSignature():  not implemented.');
     }
   }
 
   setImageUrl($event: any) {
     if ($event.target.files && $event.target.files[0]) {
-      var reader = new FileReader();
+      const reader = new FileReader();
 
       reader.onload = (event: any) => {
         this.imageUrl = event.target.result;
-      }
+      };
 
       reader.readAsDataURL($event.target.files[0]);
 

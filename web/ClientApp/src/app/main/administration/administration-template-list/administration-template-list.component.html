@@ -42,43 +42,53 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  <div class='modal-body'>
-    <form #templateFileSelection (ngSubmit)='c("Close"); doImport()'>
-      <div class='form-group'>
-        <label>Select template file:</label>
-        <input type='file'
+  <form #templateFileSelection (ngSubmit)='c("Close"); doImport()'>
+    <div class='modal-body'>
+      <div class='form-group row align-items-center'>
+        <div class='col-6'><label style='font-weight:1200'>Select template file:</label></div>
+        <div class='col-6'>
+          <input type='file'
           [(ngModel)]='fileName'
           [ngModelOptions]='{standalone: true}'
           accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
           (change)='setExcelTemplateUrl($event)'
           />
+        </div>
       </div>
-      <div class='form-group'>
-        <label>Select template type:</label>
-        <div ngbDropdown class="d-inline-block">
-          <button type='button' class="btn btn-outline-primary" id="dropdownSelectTemplateType" ngbDropdownToggle>{{selectedTemplateType}}</button>
-          <div ngbDropdownMenu aria-labelledby="dropdownSelectTemplateType">
-            <button type='button' class='dropdown-item' *ngFor='let type of getTemplateTypes()' (click)='setSelectedTemplateType(type)'>{{type.label}}</button>
+      <div class='form-group row align-items-center'>
+        <div class='col-6'><label style='font-weight:1200'>Select template type:</label></div>
+        <div class='col-6'>
+          <div class='row align-items-center justify-content-center'>
+            <div ngbDropdown class='d-inline-block col-6'>
+              <button type='button' class="btn btn-outline-primary" id="dropdownSelectTemplateType" ngbDropdownToggle>{{selectedTemplateType}}</button>
+              <div ngbDropdownMenu aria-labelledby="dropdownSelectTemplateType">
+                <button type='button' class='dropdown-item' *ngFor='let type of getTemplateTypes()' (click)='setSelectedTemplateType(type)'>{{type.label}}</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div class='form-group'>
-        <label>Select academic year:</label>
-        <div ngbDropdown class="d-inline-block">
-          <button type='button' class="btn btn-outline-primary" id="dropdownSelectSchoolYear" ngbDropdownToggle>{{selectedSchoolYear}}</button>
-          <div ngbDropdownMenu aria-labelledby="dropdownSelectSchoolYear">
-            <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='setSelectedSchoolYear(year)'>{{year}}</button>
+      <div class=' form-group row align-items-center'>
+        <div class='col-6'><label style='font-weight:1200'>Select academic year:</label></div>
+        <div class='col-6'>
+          <div class='row align-items-center justify-content-center'>
+            <div ngbDropdown class="d-inline-block col-6">
+              <button type='button' class="btn btn-outline-primary" id="dropdownSelectSchoolYear" ngbDropdownToggle></button>
+              <div ngbDropdownMenu aria-labelledby="dropdownSelectSchoolYear">
+                <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='setSelectedSchoolYear(year)'>{{year}}</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div class='form-group'>
-        <div class='col offset-7'>
+    </div>
+    <div class='modal-footer'>
+      <div class='form-group row align-items-center'>
+        <div class='col-12'>
           <button type='button' class='btn btn-outline' (click)='d("Cancel")'>CANCEL</button>
           <button type='submit' class='btn btn-primary'>IMPORT</button>
         </div>
       </div>
-    </form>
-  </div>
-  <div class='modal-footer'>
-  </div>
+    </div>
+  </form>
 </ng-template>

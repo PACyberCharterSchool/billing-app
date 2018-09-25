@@ -7,10 +7,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
 
 using CsvHelper;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
+using Aspose.Cells;
 
 using api.Common;
 using models;
@@ -22,21 +22,50 @@ namespace api.Controllers
 	{
 		private readonly PacBillContext _context;
 		private readonly ICalendarRepository _calendars;
+		private readonly IAuditRecordRepository _audits;
 		private readonly ILogger<CalendarsController> _logger;
 
 		public CalendarsController(
 			PacBillContext context,
 			ICalendarRepository calendars,
+			IAuditRecordRepository audits,
 			ILogger<CalendarsController> logger)
 		{
 			_context = context;
 			_calendars = calendars;
+			_audits = audits;
 			_logger = logger;
 		}
 
 		public struct CalendarResponse
 		{
 			public Calendar Calendar { get; set; }
+		}
+
+		public struct CalendarYearsResponse
+		{
+			public IList<string> Years { get; set; }
+		}
+
+		[HttpGet("years")]
+		[Authorize(Policy = "ADM=")]
+		[ProducesResponseType(typeof(CalendarYearsResponse), 200)]
+		[ProducesResponseType(404)]
+		public async Task<IActionResult> GetYears()
+		{
+			try
+			{
+				var years = await Task.Run(() => _calendars.GetYears());
+
+				return new ObjectResult(new CalendarYearsResponse
+				{
+					Years = years.ToList()
+				});
+			}
+			catch (NotFoundException)
+			{
+				return NotFound();
+			}
 		}
 
 		[HttpGet("{year}")]
@@ -79,32 +108,40 @@ namespace api.Controllers
 
 		private static Calendar XlsxToCalendar(string year, Stream stream)
 		{
-			var wb = new XSSFWorkbook(stream);
-			var sheet = wb.GetSheetAt(0);
+			var wb = new Workbook(stream);
+			var sheet = wb.Worksheets[0];
 
-			var header = sheet.GetRow(0);
-			var dayIndex = header.Cells.FindIndex(c => c.StringCellValue == "DAY");
-			var dateIndex = header.Cells.FindIndex(c => c.StringCellValue == "DATE");
-			var schoolDayIndex = header.Cells.FindIndex(c => c.StringCellValue == "SCHOOL DAY");
-			var membershipIndex = header.Cells.FindIndex(c => c.StringCellValue == "MEMBERSHIP");
+			FindOptions fopts = new FindOptions();
+			fopts.LookInType = LookInType.Values;
+			fopts.LookAtType = LookAtType.EntireContent;
+
+			// var header = sheet.GetRow(0);
+			// var dayIndex = header.Cells.FindIndex(c => c.StringCellValue == "DAY");
+			var dayIndex = sheet.Cells.Find("DAY", null, fopts).Column;
+			// var dateIndex = header.Cells.FindIndex(c => c.StringCellValue == "DATE");
+			var dateIndex = sheet.Cells.Find("DATE", null, fopts).Column;
+			// var schoolDayIndex = header.Cells.FindIndex(c => c.StringCellValue == "SCHOOL DAY");
+			var schoolDayIndex = sheet.Cells.Find("SCHOOL DAY", null, fopts).Column;
+			// var membershipIndex = header.Cells.FindIndex(c => c.StringCellValue == "MEMBERSHIP");
+			var membershipIndex = sheet.Cells.Find("MEMBERSHIP", null, fopts).Column;
 
 			var calendar = new Calendar
 			{
 				SchoolYear = year,
 				Days = new List<CalendarDay>(),
 			};
-			for (var i = 1; i <= sheet.LastRowNum; i++)
+			for (var i = 1; i <= sheet.Cells.MaxDataRow; i++)
 			{
-				var row = sheet.GetRow(i);
-				if (row == null || row.Cells.All(c => c.CellType == CellType.Blank))
+				var row = sheet.Cells.Rows[i];
+				if (row == null || row.IsBlank)
 					continue;
 
 				calendar.Days.Add(new CalendarDay
 				{
-					DayOfWeek = row.GetCell(dayIndex).StringCellValue,
-					Date = DateTime.FromOADate(row.GetCell(dateIndex).NumericCellValue), // days since epoch
-					SchoolDay = (byte)row.GetCell(schoolDayIndex).NumericCellValue,
-					Membership = (byte)row.GetCell(membershipIndex).NumericCellValue,
+					DayOfWeek = row.GetCellByIndex(dayIndex).StringValue,
+					Date = DateTime.FromOADate(row.GetCellByIndex(dateIndex).IntValue), // days since epoch
+					SchoolDay = (byte)row.GetCellByIndex(schoolDayIndex).IntValue,
+					Membership = (byte)row.GetCellByIndex(membershipIndex).IntValue,
 				});
 			}
 
@@ -131,10 +168,34 @@ namespace api.Controllers
 				return new BadRequestObjectResult(
 					new ErrorResponse($"Invalid file Content-Type '{file.ContentType}'."));
 
-			var parse = _parsers[file.ContentType];
-			var calendar = parse(year, file.OpenReadStream());
+			var parse = _parsers[file.ContentType]; var calendar = parse(year, file.OpenReadStream());
 
 			calendar = await Task.Run(() => _context.SaveChanges(() => _calendars.CreateOrUpdate(calendar)));
+
+			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+			using (var tx = _context.Database.BeginTransaction())
+			{
+				try
+				{
+					_audits.Create(new AuditRecord {
+						Username = username,
+						Activity = AuditRecordActivity.UPDATE_SCHOOL_CALENDAR,
+						Timestamp = DateTime.Now,
+						Identifier = calendar.Id.ToString(),
+						Field = null,
+						Next = null,
+						Previous = null,
+					});
+					_context.SaveChanges();
+
+					tx.Commit();
+				}
+				catch (Exception)
+				{
+					tx.Rollback();
+					throw;
+				}
+			}
 
 			return new CreatedResult($"/api/calendars/{year}", new CalendarResponse
 			{

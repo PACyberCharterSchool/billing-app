@@ -1,7 +1,7 @@
 export enum AuditRecordActivityType {
-  UpdateInvoiceTemplate = 'UpdateInvoiceTemplate',
+  UpdateTemplate = 'UpdateTemplate',
   EditStudentRecord = 'EditStudentRecord',
-  SchoolCalendars = 'SchoolCalendars',
+  UpdateSchoolCalendar = 'UpdateSchoolCalendar',
   SchoolDistricts = 'SchoolDistricts'
 }
 

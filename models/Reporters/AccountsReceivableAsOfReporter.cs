@@ -4,6 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 
 using models.Common;
+using System.IO;
 
 namespace models.Reporters
 {
@@ -14,12 +15,12 @@ namespace models.Reporters
 		public string PaymentType { get; set; }
 		public decimal RegularEducationDue { get; set; }
 		public decimal SpecialEducationDue { get; set; }
-		public decimal TotalDue => RegularEducationDue + SpecialEducationDue;
+		public decimal TotalDue => (RegularEducationDue + SpecialEducationDue).Round();
 		public decimal PaidByDistrict { get; set; }
 		public decimal PaidByPDE { get; set; }
 		public decimal Refunded { get; set; }
-		public decimal TotalPaid => PaidByDistrict + PaidByPDE - Refunded;
-		public decimal NetDue => TotalDue - TotalPaid;
+		public decimal TotalPaid => (PaidByDistrict + PaidByPDE - Refunded).Round();
+		public decimal NetDue => (TotalDue - TotalPaid).Round();
 	}
 
 	public class AccountsReceivableAsOf
@@ -60,6 +61,12 @@ namespace models.Reporters
 			return scopes;
 		}
 
+		private BulkInvoice Deserialize(string data)
+		{
+			using (var tr = new StringReader(data))
+				return new JsonSerializer().Deserialize<BulkInvoice>(new JsonTextReader(tr));
+		}
+
 		private IList<AccountsReceivableAsOfSchoolDistrict> GetSchoolDistricts(
 			DateTime asOf,
 			string schoolYear,
@@ -72,8 +79,9 @@ namespace models.Reporters
 			var invoices = _context.Reports.
 				Where(r => scopes.Contains(r.Scope)).
 				Where(r => r.Type == ReportType.BulkInvoice || r.Type == ReportType.Invoice).
-				Select(r => JsonConvert.DeserializeObject<BulkInvoice>(r.Data)).
-				OrderByDescending(i => i.Prepared);
+				Select(r => Deserialize(r.Data)).
+				OrderByDescending(i => i.Prepared).
+				ToList();
 
 			var districts = new Dictionary<int, BulkInvoiceSchoolDistrict>();
 			foreach (var i in invoices)
