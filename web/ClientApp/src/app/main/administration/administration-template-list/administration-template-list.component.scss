@@ -48,11 +48,23 @@
   }
 }
 
-.modal-title {
-  color: #58a917;
-}
+form {
+  .modal-body {
+    .form-group {
+      .col-6 {
+        .row.align-items-center {
+          .d-inline-block {
+            button.btn-outline-primary {
+              width: 100%;
+            }
 
-#dropdownSelectSchoolYear + div.dropdown-menu {
-  height: 240px;
-  overflow: scroll;
+            #dropdownSelectSchoolYear + div.dropdown-menu {
+              height: 240px;
+              overflow: scroll;
+            }
+          }
+        }
+      }
+    }
+  }
 }
