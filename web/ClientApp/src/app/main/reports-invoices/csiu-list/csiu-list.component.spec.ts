@@ -1,14 +1,25 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 
 import { CsiuListComponent } from './csiu-list.component';
 
-describe('CsiuListComponent', () => {
+import { NormalizeFieldNamePipe } from '../../../pipes/normalize-field-name.pipe';
+import { NormalizeFieldValuePipe } from '../../../pipes/normalize-field-value.pipe';
+import { OrderByPipe } from '../../../pipes/orderby.pipe';
+
+xdescribe('CsiuListComponent', () => {
   let component: CsiuListComponent;
   let fixture: ComponentFixture<CsiuListComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CsiuListComponent ]
+      declarations: [
+        CsiuListComponent,
+        NormalizeFieldNamePipe,
+        NormalizeFieldValuePipe,
+        OrderByPipe
+      ],
+      imports: [ FormsModule ]
     })
     .compileComponents();
   }));

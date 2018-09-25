@@ -65,6 +65,9 @@ export class CsiuListComponent implements OnInit {
     this.refreshCSIUList();
   }
 
+  public filterCSIUList(): void {
+  }
+
   public refreshCSIUList(): void {
     this.reportsService.getCSIU().subscribe(
       data => {

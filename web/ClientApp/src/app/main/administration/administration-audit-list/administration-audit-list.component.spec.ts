@@ -16,7 +16,7 @@ import { Globals } from '../../../globals';
 import { UtilitiesService } from '../../../services/utilities.service';
 import { AuditRecordsService } from '../../../services/audit-records.service'
 
-describe('AdministrationAuditListComponent', () => {
+xdescribe('AdministrationAuditListComponent', () => {
   let component: AdministrationAuditListComponent;
   let fixture: ComponentFixture<AdministrationAuditListComponent>;
 
