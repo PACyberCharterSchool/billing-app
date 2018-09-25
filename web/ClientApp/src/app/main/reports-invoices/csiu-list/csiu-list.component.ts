@@ -130,6 +130,7 @@ export class CsiuListComponent implements OnInit {
   }
 
   public onCreateSubmit(): void {
+    this.ngxSpinnerService.show();
     this.reportsService.createCSIU(
       this.generateCSIUReportName(),
       this.selectedAcademicYear.replace(/\s+/g, ''),
@@ -138,9 +139,12 @@ export class CsiuListComponent implements OnInit {
         data => {
           console.log('CsiuListComponent.onCreateSubmit():  data is ', data);
           this.reports = this.allReports = data['reports'];
+          this.ngxSpinnerService.hide();
+          this.refreshCSIUList();
         },
         error => {
           console.log('CsiuListComponent.onCreateSubmit():  error is ', error);
+          this.ngxSpinnerService.hide();
         }
       );
   }
