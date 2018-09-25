@@ -27,6 +27,7 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
   private calendarImportFormData: FormData = new FormData();
   public selectedAcademicYear: string;
   public schoolYears: string[];
+  public calendarSchoolYears: string[];
 
   constructor(
     private schoolCalendarService: SchoolCalendarService,
@@ -54,6 +55,16 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
     );
 
     this.schoolYears = this.academicYearsService.getAcademicYears();
+
+    this.schoolCalendarService.getAcademicYears().subscribe(
+      data => {
+        this.calendarSchoolYears = data['years'];
+        console.log('AdministrationSchoolCalendarComponent.ngOnInit(): data is ', data['years']);
+      },
+      error => {
+        console.log('AdministrationSchoolCalendarComponent.ngOnInit():  error is ', error);
+      }
+    );
   }
 
   sort(property) {
@@ -117,6 +128,10 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
         console.log('AdministrationSchoolCalendarComponent.handleFileSelection(): error is ', error);
       }
     );
+  }
+
+  public filterCalendarSchoolYear(year: string): void {
+
   }
 
   handleFileSelection($event) {

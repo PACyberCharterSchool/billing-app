@@ -14,6 +14,8 @@ namespace models
 		Calendar CreateOrUpdate(DateTime time, Calendar update);
 		Calendar CreateOrUpdate(Calendar create);
 		Calendar Get(string year);
+
+		IEnumerable<string> GetYears();
 	}
 
 	public class CalendarRepository : ICalendarRepository
@@ -82,6 +84,17 @@ namespace models
 				throw new NotFoundException(typeof(Calendar), year);
 
 			return calendar;
+		}
+
+		public IEnumerable<Calendar> GetMany()
+		{
+			return _calendars.OrderBy(c => c.SchoolYear);
+		}
+
+		public IEnumerable<string> GetYears()
+		{
+			var calendars = GetMany();
+			return calendars.Select(c => c.SchoolYear).Distinct();
 		}
 	}
 }

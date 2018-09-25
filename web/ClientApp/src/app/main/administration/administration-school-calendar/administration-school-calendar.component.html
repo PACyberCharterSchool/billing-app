@@ -1,11 +1,19 @@
 <div class='row calendar-title-row align-items-center'>
   <div class='col-auto calendar-title-col'>
-    <h4>Pennsylvania School Calendar</h4>
+    <h4>PA School Calendar</h4>
   </div>
   <div class='col-7 calendar-search-col'>
     <input type='text' [(ngModel)]='searchText' />
     <button type='button' class='btn btn-primary' (click)='filterDays()'>SEARCH</button>
     <button type='button' class='btn btn-outline-primary' (click)='resetDays()'>RESET</button>
+  </div>
+  <div class='col-2'>
+    <div ngbDropdown class='d-inline-block'>
+      <button ngbDropdownToggle class='btn btn-outline-primary' id='availableAcademicYearsDropdown'></button>
+      <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='availableAcademicYearsDropdown'>
+        <button class='dropdown-item' *ngFor='let y of calendarSchoolYears' (click)='filterCalendarSchoolYear(y)'>{{y}}</button>
+      </div>
+    </div>
   </div>
 </div>
 <div class='row calendar-select-row align-items-center'>

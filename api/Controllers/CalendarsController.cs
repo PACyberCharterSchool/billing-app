@@ -10,8 +10,7 @@ using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
 
 using CsvHelper;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
+using Aspose.Cells;
 
 using api.Common;
 using models;
@@ -41,6 +40,32 @@ namespace api.Controllers
 		public struct CalendarResponse
 		{
 			public Calendar Calendar { get; set; }
+		}
+
+		public struct CalendarYearsResponse
+		{
+			public IList<string> Years { get; set; }
+		}
+
+		[HttpGet("years")]
+		[Authorize(Policy = "ADM=")]
+		[ProducesResponseType(typeof(CalendarYearsResponse), 200)]
+		[ProducesResponseType(404)]
+		public async Task<IActionResult> GetYears()
+		{
+			try
+			{
+				var years = await Task.Run(() => _calendars.GetYears());
+
+				return new ObjectResult(new CalendarYearsResponse
+				{
+					Years = years.ToList()
+				});
+			}
+			catch (NotFoundException)
+			{
+				return NotFound();
+			}
 		}
 
 		[HttpGet("{year}")]
@@ -83,32 +108,40 @@ namespace api.Controllers
 
 		private static Calendar XlsxToCalendar(string year, Stream stream)
 		{
-			var wb = new XSSFWorkbook(stream);
-			var sheet = wb.GetSheetAt(0);
+			var wb = new Workbook(stream);
+			var sheet = wb.Worksheets[0];
 
-			var header = sheet.GetRow(0);
-			var dayIndex = header.Cells.FindIndex(c => c.StringCellValue == "DAY");
-			var dateIndex = header.Cells.FindIndex(c => c.StringCellValue == "DATE");
-			var schoolDayIndex = header.Cells.FindIndex(c => c.StringCellValue == "SCHOOL DAY");
-			var membershipIndex = header.Cells.FindIndex(c => c.StringCellValue == "MEMBERSHIP");
+			FindOptions fopts = new FindOptions();
+			fopts.LookInType = LookInType.Values;
+			fopts.LookAtType = LookAtType.EntireContent;
+
+			// var header = sheet.GetRow(0);
+			// var dayIndex = header.Cells.FindIndex(c => c.StringCellValue == "DAY");
+			var dayIndex = CellsHelper.ColumnNameToIndex("DAY");
+			// var dateIndex = header.Cells.FindIndex(c => c.StringCellValue == "DATE");
+			var dateIndex = CellsHelper.ColumnNameToIndex("DATE");
+			// var schoolDayIndex = header.Cells.FindIndex(c => c.StringCellValue == "SCHOOL DAY");
+			var schoolDayIndex = CellsHelper.ColumnNameToIndex("SCHOOL DAY");
+			// var membershipIndex = header.Cells.FindIndex(c => c.StringCellValue == "MEMBERSHIP");
+			var membershipIndex = CellsHelper.ColumnNameToIndex("MEMBERSHIP");
 
 			var calendar = new Calendar
 			{
 				SchoolYear = year,
 				Days = new List<CalendarDay>(),
 			};
-			for (var i = 1; i <= sheet.LastRowNum; i++)
+			for (var i = 1; i <= sheet.Cells.MaxDataRow; i++)
 			{
-				var row = sheet.GetRow(i);
-				if (row == null || row.Cells.All(c => c.CellType == CellType.Blank))
+				var row = sheet.Cells.Rows[i];
+				if (row == null || row.IsBlank)
 					continue;
 
 				calendar.Days.Add(new CalendarDay
 				{
-					DayOfWeek = row.GetCell(dayIndex).StringCellValue,
-					Date = DateTime.FromOADate(row.GetCell(dateIndex).NumericCellValue), // days since epoch
-					SchoolDay = (byte)row.GetCell(schoolDayIndex).NumericCellValue,
-					Membership = (byte)row.GetCell(membershipIndex).NumericCellValue,
+					DayOfWeek = row.GetCellByIndex(dayIndex).StringValue,
+					Date = DateTime.FromOADate(row.GetCellByIndex(dateIndex).IntValue), // days since epoch
+					SchoolDay = (byte)row.GetCellByIndex(schoolDayIndex).IntValue,
+					Membership = (byte)row.GetCellByIndex(membershipIndex).IntValue,
 				});
 			}
 
