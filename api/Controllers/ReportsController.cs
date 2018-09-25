@@ -137,6 +137,14 @@ namespace api.Controllers
 			public IList<int> Auns { get; set; }
 		}
 
+		public class CreateCsiuReport
+		{
+			[Required]
+			public DateTime AsOf { get; set; }
+
+			public IList<int> Auns { get; set; }
+		}
+
 		public class CreateReport
 		{
 			[EnumerationValidation(typeof(ReportType))]
@@ -156,6 +164,7 @@ namespace api.Controllers
 			public CreateStudentInformationReport StudentInformation { get; set; }
 			public CreateBulkStudentInformationReport BulkStudentInformation { get; set; }
 			public CreateAccountsReceivableAsOfReport AccountsReceivableAsOf { get; set; }
+			public CreateCsiuReport Csiu { get; set; }
 		}
 
 		private void StyleInvoiceWorksheet(Worksheet sheet)
@@ -582,6 +591,7 @@ namespace api.Controllers
 			var paymentTypeStyle = new CellsFactory().CreateStyle();
 			paymentTypeStyle.HorizontalAlignment = TextAlignmentType.Center;
 
+			// TODO(Erik): this should really be done in the reporter
 			var totalDue = 0m;
 			var totalRefunded = 0m;
 			var totalPaid = 0m;
@@ -652,6 +662,72 @@ namespace api.Controllers
 			return report;
 		}
 
+		private Report CreateCsiu(CreateReport create)
+		{
+			var reporter = _reporters.CreateCsiuReporter(_context);
+			var result = reporter.GenerateReport(new CsiuReporter.Config
+			{
+				AsOf = create.Csiu.AsOf,
+				Auns = create.Csiu.Auns,
+			});
+
+			var wb = new Workbook();
+			var ws = wb.Worksheets[0];
+
+			var columnHeaders = new[] { "G/L Account #", "Amount", "Description" };
+			var headerStyle = new CellsFactory().CreateStyle();
+			headerStyle.HorizontalAlignment = TextAlignmentType.Center;
+			headerStyle.Font.IsBold = true;
+			headerStyle.Font.Underline = FontUnderlineType.Accounting;
+
+			for (var i = 0; i < columnHeaders.Length; i++)
+			{
+				ws.Cells[0, i].PutValue(columnHeaders[i]);
+				ws.Cells[0, i].SetStyle(headerStyle);
+			}
+
+			ws.Cells.SetColumnWidthInch(0, 2.5);
+			ws.Cells.SetColumnWidthInch(1, 1);
+			ws.Cells.SetColumnWidthInch(2, 2.5);
+
+			var numericSyle = new CellsFactory().CreateStyle();
+			numericSyle.Custom = "#,##0.00_);(#,##0.00)";
+
+			var r = 1;
+			foreach (var account in result.Accounts)
+			{
+				var c = 0;
+				ws.Cells[r, c++].PutValue(account.Number);
+				ws.Cells[r, c++].PutValue(account.Amount);
+				ws.Cells[r, c - 1].SetStyle(numericSyle);
+				ws.Cells[r, c++].PutValue(account.Description);
+				r++;
+			}
+
+			Report report;
+			using (var xlsxStream = new MemoryStream())
+			using (var pdfStream = new MemoryStream())
+			{
+				wb.CalculateFormula();
+				wb.Save(xlsxStream, SaveFormat.Xlsx);
+				wb.Save(pdfStream, SaveFormat.Pdf);
+
+				report = new Report
+				{
+					Type = ReportType.Csiu,
+					SchoolYear = create.SchoolYear,
+					Name = create.Name,
+					Approved = true,
+					Created = DateTime.Now,
+					Data = JsonConvert.SerializeObject(result),
+					Xlsx = xlsxStream.ToArray(),
+					Pdf = pdfStream.ToArray(),
+				};
+			}
+
+			return report;
+		}
+
 		[HttpPost]
 		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportResponse), 200)]
@@ -702,6 +778,13 @@ namespace api.Controllers
 						return new BadRequestObjectResult(new ErrorsResponse("Cannot create accounts receivable as of without 'accounts receivable as of' config."));
 
 					report = CreateAccountsReceivableAsOf(create);
+				}
+				else if (create.ReportType == ReportType.Csiu.Value)
+				{
+					if (create.Csiu == null)
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create CSIU without 'csiu' config."));
+
+					report = CreateCsiu(create);
 				}
 				else
 				{

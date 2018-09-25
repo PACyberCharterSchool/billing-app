@@ -49,49 +49,24 @@ namespace models.Reporters
 		public InvoiceTransaction May { get; set; }
 		public InvoiceTransaction June { get; set; }
 
-		private decimal GetValue(decimal? amount) => amount.HasValue ? amount.Value : 0;
-
-		public decimal CheckTotalPaid =>
-			GetValue(July?.Payment?.CheckAmount) +
-			GetValue(August?.Payment?.CheckAmount) +
-			GetValue(September?.Payment?.CheckAmount) +
-			GetValue(October?.Payment?.CheckAmount) +
-			GetValue(November?.Payment?.CheckAmount) +
-			GetValue(December?.Payment?.CheckAmount) +
-			GetValue(January?.Payment?.CheckAmount) +
-			GetValue(February?.Payment?.CheckAmount) +
-			GetValue(March?.Payment?.CheckAmount) +
-			GetValue(April?.Payment?.CheckAmount) +
-			GetValue(May?.Payment?.CheckAmount) +
-			GetValue(June?.Payment?.CheckAmount);
-
-		public decimal UniPayTotalPaid =>
-			GetValue(July?.Payment?.UniPayAmount) +
-			GetValue(August?.Payment?.UniPayAmount) +
-			GetValue(September?.Payment?.UniPayAmount) +
-			GetValue(October?.Payment?.UniPayAmount) +
-			GetValue(November?.Payment?.UniPayAmount) +
-			GetValue(December?.Payment?.UniPayAmount) +
-			GetValue(January?.Payment?.UniPayAmount) +
-			GetValue(February?.Payment?.UniPayAmount) +
-			GetValue(March?.Payment?.UniPayAmount) +
-			GetValue(April?.Payment?.UniPayAmount) +
-			GetValue(May?.Payment?.UniPayAmount) +
-			GetValue(June?.Payment?.UniPayAmount);
-
-		public decimal TotalRefunded =>
-			GetValue(July?.Refund) +
-			GetValue(August?.Refund) +
-			GetValue(September?.Refund) +
-			GetValue(October?.Refund) +
-			GetValue(November?.Refund) +
-			GetValue(December?.Refund) +
-			GetValue(January?.Refund) +
-			GetValue(February?.Refund) +
-			GetValue(March?.Refund) +
-			GetValue(April?.Refund) +
-			GetValue(May?.Refund) +
-			GetValue(June?.Refund);
+		public IDictionary<string, InvoiceTransaction> AsDictionary()
+		{
+			return new Dictionary<string, InvoiceTransaction>
+			{
+				{"July", July},
+				{"August", August},
+				{"September", September},
+				{"October", October},
+				{"November", November},
+				{"December", December},
+				{"January", January},
+				{"February", February},
+				{"March", March},
+				{"April", April},
+				{"May", May},
+				{"June", June},
+			};
+		}
 	}
 
 	public class InvoiceStudent

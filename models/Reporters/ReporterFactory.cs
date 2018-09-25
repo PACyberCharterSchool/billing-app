@@ -8,6 +8,7 @@ namespace models.Reporters
 		IReporter<AccountsReceivableAsOf, AccountsReceivableAsOfReporter.Config> CreateAccountsReceivableAsOfReporter(PacBillContext context);
 		IReporter<BulkInvoice, BulkInvoiceReporter.Config> CreateBulkInvoiceReporter(PacBillContext context);
 		IReporter<BulkStudentInformation, BulkStudentInformationReporter.Config> CreateBulkStudentInformationReporter(PacBillContext context);
+		IReporter<CsiuReport, CsiuReporter.Config> CreateCsiuReporter(PacBillContext context);
 	}
 
 	public class ReporterFactory : IReporterFactory
@@ -20,5 +21,8 @@ namespace models.Reporters
 
 		public IReporter<BulkStudentInformation, BulkStudentInformationReporter.Config> CreateBulkStudentInformationReporter(PacBillContext context)
 			=> new BulkStudentInformationReporter(context);
+
+		public IReporter<CsiuReport, CsiuReporter.Config> CreateCsiuReporter(PacBillContext context)
+			=> new CsiuReporter(context);
 	}
 }

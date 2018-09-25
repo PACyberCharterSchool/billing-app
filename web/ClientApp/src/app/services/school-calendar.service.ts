@@ -22,6 +22,11 @@ export class SchoolCalendarService {
     this.apiSchoolCalendarUrl = '/api/Calendars';
   }
 
+  getAcademicYears(): Observable<string[]> {
+    const url = this.apiSchoolCalendarUrl + '/years';
+    return this.httpClient.get<string[]>(url, this.headers);
+  }
+
   getByYear(year: string): Observable<Calendar> {
     const url = this.apiSchoolCalendarUrl + `/${year.replace(/\s+/g, '')}`;
     return this.httpClient.get<Calendar>(url, this.headers);
