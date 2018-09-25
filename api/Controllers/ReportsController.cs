@@ -76,6 +76,8 @@ namespace api.Controllers
 			[Required]
 			[Range(100000000, 999999999)]
 			public int SchoolDistrictAun { get; set; }
+
+			public bool TotalsOnly { get; set; }
 		}
 
 		public class CreateBulkInvoiceReport
@@ -98,7 +100,7 @@ namespace api.Controllers
 			[JsonConverter(typeof(SchoolDistrictPaymentTypeJsonConverter))]
 			public SchoolDistrictPaymentType PaymentType { get; set; }
 
-			public bool Approved { get; set; }
+			public bool TotalsOnly { get; set; }
 		}
 
 		public class CreateStudentInformationReport
@@ -317,10 +319,16 @@ namespace api.Controllers
 				var district = districts[i];
 				CloneInvoiceSummarySheet(source, wb, i, district.SchoolDistrict.Name);
 
+				if (create.BulkInvoice.TotalsOnly)
+					continue;
+
 				var studentCount = district.Students.Count();
 				if (studentCount > 0)
 					CloneStudentItemizationSheets(source, wb, studentCount, i, district.SchoolDistrict.Name, invoiceTemplate);
 			}
+
+			if (create.BulkInvoice.TotalsOnly)
+				wb.Worksheets.RemoveAt(1);
 
 			// generate xlsx
 			var json = JsonConvert.SerializeObject(invoice);
@@ -381,6 +389,7 @@ namespace api.Controllers
 					ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
 					ToPDE = create.Invoice.ToPDE,
 					Auns = new[] { create.Invoice.SchoolDistrictAun },
+					TotalsOnly = create.Invoice.TotalsOnly,
 				},
 			});
 
