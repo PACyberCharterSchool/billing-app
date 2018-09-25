@@ -15,12 +15,12 @@ namespace models.Reporters
 		public string PaymentType { get; set; }
 		public decimal RegularEducationDue { get; set; }
 		public decimal SpecialEducationDue { get; set; }
-		public decimal TotalDue => RegularEducationDue + SpecialEducationDue;
+		public decimal TotalDue => (RegularEducationDue + SpecialEducationDue).Round();
 		public decimal PaidByDistrict { get; set; }
 		public decimal PaidByPDE { get; set; }
 		public decimal Refunded { get; set; }
-		public decimal TotalPaid => PaidByDistrict + PaidByPDE - Refunded;
-		public decimal NetDue => TotalDue - TotalPaid;
+		public decimal TotalPaid => (PaidByDistrict + PaidByPDE - Refunded).Round();
+		public decimal NetDue => (TotalDue - TotalPaid).Round();
 	}
 
 	public class AccountsReceivableAsOf
