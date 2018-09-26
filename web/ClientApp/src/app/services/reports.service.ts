@@ -35,9 +35,17 @@ export class ReportsService {
     return this.httpClient.get<Report[]>(url, this.headers);
   }
 
-  public getAccountsReceivableAsOf(auns?: number[]): Observable<Report[]> {
+  public getAccountsReceivableAsOf(): Observable<Report[]> {
     const reportMeta: Object = Object.assign({}, {
-      'Type': ReportType.AccountReceivableAsOf,
+      'Type': ReportType.AccountsReceivableAsOf,
+    });
+
+    return this.getReportsByMeta(reportMeta);
+  }
+
+  public getAccountsReceivableAging(): Observable<Report[]> {
+    const reportMeta: Object = Object.assign({}, {
+      'Type': ReportType.AccountsReceivableAging,
     });
 
     return this.getReportsByMeta(reportMeta);
@@ -180,7 +188,7 @@ export class ReportsService {
   public createAccountsReceivableAsOf(name: string, schoolYear: string, asOf: Date, auns?: number[]): Observable<Report> {
     const url: string = this.apiReportsUrl;
     const reportMeta: Object = Object.assign({}, {
-      'reportType': ReportType.AccountReceivableAsOf,
+      'reportType': ReportType.AccountsReceivableAsOf,
       'name': name,
       'schoolYear': schoolYear.replace(/\s+/g, ''),
       'accountsReceivableAsOf': {

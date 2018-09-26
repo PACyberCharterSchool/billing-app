@@ -11,6 +11,7 @@ import { InvoicesMonthlyCombinedListComponent } from './invoices-monthly-combine
 import { StudentActivityListComponent } from './student-activity-list/student-activity-list.component';
 import { AccountsReceivableAsOfComponent } from './accounts-receivable-as-of/accounts-receivable-as-of.component';
 import { CsiuListComponent } from './csiu-list/csiu-list.component';
+import { AccountsReceivableAgingComponent } from './accounts-receivable-aging/accounts-receivable-aging.component';
 
 import { AuthenticationGuardService } from '../../services/authentication-guard.service';
 
@@ -59,6 +60,12 @@ const reportsInvoicesRoutes: Routes = [
       {
         path: 'as-of-date-reports',
         component: AccountsReceivableAsOfComponent,
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
+      },
+      {
+        path: 'aging-reports',
+        component: AccountsReceivableAgingComponent,
         outlet: 'action',
         canActivate: [ AuthenticationGuardService ]
       },

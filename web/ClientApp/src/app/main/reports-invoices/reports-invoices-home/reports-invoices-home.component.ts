@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 enum BUTTON_IDS {
   InvoicesBtn = 'invoices-btn',
   DigitalSignaturesBtn = 'digital-signatures-btn',
-  AgingReportsBtn = 'aging-reports-btn',
+  AgingReportsBtn = 'accounts-receivable-aging-report-btn',
   AsOfDateReportsBtn = 'accounts-receivable-aod-report-btn',
   CSIUExportBtn = 'csiu-btn',
   ItemizedStudentActivityBtn = 'itemized-student-activity-btn',
