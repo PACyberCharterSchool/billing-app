@@ -195,7 +195,7 @@ export class InvoiceCreateFormComponent implements OnInit {
       name: this.selectedScope + this.selectedSchoolDistrict.name + '_INVOICE_',
       schoolYear: this.selectedSchoolYear.replace(/\s+/g, ''),
       invoice: {
-        asOf: new Date(Date.now()).toLocaleDateString('en-US'),
+        // asOf: new Date(Date.now()).toLocaleDateString('en-US'),
         toSchoolDistrict: new Date(`${this.toSchoolDistrictDate.month}/${this.toSchoolDistrictDate.day}/${this.toSchoolDistrictDate.year}`),
         toPDE: new Date(`${this.toPDEDate.month}/${this.toPDEDate.day}/${this.toPDEDate.year}`),
         schoolDistrictAun: +this.selectedSchoolDistrict.aun,
@@ -210,7 +210,7 @@ export class InvoiceCreateFormComponent implements OnInit {
       reportType: ReportType.Invoice,
       schoolYear: this.selectedSchoolYear.replace(/\s+/g, ''),
       invoice: {
-        asOf: new Date(Date.now()).toLocaleDateString('en-US'),
+        // asOf: new Date(Date.now()).toLocaleDateString('en-US'),
         toSchoolDistrict: new Date(`${this.toSchoolDistrictDate.month}/${this.toSchoolDistrictDate.day}/${this.toSchoolDistrictDate.year}`),
         toPDE: new Date(`${this.toPDEDate.month}/${this.toPDEDate.day}/${this.toPDEDate.year}`),
         scope: this.selectedScope.replace(/\s+/g, '')
