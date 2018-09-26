@@ -139,6 +139,7 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
           console.log('AdministrationSchoolCalendarComponent.ngOnInit(): school calendar is ', data['calendar']);
           this.schoolCalendar = data['calendar'];
           this.days = this.schoolCalendar.days;
+          this.selectedAcademicYear = year;
         },
         error => {
           console.log('AdministrationSchoolCalendar.filterCalendarSchoolYear():  error is ', error);
