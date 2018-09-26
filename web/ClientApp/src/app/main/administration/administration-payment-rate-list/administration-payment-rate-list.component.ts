@@ -201,7 +201,7 @@ export class AdministrationPaymentRateListComponent implements OnInit {
   }
 
   importSchoolDistricts(importSchoolDistrictsContent): void {
-    this.ngbModal.open(importSchoolDistrictsContent, { centered: true, size: 'lg' }).result.then(
+    this.ngbModal.open(importSchoolDistrictsContent, { centered: true }).result.then(
       (result) => {
         this.refreshSchoolDistrictList();
       },
