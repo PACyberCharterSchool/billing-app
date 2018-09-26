@@ -321,7 +321,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   displayCreateBulkInvoiceDialog(bulkCreateContent): void {
-    const modal = this.ngbModal.open(bulkCreateContent, { centered: true });
+    const modal = this.ngbModal.open(bulkCreateContent, { centered: true, size: 'lg' });
     this.selectedCreateTemplateName = 'Select Template';
 
     modal.result.then(
