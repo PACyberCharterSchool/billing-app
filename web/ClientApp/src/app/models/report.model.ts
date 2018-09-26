@@ -3,7 +3,8 @@ export enum ReportType {
   StudentInformation = 'StudentInformation',
   BulkInvoice = 'BulkInvoice',
   BulkStudentInformation = 'BulkStudentInformation',
-  AccountReceivableAsOf = 'AccountsReceivableAsOf',
+  AccountsReceivableAsOf = 'AccountsReceivableAsOf',
+  AccountsReceivableAging = 'AccountsReceivableAging',
   CSIU = 'Csiu'
 }
 

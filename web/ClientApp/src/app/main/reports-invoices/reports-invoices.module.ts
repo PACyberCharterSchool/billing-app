@@ -26,6 +26,7 @@ import { SharedModule } from '../../shared/shared.module';
 
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { CsiuListComponent } from './csiu-list/csiu-list.component';
+import { AccountsReceivableAgingComponent } from './accounts-receivable-aging/accounts-receivable-aging.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { CsiuListComponent } from './csiu-list/csiu-list.component';
     InvoicesMonthlyCombinedListComponent,
     StudentActivityListComponent,
     AccountsReceivableAsOfComponent,
-    CsiuListComponent
+    CsiuListComponent,
+    AccountsReceivableAgingComponent
   ],
   imports: [
     CommonModule,
