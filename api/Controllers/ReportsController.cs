@@ -65,9 +65,6 @@ namespace api.Controllers
 			public string Scope { get; set; }
 
 			[Required]
-			public DateTime AsOf { get; set; }
-
-			[Required]
 			public DateTime ToSchoolDistrict { get; set; }
 
 			[Required]
@@ -85,9 +82,6 @@ namespace api.Controllers
 			[Required]
 			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
 			public string Scope { get; set; }
-
-			[Required]
-			public DateTime AsOf { get; set; }
 
 			[Required]
 			public DateTime ToSchoolDistrict { get; set; }
@@ -302,7 +296,6 @@ namespace api.Controllers
 				SchoolYear = create.SchoolYear,
 				Scope = create.BulkInvoice.Scope,
 				Prepared = time,
-				AsOf = create.BulkInvoice.AsOf,
 				ToSchoolDistrict = create.BulkInvoice.ToSchoolDistrict,
 				ToPDE = create.BulkInvoice.ToPDE,
 				Auns = create.BulkInvoice.Auns,
@@ -385,7 +378,6 @@ namespace api.Controllers
 				BulkInvoice = new CreateBulkInvoiceReport
 				{
 					Scope = create.Invoice.Scope,
-					AsOf = create.Invoice.AsOf,
 					ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
 					ToPDE = create.Invoice.ToPDE,
 					Auns = new[] { create.Invoice.SchoolDistrictAun },
@@ -875,7 +867,6 @@ namespace api.Controllers
 						Invoice = new CreateInvoiceReport
 						{
 							Scope = create.Invoice.Scope,
-							AsOf = create.Invoice.AsOf,
 							ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
 							ToPDE = create.Invoice.ToPDE,
 							SchoolDistrictAun = sd.Aun,
