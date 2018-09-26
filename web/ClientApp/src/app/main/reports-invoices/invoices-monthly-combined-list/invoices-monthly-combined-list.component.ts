@@ -226,7 +226,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     return this.academicYearsService.getAcademicYears();
   }
 
-  private getInvoiceRecipients(): number[] {
+  private getInvoiceCreateParams(): number[] {
     let auns: number[];
 
     switch (this.invoiceRecipient) {
@@ -236,8 +236,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       case 'PDE':
         auns = this.schoolDistricts.filter((sd) => sd.paymentType === 'ACH').map((sd) => +sd.aun);
         break;
-      case 'Totals':
-        break;
       case 'All':
         auns = null;
         break;
@@ -246,11 +244,16 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     return auns;
   }
 
+  private isTotalsOnly(): boolean {
+    return this.invoiceRecipient === 'Totals';
+  }
+
   create(): void {
     this.spinnerMsg = 'Creating bulk invoice.  Please wait...';
     this.ngxSpinnerService.show();
     this.selectedAsOfBillingDate = new Date(Date.now()).toLocaleDateString('en-US');
-    const auns: number[] = this.getInvoiceRecipients();
+    const auns: number[] = this.getInvoiceCreateParams();
+    const totalsOnly = this.isTotalsOnly();
 
     this.reportsService.createBulkInvoice(
       {
@@ -268,7 +271,8 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
             this.toPDEDate.month - 1,
             this.toPDEDate.day).toLocaleDateString('en-US'),
           'scope': this.selectedCreateScope,
-          'auns': auns
+          'auns': auns,
+          'totalsOnly': totalsOnly,
         }
       }
     ).subscribe(
@@ -343,6 +347,9 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
         return 'SD_Only';
       case 'PDE':
         return 'PDE_Only';
+      case 'Totals':
+        return 'Totals_Only';
+        break;
       default:
         return '';
     }
