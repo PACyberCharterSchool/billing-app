@@ -236,6 +236,8 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       case 'PDE':
         auns = this.schoolDistricts.filter((sd) => sd.paymentType === 'ACH').map((sd) => +sd.aun);
         break;
+      case 'Totals':
+        break;
       case 'All':
         auns = null;
         break;
