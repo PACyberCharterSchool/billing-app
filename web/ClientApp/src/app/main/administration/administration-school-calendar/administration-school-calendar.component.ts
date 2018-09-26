@@ -76,7 +76,7 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
 
   listDisplayableFields() {
     if (this.schoolCalendar && this.schoolCalendar.days && this.schoolCalendar.days.length > 0) {
-      const rejected = ['lazyLoader'];
+      const rejected = ['id', 'lazyLoader'];
       const fields = this.utilitiesService.objectKeys(this.schoolCalendar.days[0]);
       if (fields) {
         return fields.filter((i) => !rejected.includes(i));
