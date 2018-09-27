@@ -80,7 +80,8 @@ namespace models.Reporters
 				Where(r => scopes.Contains(r.Scope)).
 				Where(r => r.Type == ReportType.BulkInvoice || r.Type == ReportType.Invoice).
 				Select(r => Deserialize(r.Data)).
-				OrderByDescending(i => i.Prepared).
+				OrderByDescending(i => i.Scope).
+				ThenByDescending(i => i.Prepared).
 				ToList();
 
 			var districts = new Dictionary<int, BulkInvoiceSchoolDistrict>();
