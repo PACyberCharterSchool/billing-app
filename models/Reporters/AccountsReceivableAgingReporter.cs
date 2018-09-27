@@ -52,7 +52,8 @@ namespace models.Reporters
 
 			return invoices.
 				Select(r => JsonConvert.DeserializeObject<BulkInvoice>(r.Data)).
-				OrderByDescending(i => i.Prepared).
+				OrderByDescending(i => i.Scope).
+				ThenByDescending(i => i.Prepared).
 				ToList();
 		}
 
