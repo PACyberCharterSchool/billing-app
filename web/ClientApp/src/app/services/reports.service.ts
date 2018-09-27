@@ -192,7 +192,7 @@ export class ReportsService {
       'name': name,
       'schoolYear': schoolYear.replace(/\s+/g, ''),
       'accountsReceivableAsOf': {
-        'asOf': new Date(Date.now()).toLocaleDateString('en-US'),
+        'asOf': asOf.toLocaleDateString('en-US'),
         'auns': auns
       }
     });

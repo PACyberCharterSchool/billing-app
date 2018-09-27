@@ -121,8 +121,8 @@ export class AccountsReceivableAsOfComponent implements OnInit {
   }
 
   private generateAccountsReceivableAsOfReportName(): string {
-    return 'Accounts_Receivable_' +
-      this.selectedAcademicYear + '_' + `${this.asOfDate.month}-${this.asOfDate.day}-${this.asOfDate.year}`;
+    return 'AccountsReceivableAsOf_' +
+      this.selectedAcademicYear.replace(/\s+/g, '') + '_' + `${this.asOfDate.month}-${this.asOfDate.day}-${this.asOfDate.year}`;
   }
 
   public onCreateSubmit(): void {
@@ -131,7 +131,7 @@ export class AccountsReceivableAsOfComponent implements OnInit {
     this.reportsService.createAccountsReceivableAsOf(
       this.generateAccountsReceivableAsOfReportName(),
       this.selectedAcademicYear,
-      this.asOfDate).subscribe(
+      new Date(this.asOfDate.year, this.asOfDate.month - 1, this.asOfDate.day)).subscribe(
         data => {
           this.ngxSpinnerService.hide();
           this.refreshAccountsReceivableAsOfList();

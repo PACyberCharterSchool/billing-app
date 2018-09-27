@@ -121,7 +121,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
   }
 
   private generateAccountsReceivableAgingReportName(): string {
-    return 'Accounts_Receivable_' +
+    return 'AccountsReceivableAsOf_' +
       this.selectedAcademicYear + '_' + `${this.asOfDate.month}-${this.asOfDate.day}-${this.asOfDate.year}`;
   }
 
@@ -131,7 +131,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
     this.reportsService.createAccountsReceivableAsOf(
       this.generateAccountsReceivableAgingReportName(),
       this.selectedAcademicYear,
-      this.asOfDate).subscribe(
+      new Date(this.asOfDate.year, this.asOfDate.month - 1, this.asOfDate.day)).subscribe(
         data => {
           this.ngxSpinnerService.hide();
           this.refreshAccountsReceivableAgingList();
