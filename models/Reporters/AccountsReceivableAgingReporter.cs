@@ -114,6 +114,7 @@ namespace models.Reporters
 				{
 					Aun = dd.Key,
 					Name = dd.Value[0].SchoolDistrict.Name,
+					Transactions = transactions,
 				});
 			}
 
