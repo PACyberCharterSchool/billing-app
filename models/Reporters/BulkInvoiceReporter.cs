@@ -217,13 +217,13 @@ namespace models.Reporters
 				foreach (var month in Month.AsEnumerable())
 				{
 					var property = typeof(InvoiceTransactions).GetProperty(month.Name);
-					if (period.IsBefore(month.Number))
+					if (period.IsBefore(month))
 					{
 						property.SetValue(transactions, new InvoiceTransaction());
 						continue;
 					}
 
-					var year = month.Number >= 7 ? firstYear : secondYear;
+					var year = month.FirstYear ? firstYear : secondYear;
 					var start = month.AsDateTime(year);
 					var end = start.EndOfMonth();
 
