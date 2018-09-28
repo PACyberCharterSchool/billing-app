@@ -307,10 +307,13 @@ namespace api.Controllers
 			var wb = new Workbook();
 
 			var districts = invoice.Districts.ToList();
+			var summaryPages = new List<int>();
 			for (int i = 0; i < districts.Count; i++)
 			{
 				var district = districts[i];
 				CloneInvoiceSummarySheet(source, wb, i, district.SchoolDistrict.Name);
+
+				summaryPages.Add(wb.Worksheets.Last().Index);
 
 				if (create.BulkInvoice.TotalsOnly)
 					continue;
@@ -327,12 +330,33 @@ namespace api.Controllers
 			var json = JsonConvert.SerializeObject(invoice);
 			wb = _exporter.Export(wb, JsonConvert.DeserializeObject(json));
 
+			// do this after data is actually in cells
+			foreach (var p in summaryPages)
+			{
+				var sheet = wb.Worksheets[p];
+
+				for (var r = 18; r <= 29; r++)
+				{
+					if (!sheet.Cells[r, 6].StringValue.Contains('\n'))
+						continue;
+
+					for (var c = 6; c <= 7; c++)
+					{
+						var style = sheet.Cells[r, c].GetStyle();
+						style.IsTextWrapped = true;
+						sheet.Cells[r, c].SetStyle(style);
+					}
+
+					var newlines = sheet.Cells[r, 6].StringValue.Count(s => s == '\n');
+					sheet.Cells.SetRowHeight(r, sheet.Cells.GetRowHeight(r) * (newlines + 1));
+				}
+			}
+
 			// create report
 			Report report;
 			using (var ms = new MemoryStream())
 			using (var pdfms = new MemoryStream())
 			{
-				// wb.Write(ms);
 				wb.Save(ms, new XlsSaveOptions(SaveFormat.Xlsx));
 				wb.CalculateFormula();
 				wb.Save(pdfms, new XlsSaveOptions(SaveFormat.Pdf));

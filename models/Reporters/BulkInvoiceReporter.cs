@@ -25,7 +25,7 @@ namespace models.Reporters
 		public string CheckNumber { get; set; }
 		public decimal? CheckAmount { get; set; }
 		public decimal? UniPayAmount { get; set; }
-		public DateTime Date { get; set; }
+		public string Date { get; set; }
 	}
 
 	public class InvoiceTransaction
@@ -235,14 +235,14 @@ namespace models.Reporters
 							ToList();
 
 						if (districtPayments.Count > 0)
-							transaction.Payment = districtPayments.Select(p => new InvoicePayment
+							transaction.Payment = new InvoicePayment
 							{
-								Type = p.Type.Value,
-								CheckNumber = p.ExternalId,
-								CheckAmount = p.Type == PaymentType.Check ? (decimal?)p.Amount : null,
-								UniPayAmount = p.Type == PaymentType.UniPay ? (decimal?)p.Amount : null,
-								Date = p.Date,
-							}).First();
+								Type = districtPayments[0].Type.Value,
+								CheckNumber = String.Join("\n", districtPayments.Select(p => p.ExternalId)),
+								CheckAmount = districtPayments.Where(p => p.Type == PaymentType.Check).Sum(p => (decimal?)p.Amount).Round(),
+								UniPayAmount = districtPayments.Where(p => p.Type == PaymentType.UniPay).Sum(p => (decimal?)p.Amount).Round(),
+								Date = String.Join("\n", districtPayments.Select(p => p.Date.ToString("M/d/yyyy"))),
+							};
 					}
 
 					if (refunds.ContainsKey(aun))
@@ -251,7 +251,7 @@ namespace models.Reporters
 							Where(r => r.Date >= start && r.Date <= end).
 							ToList();
 						if (districtRefunds.Count > 0)
-							transaction.Refund = districtRefunds.Select(r => (decimal?)r.Amount).First();
+							transaction.Refund = districtRefunds.Sum(r => (decimal?)r.Amount);
 					}
 
 					property.SetValue(transactions, transaction);
