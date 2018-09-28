@@ -235,14 +235,22 @@ namespace models.Reporters
 							ToList();
 
 						if (districtPayments.Count > 0)
+						{
 							transaction.Payment = new InvoicePayment
 							{
 								Type = districtPayments[0].Type.Value,
 								CheckNumber = String.Join("\n", districtPayments.Select(p => p.ExternalId)),
-								CheckAmount = districtPayments.Where(p => p.Type == PaymentType.Check).Sum(p => (decimal?)p.Amount).Round(),
-								UniPayAmount = districtPayments.Where(p => p.Type == PaymentType.UniPay).Sum(p => (decimal?)p.Amount).Round(),
+								CheckAmount = districtPayments.Where(p => p.Type == PaymentType.Check).Sum(p => p.Amount).Round(),
+								UniPayAmount = districtPayments.Where(p => p.Type == PaymentType.UniPay).Sum(p => p.Amount).Round(),
 								Date = String.Join("\n", districtPayments.Select(p => p.Date.ToString("M/d/yyyy"))),
 							};
+
+							if (transaction.Payment.CheckAmount == 0)
+								transaction.Payment.CheckAmount = null;
+
+							if (transaction.Payment.UniPayAmount == 0)
+								transaction.Payment.UniPayAmount = null;
+						}
 					}
 
 					if (refunds.ContainsKey(aun))
