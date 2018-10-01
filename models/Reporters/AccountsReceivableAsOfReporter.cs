@@ -127,11 +127,11 @@ namespace models.Reporters
 					Aun = d.SchoolDistrict.Aun,
 					Name = d.SchoolDistrict.Name,
 					PaymentType = d.SchoolDistrict.PaymentType,
-					RegularEducationDue = d.SchoolDistrict.RegularRate * ((decimal)d.RegularEnrollments.Values.Sum() / 12),
-					SpecialEducationDue = d.SchoolDistrict.SpecialRate * ((decimal)d.SpecialEnrollments.Values.Sum() / 12),
-					PaidByDistrict = check,
-					PaidByPDE = unipay,
-					Refunded = refund,
+					RegularEducationDue = (d.SchoolDistrict.RegularRate * ((decimal)d.RegularEnrollments.Values.Sum() / 12)).Round(),
+					SpecialEducationDue = (d.SchoolDistrict.SpecialRate * ((decimal)d.SpecialEnrollments.Values.Sum() / 12)).Round(),
+					PaidByDistrict = check.Round(),
+					PaidByPDE = unipay.Round(),
+					Refunded = refund.Round(),
 				};
 			}).ToList();
 		}
