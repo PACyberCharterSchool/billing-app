@@ -26,7 +26,7 @@ export class ReportsService {
   public getReportsByMeta(reportInfo: Object): Observable<Report[]> {
     let url = this.apiReportsUrl;
 
-    if (reportInfo['Type']) { url +=  `?Type=${reportInfo['Type']}`; } // there will *always* be a Type
+    if (reportInfo['Type']) { url += `?Type=${reportInfo['Type']}`; } // there will *always* be a Type
     if (reportInfo['Name']) { url += `&Name=${reportInfo['Name']}`; }
     if (reportInfo['SchoolYear']) { url += `&SchoolYear=${reportInfo['SchoolYear']}`; }
     if (reportInfo['Approved']) { url += `&Approved=${reportInfo['Approved']}`; }
@@ -74,7 +74,7 @@ export class ReportsService {
   }
 
   public getInvoices(name: string, year: string, scope: string, approved: boolean): Observable<Report[]> {
-    const reportInfo: Object = Object.assign({}, {'Type': ReportType.Invoice});
+    const reportInfo: Object = Object.assign({}, { 'Type': ReportType.Invoice });
 
     if (name) { reportInfo['Name'] = name; }
     if (year) { reportInfo['SchoolYear'] = year; }
@@ -85,7 +85,7 @@ export class ReportsService {
   }
 
   public getBulkInvoices(year: string, scope: string): Observable<any> {
-    const reportInfo: Object = Object.assign({}, {'Type': ReportType.BulkInvoice});
+    const reportInfo: Object = Object.assign({}, { 'Type': ReportType.BulkInvoice });
 
     if (year) { reportInfo['SchoolYear'] = year; }
     if (scope) { reportInfo['Scope'] = scope; }
@@ -145,7 +145,7 @@ export class ReportsService {
   }
 
   public getActivities(name: string, year: string, scope: string, approved: boolean): Observable<Report[]> {
-    const reportInfo: Object = Object.assign({}, {'Type': ReportType.BulkStudentInformation});
+    const reportInfo: Object = Object.assign({}, { 'Type': ReportType.BulkStudentInformation });
 
     if (name) { reportInfo['Name'] = name; }
     if (year) { reportInfo['SchoolYear'] = year; }
@@ -206,7 +206,7 @@ export class ReportsService {
       'schoolYear': schoolYear.replace(/\s+/g, ''),
       'name': name,
       'csiu': {
-        'asOf': new Date(Date.now()).toLocaleDateString('en-US'),
+        'asOf': asOf.toLocaleDateString('en-US'),
         'auns': auns
       }
     });
