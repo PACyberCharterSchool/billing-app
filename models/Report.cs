@@ -15,6 +15,7 @@ namespace models
 		public static readonly ReportType AccountsReceivableAsOf = new ReportType("AccountsReceivableAsOf");
 
 		public static readonly ReportType Csiu = new ReportType("Csiu");
+		public static readonly ReportType UniPayInvoiceSummary = new ReportType("UniPayInvoiceSummary");
 	}
 
 	public class ReportMetadata

@@ -59,6 +59,14 @@ export class ReportsService {
     return this.getReportsByMeta(reportMeta);
   }
 
+  public getUniPayInvoiceSummary(): Observable<Report[]> {
+    const reportMeta: Object = Object.assign({}, {
+      'Type': ReportType.UniPayInvoiceSummary,
+    });
+
+    return this.getReportsByMeta(reportMeta);
+  }
+
   // HTTP GET /api/reports/:name
   public getReportDataByFormat(report: Report, format: string): Observable<any> {
     const url = this.apiReportsUrl + `/${report.name}`;
@@ -208,6 +216,20 @@ export class ReportsService {
       'csiu': {
         'asOf': new Date(Date.now()).toLocaleDateString('en-US'),
         'auns': auns
+      }
+    });
+
+    return this.httpClient.post<any>(url, reportMeta, this.headers);
+  }
+
+  public createUniPayInvoiceSummary(name: string, schoolYear: string, asOf: Date): Observable<Report> {
+    const url: string = this.apiReportsUrl;
+    const reportMeta: Object = Object.assign({}, {
+      'reportType': ReportType.UniPayInvoiceSummary,
+      'schoolYear': schoolYear.replace(/\s+/g, ''),
+      'name': name,
+      'uniPayInvoiceSummary': {
+        'asOf': new Date(Date.now()).toLocaleDateString('en-US')
       }
     });
 

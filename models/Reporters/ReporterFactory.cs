@@ -9,6 +9,7 @@ namespace models.Reporters
 		IReporter<BulkInvoice, BulkInvoiceReporter.Config> CreateBulkInvoiceReporter(PacBillContext context);
 		IReporter<BulkStudentInformation, BulkStudentInformationReporter.Config> CreateBulkStudentInformationReporter(PacBillContext context);
 		IReporter<CsiuReport, CsiuReporter.Config> CreateCsiuReporter(PacBillContext context);
+		IReporter<UniPayInvoiceSummaryReport, UniPayInvoiceSummaryReporter.Config> CreateUniPayInvoiceSummaryReporter(PacBillContext context);
 	}
 
 	public class ReporterFactory : IReporterFactory
@@ -24,5 +25,8 @@ namespace models.Reporters
 
 		public IReporter<CsiuReport, CsiuReporter.Config> CreateCsiuReporter(PacBillContext context)
 			=> new CsiuReporter(context);
+
+		public IReporter<UniPayInvoiceSummaryReport, UniPayInvoiceSummaryReporter.Config> CreateUniPayInvoiceSummaryReporter(PacBillContext context)
+			=> new UniPayInvoiceSummaryReporter(context);
 	}
 }
