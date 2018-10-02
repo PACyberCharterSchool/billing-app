@@ -637,15 +637,15 @@ namespace api.Controllers
 
 				row++;
 				ws.Cells[row, 4].PutValue("Totals");
-				ws.Cells[row, 5].PutValue(district.Transactions.Sum(t => t.Buckets[0]));
+				ws.Cells[row, 5].PutValue(district.Totals[0]);
 				ws.Cells[row, 5].SetStyle(amountStyle);
-				ws.Cells[row, 6].PutValue(district.Transactions.Sum(t => t.Buckets[1]));
+				ws.Cells[row, 6].PutValue(district.Totals[1]);
 				ws.Cells[row, 6].SetStyle(amountStyle);
-				ws.Cells[row, 7].PutValue(district.Transactions.Sum(t => t.Buckets[2]));
+				ws.Cells[row, 7].PutValue(district.Totals[2]);
 				ws.Cells[row, 7].SetStyle(amountStyle);
-				ws.Cells[row, 8].PutValue(district.Transactions.Sum(t => t.Buckets[3]));
+				ws.Cells[row, 8].PutValue(district.Totals[3]);
 				ws.Cells[row, 8].SetStyle(amountStyle);
-				ws.Cells[row, 9].PutValue(district.Transactions.Sum(t => t.Buckets.Sum()));
+				ws.Cells[row, 9].PutValue(district.Balance);
 				ws.Cells[row, 9].SetStyle(amountStyle);
 				row += 2;
 			}

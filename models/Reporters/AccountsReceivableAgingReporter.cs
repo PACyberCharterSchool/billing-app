@@ -20,15 +20,16 @@ namespace models.Reporters
 		public int Aun { get; set; }
 		public string Name { get; set; }
 		public IList<AccountsReceivableAgingTransaction> Transactions { get; set; }
-		// TODO(Erik): bucket totals?
+		public IList<decimal> Totals { get; set; }
+		public decimal Balance { get; set; }
 	}
 
 	public class AccountsReceivableAging
 	{
 		public DateTime? From { get; set; }
 		public IList<AccountsReceivableAgingSchoolDistrict> SchoolDistricts { get; set; }
-		public IList<decimal?> BucketTotals { get; set; }
-		public decimal Balance { get; set; }
+		public IList<decimal> GrandTotals { get; set; }
+		public decimal GrandBalance { get; set; }
 	}
 
 	public class AccountsReceivableAgingReporter : IReporter<AccountsReceivableAging, AccountsReceivableAgingReporter.Config>
@@ -121,6 +122,7 @@ namespace models.Reporters
 
 			var now = DateTime.Now.Date;
 			var results = new List<AccountsReceivableAgingSchoolDistrict>();
+			// TODO(Erik): either next invoice or next refund
 			foreach (var dd in districts)
 			{
 				List<Payment> pp = null;
@@ -187,18 +189,25 @@ namespace models.Reporters
 							rem -= p.Amount;
 						}
 					}
-
-					// TODO(Erik): refunds, then payments to cover it
 				}
 
 				// TODO(Erik): leftover payments
 
-				results.Add(new AccountsReceivableAgingSchoolDistrict
+				var sd = new AccountsReceivableAgingSchoolDistrict
 				{
 					Aun = dd.Key,
 					Name = dd.Value[0].Bisd.SchoolDistrict.Name,
 					Transactions = transactions,
-				});
+				};
+				sd.Totals = new[] {
+					sd.Transactions.Sum(t => t.Buckets[0] ?? 0).Round(),
+					sd.Transactions.Sum(t => t.Buckets[1] ?? 0).Round(),
+					sd.Transactions.Sum(t => t.Buckets[2] ?? 0).Round(),
+					sd.Transactions.Sum(t => t.Buckets[3] ?? 0).Round(),
+				};
+				sd.Balance = sd.Totals.Sum().Round();
+
+				results.Add(sd);
 			}
 
 			return results;
