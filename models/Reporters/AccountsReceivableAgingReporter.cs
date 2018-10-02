@@ -20,6 +20,7 @@ namespace models.Reporters
 		public int Aun { get; set; }
 		public string Name { get; set; }
 		public IList<AccountsReceivableAgingTransaction> Transactions { get; set; }
+		// TODO(Erik): bucket totals?
 	}
 
 	public class AccountsReceivableAging
@@ -64,6 +65,7 @@ namespace models.Reporters
 				payments = payments.Where(p => p.Date >= from.Value);
 
 			return payments.
+				OrderBy(p => p.Date).
 				GroupBy(p => p.SchoolDistrict.Aun).
 				ToDictionary(g => g.Key, g => g.ToList());
 		}
@@ -75,8 +77,23 @@ namespace models.Reporters
 				refunds = refunds.Where(r => r.Date >= from.Value);
 
 			return refunds.
+				OrderBy(r => r.Date).
 				GroupBy(r => r.SchoolDistrict.Aun).
 				ToDictionary(g => g.Key, g => g.ToList());
+		}
+
+		private struct InvoiceDistrict
+		{
+			public string Scope { get; set; }
+			public DateTime Prepared { get; set; }
+			public BulkInvoiceSchoolDistrict Bisd { get; set; }
+
+			public InvoiceDistrict(string s, DateTime p, BulkInvoiceSchoolDistrict d)
+			{
+				Scope = s;
+				Prepared = p;
+				Bisd = d;
+			}
 		}
 
 		private IList<AccountsReceivableAgingSchoolDistrict> GetSchoolDistricts(DateTime? from, IList<int> auns = null)
@@ -84,41 +101,114 @@ namespace models.Reporters
 			if (auns == null)
 				auns = GetAuns();
 
-			var invoices = GetInvoices(from);
-			var districts = new Dictionary<int, List<BulkInvoiceSchoolDistrict>>();
+			var invoices = GetInvoices(from).OrderBy(i => i.Scope).ThenBy(i => i.Prepared);
+
+			var districts = new Dictionary<int, List<InvoiceDistrict>>();
 			foreach (var i in invoices)
 			{
 				var dd = i.Districts.Where(d => auns.Contains(d.SchoolDistrict.Aun));
 				foreach (var d in dd)
 				{
 					if (!districts.ContainsKey(d.SchoolDistrict.Aun))
-						districts.Add(d.SchoolDistrict.Aun, new List<BulkInvoiceSchoolDistrict> { d });
+						districts.Add(d.SchoolDistrict.Aun, new List<InvoiceDistrict> { new InvoiceDistrict(i.Scope, i.Prepared, d) });
 					else
-						districts[d.SchoolDistrict.Aun].Add(d);
+						districts[d.SchoolDistrict.Aun].Add(new InvoiceDistrict(i.Scope, i.Prepared, d));
 				}
 			}
 
-			var payments = GetPayments(from, auns);
+			var payments = GetPayments(from, auns); // TODO(Erik): queue?
 			var refunds = GetRefunds(from, auns);
 
+			var now = DateTime.Now.Date;
 			var results = new List<AccountsReceivableAgingSchoolDistrict>();
 			foreach (var dd in districts)
 			{
+				List<Payment> pp = null;
+				if (payments.ContainsKey(dd.Key))
+					pp = payments[dd.Key];
+
+				List<Refund> rr = null;
+				if (refunds.ContainsKey(dd.Key))
+					rr = refunds[dd.Key];
+
 				var transactions = new List<AccountsReceivableAgingTransaction>();
-				foreach (var d in dd.Value)
+				for (var i = 0; i < dd.Value.Count; i++)
 				{
-					// TODO(Erik): all the things
+					var d = dd.Value[i];
+					var amount = GetTotal(d.Bisd);
+					if (i > 0)
+						amount -= GetTotal(dd.Value[i - 1].Bisd);
+
+					var transaction = new AccountsReceivableAgingTransaction
+					{
+						Identifier = d.Scope,
+						Type = "INV", // TODO(Erik): consts
+						Date = d.Prepared,
+						Amount = amount,
+					};
+
+					var buckets = new decimal?[4];
+					var bi = 3;
+					if (d.Prepared >= now.LessDays(30))
+						bi = 0;
+					else if (d.Prepared >= now.LessDays(60) && d.Prepared <= now.LessDays(31))
+						bi = 1;
+					else if (d.Prepared >= now.LessDays(90) && d.Prepared <= now.LessDays(61))
+						bi = 2;
+					else
+						bi = 3;
+					buckets[bi] = amount;
+					transaction.Buckets = buckets;
+
+					transactions.Add(transaction);
+
+					if (pp != null && pp.Count > 0)
+					{
+						var rem = buckets[bi];
+						foreach (var p in pp)
+						{
+							if (rem <= 0)
+								break;
+
+							var pt = new AccountsReceivableAgingTransaction
+							{
+								Identifier = $"PYMT{p.Date.ToString("yyyyMMdd")}",
+								Type = "PYMT", // TODO(Erik): consts
+								Date = p.Date,
+								Amount = -p.Amount,
+							};
+							var pbb = new decimal?[4];
+							pbb[bi] = -p.Amount;
+							pt.Buckets = pbb;
+
+							// TODO(Erik): remove payment from list
+							transactions.Add(pt);
+
+							rem -= p.Amount;
+						}
+					}
+
+					// TODO(Erik): refunds, then payments to cover it
 				}
+
+				// TODO(Erik): leftover payments
 
 				results.Add(new AccountsReceivableAgingSchoolDistrict
 				{
 					Aun = dd.Key,
-					Name = dd.Value[0].SchoolDistrict.Name,
+					Name = dd.Value[0].Bisd.SchoolDistrict.Name,
 					Transactions = transactions,
 				});
 			}
 
 			return results;
+
+			decimal GetTotal(BulkInvoiceSchoolDistrict d)
+			{
+				var regular = (d.SchoolDistrict.RegularRate * ((decimal)d.RegularEnrollments.Values.Sum() / 12)).Round();
+				var special = (d.SchoolDistrict.SpecialRate * ((decimal)d.SpecialEnrollments.Values.Sum() / 12)).Round();
+				return (regular + special).Round();
+			}
 		}
 
 		public AccountsReceivableAging GenerateReport(Config config)
@@ -131,7 +221,7 @@ namespace models.Reporters
 
 			// TODO(Erik): BucketTotals from Transactions
 
-			report.Balance = report.BucketTotals.Sum(t => t.HasValue ? t.Value : 0);
+			// report.Balance = report.BucketTotals.Sum(t => t.HasValue ? t.Value : 0);
 
 			return report;
 		}

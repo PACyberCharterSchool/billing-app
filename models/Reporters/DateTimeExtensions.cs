@@ -11,5 +11,7 @@ namespace models.Reporters
 
 		public static DateTime EndOfMonth(this DateTime time)
 			=> new DateTime(time.Year, time.Month, DateTime.DaysInMonth(time.Year, time.Month));
+
+		public static DateTime LessDays(this DateTime time, int days) => time.Subtract(TimeSpan.FromDays(days));
 	}
 }

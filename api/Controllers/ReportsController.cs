@@ -26,6 +26,7 @@ using models;
 using models.Reporters;
 using models.Reporters.Exporters;
 using System.Drawing;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace api.Controllers
 {
@@ -129,6 +130,13 @@ namespace api.Controllers
 			public IList<int> Auns { get; set; }
 		}
 
+		public class CreateAccountsReceivableAgingReport
+		{
+			public DateTime? From { get; set; }
+
+			public IList<int> Auns { get; set; }
+		}
+
 		public class CreateAccountsReceivableAsOfReport
 		{
 			[Required]
@@ -163,6 +171,7 @@ namespace api.Controllers
 			public CreateBulkInvoiceReport BulkInvoice { get; set; }
 			public CreateStudentInformationReport StudentInformation { get; set; }
 			public CreateBulkStudentInformationReport BulkStudentInformation { get; set; }
+			public CreateAccountsReceivableAgingReport AccountsReceivableAging { get; set; }
 			public CreateAccountsReceivableAsOfReport AccountsReceivableAsOf { get; set; }
 			public CreateCsiuReport Csiu { get; set; }
 		}
@@ -525,6 +534,148 @@ namespace api.Controllers
 			return report;
 		}
 
+		private Report CreateAccountsReceivableAging(CreateReport create)
+		{
+			var reporter = _reporters.CreateAccountsReceivableAgingReporter(_context);
+			var result = reporter.GenerateReport(new AccountsReceivableAgingReporter.Config
+			{
+				From = create.AccountsReceivableAging.From,
+				Auns = create.AccountsReceivableAging.Auns,
+			});
+
+			var wb = new Workbook();
+			var ws = wb.Worksheets[0];
+
+			ws.PageSetup.Orientation = PageOrientationType.Landscape;
+			ws.Cells.StandardWidthInch = 0.9;
+			ws.Cells.SetColumnWidthInch(0, 1.25);
+			ws.Cells.SetColumnWidthInch(1, 0.4);
+
+			// TODO(Erik): this stuff only shows up for PDF; need to add header for XLSX
+			var from = result.From.HasValue ? result.From.Value.ToString("M/d/yyyy") : "";
+			ws.PageSetup.SetHeader(0, $"Printed: {DateTime.Now}\nDocument date: {from} - {DateTime.Now.ToString("M/d/yyyy")}");
+			ws.PageSetup.SetHeader(1, "AGED TRIAL BALANCE DETAIL\nPennsylvania Cyber Charter School\nReceivables Management");
+			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+			ws.PageSetup.SetHeader(2, $"Page: &P\nUser: {username}");
+
+			var columnHeaders = new[] { "Invoice #", "Type", "Date", "Amount", "Writeoff", "Current", "31-60 Days", "61-90 Days", "91+ Days" };
+
+			var row = 0;
+			foreach (var district in result.SchoolDistricts)
+			{
+				var topRuleStyle = new CellsFactory().CreateStyle();
+				topRuleStyle.SetBorder(BorderType.TopBorder, CellBorderType.Thin, Color.Black);
+				for (var c = 0; c <= columnHeaders.Length; c++)
+					ws.Cells[row, c].SetStyle(topRuleStyle);
+
+				row++;
+
+				ws.Cells[row, 1].PutValue("AUN:");
+				ws.Cells[row, 2].PutValue(district.Aun);
+				var aunStyle = new CellsFactory().CreateStyle();
+				aunStyle.Number = 1;
+				ws.Cells[row, 2].SetStyle(aunStyle);
+
+				ws.Cells[row, 4].PutValue("School:");
+				ws.Cells[row, 5].PutValue(district.Name);
+				var nameStyle = new CellsFactory().CreateStyle();
+				nameStyle.IsTextWrapped = false;
+				ws.Cells[row, 5].SetStyle(nameStyle);
+
+				var headerStyle = new CellsFactory().CreateStyle();
+				headerStyle.HorizontalAlignment = TextAlignmentType.Center;
+				headerStyle.SetBorder(BorderType.BottomBorder, CellBorderType.Thin, Color.Gray);
+
+				row += 2;
+				for (var c = 0; c < columnHeaders.Length; c++)
+				{
+					ws.Cells[row, c].PutValue(columnHeaders[c]);
+					ws.Cells[row, c].SetStyle(headerStyle);
+				}
+
+				// See https://apireference.aspose.com/net/cells/aspose.cells/style/properties/number.
+				var dateStyle = new CellsFactory().CreateStyle();
+				dateStyle.Number = 14; //	m/d/yyyy
+				dateStyle.HorizontalAlignment = TextAlignmentType.Center;
+
+				var amountStyle = new CellsFactory().CreateStyle();
+				amountStyle.Number = 7; // $#,##0.00_);($#,##0.00)
+				amountStyle.HorizontalAlignment = TextAlignmentType.Center;
+
+				row++;
+				foreach (var transaction in district.Transactions)
+				{
+					var c = 0;
+					ws.Cells[row, c++].PutValue(transaction.Identifier);
+					ws.Cells[row, c++].PutValue(transaction.Type);
+					ws.Cells[row, c++].PutValue(transaction.Date);
+					ws.Cells[row, c - 1].SetStyle(dateStyle);
+					ws.Cells[row, c++].PutValue(transaction.Amount);
+					ws.Cells[row, c - 1].SetStyle(amountStyle);
+					ws.Cells[row, c++].PutValue(transaction.WriteOff);
+					ws.Cells[row, c - 1].SetStyle(amountStyle);
+					ws.Cells[row, c++].PutValue(transaction.Buckets[0]);
+					ws.Cells[row, c - 1].SetStyle(amountStyle);
+					ws.Cells[row, c++].PutValue(transaction.Buckets[1]);
+					ws.Cells[row, c - 1].SetStyle(amountStyle);
+					ws.Cells[row, c++].PutValue(transaction.Buckets[2]);
+					ws.Cells[row, c - 1].SetStyle(amountStyle);
+					ws.Cells[row, c++].PutValue(transaction.Buckets[3]);
+					ws.Cells[row, c - 1].SetStyle(amountStyle);
+					row++;
+				}
+
+				var balanceRuleStyle = new CellsFactory().CreateStyle();
+				balanceRuleStyle.SetBorder(BorderType.BottomBorder, CellBorderType.Thin, Color.Gray);
+				for (var c = 5; c <= columnHeaders.Length; c++)
+					ws.Cells[row, c].SetStyle(balanceRuleStyle);
+
+				ws.Cells[row, columnHeaders.Length].PutValue("Balance");
+				var balanceStyle = ws.Cells[row, columnHeaders.Length].GetStyle();
+				balanceStyle.HorizontalAlignment = TextAlignmentType.Center;
+				ws.Cells[row, columnHeaders.Length].SetStyle(balanceStyle);
+
+				row++;
+				ws.Cells[row, 4].PutValue("Totals");
+				ws.Cells[row, 5].PutValue(district.Transactions.Sum(t => t.Buckets[0]));
+				ws.Cells[row, 5].SetStyle(amountStyle);
+				ws.Cells[row, 6].PutValue(district.Transactions.Sum(t => t.Buckets[1]));
+				ws.Cells[row, 6].SetStyle(amountStyle);
+				ws.Cells[row, 7].PutValue(district.Transactions.Sum(t => t.Buckets[2]));
+				ws.Cells[row, 7].SetStyle(amountStyle);
+				ws.Cells[row, 8].PutValue(district.Transactions.Sum(t => t.Buckets[3]));
+				ws.Cells[row, 8].SetStyle(amountStyle);
+				ws.Cells[row, 9].PutValue(district.Transactions.Sum(t => t.Buckets.Sum()));
+				ws.Cells[row, 9].SetStyle(amountStyle);
+				row += 2;
+			}
+
+			// TODO(Erik): grand totals
+
+			Report report;
+			using (var xlsxStream = new MemoryStream())
+			using (var pdfStream = new MemoryStream())
+			{
+				wb.CalculateFormula();
+				wb.Save(xlsxStream, SaveFormat.Xlsx);
+				wb.Save(pdfStream, SaveFormat.Pdf);
+
+				report = new Report
+				{
+					Type = ReportType.AccountsReceivableAging,
+					SchoolYear = create.SchoolYear,
+					Name = create.Name,
+					Approved = true,
+					Created = DateTime.Now,
+					Data = JsonConvert.SerializeObject(result),
+					Xlsx = xlsxStream.ToArray(),
+					Pdf = pdfStream.ToArray(),
+				};
+			}
+
+			return report;
+		}
+
 		private Report CreateAccountsReceivableAsOf(CreateReport create)
 		{
 			var reporter = _reporters.CreateAccountsReceivableAsOfReporter(_context);
@@ -771,6 +922,13 @@ namespace api.Controllers
 						return new BadRequestObjectResult(new ErrorsResponse("Cannot create bulk student information without 'bulk student information' config."));
 
 					report = CreateBulkStudentInformation(create);
+				}
+				else if (create.ReportType == ReportType.AccountsReceivableAging.Value)
+				{
+					if (create.AccountsReceivableAging == null)
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create accounts receivable aging without 'accounts receiable aging' config."));
+
+					report = CreateAccountsReceivableAging(create);
 				}
 				else if (create.ReportType == ReportType.AccountsReceivableAsOf.Value)
 				{
