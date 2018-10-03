@@ -562,18 +562,23 @@ namespace api.Controllers
 			var ws = wb.Worksheets[0];
 
 			ws.PageSetup.Orientation = PageOrientationType.Landscape;
-			ws.Cells.StandardWidthInch = 0.9;
-			ws.Cells.SetColumnWidthInch(0, 1.25);
+			ws.Cells.StandardWidthInch = 1;
 			ws.Cells.SetColumnWidthInch(1, 0.4);
+			ws.Cells.SetColumnWidthInch(2, 0.7);
+			ws.Cells.SetColumnWidthInch(4, 0.7);
 
 			// TODO(Erik): this stuff only shows up for PDF; need to add header for XLSX
-			var from = result.From.HasValue ? result.From.Value.ToString("M/d/yyyy") : "";
-			ws.PageSetup.SetHeader(0, $"Printed: {DateTime.Now}\nDocument date: {from} - {DateTime.Now.ToString("M/d/yyyy")}");
+			var from = result.From.HasValue ? result.From.Value.ToString("MM/dd/yyyy") : "";
+			ws.PageSetup.SetHeader(0, $"Printed: {DateTime.Now}\nDocument date: {from} - {DateTime.Now.ToString("MM/dd/yyyy")}");
 			ws.PageSetup.SetHeader(1, "AGED TRIAL BALANCE DETAIL\nPennsylvania Cyber Charter School\nReceivables Management");
 			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
 			ws.PageSetup.SetHeader(2, $"Page: &P\nUser: {username}");
 
 			var columnHeaders = new[] { "Invoice #", "Type", "Date", "Amount", "Writeoff", "Current", "31-60 Days", "61-90 Days", "91+ Days" };
+
+			var amountStyle = new CellsFactory().CreateStyle();
+			amountStyle.Number = 7; // $#,##0.00_);($#,##0.00)
+			amountStyle.HorizontalAlignment = TextAlignmentType.Center;
 
 			var row = 0;
 			foreach (var district in result.SchoolDistricts)
@@ -613,10 +618,6 @@ namespace api.Controllers
 				dateStyle.Number = 14; //	m/d/yyyy
 				dateStyle.HorizontalAlignment = TextAlignmentType.Center;
 
-				var amountStyle = new CellsFactory().CreateStyle();
-				amountStyle.Number = 7; // $#,##0.00_);($#,##0.00)
-				amountStyle.HorizontalAlignment = TextAlignmentType.Center;
-
 				row++;
 				foreach (var transaction in district.Transactions)
 				{
@@ -651,7 +652,11 @@ namespace api.Controllers
 				ws.Cells[row, columnHeaders.Length].SetStyle(balanceStyle);
 
 				row++;
+				var totalsStyle = ws.Cells[row, 4].GetStyle();
+				totalsStyle.HorizontalAlignment = TextAlignmentType.Right;
+
 				ws.Cells[row, 4].PutValue("Totals");
+				ws.Cells[row, 4].SetStyle(totalsStyle);
 				ws.Cells[row, 5].PutValue(district.Totals[0]);
 				ws.Cells[row, 5].SetStyle(amountStyle);
 				ws.Cells[row, 6].PutValue(district.Totals[1]);
@@ -665,7 +670,42 @@ namespace api.Controllers
 				row += 2;
 			}
 
-			// TODO(Erik): grand totals
+			row++;
+			var grandColumnHeaders = new[] { "Customer(s)", columnHeaders[5], columnHeaders[6], columnHeaders[7], columnHeaders[8], "Balance" };
+			var grandColumnHeadersStyle = new CellsFactory().CreateStyle();
+			grandColumnHeadersStyle.SetBorder(BorderType.BottomBorder, CellBorderType.Thin, Color.Black);
+			grandColumnHeadersStyle.HorizontalAlignment = TextAlignmentType.Center;
+
+			var grandColumnRow = 4;
+			foreach (var h in grandColumnHeaders)
+			{
+				ws.Cells[row, grandColumnRow].PutValue(h);
+				ws.Cells[row, grandColumnRow].SetStyle(grandColumnHeadersStyle);
+				grandColumnRow++;
+			}
+
+			row++;
+			var grandTotalsStyle = ws.Cells[row, 3].GetStyle();
+			grandTotalsStyle.HorizontalAlignment = TextAlignmentType.Right;
+			grandTotalsStyle.Font.IsBold = true;
+
+			var countStyle = ws.Cells[row, 4].GetStyle();
+			countStyle.HorizontalAlignment = TextAlignmentType.Center;
+
+			ws.Cells[row, 3].PutValue("Grand Totals:");
+			ws.Cells[row, 3].SetStyle(grandTotalsStyle);
+			ws.Cells[row, 4].PutValue(result.SchoolDistricts.Count);
+			ws.Cells[row, 4].SetStyle(countStyle);
+			ws.Cells[row, 5].PutValue(result.GrandTotals[0]);
+			ws.Cells[row, 5].SetStyle(amountStyle);
+			ws.Cells[row, 6].PutValue(result.GrandTotals[1]);
+			ws.Cells[row, 6].SetStyle(amountStyle);
+			ws.Cells[row, 7].PutValue(result.GrandTotals[2]);
+			ws.Cells[row, 7].SetStyle(amountStyle);
+			ws.Cells[row, 8].PutValue(result.GrandTotals[3]);
+			ws.Cells[row, 8].SetStyle(amountStyle);
+			ws.Cells[row, 9].PutValue(result.GrandBalance);
+			ws.Cells[row, 9].SetStyle(amountStyle);
 
 			Report report;
 			using (var xlsxStream = new MemoryStream())

@@ -228,9 +228,13 @@ namespace models.Reporters
 				SchoolDistricts = GetSchoolDistricts(config.From, config.Auns),
 			};
 
-			// TODO(Erik): BucketTotals from Transactions
-
-			// report.Balance = report.BucketTotals.Sum(t => t.HasValue ? t.Value : 0);
+			report.GrandTotals = new[] {
+				report.SchoolDistricts.Sum(d => d.Totals[0]).Round(),
+				report.SchoolDistricts.Sum(d => d.Totals[1]).Round(),
+				report.SchoolDistricts.Sum(d => d.Totals[2]).Round(),
+				report.SchoolDistricts.Sum(d => d.Totals[3]).Round(),
+			};
+			report.GrandBalance = report.GrandTotals.Sum().Round();
 
 			return report;
 		}
