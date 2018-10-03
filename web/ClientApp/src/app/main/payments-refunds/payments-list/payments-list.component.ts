@@ -120,7 +120,7 @@ export class PaymentsListComponent implements OnInit {
       },
       error => {
         console.log('PaymentsListComponent.ngOnInit(): error is ', error);
-        this.ngxSpinnerService.show();
+        this.ngxSpinnerService.hide();
       }
     );
   }
