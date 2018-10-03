@@ -829,15 +829,12 @@ namespace api.Controllers
 			numericStyle.Custom = "#,##0.00_);(#,##0.00)";
 			numericStyle.ForegroundColor = numericForegroundColor;
 			numericStyle.BackgroundColor = numericForegroundColor;
-			// numericStyle.BackgroundColor = System.Drawing.Color.LightGoldenrodYellow;
-			// numericStyle.ForegroundColor = System.Drawing.Color.LightGoldenrodYellow;
 			numericStyle.Pattern = BackgroundType.Solid;
 
 			var paymentTypeStyle = new CellsFactory().CreateStyle();
 			paymentTypeStyle.HorizontalAlignment = TextAlignmentType.Center;
 
 			// TODO(Erik): this should really be done in the reporter
-			var totalDue = 0m;
 			var totalPaid = 0m;
 			var totalNetDue = 0m;
 
@@ -850,8 +847,8 @@ namespace api.Controllers
 				ws.Cells[r, c++].PutValue(district.TotalPaid);
 				totalPaid += district.TotalPaid;
 				ws.Cells[r, c - 1].SetStyle(numericStyle);
-				totalDue += district.TotalDue;
-				ws.Cells[r, c++].PutValue(district.TotalDue);
+				totalNetDue += district.NetDue;
+				ws.Cells[r, c++].PutValue(district.NetDue);
 				ws.Cells[r, c - 1].SetStyle(numericStyle);
 
 				r++;
