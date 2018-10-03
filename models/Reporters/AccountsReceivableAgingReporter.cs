@@ -34,6 +34,11 @@ namespace models.Reporters
 
 	public class AccountsReceivableAgingReporter : IReporter<AccountsReceivableAging, AccountsReceivableAgingReporter.Config>
 	{
+		const string DATE_ID_FORMAT = "yyyyMMdd";
+		const string INVOICE_TYPE = "INV";
+		const string REFUND_TYPE = "REF";
+		const string PAYMENT_TYPE = "PYMT";
+
 		private readonly PacBillContext _context;
 		public AccountsReceivableAgingReporter(PacBillContext context) => _context = context;
 
@@ -176,8 +181,8 @@ namespace models.Reporters
 
 						transaction = new AccountsReceivableAgingTransaction
 						{
-							Identifier = $"REF{r.Date.ToString("yyyyMMdd")}",
-							Type = "REF",
+							Identifier = $"{REFUND_TYPE}{r.Date.ToString(DATE_ID_FORMAT)}",
+							Type = REFUND_TYPE,
 							Date = r.Date,
 							Amount = amount,
 						};
@@ -192,7 +197,7 @@ namespace models.Reporters
 						transaction = new AccountsReceivableAgingTransaction
 						{
 							Identifier = d.Scope,
-							Type = "INV",
+							Type = INVOICE_TYPE,
 							Date = d.Prepared,
 							Amount = amount,
 						};
@@ -221,8 +226,8 @@ namespace models.Reporters
 						var p = pp.Dequeue();
 						var pt = new AccountsReceivableAgingTransaction
 						{
-							Identifier = $"PYMT{p.Date.ToString("yyyyMMdd")}",
-							Type = "PYMT", // TODO(Erik): consts
+							Identifier = $"{PAYMENT_TYPE}{p.Date.ToString(DATE_ID_FORMAT)}",
+							Type = PAYMENT_TYPE,
 							Date = p.Date,
 							Amount = -p.Amount,
 						};
@@ -241,8 +246,8 @@ namespace models.Reporters
 					var p = pp.Dequeue();
 					transactions.Add(new AccountsReceivableAgingTransaction
 					{
-						Identifier = $"PYMT{p.Date.ToString("yyyyMMdd")}",
-						Type = "PYMT",
+						Identifier = $"{PAYMENT_TYPE}{p.Date.ToString(DATE_ID_FORMAT)}",
+						Type = PAYMENT_TYPE,
 						Date = p.Date,
 						Amount = -p.Amount,
 						Buckets = new decimal?[4] {
