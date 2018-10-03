@@ -135,7 +135,7 @@ export class CsiuListComponent implements OnInit {
     this.ngxSpinnerService.show();
     this.reportsService.createCSIU(
       this.generateCSIUReportName(),
-      this.selectedAcademicYear.replace(/\s+/g, ''),
+      // this.selectedAcademicYear.replace(/\s+/g, ''),
       this.asOfDate,
       this.schoolDistricts.map((sd) => +sd.aun)).subscribe(
         data => {
