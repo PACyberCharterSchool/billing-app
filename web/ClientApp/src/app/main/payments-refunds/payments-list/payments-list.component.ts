@@ -29,6 +29,7 @@ export class PaymentsListComponent implements OnInit {
   private schoolDistricts: SchoolDistrict[];
   private skip: number;
   private selectedBulkImportFile;
+  public spinnerMsg: string;
 
   constructor(
     private globals: Globals,
@@ -108,14 +109,18 @@ export class PaymentsListComponent implements OnInit {
   }
 
   refreshPaymentList() {
+    this.spinnerMsg = 'Loading payments list.  Please wait...';
+    this.ngxSpinnerService.show();
     this.paymentsService.getPayments(this.skip).subscribe(
       data => {
         this.allPayments = data['payments'];
         this.payments = data['payments'].filter((p) => p.split === 1);
+        this.ngxSpinnerService.hide();
         console.log('PaymentsListComponent.ngOnInit(): payments are ', this.allPayments);
       },
       error => {
         console.log('PaymentsListComponent.ngOnInit(): error is ', error);
+        this.ngxSpinnerService.show();
       }
     );
   }

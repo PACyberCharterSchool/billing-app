@@ -786,6 +786,8 @@ namespace api.Controllers
 			headerStyle.Font.Color = headerColor; 
 			ws.Cells[0, 1].SetStyle(headerStyle);
 			ws.Cells[0, 1].PutValue("The Pennsylvania Cyber Charter School");
+			ws.Cells[5, 4].SetStyle(headerStyle);
+			ws.Cells[5, 4].PutValue($"{result.AsOf.ToString("M/dd/yyyy")}");
 
 			ws.Cells.Merge(1, 1, 1, columnHeaders.Length);
 			headerColor = System.Drawing.Color.FromArgb(0, 0, 0);
@@ -801,8 +803,6 @@ namespace api.Controllers
 			ws.Cells[3, 1].PutValue($"Submission for {result.AsOf.ToString("MMMM")} {result.AsOf.Year} UniPay");
 			ws.Cells[3, 1].SetStyle(headerStyle);
 
-			ws.Cells.SetRowHeightInch(4, 1.5);
-
 			ws.Cells.StandardWidthInch = 1;
 			ws.Cells.SetColumnWidthInch(0, 1);
 			ws.Cells.SetColumnWidthInch(1, 1);
@@ -816,19 +816,22 @@ namespace api.Controllers
 			columnHeaderStyle.VerticalAlignment = TextAlignmentType.Center;
 			columnHeaderStyle.IsTextWrapped = true;
 
+			ws.Cells.SetRowHeightInch(6, 1);
+
 			for (var i = 0; i < columnHeaders.Length; i++)
 			{
-				ws.Cells[5, i + 1].PutValue(columnHeaders[i]);
-				ws.Cells[5, i + 1].SetStyle(columnHeaderStyle);
+				ws.Cells[6, i + 1].PutValue(columnHeaders[i]);
+				ws.Cells[6, i + 1].SetStyle(columnHeaderStyle);
 			}
-
-			ws.Cells.SetRowHeightInch(4, 0.4);
 
 			var numericStyle = new CellsFactory().CreateStyle();
 			System.Drawing.Color numericForegroundColor = System.Drawing.Color.FromArgb(255, 255, 255, 153);
 			numericStyle.Custom = "#,##0.00_);(#,##0.00)";
-			// numericStyle.ForegroundColor = numericForegroundColor;
-			numericStyle.ForegroundColor = System.Drawing.Color.LightGoldenrodYellow;
+			numericStyle.ForegroundColor = numericForegroundColor;
+			numericStyle.BackgroundColor = numericForegroundColor;
+			// numericStyle.BackgroundColor = System.Drawing.Color.LightGoldenrodYellow;
+			// numericStyle.ForegroundColor = System.Drawing.Color.LightGoldenrodYellow;
+			numericStyle.Pattern = BackgroundType.Solid;
 
 			var paymentTypeStyle = new CellsFactory().CreateStyle();
 			paymentTypeStyle.HorizontalAlignment = TextAlignmentType.Center;
@@ -838,13 +841,14 @@ namespace api.Controllers
 			var totalPaid = 0m;
 			var totalNetDue = 0m;
 
-			var r = 6;
+			var r = 7;
 			foreach (var district in result.SchoolDistricts)
 			{
 				var c = 1;
 				ws.Cells[r, c++].PutValue(district.Aun);
 				ws.Cells[r, c++].PutValue(district.Name);
 				ws.Cells[r, c++].PutValue(district.TotalPaid);
+				totalPaid += district.TotalPaid;
 				ws.Cells[r, c - 1].SetStyle(numericStyle);
 				totalDue += district.TotalDue;
 				ws.Cells[r, c++].PutValue(district.TotalDue);
