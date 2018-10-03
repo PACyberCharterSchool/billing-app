@@ -67,7 +67,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
-  public filterAccountsReceivableAsOfBySearch(): void {
+  public filterAccountsReceivableAgingBySearch(): void {
     if (this.searchText) {
       this.reports = this.allReports.filter(
         (i) => {
@@ -100,7 +100,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
     return this.utilitiesService.objectValues(selected);
   }
 
-  public displayCreateAccountsReceivableAsOfDialog(createContent): void {
+  public displayCreateAccountsReceivableAgingDialog(createContent): void {
     const modal = this.ngbModalService.open(createContent, { centered: true });
     modal.result.then(
       (result) => {
