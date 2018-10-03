@@ -44,7 +44,20 @@ namespace models.Reporters
 			public IList<int> Auns { get; set; }
 		}
 
-		private IList<int> GetAuns() => _context.SchoolDistricts.Select(d => d.Aun).ToList();
+		private struct AunNames
+		{
+			public int Aun { get; set; }
+			public string Name { get; set; }
+		}
+
+		private IList<AunNames> GetAunNames(IList<int> auns = null)
+		{
+			var dd = _context.SchoolDistricts.AsQueryable();
+			if (auns != null)
+				dd = dd.Where(d => auns.Contains(d.Aun));
+
+			return dd.Select(d => new AunNames { Aun = d.Aun, Name = d.Name }).ToList();
+		}
 
 		private IList<BulkInvoice> GetInvoices(DateTime? from)
 		{
@@ -59,31 +72,35 @@ namespace models.Reporters
 				ToList();
 		}
 
-		private IDictionary<int, List<Payment>> GetPayments(DateTime? from, IList<int> auns)
+		private IDictionary<int, Queue<Payment>> GetPayments(DateTime? from, DateTime now, IList<int> auns)
 		{
-			var payments = _context.Payments.Where(p => auns.Contains(p.SchoolDistrict.Aun));
+			var payments = _context.Payments.
+				Where(p => auns.Contains(p.SchoolDistrict.Aun)).
+				Where(p => p.Date <= now.AddDays(1).Date);
 			if (from.HasValue)
 				payments = payments.Where(p => p.Date >= from.Value);
 
 			return payments.
 				OrderBy(p => p.Date).
 				GroupBy(p => p.SchoolDistrict.Aun).
-				ToDictionary(g => g.Key, g => g.ToList());
+				ToDictionary(g => g.Key, g => new Queue<Payment>(g.ToList()));
 		}
 
-		private IDictionary<int, List<Refund>> GetRefunds(DateTime? from, IList<int> auns)
+		private IDictionary<int, Queue<Refund>> GetRefunds(DateTime? from, DateTime now, IList<int> auns)
 		{
-			var refunds = _context.Refunds.Where(r => auns.Contains(r.SchoolDistrict.Aun));
+			var refunds = _context.Refunds.
+				Where(r => auns.Contains(r.SchoolDistrict.Aun)).
+				Where(r => r.Date <= now.AddDays(1).Date);
 			if (from.HasValue)
-				refunds = refunds.Where(r => r.Date >= from.Value);
+				refunds = refunds.Where(r => r.Date >= from.Value && r.Date <= now.AddDays(1).Date);
 
 			return refunds.
 				OrderBy(r => r.Date).
 				GroupBy(r => r.SchoolDistrict.Aun).
-				ToDictionary(g => g.Key, g => g.ToList());
+				ToDictionary(g => g.Key, g => new Queue<Refund>(g.ToList()));
 		}
 
-		private struct InvoiceDistrict
+		private class InvoiceDistrict
 		{
 			public string Scope { get; set; }
 			public DateTime Prepared { get; set; }
@@ -99,104 +116,145 @@ namespace models.Reporters
 
 		private IList<AccountsReceivableAgingSchoolDistrict> GetSchoolDistricts(DateTime? from, IList<int> auns = null)
 		{
-			if (auns == null)
-				auns = GetAuns();
+			var aunNames = GetAunNames(auns);
+			auns = aunNames.Select(an => an.Aun).ToList();
 
 			var invoices = GetInvoices(from).OrderBy(i => i.Scope).ThenBy(i => i.Prepared);
-
-			var districts = new Dictionary<int, List<InvoiceDistrict>>();
+			var districts = new Dictionary<int, Queue<InvoiceDistrict>>();
 			foreach (var i in invoices)
 			{
 				var dd = i.Districts.Where(d => auns.Contains(d.SchoolDistrict.Aun));
 				foreach (var d in dd)
 				{
 					if (!districts.ContainsKey(d.SchoolDistrict.Aun))
-						districts.Add(d.SchoolDistrict.Aun, new List<InvoiceDistrict> { new InvoiceDistrict(i.Scope, i.Prepared, d) });
+					{
+						var q = new Queue<InvoiceDistrict>();
+						q.Enqueue(new InvoiceDistrict(i.Scope, i.Prepared, d));
+						districts.Add(d.SchoolDistrict.Aun, q);
+					}
 					else
-						districts[d.SchoolDistrict.Aun].Add(new InvoiceDistrict(i.Scope, i.Prepared, d));
+						districts[d.SchoolDistrict.Aun].Enqueue(new InvoiceDistrict(i.Scope, i.Prepared, d));
 				}
 			}
 
-			var payments = GetPayments(from, auns); // TODO(Erik): queue?
-			var refunds = GetRefunds(from, auns);
-
 			var now = DateTime.Now.Date;
-			var results = new List<AccountsReceivableAgingSchoolDistrict>();
-			// TODO(Erik): either next invoice or next refund
-			foreach (var dd in districts)
-			{
-				List<Payment> pp = null;
-				if (payments.ContainsKey(dd.Key))
-					pp = payments[dd.Key];
+			var payments = GetPayments(from, now, auns);
+			var refunds = GetRefunds(from, now, auns);
 
-				List<Refund> rr = null;
-				if (refunds.ContainsKey(dd.Key))
-					rr = refunds[dd.Key];
+			var results = new List<AccountsReceivableAgingSchoolDistrict>();
+			foreach (var an in aunNames.OrderBy(an => an.Name))
+			{
+				Queue<Refund> rr = null;
+				if (refunds.ContainsKey(an.Aun))
+					rr = refunds[an.Aun];
+
+				Queue<InvoiceDistrict> dd = null;
+				if (districts.ContainsKey(an.Aun))
+					dd = districts[an.Aun];
+
+				Queue<Payment> pp = null;
+				if (payments.ContainsKey(an.Aun))
+					pp = payments[an.Aun];
 
 				var transactions = new List<AccountsReceivableAgingTransaction>();
-				for (var i = 0; i < dd.Value.Count; i++)
+				InvoiceDistrict previous = null;
+				while ((rr != null && rr.Count > 0) || (dd != null && dd.Count > 0))
 				{
-					var d = dd.Value[i];
-					var amount = GetTotal(d.Bisd);
-					if (i > 0)
-						amount -= GetTotal(dd.Value[i - 1].Bisd);
+					Refund r = null;
+					if (rr != null && rr.Count > 0)
+						r = rr.Peek();
 
-					var transaction = new AccountsReceivableAgingTransaction
+					InvoiceDistrict d = null;
+					if (dd != null && dd.Count > 0)
+						d = dd.Peek();
+
+					AccountsReceivableAgingTransaction transaction = null;
+					if ((r != null && d != null && r.Date < d.Prepared) || (r != null && d == null))
 					{
-						Identifier = d.Scope,
-						Type = "INV", // TODO(Erik): consts
-						Date = d.Prepared,
-						Amount = amount,
-					};
+						r = rr.Dequeue();
+						var amount = r.Amount;
+
+						transaction = new AccountsReceivableAgingTransaction
+						{
+							Identifier = $"REF{r.Date.ToString("yyyyMMdd")}",
+							Type = "REF",
+							Date = r.Date,
+							Amount = amount,
+						};
+					}
+					else if (d != null)
+					{
+						d = dd.Dequeue();
+						var amount = GetTotal(d.Bisd);
+						if (previous != null)
+							amount -= GetTotal(previous.Bisd);
+
+						transaction = new AccountsReceivableAgingTransaction
+						{
+							Identifier = d.Scope,
+							Type = "INV",
+							Date = d.Prepared,
+							Amount = amount,
+						};
+
+						previous = d;
+					}
 
 					var buckets = new decimal?[4];
 					var bi = 3;
-					if (d.Prepared >= now.LessDays(30))
+					if (transaction.Date >= now.LessDays(30))
 						bi = 0;
-					else if (d.Prepared >= now.LessDays(60) && d.Prepared <= now.LessDays(31))
+					else if (transaction.Date >= now.LessDays(60) && transaction.Date <= now.LessDays(31))
 						bi = 1;
-					else if (d.Prepared >= now.LessDays(90) && d.Prepared <= now.LessDays(61))
+					else if (transaction.Date >= now.LessDays(90) && transaction.Date <= now.LessDays(61))
 						bi = 2;
 					else
 						bi = 3;
-					buckets[bi] = amount;
+					buckets[bi] = transaction.Amount;
 					transaction.Buckets = buckets;
 
 					transactions.Add(transaction);
 
-					if (pp != null && pp.Count > 0)
+					var rem = buckets[bi];
+					while (rem > 0 && (pp != null && pp.Count > 0))
 					{
-						var rem = buckets[bi];
-						foreach (var p in pp)
+						var p = pp.Dequeue();
+						var pt = new AccountsReceivableAgingTransaction
 						{
-							if (rem <= 0)
-								break;
+							Identifier = $"PYMT{p.Date.ToString("yyyyMMdd")}",
+							Type = "PYMT", // TODO(Erik): consts
+							Date = p.Date,
+							Amount = -p.Amount,
+						};
+						var pbb = new decimal?[4];
+						pbb[bi] = -p.Amount;
+						pt.Buckets = pbb;
 
-							var pt = new AccountsReceivableAgingTransaction
-							{
-								Identifier = $"PYMT{p.Date.ToString("yyyyMMdd")}",
-								Type = "PYMT", // TODO(Erik): consts
-								Date = p.Date,
-								Amount = -p.Amount,
-							};
-							var pbb = new decimal?[4];
-							pbb[bi] = -p.Amount;
-							pt.Buckets = pbb;
+						transactions.Add(pt);
 
-							// TODO(Erik): remove payment from list
-							transactions.Add(pt);
-
-							rem -= p.Amount;
-						}
+						rem -= p.Amount;
 					}
 				}
 
-				// TODO(Erik): leftover payments
+				while (pp != null && pp.Count > 0)
+				{
+					var p = pp.Dequeue();
+					transactions.Add(new AccountsReceivableAgingTransaction
+					{
+						Identifier = $"PYMT{p.Date.ToString("yyyyMMdd")}",
+						Type = "PYMT",
+						Date = p.Date,
+						Amount = -p.Amount,
+						Buckets = new decimal?[4] {
+							-p.Amount, null, null, null,
+						}
+					});
+				}
 
 				var sd = new AccountsReceivableAgingSchoolDistrict
 				{
-					Aun = dd.Key,
-					Name = dd.Value[0].Bisd.SchoolDistrict.Name,
+					Aun = an.Aun,
+					Name = an.Name,
 					Transactions = transactions,
 				};
 				sd.Totals = new[] {
