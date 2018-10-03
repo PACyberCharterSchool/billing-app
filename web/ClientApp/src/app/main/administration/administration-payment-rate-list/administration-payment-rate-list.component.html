@@ -45,35 +45,41 @@
 </div>
 <ngx-spinner size='large' loadingText='Retrieving school district records from PACBill database.  Please wait...' type='timer'></ngx-spinner>
 <ng-template #importSchoolDistrictsContent let-c='close' let-d='dismiss'>
-  <div class='col-12'>
-    <div class='modal-header'>
-      <h4 class='modal-title'>Bulk Import School Districts</h4>
-      <button type='button' class='close' aria-label='Close' (click)="d('Cross click')">
-        <span aria-hidden="true">&times;</span>
-      </button>
+  <div class='row align-items-center'>
+    <div class='col-12'>
+      <div class='modal-header'>
+        <h4 class='modal-title'>Bulk Import School Districts</h4>
+        <button type='button' class='close' aria-label='Close' (click)="d('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
     </div>
-    <form #selectSchoolDistrictsForm (ngSubmit)='c("Import clicked."); doImport()'>
-      <div class='modal-body'>
-          <div class='form-group col-12'>
-            <div class='col-6'>
-              <label>Select school district data file:</label>
+  </div>
+  <div class='row align-items-center'>
+    <div class='col-12'>
+      <form #selectSchoolDistrictsForm (ngSubmit)='c("Import clicked."); doImport()'>
+        <div class='modal-body'>
+            <div class='form-group'>
+              <div class='col-6'>
+                <label>Select school district data file:</label>
+              </div>
+              <div class='col-6'>
+                <input type='file'
+                  [(ngModel)]='fileName'
+                  [ngModelOptions]='{standalone: true}'
+                  accept='text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                  (change)='setImportSchoolDistrictsUrl($event)'
+                  />
+              </div>
             </div>
-            <div class='col-6'>
-              <input type='file'
-                [(ngModel)]='fileName'
-                [ngModelOptions]='{standalone: true}'
-                accept='text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                (change)='setImportSchoolDistrictsUrl($event)'
-                />
-            </div>
-          </div>
-      </div>
-      <div class='modal-footer'>
-        <div class='form-group'>
-          <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
-          <button type='submit' class='btn btn-primary'>IMPORT</button>
         </div>
-      </div>
-    </form>
+        <div class='modal-footer'>
+          <div class='form-group'>
+            <button type='button' class='btn btn-outline' (click)='d("Cancel click")'>CANCEL</button>
+            <button type='submit' class='btn btn-primary'>IMPORT</button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 </ng-template>

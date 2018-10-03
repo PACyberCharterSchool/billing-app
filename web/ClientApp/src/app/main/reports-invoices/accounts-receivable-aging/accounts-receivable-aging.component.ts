@@ -11,11 +11,11 @@ import { FileSaverService } from '../../../services/file-saver.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
 
 @Component({
-  selector: 'app-accounts-receivable-as-of',
-  templateUrl: './accounts-receivable-as-of.component.html',
-  styleUrls: ['./accounts-receivable-as-of.component.scss']
+  selector: 'app-accounts-receivable-aging',
+  templateUrl: './accounts-receivable-aging.component.html',
+  styleUrls: ['./accounts-receivable-aging.component.scss']
 })
-export class AccountsReceivableAsOfComponent implements OnInit {
+export class AccountsReceivableAgingComponent implements OnInit {
   public reports: Report[];
   public allReports: Report[];
   private skip: number;
@@ -45,12 +45,12 @@ export class AccountsReceivableAsOfComponent implements OnInit {
   ngOnInit() {
     this.skip = 0;
     this.spinnerMsg = '';
-    this.refreshAccountsReceivableAsOfList();
+    this.refreshAccountsReceivableAgingList();
     this.schoolYears = this.academicYearsService.getAcademicYears();
   }
 
-  public refreshAccountsReceivableAsOfList(): void {
-    this.reportsService.getAccountsReceivableAsOf().subscribe(
+  public refreshAccountsReceivableAgingList(): void {
+    this.reportsService.getAccountsReceivableAging().subscribe(
       data => {
         this.allReports = this.reports = data['reports'];
         console.log('AccountsReceivableAsOfComponent.ngOnInit():  reports are ', data['reports']);
@@ -120,25 +120,25 @@ export class AccountsReceivableAsOfComponent implements OnInit {
     );
   }
 
-  private generateAccountsReceivableAsOfReportName(): string {
+  private generateAccountsReceivableAgingReportName(): string {
     return 'AccountsReceivableAsOf_' +
-      this.selectedAcademicYear.replace(/\s+/g, '') + '_' + `${this.asOfDate.month}-${this.asOfDate.day}-${this.asOfDate.year}`;
+      this.selectedAcademicYear + '_' + `${this.asOfDate.month}-${this.asOfDate.day}-${this.asOfDate.year}`;
   }
 
   public onCreateSubmit(): void {
     this.ngxSpinnerService.show();
     this.spinnerMsg = 'Generating accounts receivable as of report.  Please wait...';
     this.reportsService.createAccountsReceivableAsOf(
-      this.generateAccountsReceivableAsOfReportName(),
+      this.generateAccountsReceivableAgingReportName(),
       this.selectedAcademicYear,
       new Date(this.asOfDate.year, this.asOfDate.month - 1, this.asOfDate.day)).subscribe(
         data => {
           this.ngxSpinnerService.hide();
-          this.refreshAccountsReceivableAsOfList();
+          this.refreshAccountsReceivableAgingList();
         },
         error => {
           this.ngxSpinnerService.hide();
-          this.refreshAccountsReceivableAsOfList();
+          this.refreshAccountsReceivableAgingList();
         }
       );
   }
@@ -184,4 +184,6 @@ export class AccountsReceivableAsOfComponent implements OnInit {
   public setSelectedDownloadFormat(format: string): void {
     this.selectedDownloadFormat = format;
   }
+
+
 }

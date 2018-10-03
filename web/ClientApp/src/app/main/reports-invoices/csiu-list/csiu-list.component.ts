@@ -111,12 +111,14 @@ export class CsiuListComponent implements OnInit {
     );
   }
 
-  public displayDownloadFormatTypeDialog(downloadContent): void {
+  public displayDownloadCSIUFormatDialog(downloadContent, report: Report): void {
     const modal = this.ngbModalService.open(downloadContent, { centered: true });
     modal.result.then(
       (result) => {
+        this.downloadReportByFormat(report, this.selectedDownloadFormat);
       },
       (reason) => {
+        console.log('CsiuListComponent.displayDownloadCSIUFormatDialog():  reason is ', reason);
       }
     );
   }
@@ -149,7 +151,30 @@ export class CsiuListComponent implements OnInit {
       );
   }
 
+  public downloadReportByFormat(report: Report, format: string): void {
+    this.ngxSpinnerService.show();
+    this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
+      data => {
+        console.log('AccountsReceivableAsOfComponent.downloadReportByFormat():  data is ', data);
+        this.ngxSpinnerService.hide();
+        if (format.toLowerCase().includes('excel')) {
+          this.fileSaverService.saveInvoiceAsExcelFile(data, report);
+        } else {
+          this.fileSaverService.saveInvoiceAsPDFFile(data, report);
+        }
+      },
+      error => {
+        this.ngxSpinnerService.hide();
+        console.log('AccountsReceivableAsOfComponent.downloadReportByFormat():  error is ', error);
+      }
+    );
+  }
+
   public setSelectedAcademicYear(year: string): void {
     this.selectedAcademicYear = year;
+  }
+
+  public setSelectedDownloadFormat(format: string): void {
+    this.selectedDownloadFormat = format;
   }
 }

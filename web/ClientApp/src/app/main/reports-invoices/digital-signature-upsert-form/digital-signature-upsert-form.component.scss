@@ -1,7 +1,19 @@
 form {
   div.modal-body {
     div.row {
-      div.col-12 {
+      div.col-10 {
+        input[type="text"] {
+          font-size: 16px;
+          height: 40px;
+          width: 100%;
+        }
+      }
+
+      div.col-4 {
+        img {
+          width: 100%;
+        }
+
         img.unassigned{
           background-color: #dddddd;
           height: 240px;

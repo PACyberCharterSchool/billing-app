@@ -25,7 +25,7 @@ namespace models.Reporters
 		public string CheckNumber { get; set; }
 		public decimal? CheckAmount { get; set; }
 		public decimal? UniPayAmount { get; set; }
-		public DateTime Date { get; set; }
+		public string Date { get; set; }
 	}
 
 	public class InvoiceTransaction
@@ -119,11 +119,9 @@ namespace models.Reporters
 		public string SchoolYear { get; set; }
 		public int FirstYear => int.Parse(SchoolYear.Split("-")[0]);
 		public int SecondYear => int.Parse(SchoolYear.Split("-")[1]);
-		public DateTime AsOf { get; set; }
-		public string AsOfMonth => AsOf.ToString("MMMM");
-		public int AsOfYear => AsOf.Year;
 		public string Scope { get; set; }
-		public string ScopeMonth => new DateTime(DateTime.Now.Year, int.Parse(Scope.Substring(5, 2)), 1).ToString("MMMM");
+		public DateTime ScopeDateTime => new DateTime(int.Parse(Scope.Substring(0, 4)), int.Parse(Scope.Substring(5, 2)), 1);
+		public string ScopeMonth => ScopeDateTime.ToString("MMMM");
 		public int ScopeYear => int.Parse(Scope.Substring(0, 4));
 		public DateTime Prepared { get; set; }
 		public DateTime ToSchoolDistrict { get; set; }
@@ -206,7 +204,7 @@ namespace models.Reporters
 			string schoolYear,
 			int firstYear,
 			int secondYear,
-			DateTime asOf)
+			DateTime period)
 		{
 			var payments = _context.Payments.
 				Where(p => auns.Contains(p.SchoolDistrict.Aun)).
@@ -227,13 +225,13 @@ namespace models.Reporters
 				foreach (var month in Month.AsEnumerable())
 				{
 					var property = typeof(InvoiceTransactions).GetProperty(month.Name);
-					if (asOf.IsBefore(month.Number))
+					if (period.IsBefore(month))
 					{
 						property.SetValue(transactions, new InvoiceTransaction());
 						continue;
 					}
 
-					var year = month.Number >= 7 ? firstYear : secondYear;
+					var year = month.FirstYear ? firstYear : secondYear;
 					var start = month.AsDateTime(year);
 					var end = start.EndOfMonth();
 
@@ -245,14 +243,22 @@ namespace models.Reporters
 							ToList();
 
 						if (districtPayments.Count > 0)
-							transaction.Payment = districtPayments.Select(p => new InvoicePayment
+						{
+							transaction.Payment = new InvoicePayment
 							{
-								Type = p.Type.Value,
-								CheckNumber = p.ExternalId,
-								CheckAmount = p.Type == PaymentType.Check ? (decimal?)p.Amount : null,
-								UniPayAmount = p.Type == PaymentType.UniPay ? (decimal?)p.Amount : null,
-								Date = p.Date,
-							}).First();
+								Type = districtPayments[0].Type.Value,
+								CheckNumber = String.Join("\n", districtPayments.Select(p => p.ExternalId)),
+								CheckAmount = districtPayments.Where(p => p.Type == PaymentType.Check).Sum(p => p.Amount).Round(),
+								UniPayAmount = districtPayments.Where(p => p.Type == PaymentType.UniPay).Sum(p => p.Amount).Round(),
+								Date = String.Join("\n", districtPayments.Select(p => p.Date.ToString("M/d/yyyy"))),
+							};
+
+							if (transaction.Payment.CheckAmount == 0)
+								transaction.Payment.CheckAmount = null;
+
+							if (transaction.Payment.UniPayAmount == 0)
+								transaction.Payment.UniPayAmount = null;
+						}
 					}
 
 					if (refunds.ContainsKey(aun))
@@ -261,7 +267,7 @@ namespace models.Reporters
 							Where(r => r.Date >= start && r.Date <= end).
 							ToList();
 						if (districtRefunds.Count > 0)
-							transaction.Refund = districtRefunds.Select(r => (decimal?)r.Amount).First();
+							transaction.Refund = districtRefunds.Sum(r => (decimal?)r.Amount);
 					}
 
 					property.SetValue(transactions, transaction);
@@ -292,7 +298,7 @@ namespace models.Reporters
 			IList<InvoiceStudent> allStudents,
 			int firstYear,
 			int secondYear,
-			DateTime asOf)
+			DateTime period)
 		{
 			var result = new Dictionary<int, (InvoiceEnrollments Regular, InvoiceEnrollments Special)>();
 			foreach (var aun in auns)
@@ -314,7 +320,7 @@ namespace models.Reporters
 					else
 						end = new DateTime(year, month.Number, 1).EndOfMonth();
 
-					if (end > asOf.EndOfMonth() && end.Month != 9)
+					if (end > period && end.Month != 9)
 					{
 						regularEnrollments[month.Name] = regularCount;
 						specialEnrollments[month.Name] = specialCount;
@@ -374,23 +380,24 @@ namespace models.Reporters
 
 			var firstDay = calendar.Days.Single(d => d.SchoolDay == 1).Date;
 
+			var period = bulk.ScopeDateTime.EndOfMonth();
 			var students = GetInvoiceStudents(
 				auns,
 				bulk.Scope,
 				firstDay,
-				bulk.AsOf.EndOfMonth());
+				period);
 			var transactions = GetInvoiceTransactions(
 				auns,
 				bulk.SchoolYear,
 				bulk.FirstYear,
 				bulk.SecondYear,
-				bulk.AsOf);
+				period);
 			var enrollments = GetInvoiceEnrollments(
 				auns,
 				students,
 				bulk.FirstYear,
 				bulk.SecondYear,
-				bulk.AsOf);
+				period);
 
 			var result = new List<BulkInvoiceSchoolDistrict>();
 			foreach (var district in districts)
@@ -411,7 +418,6 @@ namespace models.Reporters
 			public string SchoolYear { get; set; }
 			public string Scope { get; set; }
 			public DateTime Prepared { get; set; }
-			public DateTime AsOf { get; set; }
 			public DateTime ToSchoolDistrict { get; set; }
 			public DateTime ToPDE { get; set; }
 			public IList<int> Auns { get; set; }
@@ -423,7 +429,6 @@ namespace models.Reporters
 			var bulk = new BulkInvoice
 			{
 				SchoolYear = config.SchoolYear,
-				AsOf = config.AsOf,
 				Scope = config.Scope,
 				Prepared = config.Prepared,
 				ToSchoolDistrict = config.ToSchoolDistrict,

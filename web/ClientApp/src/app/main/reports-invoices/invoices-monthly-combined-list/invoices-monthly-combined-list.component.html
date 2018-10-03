@@ -88,10 +88,13 @@
               <div class='col-6'>
                 <div class='btn-group btn-group-toggle' ngbRadioGroup id='invoiceRecipient' name='invoiceRecipient' [(ngModel)]='invoiceRecipient'>
                   <label ngbButtonLabel class='btn-primary'>
-                    <input ngbButton type="radio" value='SD'> Direct Pay SDs
+                    <input ngbButton type='radio' value='SD' /> Direct Pay SDs
                   </label>
                   <label ngbButtonLabel class='btn-primary'>
-                    <input ngbButton type="radio" value='PDE'> PDE
+                    <input ngbButton type='radio' value='PDE' /> PDE
+                  </label>
+                  <label ngbButtonLabel class='btn-primary'>
+                    <input ngbButton type='radio' value='Totals' /> Totals Only
                   </label>
                   <label ngbButtonLabel class='btn-primary'>
                     <input ngbButton type='radio' value='All' /> All

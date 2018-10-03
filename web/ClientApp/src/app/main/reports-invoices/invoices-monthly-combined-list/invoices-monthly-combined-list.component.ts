@@ -54,7 +54,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   public selectedCurrentScope: string;
   public selectedCreateScope: string;
   public scopes: string[];
-  public selectedAsOfBillingDate: string;
   public selectedDownloadFormat: string;
   public invoiceRecipient;
   private schoolDistricts: SchoolDistrict[];
@@ -226,7 +225,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     return this.academicYearsService.getAcademicYears();
   }
 
-  private getInvoiceRecipients(): number[] {
+  private getInvoiceCreateParams(): number[] {
     let auns: number[];
 
     switch (this.invoiceRecipient) {
@@ -244,11 +243,15 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     return auns;
   }
 
+  private isTotalsOnly(): boolean {
+    return this.invoiceRecipient === 'Totals';
+  }
+
   create(): void {
     this.spinnerMsg = 'Creating bulk invoice.  Please wait...';
     this.ngxSpinnerService.show();
-    this.selectedAsOfBillingDate = new Date(Date.now()).toLocaleDateString('en-US');
-    const auns: number[] = this.getInvoiceRecipients();
+    const auns: number[] = this.getInvoiceCreateParams();
+    const totalsOnly = this.isTotalsOnly();
 
     this.reportsService.createBulkInvoice(
       {
@@ -256,7 +259,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
         'schoolYear': this.selectedCreateSchoolYear.replace(/\s+/g, ''),
         'name': this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope),
         'bulkInvoice': {
-          'asOf': this.selectedAsOfBillingDate,
           'toSchoolDistrict': new Date(
             this.toSchoolDistrictDate.year,
             this.toSchoolDistrictDate.month - 1,
@@ -266,7 +268,8 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
             this.toPDEDate.month - 1,
             this.toPDEDate.day).toLocaleDateString('en-US'),
           'scope': this.selectedCreateScope,
-          'auns': auns
+          'auns': auns,
+          'totalsOnly': totalsOnly,
         }
       }
     ).subscribe(
@@ -315,7 +318,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   displayCreateBulkInvoiceDialog(bulkCreateContent): void {
-    const modal = this.ngbModal.open(bulkCreateContent, { centered: true });
+    const modal = this.ngbModal.open(bulkCreateContent, { centered: true, size: 'lg' });
     this.selectedCreateTemplateName = 'Select Template';
 
     modal.result.then(
@@ -341,6 +344,8 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
         return 'SD_Only';
       case 'PDE':
         return 'PDE_Only';
+      case 'Totals':
+        return 'Totals_Only';
       default:
         return '';
     }
@@ -356,10 +361,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
   private selectDownloadStatus(status: string): void {
     this.selectedDownloadStatus = status;
-  }
-
-  private selectBillingMonth(billingDate: string): void {
-    this.selectedAsOfBillingDate = billingDate;
   }
 
   private getUnapprovedInvoices(): Report[] {

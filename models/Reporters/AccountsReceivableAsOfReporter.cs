@@ -80,7 +80,8 @@ namespace models.Reporters
 				Where(r => scopes.Contains(r.Scope)).
 				Where(r => r.Type == ReportType.BulkInvoice || r.Type == ReportType.Invoice).
 				Select(r => Deserialize(r.Data)).
-				OrderByDescending(i => i.Prepared).
+				OrderByDescending(i => i.Scope).
+				ThenByDescending(i => i.Prepared).
 				ToList();
 
 			var districts = new Dictionary<int, BulkInvoiceSchoolDistrict>();
@@ -126,11 +127,11 @@ namespace models.Reporters
 					Aun = d.SchoolDistrict.Aun,
 					Name = d.SchoolDistrict.Name,
 					PaymentType = d.SchoolDistrict.PaymentType,
-					RegularEducationDue = d.SchoolDistrict.RegularRate * ((decimal)d.RegularEnrollments.Values.Sum() / 12),
-					SpecialEducationDue = d.SchoolDistrict.SpecialRate * ((decimal)d.SpecialEnrollments.Values.Sum() / 12),
-					PaidByDistrict = check,
-					PaidByPDE = unipay,
-					Refunded = refund,
+					RegularEducationDue = (d.SchoolDistrict.RegularRate * ((decimal)d.RegularEnrollments.Values.Sum() / 12)).Round(),
+					SpecialEducationDue = (d.SchoolDistrict.SpecialRate * ((decimal)d.SpecialEnrollments.Values.Sum() / 12)).Round(),
+					PaidByDistrict = check.Round(),
+					PaidByPDE = unipay.Round(),
+					Refunded = refund.Round(),
 				};
 			}).ToList();
 		}
