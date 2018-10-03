@@ -55,7 +55,7 @@ export class SchoolDistrictService {
       alternateRate: +sd.alternateRate,
       specialEducationRate: +sd.specialEducationRate,
       alternateSpecialEducationRate: +sd.alternateSpecialEducationRate,
-      paymentType: sd.paymentType === 'Check' ? 'Check' : 'ACH'
+      paymentType: sd.paymentType === 'Check' ? 'Check' : 'UniPay'
     });
 
     if (+sd.alternateRate === 0.0) {

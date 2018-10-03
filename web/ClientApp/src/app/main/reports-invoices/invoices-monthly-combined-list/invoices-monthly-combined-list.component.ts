@@ -233,7 +233,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
         auns = this.schoolDistricts.filter((sd) => sd.paymentType === PaymentType.Check).map((sd) => +sd.aun);
         break;
       case 'PDE':
-        auns = this.schoolDistricts.filter((sd) => sd.paymentType === 'ACH').map((sd) => +sd.aun);
+        auns = this.schoolDistricts.filter((sd) => sd.paymentType === 'UniPay').map((sd) => +sd.aun);
         break;
       case 'All':
         auns = null;

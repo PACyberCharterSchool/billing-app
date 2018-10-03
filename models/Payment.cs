@@ -8,7 +8,7 @@ namespace models
 		private PaymentType() : base() { }
 
 		public static readonly PaymentType Check = new PaymentType("Check");
-		public static readonly PaymentType UniPay = new PaymentType("ACH");
+		public static readonly PaymentType UniPay = new PaymentType("UniPay");
 	}
 
 	public class Payment

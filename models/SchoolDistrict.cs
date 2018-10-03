@@ -10,7 +10,7 @@ namespace models
 		private SchoolDistrictPaymentType(string value) : base(value) { }
 		private SchoolDistrictPaymentType() : base() { }
 
-		public static readonly SchoolDistrictPaymentType Ach = new SchoolDistrictPaymentType("ACH");
+		public static readonly SchoolDistrictPaymentType Ach = new SchoolDistrictPaymentType("UniPay");
 		public static readonly SchoolDistrictPaymentType Check = new SchoolDistrictPaymentType("Check");
 	}
 
