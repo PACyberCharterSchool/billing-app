@@ -149,7 +149,6 @@ namespace api.Controllers
 			[MinLength(1)]
 			public string Name { get; set; }
 
-			[Required]
 			[RegularExpression(@"^\d{4}\-\d{4}$")]
 			public string SchoolYear { get; set; }
 
@@ -731,7 +730,7 @@ namespace api.Controllers
 				report = new Report
 				{
 					Type = ReportType.Csiu,
-					SchoolYear = create.SchoolYear,
+					SchoolYear = result.SchoolYear,
 					Name = create.Name,
 					Approved = true,
 					Created = DateTime.Now,
