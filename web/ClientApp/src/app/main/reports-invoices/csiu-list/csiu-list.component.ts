@@ -128,15 +128,16 @@ export class CsiuListComponent implements OnInit {
 
   private generateCSIUReportName(): string {
     const d: Date = new Date(this.asOfDate.year, this.asOfDate.month + 1, this.asOfDate.day);
-    return `CSIU_${d.getMonth() - 1}${d.getFullYear()}_${this.selectedAcademicYear.replace(/\s+/g, '')}`;
+    return `CSIU_${d.getMonth() - 1}${d.getFullYear()}`;
   }
 
   public onCreateSubmit(): void {
+    this.spinnerMsg = `Generating CSIU report for ${this.asOfDate.month + 1}/${this.asOfDate.year}.  Please wait...`;
     this.ngxSpinnerService.show();
     this.reportsService.createCSIU(
       this.generateCSIUReportName(),
       // this.selectedAcademicYear.replace(/\s+/g, ''),
-      this.asOfDate,
+      new Date(this.asOfDate.year, this.asOfDate.month - 1, this.asOfDate.day),
       this.schoolDistricts.map((sd) => +sd.aun)).subscribe(
         data => {
           console.log('CsiuListComponent.onCreateSubmit():  data is ', data);
