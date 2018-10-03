@@ -27,6 +27,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { CsiuListComponent } from './csiu-list/csiu-list.component';
 import { AccountsReceivableAgingComponent } from './accounts-receivable-aging/accounts-receivable-aging.component';
+import { UnipayInvoiceSummaryComponent } from './unipay-invoice-summary/unipay-invoice-summary.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { AccountsReceivableAgingComponent } from './accounts-receivable-aging/ac
     StudentActivityListComponent,
     AccountsReceivableAsOfComponent,
     CsiuListComponent,
-    AccountsReceivableAgingComponent
+    AccountsReceivableAgingComponent,
+    UnipayInvoiceSummaryComponent
   ],
   imports: [
     CommonModule,

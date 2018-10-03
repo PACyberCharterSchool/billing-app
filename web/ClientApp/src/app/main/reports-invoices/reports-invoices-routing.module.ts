@@ -12,6 +12,7 @@ import { StudentActivityListComponent } from './student-activity-list/student-ac
 import { AccountsReceivableAsOfComponent } from './accounts-receivable-as-of/accounts-receivable-as-of.component';
 import { CsiuListComponent } from './csiu-list/csiu-list.component';
 import { AccountsReceivableAgingComponent } from './accounts-receivable-aging/accounts-receivable-aging.component';
+import { UnipayInvoiceSummaryComponent } from './unipay-invoice-summary/unipay-invoice-summary.component';
 
 import { AuthenticationGuardService } from '../../services/authentication-guard.service';
 
@@ -72,6 +73,12 @@ const reportsInvoicesRoutes: Routes = [
       {
         path: 'csiu-reports',
         component: CsiuListComponent,
+        outlet: 'action',
+        canActivate: [ AuthenticationGuardService ]
+      },
+      {
+        path: 'unipay-invoice-summary',
+        component: UnipayInvoiceSummaryComponent,
         outlet: 'action',
         canActivate: [ AuthenticationGuardService ]
       }

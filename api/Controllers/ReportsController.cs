@@ -139,6 +139,13 @@ namespace api.Controllers
 			public IList<int> Auns { get; set; }
 		}
 
+		public class CreateUniPayInvoiceSummaryReport
+		{
+			[Required]
+			public DateTime AsOf { get; set; }
+			// public IList<int> Auns { get; set; }
+		}
+
 		public class CreateReport
 		{
 			[EnumerationValidation(typeof(ReportType))]
@@ -158,6 +165,8 @@ namespace api.Controllers
 			public CreateBulkStudentInformationReport BulkStudentInformation { get; set; }
 			public CreateAccountsReceivableAsOfReport AccountsReceivableAsOf { get; set; }
 			public CreateCsiuReport Csiu { get; set; }
+
+			public CreateUniPayInvoiceSummaryReport UniPayInvoiceSummary { get; set; }
 		}
 
 		private void StyleInvoiceWorksheet(Worksheet sheet)
@@ -743,6 +752,145 @@ namespace api.Controllers
 			return report;
 		}
 
+		private Report CreateUniPayInvoiceSummary(CreateReport create)
+		{
+			var reporter = _reporters.CreateUniPayInvoiceSummaryReporter(_context);
+			var result = reporter.GenerateReport(new UniPayInvoiceSummaryReporter.Config
+			{
+				SchoolYear = create.SchoolYear,
+				AsOf = create.UniPayInvoiceSummary.AsOf
+			});
+			var startYear = create.SchoolYear.Substring(0, 4);
+			var endYear = create.SchoolYear.Substring(create.SchoolYear.IndexOf("-"));
+			var wb = new Workbook();
+			var ws = wb.Worksheets[0];
+
+			ws.PageSetup.SetFooter(1, "Page &P of &N");
+			ws.PageSetup.SetFooter(2, result.AsOf.ToString("M/dd/yyyy"));
+			ws.PageSetup.HeaderMargin = 0.0;
+			ws.PageSetup.FooterMargin = 0.0;
+			ws.PageSetup.TopMargin = 0.0;
+			ws.PageSetup.LeftMargin = 0.0;
+			ws.PageSetup.RightMargin = 0.0;
+
+			var columnHeaders = new[] { "SD AUN", "School District Name", "Total PDE Subsidy Deductions to Date", "Net Due to Charter School" };
+
+			var headerStyle = new CellsFactory().CreateStyle();
+			headerStyle.HorizontalAlignment = TextAlignmentType.Center;
+			headerStyle.Font.IsBold = true;
+
+			// These are separate rows because the PDF isn't breaking lines
+			ws.Cells.Merge(0, 1, 1, columnHeaders.Length);
+			System.Drawing.Color headerColor = System.Drawing.Color.FromArgb(128, 0, 0);
+			headerStyle.Font.Color = headerColor; 
+			ws.Cells[0, 1].SetStyle(headerStyle);
+			ws.Cells[0, 1].PutValue("The Pennsylvania Cyber Charter School");
+			ws.Cells[5, 4].SetStyle(headerStyle);
+			ws.Cells[5, 4].PutValue($"{result.AsOf.ToString("M/dd/yyyy")}");
+
+			ws.Cells.Merge(1, 1, 1, columnHeaders.Length);
+			headerColor = System.Drawing.Color.FromArgb(0, 0, 0);
+			headerStyle.Font.Color = headerColor;
+			ws.Cells[1, 1].SetStyle(headerStyle);
+			ws.Cells[1, 1].PutValue($"Summary of UniPay Request for the {result.SchoolYear} School Year");
+
+			ws.Cells.Merge(2, 1, 1, columnHeaders.Length);
+			ws.Cells[2, 1].PutValue($"For the Months of July {startYear} to {result.AsOf.ToString("MMMM yyyy")}");
+			ws.Cells[2, 1].SetStyle(headerStyle);
+
+			ws.Cells.Merge(3, 1, 1, columnHeaders.Length);
+			ws.Cells[3, 1].PutValue($"Submission for {result.AsOf.ToString("MMMM")} {result.AsOf.Year} UniPay");
+			ws.Cells[3, 1].SetStyle(headerStyle);
+
+			ws.Cells.StandardWidthInch = 1;
+			ws.Cells.SetColumnWidthInch(0, 1);
+			ws.Cells.SetColumnWidthInch(1, 1);
+			ws.Cells.SetColumnWidthInch(2, 2);
+
+			var columnHeaderStyle = new CellsFactory().CreateStyle();
+			columnHeaderStyle.Font.IsBold = true;
+			columnHeaderStyle.HorizontalAlignment = TextAlignmentType.Center;
+			columnHeaderStyle.VerticalAlignment = TextAlignmentType.Center;
+			columnHeaderStyle.IsTextWrapped = true;
+			columnHeaderStyle.SetBorder(BorderType.BottomBorder, CellBorderType.Medium, Color.Black);
+
+			ws.Cells.SetRowHeightInch(6, 1);
+
+			for (var i = 0; i < columnHeaders.Length; i++)
+			{
+				ws.Cells[6, i + 1].PutValue(columnHeaders[i]);
+				ws.Cells[6, i + 1].SetStyle(columnHeaderStyle);
+			}
+
+			var numericStyle = new CellsFactory().CreateStyle();
+			System.Drawing.Color numericForegroundColor = System.Drawing.Color.FromArgb(255, 255, 255, 153);
+			numericStyle.Custom = "#,##0.00_);(#,##0.00)";
+			numericStyle.ForegroundColor = numericForegroundColor;
+			numericStyle.BackgroundColor = numericForegroundColor;
+			numericStyle.Pattern = BackgroundType.Solid;
+
+			var paymentTypeStyle = new CellsFactory().CreateStyle();
+			paymentTypeStyle.HorizontalAlignment = TextAlignmentType.Center;
+
+			// TODO(Erik): this should really be done in the reporter
+			var totalPaid = 0m;
+			var totalNetDue = 0m;
+
+			var r = 7;
+			foreach (var district in result.SchoolDistricts)
+			{
+				var c = 1;
+				ws.Cells[r, c++].PutValue(district.Aun);
+				ws.Cells[r, c++].PutValue(district.Name);
+				ws.Cells[r, c++].PutValue(district.TotalPaid);
+				totalPaid += district.TotalPaid;
+				ws.Cells[r, c - 1].SetStyle(numericStyle);
+				totalNetDue += district.NetDue;
+				ws.Cells[r, c++].PutValue(district.NetDue);
+				ws.Cells[r, c - 1].SetStyle(numericStyle);
+
+				r++;
+			}
+
+			var totalsStyle = new CellsFactory().CreateStyle();
+			totalsStyle.HorizontalAlignment = TextAlignmentType.Right;
+			totalsStyle.Font.IsBold = true;
+			ws.Cells[r, 0].PutValue("Totals:");
+			ws.Cells[r, 0].SetStyle(totalsStyle);
+
+			var totalsNumericStyle = new CellsFactory().CreateStyle();
+			totalsNumericStyle.Copy(numericStyle);
+			totalsNumericStyle.SetBorder(BorderType.TopBorder, CellBorderType.Thin, Color.Black);
+
+			ws.Cells[r, 3].PutValue(totalPaid);
+			ws.Cells[r, 3].SetStyle(totalsNumericStyle);
+			ws.Cells[r, 4].PutValue(totalNetDue);
+			ws.Cells[r, 4].SetStyle(totalsNumericStyle);
+
+			Report report;
+			using (var xlsxStream = new MemoryStream())
+			using (var pdfStream = new MemoryStream())
+			{
+				wb.CalculateFormula();
+				wb.Save(xlsxStream, SaveFormat.Xlsx);
+				wb.Save(pdfStream, SaveFormat.Pdf);
+
+				report = new Report
+				{
+					Type = ReportType.UniPayInvoiceSummary,
+					SchoolYear = create.SchoolYear,
+					Name = create.Name,
+					Approved = true,
+					Created = DateTime.Now,
+					Data = JsonConvert.SerializeObject(result),
+					Xlsx = xlsxStream.ToArray(),
+					Pdf = pdfStream.ToArray(),
+				};
+			}
+
+			return report;
+		}
+
 		[HttpPost]
 		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(ReportResponse), 200)]
@@ -800,6 +948,13 @@ namespace api.Controllers
 						return new BadRequestObjectResult(new ErrorsResponse("Cannot create CSIU without 'csiu' config."));
 
 					report = CreateCsiu(create);
+				}
+				else if (create.ReportType == ReportType.UniPayInvoiceSummary.Value)
+				{
+					if (create.UniPayInvoiceSummary == null)
+						return new BadRequestObjectResult(new ErrorResponse("Cannot create UniPay Invoice summary without 'unipay invoice summary' config."));
+
+					report = CreateUniPayInvoiceSummary(create);
 				}
 				else
 				{
