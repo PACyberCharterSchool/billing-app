@@ -809,12 +809,11 @@ namespace api.Controllers
 			ws.Cells.SetColumnWidthInch(2, 2);
 
 			var columnHeaderStyle = new CellsFactory().CreateStyle();
-			columnHeaderStyle.Pattern = BackgroundType.Solid;
-			columnHeaderStyle.ForegroundColor = Color.DarkGray;
 			columnHeaderStyle.Font.IsBold = true;
 			columnHeaderStyle.HorizontalAlignment = TextAlignmentType.Center;
 			columnHeaderStyle.VerticalAlignment = TextAlignmentType.Center;
 			columnHeaderStyle.IsTextWrapped = true;
+			columnHeaderStyle.SetBorder(BorderType.BottomBorder, CellBorderType.Medium, Color.Black);
 
 			ws.Cells.SetRowHeightInch(6, 1);
 
