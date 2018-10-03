@@ -53,10 +53,10 @@ export class AccountsReceivableAgingComponent implements OnInit {
     this.reportsService.getAccountsReceivableAging().subscribe(
       data => {
         this.allReports = this.reports = data['reports'];
-        console.log('AccountsReceivableAsOfComponent.ngOnInit():  reports are ', data['reports']);
+        console.log('AccountsReceivableAgingComponent.ngOnInit():  reports are ', data['reports']);
       },
       error => {
-        console.log('AccountsReceivableAsOfComponent.ngOnInit():  error is ', error);
+        console.log('AccountsReceivableAgingomponent.ngOnInit():  error is ', error);
       }
     );
   }
@@ -67,7 +67,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
-  public filterAccountsReceivableAsOfBySearch(): void {
+  public filterAccountsReceivableAgingBySearch(): void {
     if (this.searchText) {
       this.reports = this.allReports.filter(
         (i) => {
@@ -100,7 +100,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
     return this.utilitiesService.objectValues(selected);
   }
 
-  public displayCreateAccountsReceivableAsOfDialog(createContent): void {
+  public displayCreateAccountsReceivableAgingDialog(createContent): void {
     const modal = this.ngbModalService.open(createContent, { centered: true });
     modal.result.then(
       (result) => {
@@ -121,7 +121,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
   }
 
   private generateAccountsReceivableAgingReportName(): string {
-    return 'AccountsReceivableAsOf_' +
+    return 'AccountsReceivableAging_' +
       this.selectedAcademicYear + '_' + `${this.asOfDate.month}-${this.asOfDate.day}-${this.asOfDate.year}`;
   }
 
@@ -147,7 +147,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
     this.ngxSpinnerService.show();
     this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
-        console.log('AccountsReceivableAsOfComponent.downloadReportByFormat():  data is ', data);
+        console.log('AccountsReceivableAgingComponent.downloadReportByFormat():  data is ', data);
         this.ngxSpinnerService.hide();
         if (format.toLowerCase().includes('excel')) {
           this.fileSaverService.saveInvoiceAsExcelFile(data, report);
@@ -157,7 +157,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
       },
       error => {
         this.ngxSpinnerService.hide();
-        console.log('AccountsReceivableAsOfComponent.downloadReportByFormat():  error is ', error);
+        console.log('AccountsReceivableAgingComponent.downloadReportByFormat():  error is ', error);
       }
     );
   }
@@ -166,11 +166,11 @@ export class AccountsReceivableAgingComponent implements OnInit {
     this.selectedAcademicYear = year;
   }
 
-  public displayDownloadAccountsReceivableAsOfFormatDialog(downloadReportTypeContent, report: Report): void {
+  public displayDownloadAccountsReceivableAgingFormatDialog(downloadReportTypeContent, report: Report): void {
     const modal = this.ngbModalService.open(downloadReportTypeContent, { centered: true });
     modal.result.then(
       (result) => {
-        console.log('AccountsReceivableAsOfComponent.displayDownloadAccountsReceivableAsOfFormatDialog():  download');
+        console.log('AccountsReceivableAgingComponent.displayDownloadAccountsReceivableAgingFormatDialog():  download');
         this.downloadReportByFormat(report, this.selectedDownloadFormat);
       },
       (reason) => {
