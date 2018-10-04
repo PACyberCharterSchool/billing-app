@@ -128,7 +128,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
   public onCreateSubmit(): void {
     this.ngxSpinnerService.show();
     this.spinnerMsg = 'Generating accounts receivable as of report.  Please wait...';
-    this.reportsService.createAccountsReceivableAsOf(
+    this.reportsService.createAccountsReceivableAging(
       this.generateAccountsReceivableAgingReportName(),
       this.selectedAcademicYear,
       new Date(this.asOfDate.year, this.asOfDate.month - 1, this.asOfDate.day)).subscribe(

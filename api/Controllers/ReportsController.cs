@@ -1131,7 +1131,7 @@ namespace api.Controllers
 				else if (create.ReportType == ReportType.AccountsReceivableAging.Value)
 				{
 					if (create.AccountsReceivableAging == null)
-						return new BadRequestObjectResult(new ErrorsResponse("Cannot create accounts receivable aging without 'accounts receiable aging' config."));
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create accounts receivable aging without 'accounts receivable aging' config."));
 
 					report = CreateAccountsReceivableAging(create);
 				}

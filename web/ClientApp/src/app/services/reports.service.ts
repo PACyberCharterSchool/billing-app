@@ -207,6 +207,21 @@ export class ReportsService {
     return this.httpClient.post<any>(url, reportMeta, this.headers);
   }
 
+  public createAccountsReceivableAging(name: string, schoolYear: string, from: Date, auns?: number[]): Observable<Report> {
+    const url: string = this.apiReportsUrl;
+    const reportMeta: Object = Object.assign({}, {
+      'reportType': ReportType.AccountsReceivableAging,
+      'name': name,
+      'schoolYear': schoolYear.replace(/\s+/g, ''),
+      'accountsReceivableAging': {
+        'from': from.toLocaleDateString('en-US'),
+        'auns': auns
+      }
+    });
+
+    return this.httpClient.post<any>(url, reportMeta, this.headers);
+  }
+
   public createCSIU(name: string, asOf: Date, auns?: number[]): Observable<Report> {
     const url: string = this.apiReportsUrl;
     const reportMeta: Object = Object.assign({}, {
