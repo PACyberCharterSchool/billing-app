@@ -964,12 +964,13 @@ namespace api.Controllers
 			ws.PageSetup.RightMarginInch = 0.25;
 			const int width = 17; // 16 cells wide
 			ws.Cells.StandardWidthInch = 9D / width;
-			ws.Cells.StandardHeight = ws.Cells.StandardHeight * 1.3;
+			ws.Cells.StandardHeight = ws.Cells.StandardHeight * 1.45;
 
 			var row = 0;
 			var headerStyle = new CellsFactory().CreateStyle();
 			headerStyle.IsTextWrapped = true;
 			headerStyle.HorizontalAlignment = TextAlignmentType.Center;
+			headerStyle.VerticalAlignment = TextAlignmentType.Top;
 			headerStyle.Font.IsBold = true;
 			headerStyle.Font.Size = 9;
 			ws.Cells[row, 0].SetStyle(headerStyle);
@@ -981,7 +982,7 @@ namespace api.Controllers
 				"Summary Information Sheet\n" +
 				$"For the Months of July {result.FirstYear} through April {result.SecondYear}" // TODO(Erik): second month?
 			);
-			ws.Cells.SetRowHeight(row, ws.Cells.GetRowHeight(row) * 4);
+			ws.Cells.SetRowHeight(row, ws.Cells.GetRowHeight(row) * 3);
 			row++;
 
 			ws.Cells[row, 0].PutValue("TOTAL");
