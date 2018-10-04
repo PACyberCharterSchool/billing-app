@@ -150,6 +150,18 @@ namespace api.Controllers
 			// public IList<int> Auns { get; set; }
 		}
 
+		public class CreateTotalsOnlyInvoiceReport
+		{
+			[Required]
+			[RegularExpression(@"^\d{4}(?:\-\d{4}|\.\d{2})$")]
+			public string Scope { get; set; }
+
+			public IList<int> Auns { get; set; }
+
+			[JsonConverter(typeof(SchoolDistrictPaymentTypeJsonConverter))]
+			public SchoolDistrictPaymentType PaymentType { get; set; }
+		}
+
 		public class CreateReport
 		{
 			[EnumerationValidation(typeof(ReportType))]
@@ -170,7 +182,7 @@ namespace api.Controllers
 			public CreateAccountsReceivableAgingReport AccountsReceivableAging { get; set; }
 			public CreateAccountsReceivableAsOfReport AccountsReceivableAsOf { get; set; }
 			public CreateCsiuReport Csiu { get; set; }
-
+			public CreateTotalsOnlyInvoiceReport TotalsOnlyInvoice { get; set; }
 			public CreateUniPayInvoiceSummaryReport UniPayInvoiceSummary { get; set; }
 		}
 
@@ -932,6 +944,43 @@ namespace api.Controllers
 			return report;
 		}
 
+		private Report CreateTotalsOnlyInvoice(CreateReport create)
+		{
+			var reporter = _reporters.CreateTotalsOnlyInvoiceReporter(_context);
+			var result = reporter.GenerateReport(new TotalsOnlyInvoiceReporter.Config
+			{
+				SchoolYear = create.SchoolYear,
+				Scope = create.TotalsOnlyInvoice.Scope,
+				Auns = create.TotalsOnlyInvoice.Auns,
+				PaymentType = create.TotalsOnlyInvoice.PaymentType,
+			});
+
+			var wb = new Workbook();
+
+			Report report;
+			using (var xlsxStream = new MemoryStream())
+			using (var pdfStream = new MemoryStream())
+			{
+				wb.CalculateFormula();
+				wb.Save(xlsxStream, SaveFormat.Xlsx);
+				wb.Save(pdfStream, SaveFormat.Pdf);
+
+				report = new Report
+				{
+					Type = ReportType.TotalsOnly,
+					SchoolYear = result.SchoolYear,
+					Name = create.Name,
+					Approved = true,
+					Created = DateTime.Now,
+					Data = JsonConvert.SerializeObject(result),
+					Xlsx = xlsxStream.ToArray(),
+					Pdf = pdfStream.ToArray(),
+				};
+			}
+
+			return report;
+		}
+
 		private Report CreateUniPayInvoiceSummary(CreateReport create)
 		{
 			var reporter = _reporters.CreateUniPayInvoiceSummaryReporter(_context);
@@ -1137,6 +1186,13 @@ namespace api.Controllers
 						return new BadRequestObjectResult(new ErrorsResponse("Cannot create CSIU without 'csiu' config."));
 
 					report = CreateCsiu(create);
+				}
+				else if (create.ReportType == ReportType.TotalsOnly.Value)
+				{
+					if (create.TotalsOnlyInvoice == null)
+						return new BadRequestObjectResult(new ErrorsResponse("Cannot create totals only invoice with 'totals only invoice' config."));
+
+					report = CreateTotalsOnlyInvoice(create);
 				}
 				else if (create.ReportType == ReportType.UniPayInvoiceSummary.Value)
 				{
