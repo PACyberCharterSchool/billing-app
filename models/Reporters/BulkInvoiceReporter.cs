@@ -67,6 +67,14 @@ namespace models.Reporters
 				{"June", June},
 			};
 		}
+
+		public IEnumerable<InvoiceTransaction> AsEnumerable()
+		{
+			return new[] {
+				July, August, September, October, November, December,
+				January, February, March, April, May, June,
+			};
+		}
 	}
 
 	public class InvoiceStudent

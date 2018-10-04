@@ -7,11 +7,12 @@ namespace models
 		private ReportType(string value) : base(value) { }
 
 		public static readonly ReportType Invoice = new ReportType("Invoice");
-		public static readonly ReportType StudentInformation = new ReportType("StudentInformation");
-
 		public static readonly ReportType BulkInvoice = new ReportType("BulkInvoice");
+
+		public static readonly ReportType StudentInformation = new ReportType("StudentInformation");
 		public static readonly ReportType BulkStudentInformation = new ReportType("BulkStudentInformation");
 
+		public static readonly ReportType AccountsReceivableAging = new ReportType("AccountsReceivableAging");
 		public static readonly ReportType AccountsReceivableAsOf = new ReportType("AccountsReceivableAsOf");
 
 		public static readonly ReportType Csiu = new ReportType("Csiu");
