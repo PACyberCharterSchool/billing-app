@@ -81,9 +81,9 @@ namespace models.Reporters
 			{
 				transactions.Add(month.Name, new TotalsOnlyTransaction
 				{
-					Sd = bulk.Districts.Sum(d => SdForMonth(d.Transactions.AsDictionary(), month).Round()),
-					Pde = bulk.Districts.Sum(d => PdeForMonth(d.Transactions.AsDictionary(), month).Round()),
-					Refund = bulk.Districts.Sum(d => RefundForMonth(d.Transactions.AsDictionary(), month).Round()),
+					Sd = bulk.Districts.Sum(d => SdForMonth(d.Transactions.AsDictionary(), month)).Round(true),
+					Pde = bulk.Districts.Sum(d => PdeForMonth(d.Transactions.AsDictionary(), month)).Round(true),
+					Refund = bulk.Districts.Sum(d => RefundForMonth(d.Transactions.AsDictionary(), month)).Round(true),
 				});
 			}
 
