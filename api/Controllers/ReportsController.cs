@@ -1088,20 +1088,20 @@ namespace api.Controllers
 			}
 			row++;
 
-			ws.Cells[row, width - 2].PutValue("Total Amount Due Year to Date:");
+			ws.Cells[row, width - 3].PutValue("Total Amount Due Year to Date:");
 			var totalDueLabelStyle = new CellsFactory().CreateStyle();
 			totalDueLabelStyle.HorizontalAlignment = TextAlignmentType.Right;
 			totalDueLabelStyle.VerticalAlignment = TextAlignmentType.Bottom;
 			totalDueLabelStyle.Font.IsBold = true;
-			ws.Cells[row, width - 2].SetStyle(totalDueLabelStyle);
+			ws.Cells[row, width - 3].SetStyle(totalDueLabelStyle);
 
-			ws.Cells.Merge(row, width - 1, 1, 2);
-			ws.Cells[row, width - 1].PutValue(result.TotalDue);
+			ws.Cells.Merge(row, width - 2, 1, 3);
+			ws.Cells[row, width - 2].PutValue(result.TotalDue);
 			var totalDueStyle = new CellsFactory().CreateStyle();
 			totalDueStyle.Number = 7;
 			totalDueStyle.Font.IsBold = true;
 			totalDueStyle.VerticalAlignment = TextAlignmentType.Bottom;
-			ws.Cells[row, width - 1].SetStyle(totalDueStyle);
+			ws.Cells[row, width - 2].SetStyle(totalDueStyle);
 			row++;
 
 			var transactionHeaderStyle = new CellsFactory().CreateStyle();
@@ -1110,15 +1110,22 @@ namespace api.Controllers
 			transactionHeaderStyle.IsTextWrapped = true;
 			transactionHeaderStyle.HorizontalAlignment = TextAlignmentType.Center;
 
-			var transactionHeaders = new[] { "Month", "School District Direct Payment", "Check Number", "Check Date", "PDE Subsidy Deduction", "Refund From Charter School" };
+			var transactionHeaders = new (string Header, int Width)[] {
+				("Month", 2),
+				("School District Direct Payment", 3),
+				("Check Number", 2),
+				("Check Date", 2),
+				("PDE Subsidy Deduction", 3),
+				("Refund From Charter School", 3),
+			};
 			{
 				var col = 2;
 				foreach (var h in transactionHeaders)
 				{
-					ws.Cells.Merge(row, col, 1, 2);
-					ws.Cells[row, col].PutValue(h);
+					ws.Cells.Merge(row, col, 1, h.Width);
+					ws.Cells[row, col].PutValue(h.Header);
 					ws.Cells[row, col].GetMergedRange().SetStyle(transactionHeaderStyle);
-					col += 2;
+					col += h.Width;
 				}
 			}
 			ws.Cells.SetRowHeight(row, ws.Cells.GetRowHeight(row) * 2);
@@ -1130,32 +1137,38 @@ namespace api.Controllers
 			foreach (var month in Month.AsEnumerable())
 			{
 				var t = result.Transactions[month.Name];
+				var h = 0;
 				var col = 2;
-				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells.Merge(row, col, 1, transactionHeaders[h].Width);
 				if (month.Name == "July")
 					ws.Cells[row, col].PutValue($"{month.Name}, {result.FirstYear}");
 				else if (month.Name == "January")
 					ws.Cells[row, col].PutValue($"{month.Name}, {result.SecondYear}");
 				else
 					ws.Cells[row, col].PutValue(month.Name);
-				col += 2;
+				col += transactionHeaders[h].Width;
+				h++;
 
-				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells.Merge(row, col, 1, transactionHeaders[h].Width);
 				ws.Cells[row, col].PutValue(t.Sd);
 				ws.Cells[row, col].GetMergedRange().SetStyle(transactionAmountStyle);
-				col += 2;
+				col += transactionHeaders[h].Width;
+				h++;
 
-				ws.Cells.Merge(row, col, 1, 2); // check number
-				col += 2;
-				ws.Cells.Merge(row, col, 1, 2); // check date
-				col += 2;
+				ws.Cells.Merge(row, col, 1, transactionHeaders[h].Width); // check number
+				col += transactionHeaders[h].Width;
+				h++;
+				ws.Cells.Merge(row, col, 1, transactionHeaders[h].Width); // check date
+				col += transactionHeaders[h].Width;
+				h++;
 
-				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells.Merge(row, col, 1, transactionHeaders[h].Width);
 				ws.Cells[row, col].PutValue(t.Pde);
 				ws.Cells[row, col].GetMergedRange().SetStyle(transactionAmountStyle);
-				col += 2;
+				col += transactionHeaders[h].Width;
+				h++;
 
-				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells.Merge(row, col, 1, transactionHeaders[h].Width);
 				ws.Cells[row, col].PutValue(-t.Refund);
 				ws.Cells[row, col].GetMergedRange().SetStyle(transactionAmountStyle);
 
@@ -1167,44 +1180,49 @@ namespace api.Controllers
 			transactionTotalsStyle.Number = 7;
 
 			{
+				var h = 1;
 				var col = 4;
-				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells.Merge(row, col, 1, transactionHeaders[h].Width);
 				ws.Cells[row, col].PutValue(result.TotalSd);
 				ws.Cells[row, col].GetMergedRange().SetStyle(transactionTotalsStyle);
-				col += 2;
+				col += transactionHeaders[h].Width;
+				h++;
 
-				ws.Cells.Merge(row, col, 1, 2); // check number
+				ws.Cells.Merge(row, col, 1, transactionHeaders[h].Width); // check number
 				ws.Cells[row, col].GetMergedRange().SetStyle(transactionTotalsStyle);
-				col += 2;
-				ws.Cells.Merge(row, col, 1, 2); // check date
+				col += transactionHeaders[h].Width;
+				h++;
+				ws.Cells.Merge(row, col, 1, transactionHeaders[h].Width); // check date
 				ws.Cells[row, col].GetMergedRange().SetStyle(transactionTotalsStyle);
-				col += 2;
+				col += transactionHeaders[h].Width;
+				h++;
 
-				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells.Merge(row, col, 1, transactionHeaders[h].Width);
 				ws.Cells[row, col].PutValue(result.TotalPde);
 				ws.Cells[row, col].GetMergedRange().SetStyle(transactionTotalsStyle);
-				col += 2;
+				col += transactionHeaders[h].Width;
+				h++;
 
-				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells.Merge(row, col, 1, transactionHeaders[h].Width);
 				ws.Cells[row, col].PutValue(-result.TotalRefund);
 				ws.Cells[row, col].GetMergedRange().SetStyle(transactionTotalsStyle);
 			}
 			row++;
 
-			ws.Cells[row, width - 2].PutValue($"Total Paid to Date for {result.SchoolYear} School Year:");
-			ws.Cells[row, width - 2].SetStyle(totalDueLabelStyle);
+			ws.Cells[row, width - 3].PutValue($"Total Paid to Date for {result.SchoolYear} School Year:");
+			ws.Cells[row, width - 3].SetStyle(totalDueLabelStyle);
 
-			ws.Cells.Merge(row, width - 1, 1, 2);
-			ws.Cells[row, width - 1].PutValue(result.TotalPaid);
-			ws.Cells[row, width - 1].GetMergedRange().SetStyle(totalDueStyle);
+			ws.Cells.Merge(row, width - 2, 1, 3);
+			ws.Cells[row, width - 2].PutValue(result.TotalPaid);
+			ws.Cells[row, width - 2].GetMergedRange().SetStyle(totalDueStyle);
 			row++;
 
-			ws.Cells[row, width - 2].PutValue("Net Due to Charter School:");
-			ws.Cells[row, width - 2].SetStyle(totalDueLabelStyle);
+			ws.Cells[row, width - 3].PutValue("Net Due to Charter School:");
+			ws.Cells[row, width - 3].SetStyle(totalDueLabelStyle);
 
-			ws.Cells.Merge(row, width - 1, 1, 2);
-			ws.Cells[row, width - 1].PutValue(result.NetDue);
-			ws.Cells[row, width - 1].GetMergedRange().SetStyle(totalDueStyle);
+			ws.Cells.Merge(row, width - 2, 1, 3);
+			ws.Cells[row, width - 2].PutValue(result.NetDue);
+			ws.Cells[row, width - 2].GetMergedRange().SetStyle(totalDueStyle);
 
 			Report report;
 			using (var xlsxStream = new MemoryStream())
