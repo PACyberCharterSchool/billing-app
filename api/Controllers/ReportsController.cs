@@ -74,8 +74,6 @@ namespace api.Controllers
 			[Required]
 			[Range(100000000, 999999999)]
 			public int SchoolDistrictAun { get; set; }
-
-			public bool TotalsOnly { get; set; }
 		}
 
 		public class CreateBulkInvoiceReport
@@ -94,8 +92,6 @@ namespace api.Controllers
 
 			[JsonConverter(typeof(SchoolDistrictPaymentTypeJsonConverter))]
 			public SchoolDistrictPaymentType PaymentType { get; set; }
-
-			public bool TotalsOnly { get; set; }
 		}
 
 		public class CreateStudentInformationReport
@@ -332,16 +328,10 @@ namespace api.Controllers
 
 				summaryPages.Add(wb.Worksheets.Last().Index);
 
-				if (create.BulkInvoice.TotalsOnly)
-					continue;
-
 				var studentCount = district.Students.Count();
 				if (studentCount > 0)
 					CloneStudentItemizationSheets(source, wb, studentCount, i, district.SchoolDistrict.Name, invoiceTemplate);
 			}
-
-			if (create.BulkInvoice.TotalsOnly)
-				wb.Worksheets.RemoveAt(1);
 
 			// generate xlsx
 			var json = JsonConvert.SerializeObject(invoice);
@@ -422,7 +412,6 @@ namespace api.Controllers
 					ToSchoolDistrict = create.Invoice.ToSchoolDistrict,
 					ToPDE = create.Invoice.ToPDE,
 					Auns = new[] { create.Invoice.SchoolDistrictAun },
-					TotalsOnly = create.Invoice.TotalsOnly,
 				},
 			});
 
@@ -973,7 +962,7 @@ namespace api.Controllers
 			// These are separate rows because the PDF isn't breaking lines
 			ws.Cells.Merge(0, 1, 1, columnHeaders.Length);
 			System.Drawing.Color headerColor = System.Drawing.Color.FromArgb(128, 0, 0);
-			headerStyle.Font.Color = headerColor; 
+			headerStyle.Font.Color = headerColor;
 			ws.Cells[0, 1].SetStyle(headerStyle);
 			ws.Cells[0, 1].PutValue("The Pennsylvania Cyber Charter School");
 			ws.Cells[5, 4].SetStyle(headerStyle);
