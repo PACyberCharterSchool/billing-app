@@ -835,6 +835,7 @@ namespace api.Controllers
 			// TODO(Erik): this should really be done in the reporter
 			var totalPaid = 0m;
 			var totalNetDue = 0m;
+			var totalDue = 0m;
 
 			var r = 7;
 			foreach (var district in result.SchoolDistricts)
@@ -844,6 +845,7 @@ namespace api.Controllers
 				ws.Cells[r, c++].PutValue(district.Name);
 				ws.Cells[r, c++].PutValue(district.TotalPaid);
 				totalPaid += district.TotalPaid;
+				totalDue += district.TotalDue;
 				ws.Cells[r, c - 1].SetStyle(numericStyle);
 				totalNetDue += district.NetDue;
 				ws.Cells[r, c++].PutValue(district.NetDue);

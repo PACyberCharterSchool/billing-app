@@ -12,7 +12,9 @@ namespace models.Reporters
 	{
 		public int Aun { get; set; }
 		public string Name { get; set; }
-		public decimal TotalDue { get; set; }
+		public decimal RegularEducationDue { get; set; }
+		public decimal SpecialEducationDue { get; set; }
+		public decimal TotalDue => (RegularEducationDue + SpecialEducationDue).Round();
 		public decimal PaidByDistrict { get; set; }
 		public decimal PaidByPDE { get; set; }
 		public decimal Refunded { get; set; }
@@ -65,7 +67,7 @@ namespace models.Reporters
 				return new JsonSerializer().Deserialize<BulkInvoice>(new JsonTextReader(tr));
 		}
 
-		private IList<UniPayInvoiceSummarySchoolDistrict> GetUniPayInvoiceSummarySchoolDistricts(
+		private IList<UniPayInvoiceSummarySchoolDistrict> GetSchoolDistricts(
 			DateTime asOf,
 			string schoolYear
 			)
@@ -123,6 +125,8 @@ namespace models.Reporters
 				{
 					Aun = d.SchoolDistrict.Aun,
 					Name = d.SchoolDistrict.Name,
+					RegularEducationDue = (d.SchoolDistrict.RegularRate * ((decimal)d.RegularEnrollments.Values.Sum() / 12)).Round(),
+					SpecialEducationDue = (d.SchoolDistrict.SpecialRate * ((decimal)d.SpecialEnrollments.Values.Sum() / 12)).Round(),
 					PaidByDistrict = check.Round(),
 					PaidByPDE = unipay.Round(),
 					Refunded = refund.Round(),
@@ -142,7 +146,7 @@ namespace models.Reporters
 			{
 				SchoolYear = config.SchoolYear,
 				AsOf = config.AsOf,
-				SchoolDistricts = GetUniPayInvoiceSummarySchoolDistricts(config.AsOf, config.SchoolYear),
+				SchoolDistricts = GetSchoolDistricts(config.AsOf, config.SchoolYear),
 			};
 
 			return report;
