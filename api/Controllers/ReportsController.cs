@@ -964,7 +964,7 @@ namespace api.Controllers
 			ws.PageSetup.RightMarginInch = 0.25;
 			const int width = 17; // 16 cells wide
 			ws.Cells.StandardWidthInch = 9D / width;
-			ws.Cells.StandardHeight = ws.Cells.StandardHeight * 1.5;
+			ws.Cells.StandardHeight = ws.Cells.StandardHeight * 1.3;
 
 			var row = 0;
 			var headerStyle = new CellsFactory().CreateStyle();
@@ -1209,6 +1209,29 @@ namespace api.Controllers
 			}
 			row++;
 
+			var remitLabelStyle = new CellsFactory().CreateStyle();
+			remitLabelStyle.Font.IsBold = true;
+			remitLabelStyle.Font.Size = 9;
+			remitLabelStyle.HorizontalAlignment = TextAlignmentType.Right;
+			remitLabelStyle.VerticalAlignment = TextAlignmentType.Top;
+
+			var remitStyle = new CellsFactory().CreateStyle();
+			remitStyle.IsTextWrapped = true;
+			remitStyle.VerticalAlignment = TextAlignmentType.Top;
+			remitStyle.Font.Size = 9;
+
+			ws.Cells[row, 3].PutValue("Please Remit Payment to:");
+			ws.Cells[row, 3].SetStyle(remitLabelStyle);
+			ws.Cells.Merge(row, 4, 3, 5);
+			ws.Cells[row, 4].PutValue(
+				"The Pennsylvania Cyber Charter School\n" +
+				"Business Office, Suite A130\n" +
+				"652 Midland Avenue\n" +
+				"Midland, PA 15059\n"
+			);
+			ws.Cells[row, 4].GetMergedRange().SetStyle(remitStyle);
+			row++;
+
 			ws.Cells[row, width - 3].PutValue($"Total Paid to Date for {result.SchoolYear} School Year:");
 			ws.Cells[row, width - 3].SetStyle(totalDueLabelStyle);
 
@@ -1223,6 +1246,16 @@ namespace api.Controllers
 			ws.Cells.Merge(row, width - 2, 1, 3);
 			ws.Cells[row, width - 2].PutValue(result.NetDue);
 			ws.Cells[row, width - 2].GetMergedRange().SetStyle(totalDueStyle);
+			row++;
+
+			ws.Cells[row, 3].PutValue("Please Direct any questions to:");
+			ws.Cells[row, 3].SetStyle(remitLabelStyle);
+			ws.Cells.Merge(row, 4, 2, 3);
+			ws.Cells[row, 4].PutValue(
+				"Child Account: 724-888-7780\n" +
+				"Finance: 724-888-7792"
+			);
+			ws.Cells[row, 4].GetMergedRange().SetStyle(remitStyle);
 
 			Report report;
 			using (var xlsxStream = new MemoryStream())
