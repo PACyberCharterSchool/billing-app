@@ -33,6 +33,7 @@ namespace models.Reporters
 		public TotalsOnlyEnrollments Enrollments { get; set; }
 		public decimal RegularDue { get; set; }
 		public decimal SpecialDue { get; set; }
+		public decimal TotalDue { get; set; }
 		public TotalsOnlyTransactions Transactions { get; set; }
 		public decimal TotalSd { get; set; }
 		public decimal TotalPde { get; set; }
@@ -124,6 +125,7 @@ namespace models.Reporters
 			report.Enrollments = GetEnrollments(bulk);
 			report.RegularDue = bulk.Districts.Sum(d => (d.SchoolDistrict.RegularRate * d.RegularEnrollments.Sum(e => e.Value) / 12).Round());
 			report.SpecialDue = bulk.Districts.Sum(d => (d.SchoolDistrict.SpecialRate * d.SpecialEnrollments.Sum(e => e.Value) / 12).Round());
+			report.TotalDue = (report.RegularDue + report.SpecialDue).Round();
 
 			report.Transactions = GetTransactions(bulk);
 			report.TotalSd = report.Transactions.Sum(t => t.Value.Sd.HasValue ? t.Value.Sd.Value : 0m).Round();
@@ -131,7 +133,7 @@ namespace models.Reporters
 			report.TotalRefund = report.Transactions.Sum(t => t.Value.Refund.HasValue ? t.Value.Refund.Value : 0m).Round();
 			report.TotalPaid = ((report.TotalSd + report.TotalPde) - report.TotalRefund).Round();
 
-			report.NetDue = ((report.RegularDue + report.SpecialDue) - report.TotalPaid).Round();
+			report.NetDue = (report.TotalDue - report.TotalPaid).Round();
 
 			return report;
 		}

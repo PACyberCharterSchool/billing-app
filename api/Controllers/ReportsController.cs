@@ -27,6 +27,7 @@ using models.Reporters;
 using models.Reporters.Exporters;
 using System.Drawing;
 using System.IdentityModel.Tokens.Jwt;
+using models.Common;
 
 namespace api.Controllers
 {
@@ -956,6 +957,254 @@ namespace api.Controllers
 			});
 
 			var wb = new Workbook();
+			var ws = wb.Worksheets[0];
+
+			ws.PageSetup.Orientation = PageOrientationType.Landscape;
+			ws.PageSetup.LeftMarginInch = 0.25;
+			ws.PageSetup.RightMarginInch = 0.25;
+			const int width = 17; // 16 cells wide
+			ws.Cells.StandardWidthInch = 9D / width;
+			ws.Cells.StandardHeight = ws.Cells.StandardHeight * 1.5;
+
+			var row = 0;
+			var headerStyle = new CellsFactory().CreateStyle();
+			headerStyle.IsTextWrapped = true;
+			headerStyle.HorizontalAlignment = TextAlignmentType.Center;
+			headerStyle.Font.IsBold = true;
+			headerStyle.Font.Size = 9;
+			ws.Cells[row, 0].SetStyle(headerStyle);
+
+			ws.Cells.Merge(row, 0, 1, width);
+			ws.Cells[row, 0].PutValue(
+				"The Pennsylvania Cyber Charter School\n" +
+				$"INVOICE for the {result.SchoolYear} SCHOOL YEAR\n" +
+				"Summary Information Sheet\n" +
+				$"For the Months of July {result.FirstYear} through April {result.SecondYear}" // TODO(Erik): second month?
+			);
+			ws.Cells.SetRowHeight(row, ws.Cells.GetRowHeight(row) * 4);
+			row++;
+
+			ws.Cells[row, 0].PutValue("TOTAL");
+
+			var dateStyle = new CellsFactory().CreateStyle();
+			dateStyle.Number = 14;
+			dateStyle.HorizontalAlignment = TextAlignmentType.Right;
+			ws.Cells.Merge(row, width - 1, 1, 2);
+			ws.Cells[row, width - 1].PutValue(result.Prepared);
+			ws.Cells[row, width - 1].GetMergedRange().SetStyle(dateStyle);
+			row++;
+
+			var enrollmentStyle = new CellsFactory().CreateStyle();
+			foreach (var t in new[] { BorderType.TopBorder, BorderType.RightBorder, BorderType.BottomBorder, BorderType.LeftBorder })
+				enrollmentStyle.SetBorder(t, CellBorderType.Medium, Color.Black);
+
+			var enrollmentHeaderStyle = new CellsFactory().CreateStyle();
+			enrollmentHeaderStyle.Copy(enrollmentStyle);
+			enrollmentHeaderStyle.HorizontalAlignment = TextAlignmentType.Center;
+			enrollmentHeaderStyle.IsTextWrapped = true;
+
+			{
+				var col = 3;
+				foreach (var month in Month.AsEnumerable().Where(m => m.Name != "June"))
+				{
+					var name = month.Name;
+					if (name.Length > 5)
+						name = $"{name.Substring(0, 3)}.";
+
+					ws.Cells[row, col].PutValue(name);
+					ws.Cells[row, col].SetStyle(enrollmentHeaderStyle);
+					col++;
+				}
+
+				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells[row, col].PutValue("Selected Expenditure per ADM");
+				ws.Cells[row, col].GetMergedRange().SetStyle(enrollmentHeaderStyle);
+				col += 2;
+
+				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells[row, col].PutValue("Amount Due");
+				var amountDueLabelStyle = new CellsFactory().CreateStyle();
+				amountDueLabelStyle.Copy(enrollmentHeaderStyle);
+				amountDueLabelStyle.SetBorder(BorderType.TopBorder, CellBorderType.None, Color.White);
+				amountDueLabelStyle.SetBorder(BorderType.RightBorder, CellBorderType.None, Color.White);
+				ws.Cells[row, col].GetMergedRange().SetStyle(amountDueLabelStyle);
+			}
+			ws.Cells.SetRowHeight(row, ws.Cells.GetRowHeight(row) * 2);
+			row++;
+
+			var naStyle = new CellsFactory().CreateStyle();
+			naStyle.Copy(enrollmentStyle);
+			naStyle.HorizontalAlignment = TextAlignmentType.Right;
+
+			var amountDueStyle = new CellsFactory().CreateStyle();
+			amountDueStyle.Copy(enrollmentStyle);
+			amountDueStyle.Number = 7;
+
+			ws.Cells.Merge(row, 0, 1, 3);
+			ws.Cells[row, 0].PutValue("Nonspecial Education");
+			ws.Cells[row, 0].GetMergedRange().SetStyle(enrollmentStyle);
+			{
+				var col = 3;
+				foreach (var month in Month.AsEnumerable().Where(m => m.Name != "June"))
+				{
+					var c = result.Enrollments[month.Name].Regular;
+					ws.Cells[row, col].PutValue(c);
+					ws.Cells[row, col].SetStyle(enrollmentStyle);
+					col++;
+				}
+
+				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells[row, col].PutValue("n/a");
+				ws.Cells[row, col].GetMergedRange().SetStyle(naStyle);
+				col += 2;
+
+				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells[row, col].PutValue(result.RegularDue);
+				ws.Cells[row, col].GetMergedRange().SetStyle(amountDueStyle);
+			}
+			row++;
+
+			ws.Cells.Merge(row, 0, 1, 3);
+			ws.Cells[row, 0].PutValue("Special Education");
+			ws.Cells[row, 0].GetMergedRange().SetStyle(enrollmentStyle);
+			{
+				var col = 3;
+				foreach (var month in Month.AsEnumerable().Where(m => m.Name != "June"))
+				{
+					var c = result.Enrollments[month.Name].Special;
+					ws.Cells[row, col].PutValue(c);
+					ws.Cells[row, col].SetStyle(enrollmentStyle);
+					col++;
+				}
+
+				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells[row, col].PutValue("n/a");
+				ws.Cells[row, col].GetMergedRange().SetStyle(naStyle);
+				col += 2;
+
+				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells[row, col].PutValue(result.SpecialDue);
+				ws.Cells[row, col].GetMergedRange().SetStyle(amountDueStyle);
+			}
+			row++;
+
+			ws.Cells[row, width - 2].PutValue("Total Amount Due Year to Date:");
+			var totalDueLabelStyle = new CellsFactory().CreateStyle();
+			totalDueLabelStyle.HorizontalAlignment = TextAlignmentType.Right;
+			totalDueLabelStyle.VerticalAlignment = TextAlignmentType.Bottom;
+			totalDueLabelStyle.Font.IsBold = true;
+			ws.Cells[row, width - 2].SetStyle(totalDueLabelStyle);
+
+			ws.Cells.Merge(row, width - 1, 1, 2);
+			ws.Cells[row, width - 1].PutValue(result.TotalDue);
+			var totalDueStyle = new CellsFactory().CreateStyle();
+			totalDueStyle.Number = 7;
+			totalDueStyle.Font.IsBold = true;
+			totalDueStyle.VerticalAlignment = TextAlignmentType.Bottom;
+			ws.Cells[row, width - 1].SetStyle(totalDueStyle);
+			row++;
+
+			var transactionHeaderStyle = new CellsFactory().CreateStyle();
+			transactionHeaderStyle.SetBorder(BorderType.BottomBorder, CellBorderType.Thick, Color.Black);
+			transactionHeaderStyle.Font.Size = 9;
+			transactionHeaderStyle.IsTextWrapped = true;
+			transactionHeaderStyle.HorizontalAlignment = TextAlignmentType.Center;
+
+			var transactionHeaders = new[] { "Month", "School District Direct Payment", "Check Number", "Check Date", "PDE Subsidy Deduction", "Refund From Charter School" };
+			{
+				var col = 2;
+				foreach (var h in transactionHeaders)
+				{
+					ws.Cells.Merge(row, col, 1, 2);
+					ws.Cells[row, col].PutValue(h);
+					ws.Cells[row, col].GetMergedRange().SetStyle(transactionHeaderStyle);
+					col += 2;
+				}
+			}
+			ws.Cells.SetRowHeight(row, ws.Cells.GetRowHeight(row) * 2);
+			row++;
+
+			var transactionAmountStyle = new CellsFactory().CreateStyle();
+			transactionAmountStyle.Number = 7;
+
+			foreach (var month in Month.AsEnumerable())
+			{
+				var t = result.Transactions[month.Name];
+				var col = 2;
+				ws.Cells.Merge(row, col, 1, 2);
+				if (month.Name == "July")
+					ws.Cells[row, col].PutValue($"{month.Name}, {result.FirstYear}");
+				else if (month.Name == "January")
+					ws.Cells[row, col].PutValue($"{month.Name}, {result.SecondYear}");
+				else
+					ws.Cells[row, col].PutValue(month.Name);
+				col += 2;
+
+				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells[row, col].PutValue(t.Sd);
+				ws.Cells[row, col].GetMergedRange().SetStyle(transactionAmountStyle);
+				col += 2;
+
+				ws.Cells.Merge(row, col, 1, 2); // check number
+				col += 2;
+				ws.Cells.Merge(row, col, 1, 2); // check date
+				col += 2;
+
+				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells[row, col].PutValue(t.Pde);
+				ws.Cells[row, col].GetMergedRange().SetStyle(transactionAmountStyle);
+				col += 2;
+
+				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells[row, col].PutValue(-t.Refund);
+				ws.Cells[row, col].GetMergedRange().SetStyle(transactionAmountStyle);
+
+				row++;
+			}
+
+			var transactionTotalsStyle = new CellsFactory().CreateStyle();
+			transactionTotalsStyle.SetBorder(BorderType.TopBorder, CellBorderType.Medium, Color.Black);
+			transactionTotalsStyle.Number = 7;
+
+			{
+				var col = 4;
+				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells[row, col].PutValue(result.TotalSd);
+				ws.Cells[row, col].GetMergedRange().SetStyle(transactionTotalsStyle);
+				col += 2;
+
+				ws.Cells.Merge(row, col, 1, 2); // check number
+				ws.Cells[row, col].GetMergedRange().SetStyle(transactionTotalsStyle);
+				col += 2;
+				ws.Cells.Merge(row, col, 1, 2); // check date
+				ws.Cells[row, col].GetMergedRange().SetStyle(transactionTotalsStyle);
+				col += 2;
+
+				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells[row, col].PutValue(result.TotalPde);
+				ws.Cells[row, col].GetMergedRange().SetStyle(transactionTotalsStyle);
+				col += 2;
+
+				ws.Cells.Merge(row, col, 1, 2);
+				ws.Cells[row, col].PutValue(-result.TotalRefund);
+				ws.Cells[row, col].GetMergedRange().SetStyle(transactionTotalsStyle);
+			}
+			row++;
+
+			ws.Cells[row, width - 2].PutValue($"Total Paid to Date for {result.SchoolYear} School Year:");
+			ws.Cells[row, width - 2].SetStyle(totalDueLabelStyle);
+
+			ws.Cells.Merge(row, width - 1, 1, 2);
+			ws.Cells[row, width - 1].PutValue(result.TotalPaid);
+			ws.Cells[row, width - 1].GetMergedRange().SetStyle(totalDueStyle);
+			row++;
+
+			ws.Cells[row, width - 2].PutValue("Net Due to Charter School:");
+			ws.Cells[row, width - 2].SetStyle(totalDueLabelStyle);
+
+			ws.Cells.Merge(row, width - 1, 1, 2);
+			ws.Cells[row, width - 1].PutValue(result.NetDue);
+			ws.Cells[row, width - 1].GetMergedRange().SetStyle(totalDueStyle);
 
 			Report report;
 			using (var xlsxStream = new MemoryStream())
