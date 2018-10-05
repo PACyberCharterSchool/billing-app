@@ -28,6 +28,7 @@
     <table class='table table-fixed table-striped'>
       <thead>
         <tr>
+          <th>Totals Only?</th>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
             {{k | normalizeFieldName}}
             <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
@@ -37,6 +38,8 @@
       </thead>
       <tbody>
         <tr *ngFor='let report of bulkReports | orderBy: {property: property, direction: direction}'>
+          <td *ngIf='report.type === "TotalsOnlyInvoice"'>Yes</td>
+          <td *ngIf='report.type !== "TotalsOnlyInvoice"'>No</td>
           <td *ngFor='let v of listDisplayableValues(report)' placement='top' ngbTooltip='{{v | normalizeFieldValue}}'>{{v | normalizeFieldValue}}</td>
           <td><button type='button' class='btn btn-primary' (click)='displayDownloadFormatDialog(downloadFormatContent, report)'>Download</button></td>
         </tr>
@@ -99,6 +102,23 @@
                   <label ngbButtonLabel class='btn-primary'>
                     <input ngbButton type='radio' value='All' /> All
                   </label>
+                </div>
+              </div>
+            </div>
+            <div id='collapsePaymentType' [ngbCollapse]='invoiceRecipient !== "Totals"'>
+              <div class='form-group row align-items-center'>
+                <div class='col-6'>
+                  <label>Payment Type</label>
+                </div>
+                <div class='col-6'>
+                  <div class='btn-group btn-group-toggle' ngbRadioGroup id='paymentType' name='paymentType' [(ngModel)]='paymentType'>
+                    <label ngbButtonLabel class='btn-primary'>
+                      <input ngbButton type='radio' value='Check' /> Check
+                    </label>
+                    <label ngbButtonLabel class='btn-primary'>
+                      <input ngbButton type='radio' value='UniPay' /> UniPay
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
