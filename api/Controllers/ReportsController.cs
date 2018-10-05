@@ -602,9 +602,8 @@ namespace api.Controllers
 				row++;
 
 				ws.Cells[row, 1].PutValue("AUN:");
-				ws.Cells[row, 2].PutValue(district.Aun);
+				ws.Cells[row, 2].PutValue(district.Aun.ToString());
 				var aunStyle = new CellsFactory().CreateStyle();
-				aunStyle.Number = 1;
 				ws.Cells[row, 2].SetStyle(aunStyle);
 
 				ws.Cells[row, 4].PutValue("School:");
