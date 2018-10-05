@@ -59,6 +59,11 @@ export class ReportsService {
     return this.getReportsByMeta(reportMeta);
   }
 
+  public getTotalsOnly(): Observable<Report[]> {
+    const reportMeta: Object = Object.assign({}, { 'Type': ReportType.TotalsOnly });
+    return this.getReportsByMeta(reportMeta);
+  }
+
   public getUniPayInvoiceSummary(): Observable<Report[]> {
     const reportMeta: Object = Object.assign({}, {
       'Type': ReportType.UniPayInvoiceSummary,
@@ -234,6 +239,27 @@ export class ReportsService {
       }
     });
 
+    return this.httpClient.post<any>(url, reportMeta, this.headers);
+  }
+
+  public createTotalsOnlyInvoice(
+    name: string,
+    scope: string,
+    schoolYear: string,
+    paymentType: string,
+    auns?: number[]
+    ): Observable<Report> {
+    const url: string = this.apiReportsUrl;
+    const reportMeta: Object = Object.assign({}, {
+      'reportType': ReportType.TotalsOnly,
+      'schoolYear': schoolYear.replace(/\s+/g, ''),
+      'name': name,
+      'totalsOnlyInvoice': {
+        'scope': scope,
+        'auns': auns,
+        'paymentType': paymentType
+      }
+    });
     return this.httpClient.post<any>(url, reportMeta, this.headers);
   }
 
