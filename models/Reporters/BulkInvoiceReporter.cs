@@ -347,19 +347,10 @@ namespace models.Reporters
 							continue;
 						}
 
-						// if (group.All(s => s.IsSpecialEducation == true) && !AreEnrollmentAndWithdrawalInSameMonth(group))
-						// {
-						// 	specialCount++;
-						// 	continue;
-						// }
-
-						if (!AreEnrollmentAndWithdrawalInSameMonth(group))
+						if (group.All(s => s.IsSpecialEducation) && AreEnrollmentAndWithdrawalInSameMonth(group))
 						{
-							if (group.All(s => s.IsSpecialEducation == true))
-							{
-								specialCount++;
-								continue;
-							}
+							specialCount++;
+							continue;
 						}
 
 						regularCount++;
