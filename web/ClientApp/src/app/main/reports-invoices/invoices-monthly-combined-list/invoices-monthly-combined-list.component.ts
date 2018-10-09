@@ -245,33 +245,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     return this.academicYearsService.getAcademicYears();
   }
 
-  private getAuns(): number[] {
-    let auns: number[];
-
-    switch (this.invoiceRecipient) {
-      case 'SD':
-        auns = this.schoolDistricts.filter((sd) => sd.paymentType === PaymentType.Check).map((sd) => +sd.aun);
-        break;
-      case 'PDE':
-        auns = this.schoolDistricts.filter((sd) => sd.paymentType === PaymentType.UniPay).map((sd) => +sd.aun);
-        break;
-      case 'Totals':
-        if (this.paymentType === undefined || this.paymentType === 'All') {
-          auns = null;
-        } else {
-          auns = this.paymentType === PaymentType.Check ?
-            this.schoolDistricts.filter((sd) => sd.paymentType === PaymentType.Check).map((sd) => +sd.aun) :
-            this.schoolDistricts.filter((sd) => sd.paymentType === PaymentType.UniPay).map((sd) => +sd.aun);
-        }
-        break;
-      case 'All':
-        auns = null;
-        break;
-    }
-
-    return auns;
-  }
-
   private isTotalsOnly(): boolean {
     return this.invoiceRecipient === 'Totals';
   }
@@ -279,24 +252,30 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   private doCreateBulkInvoice(): void {
     this.spinnerMsg = 'Creating bulk invoice.  Please wait...';
     this.ngxSpinnerService.show();
-    const auns: number[] = this.getAuns();
+
+    let paymentType: string;
+    if (this.invoiceRecipient === 'SD') {
+      paymentType = 'Check';
+    } else if (this.invoiceRecipient === 'PDE') {
+      paymentType = 'UniPay';
+    }
 
     this.reportsService.createBulkInvoice(
       {
-        'reportType': 'BulkInvoice',
-        'schoolYear': this.selectedCreateSchoolYear.replace(/\s+/g, ''),
-        'name': this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope),
-        'bulkInvoice': {
-          'toSchoolDistrict': new Date(
+        reportType: 'BulkInvoice',
+        schoolYear: this.selectedCreateSchoolYear.replace(/\s+/g, ''),
+        name: this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope),
+        bulkInvoice: {
+          toSchoolDistrict: new Date(
             this.toSchoolDistrictDate.year,
             this.toSchoolDistrictDate.month - 1,
             this.toSchoolDistrictDate.day).toLocaleDateString('en-US'),
-          'toPDE': new Date(
+          toPDE: new Date(
             this.toPDEDate.year,
             this.toPDEDate.month - 1,
             this.toPDEDate.day).toLocaleDateString('en-US'),
-          'scope': this.selectedCreateScope,
-          'auns': auns,
+          scope: this.selectedCreateScope,
+          paymentType: paymentType,
         }
       }
     ).subscribe(
@@ -314,14 +293,12 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   private doCreateTotalsOnlyInvoice(): void {
     this.spinnerMsg = 'Creating totals only invoice.  Please wait...';
     this.ngxSpinnerService.show();
-    const auns: number[] = this.getAuns();
 
     this.reportsService.createTotalsOnlyInvoice(
       this.generateTotalsOnlyInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope, this.paymentType),
       this.selectedCreateScope,
       this.selectedCreateSchoolYear,
-      this.paymentType === 'All' ? undefined : this.paymentType,
-      auns).subscribe(
+      this.paymentType === 'All' ? undefined : this.paymentType).subscribe(
         data => {
           this.ngxSpinnerService.hide();
           this.refreshInvoices();
