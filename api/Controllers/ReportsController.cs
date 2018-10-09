@@ -958,6 +958,9 @@ namespace api.Controllers
 			var wb = new Workbook();
 			var ws = wb.Worksheets[0];
 
+			ws.PageSetup.FitToPagesTall = 1;
+			ws.PageSetup.FitToPagesWide = 0;
+
 			ws.PageSetup.Orientation = PageOrientationType.Landscape;
 			ws.PageSetup.LeftMarginInch = 0.25;
 			ws.PageSetup.RightMarginInch = 0.25;
