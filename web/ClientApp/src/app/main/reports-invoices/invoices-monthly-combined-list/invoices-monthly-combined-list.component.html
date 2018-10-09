@@ -1,5 +1,7 @@
 <div class='row invoices-title-row align-items-center'>
-  <div class='col-3'><h4>Combined Invoices</h4></div>
+  <div class='col-3'>
+    <h4>Combined Invoices</h4>
+  </div>
   <div class='col-7'>
     <input type='text' [(ngModel)]='searchText' />
     <button type='button' class='btn btn-primary' (click)='filterInvoices()'>SEARCH</button>
@@ -9,7 +11,8 @@
     <div class='row'>
       <div class='col'>
         <div ngbDropdown class="d-inline-block">
-          <button class="btn btn-outline-primary" id="dropdownScope" ngbDropdownToggle>{{selectedCurrentScope}}</button>
+          <button class="btn btn-outline-primary" id="dropdownScope"
+            ngbDropdownToggle>{{selectedCurrentScope}}</button>
           <div ngbDropdownMenu aria-labelledby="dropdownScope">
             <button class='dropdown-item' *ngFor='let scope of scopes' (click)='filterByScope(scope)'>{{scope}}</button>
           </div>
@@ -31,7 +34,8 @@
           <th>Totals Only?</th>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
             {{k | normalizeFieldName}}
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }"
+              aria-hidden="true"></i>
           </th>
           <th>Download</th>
         </tr>
@@ -40,7 +44,9 @@
         <tr *ngFor='let report of bulkReports | orderBy: {property: property, direction: direction}'>
           <td *ngIf='report.type === "TotalsOnlyInvoice"'>Yes</td>
           <td *ngIf='report.type !== "TotalsOnlyInvoice"'>No</td>
-          <td *ngFor='let v of listDisplayableValues(report)' placement='top' ngbTooltip='{{v | normalizeFieldValue}}'>{{v | normalizeFieldValue}}</td>
+          <td *ngFor='let v of listDisplayableValues(report)' placement='top'
+            ngbTooltip='{{v | normalizeFieldValue}}'>{{v |
+            normalizeFieldValue}}</td>
           <td><button type='button' class='btn btn-primary' (click)='displayDownloadFormatDialog(downloadFormatContent, report)'>Download</button></td>
         </tr>
       </tbody>
@@ -58,102 +64,112 @@
     <div class='modal-body'>
       <div class='row align-items-center'>
         <div class='col-12'>
-            <div class='form-group row align-items-center'>
-              <div class='col-6 justify-content-left'>
-                <label>Select Academic Year</label>
-              </div>
-              <div class='col-6'>
-                <div ngbDropdown class="d-inline-block">
-                  <button type='button' class="btn btn-outline-primary" id="dropdownDownloadSchoolYear" ngbDropdownToggle>{{selectedCreateSchoolYear}}</button>
-                  <div ngbDropdownMenu aria-labelledby="dropdownDownloadSchoolYear">
-                    <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()' (click)='selectSchoolYear(year)'>{{year}}</button>
-                  </div>
+          <div class='form-group row align-items-center'>
+            <div class='col-6 justify-content-left'>
+              <label>Select Academic Year</label>
+            </div>
+            <div class='col-6'>
+              <div ngbDropdown class="d-inline-block">
+                <button type='button' class="btn btn-outline-primary" id="dropdownDownloadSchoolYear"
+                  ngbDropdownToggle>{{selectedCreateSchoolYear}}</button>
+                <div ngbDropdownMenu aria-labelledby="dropdownDownloadSchoolYear">
+                  <button type='button' class='dropdown-item' *ngFor='let year of getSchoolYears()'
+                    (click)='selectSchoolYear(year)'>{{year}}</button>
                 </div>
               </div>
             </div>
-            <div class='form-group row align-items-center'>
-              <div class='col-6'>
-                <label>Select Billing Period</label>
-              </div>
-              <div class='col-6'>
-                <div ngbDropdown class="d-inline-block">
-                  <button type='button' class="btn btn-outline-primary" id="dropdownCreateScopes" ngbDropdownToggle>{{selectedCreateScope}}</button>
-                  <div ngbDropdownMenu aria-labelledby="dropdownCreateScopes">
-                    <button type='button' class='dropdown-item' *ngFor='let scope of scopes' (click)='selectCreatedScope(scope)'>{{scope}}</button>
-                  </div>
+          </div>
+          <div class='form-group row align-items-center'>
+            <div class='col-6'>
+              <label>Select Billing Period</label>
+            </div>
+            <div class='col-6'>
+              <div ngbDropdown class="d-inline-block">
+                <button type='button' class="btn btn-outline-primary" id="dropdownCreateScopes"
+                  ngbDropdownToggle>{{selectedCreateScope}}</button>
+                <div ngbDropdownMenu aria-labelledby="dropdownCreateScopes">
+                  <button type='button' class='dropdown-item' *ngFor='let scope of scopes'
+                    (click)='selectCreatedScope(scope)'>{{scope}}</button>
                 </div>
               </div>
             </div>
+          </div>
+          <div class='form-group row align-items-center'>
+            <div class='col-6'>
+              <label>Select Invoice Recipient</label>
+            </div>
+            <div class='col-6'>
+              <div class='btn-group btn-group-toggle' ngbRadioGroup id='invoiceRecipient'
+                name='invoiceRecipient' [(ngModel)]='invoiceRecipient'>
+                <label ngbButtonLabel class='btn-primary'>
+                  <input ngbButton type='radio' value='SD' /> Direct Pay SDs
+                </label>
+                <label ngbButtonLabel class='btn-primary'>
+                  <input ngbButton type='radio' value='PDE' /> PDE
+                </label>
+                <label ngbButtonLabel class='btn-primary'>
+                  <input ngbButton type='radio' value='Totals' /> Totals Only
+                </label>
+                <label ngbButtonLabel class='btn-primary'>
+                  <input ngbButton type='radio' value='All' /> All
+                </label>
+              </div>
+            </div>
+          </div>
+          <div id='collapsePaymentType' [ngbCollapse]='invoiceRecipient !== "Totals"'>
             <div class='form-group row align-items-center'>
               <div class='col-6'>
-                <label>Select Invoice Recipient</label>
+                <label>Payment Type</label>
               </div>
               <div class='col-6'>
-                <div class='btn-group btn-group-toggle' ngbRadioGroup id='invoiceRecipient' name='invoiceRecipient' [(ngModel)]='invoiceRecipient'>
+                <div class='btn-group btn-group-toggle' ngbRadioGroup id='paymentType'
+                  name='paymentType' [(ngModel)]='paymentType'>
                   <label ngbButtonLabel class='btn-primary'>
-                    <input ngbButton type='radio' value='SD' /> Direct Pay SDs
+                    <input ngbButton type='radio' value='Check' /> Check
                   </label>
                   <label ngbButtonLabel class='btn-primary'>
-                    <input ngbButton type='radio' value='PDE' /> PDE
-                  </label>
-                  <label ngbButtonLabel class='btn-primary'>
-                    <input ngbButton type='radio' value='Totals' /> Totals Only
-                  </label>
-                  <label ngbButtonLabel class='btn-primary'>
-                    <input ngbButton type='radio' value='All' /> All
+                    <input ngbButton type='radio' value='UniPay' /> UniPay
                   </label>
                 </div>
               </div>
             </div>
-            <div id='collapsePaymentType' [ngbCollapse]='invoiceRecipient !== "Totals"'>
-              <div class='form-group row align-items-center'>
-                <div class='col-6'>
-                  <label>Payment Type</label>
-                </div>
-                <div class='col-6'>
-                  <div class='btn-group btn-group-toggle' ngbRadioGroup id='paymentType' name='paymentType' [(ngModel)]='paymentType'>
-                    <label ngbButtonLabel class='btn-primary'>
-                      <input ngbButton type='radio' value='Check' /> Check
-                    </label>
-                    <label ngbButtonLabel class='btn-primary'>
-                      <input ngbButton type='radio' value='UniPay' /> UniPay
-                    </label>
-                  </div>
+          </div>
+          <div class='form-group row align-items-center'>
+            <div class='col-6'>
+              <label>Date Issued to School District</label>
+            </div>
+            <div class='col-6'>
+              <div class='input-group'>
+                <input class='form-control' placeholder='mm-dd-yyyy' name='dpToSchoolDistrict'
+                  [(ngModel)]='toSchoolDistrictDate' ngbDatepicker
+                  #dpToSchoolDistrict='ngbDatepicker' (ngModelChange)='onIssuedSchoolDistrictDateChanged()'>
+                <div class='input-group-append'>
+                  <button class='btn btn-outline-secondary' (click)='dpToSchoolDistrict.toggle()'
+                    type='button'>
+                    <i class="fa fa-calendar fa-2x"></i>
+                  </button>
                 </div>
               </div>
             </div>
-            <div class='form-group row align-items-center'>
-              <div class='col-6'>
-                <label>Date Issued to School District</label>
-              </div>
-              <div class='col-6'>
-                <div class='input-group'>
-                  <input class='form-control' placeholder='mm-dd-yyyy'
-                        name='dpToSchoolDistrict' [(ngModel)]='toSchoolDistrictDate' ngbDatepicker #dpToSchoolDistrict='ngbDatepicker' (ngModelChange)='onIssuedSchoolDistrictDateChanged()'>
-                  <div class='input-group-append'>
-                    <button class='btn btn-outline-secondary' (click)='dpToSchoolDistrict.toggle()' type='button'>
-                      <i class="fa fa-calendar fa-2x"></i>
-                    </button>
-                  </div>
+          </div>
+          <div class='form-group row align-items-center'>
+            <div class='col-6'>
+              <label>Date Issued to PDE</label>
+            </div>
+            <div class='col-6'>
+              <div class='input-group'>
+                <input class='form-control' placeholder='mm-dd-yyyy' name='dpToPDE'
+                  [(ngModel)]='toPDEDate' ngbDatepicker #dpToPDE='ngbDatepicker'
+                  (ngModelChange)='onIssuedPDEDateChanged()'>
+                <div class='input-group-append'>
+                  <button class='btn btn-outline-secondary' (click)='dpToPDE.toggle()'
+                    type='button'>
+                    <i class="fa fa-calendar fa-2x"></i>
+                  </button>
                 </div>
               </div>
             </div>
-            <div class='form-group row align-items-center'>
-              <div class='col-6'>
-                <label>Date Issued to PDE</label>
-              </div>
-              <div class='col-6'>
-                <div class='input-group'>
-                  <input class='form-control' placeholder='mm-dd-yyyy'
-                        name='dpToPDE' [(ngModel)]='toPDEDate' ngbDatepicker #dpToPDE='ngbDatepicker' (ngModelChange)='onIssuedPDEDateChanged()'>
-                  <div class='input-group-append'>
-                    <button class='btn btn-outline-secondary' (click)='dpToPDE.toggle()' type='button'>
-                      <i class="fa fa-calendar fa-2x"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -178,9 +194,11 @@
     <div class='row align-items-center'>
       <div class='col-12 text-center'>
         <div ngbDropdown class="d-inline-block">
-          <button type='button' class="btn btn-outline-primary" id="dropdownDownloadFormat" ngbDropdownToggle>Format type</button>
+          <button type='button' class="btn btn-outline-primary" id="dropdownDownloadFormat"
+            ngbDropdownToggle>Format type</button>
           <div ngbDropdownMenu aria-labelledby="dropdownDownloadFormat">
-            <button type='button' class='dropdown-item' *ngFor='let format of downloadFormats' (click)=setSelectedDownloadFormat(format)>{{format}}</button>
+            <button type='button' class='dropdown-item' *ngFor='let format of downloadFormats'
+              (click)=setSelectedDownloadFormat(format)>{{format}}</button>
           </div>
         </div>
       </div>
@@ -195,4 +213,5 @@
     </div>
   </div>
 </ng-template>
-<ngx-spinner size='large' loadingText='Generating PACBILL invoices.  Please wait...' type='timer'></ngx-spinner>
+<ngx-spinner size='large' loadingText='Generating PACBILL invoices.  Please wait...'
+  type='timer'></ngx-spinner>

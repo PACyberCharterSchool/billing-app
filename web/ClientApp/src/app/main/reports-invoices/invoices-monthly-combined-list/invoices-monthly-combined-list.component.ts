@@ -152,16 +152,16 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       'Approved': null,
       'SchoolYear': null
     }).subscribe(
-        data => {
-          console.log(`InvoicesMonthlyCombinedListComponent.refreshInvoices(): data is ${data}.`);
-          this.ngxSpinnerService.hide();
-          this.allBulkReports = this.allBulkReports.concat(data['reports']);
-          this.bulkReports = this.allBulkReports;
-        },
-        error => {
-          this.ngxSpinnerService.hide();
-          console.log(`InvoicesMonthlyCombinedListComponent.refreshInvoices(): error is ${error}.`);
-        }
+      data => {
+        console.log(`InvoicesMonthlyCombinedListComponent.refreshInvoices(): data is ${data}.`);
+        this.ngxSpinnerService.hide();
+        this.allBulkReports = this.allBulkReports.concat(data['reports']);
+        this.bulkReports = this.allBulkReports;
+      },
+      error => {
+        this.ngxSpinnerService.hide();
+        console.log(`InvoicesMonthlyCombinedListComponent.refreshInvoices(): error is ${error}.`);
+      }
     );
 
     this.spinnerMsg = 'Loading totals only invoices.  Please wait...';
@@ -250,7 +250,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     return this.academicYearsService.getAcademicYears();
   }
 
-  private getInvoiceCreateParams(): number[] {
+  private getAuns(): number[] {
     let auns: number[];
 
     switch (this.invoiceRecipient) {
@@ -280,8 +280,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   private doCreateBulkInvoice(): void {
     this.spinnerMsg = 'Creating bulk invoice.  Please wait...';
     this.ngxSpinnerService.show();
-    const auns: number[] = this.getInvoiceCreateParams();
-    const totalsOnly = this.isTotalsOnly();
+    const auns: number[] = this.getAuns();
 
     this.reportsService.createBulkInvoice(
       {
@@ -299,7 +298,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
             this.toPDEDate.day).toLocaleDateString('en-US'),
           'scope': this.selectedCreateScope,
           'auns': auns,
-          'totalsOnly': totalsOnly,
         }
       }
     ).subscribe(
@@ -318,30 +316,30 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   private doCreateTotalsOnlyInvoice(): void {
     this.spinnerMsg = 'Creating totals only invoice.  Please wait...';
     this.ngxSpinnerService.show();
-    const auns: number[] = this.getInvoiceCreateParams();
+    const auns: number[] = this.getAuns();
 
     this.reportsService.createTotalsOnlyInvoice(
-      this.generateTotalsOnlyInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope),
+      this.generateTotalsOnlyInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope, this.paymentType),
       this.selectedCreateScope,
       this.selectedCreateSchoolYear,
       this.paymentType,
       auns).subscribe(
-      data => {
-        console.log('InvoicesMonthlyCombinedListComponent.create(): data is ', data['reports']);
-        this.ngxSpinnerService.hide();
-        this.refreshInvoices();
-      },
-      error => {
-        console.log('InvoicesMonthlyCombinedListComponent.create(): error is ', error);
-        this.ngxSpinnerService.hide();
-      }
-    );
+        data => {
+          console.log('InvoicesMonthlyCombinedListComponent.create(): data is ', data['reports']);
+          this.ngxSpinnerService.hide();
+          this.refreshInvoices();
+        },
+        error => {
+          console.log('InvoicesMonthlyCombinedListComponent.create(): error is ', error);
+          this.ngxSpinnerService.hide();
+        }
+      );
   }
 
   create(): void {
     if (this.isTotalsOnly()) {
       this.doCreateTotalsOnlyInvoice();
-    } else  {
+    } else {
       this.doCreateBulkInvoice();
     }
   }
@@ -416,8 +414,20 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     return 'BulkInvoice_' + scope + '_' + schoolYear.replace(/\s+/g, '') + this.generateInvoiceRecipientFileNameTag();
   }
 
-  private generateTotalsOnlyInvoiceName(schoolYear: string, scope: string): string {
-    return 'TotalsOnly_' + scope + '_' + schoolYear.replace(/\s+/g, '');
+  private generateTotalsOnlyInvoiceName(schoolYear: string, scope: string, paymentType: string): string {
+    let name = 'TotalsOnly_' + scope + '_' + schoolYear.replace(/\s+/g, '');
+    let tag: string;
+    if (paymentType === undefined || paymentType === 'All') {
+      tag = '';
+    } else {
+      tag = paymentType;
+    }
+
+    if (tag !== '') {
+      name += '_' + tag;
+    }
+
+    return name;
   }
 
   private selectSchoolYear(year: string): void {
