@@ -4,6 +4,9 @@ namespace models.Reporters
 {
 	public static class DecimalExtensions
 	{
+		public static double Round(this double d, int precision = 2) =>
+			Math.Round(d, precision, MidpointRounding.AwayFromZero);
+
 		public static decimal Round(this decimal d, int precision = 2) =>
 			Math.Round(d, precision, MidpointRounding.AwayFromZero);
 

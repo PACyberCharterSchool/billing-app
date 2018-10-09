@@ -808,10 +808,10 @@ namespace api.Controllers
 			paymentTypeStyle.HorizontalAlignment = TextAlignmentType.Center;
 
 			// TODO(Erik): this should really be done in the reporter
-			var totalDue = 0m;
-			var totalRefunded = 0m;
-			var totalPaid = 0m;
-			var totalNetDue = 0m;
+			var totalDue = 0D;
+			var totalRefunded = 0D;
+			var totalPaid = 0D;
+			var totalNetDue = 0D;
 
 			var r = 4;
 			foreach (var district in result.SchoolDistricts)
