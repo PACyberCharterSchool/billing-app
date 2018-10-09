@@ -84,7 +84,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.refreshInvoices();
     this.templatesService.getTemplates(this.skip).subscribe(
       data => {
-        console.log(`InvoicesMonthlyCombinedListComponent.ngOnInit(): data is ${data}.`);
         this.templates = data['templates'];
       },
       error => {
@@ -94,7 +93,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
     this.studentRecordsService.getHeaders(true).subscribe(
       data => {
-        console.log(`InvoicesMonthlyCombinedListComponent.ngOnInit(): data is ${data}.`);
         this.scopes = data['scopes'];
       },
       error => {
@@ -104,7 +102,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
     this.schoolDistrictsService.getSchoolDistricts().subscribe(
       data => {
-        console.log('InvoicesMonthlyCombinedListComponent.ngOnInit():  data is ', data);
         this.schoolDistricts = data['schoolDistricts'];
       },
       error => {
@@ -153,7 +150,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       'SchoolYear': null
     }).subscribe(
       data => {
-        console.log(`InvoicesMonthlyCombinedListComponent.refreshInvoices(): data is ${data}.`);
         this.ngxSpinnerService.hide();
         this.allBulkReports = this.allBulkReports.concat(data['reports']);
         this.bulkReports = this.allBulkReports;
@@ -173,7 +169,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       'SchoolYear': null
     }).subscribe(
       data => {
-        console.log(`InvoicesMonthlyCombinedListComponent.refreshInvoices(): data is ${data}.`);
         this.ngxSpinnerService.hide();
         this.allBulkReports = this.allBulkReports.concat(data['reports']);
         this.bulkReports = this.allBulkReports;
@@ -261,9 +256,13 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
         auns = this.schoolDistricts.filter((sd) => sd.paymentType === PaymentType.UniPay).map((sd) => +sd.aun);
         break;
       case 'Totals':
-        auns = this.paymentType === PaymentType.Check ?
-          this.schoolDistricts.filter((sd) => sd.paymentType === PaymentType.Check).map((sd) => +sd.aun) :
-          this.schoolDistricts.filter((sd) => sd.paymentType === PaymentType.UniPay).map((sd) => +sd.aun);
+        if (this.paymentType === undefined || this.paymentType === 'All') {
+          auns = null;
+        } else {
+          auns = this.paymentType === PaymentType.Check ?
+            this.schoolDistricts.filter((sd) => sd.paymentType === PaymentType.Check).map((sd) => +sd.aun) :
+            this.schoolDistricts.filter((sd) => sd.paymentType === PaymentType.UniPay).map((sd) => +sd.aun);
+        }
         break;
       case 'All':
         auns = null;
@@ -302,7 +301,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       }
     ).subscribe(
       data => {
-        console.log('InvoicesMonthlyCombinedListComponent.create(): data is ', data['reports']);
         this.ngxSpinnerService.hide();
         this.refreshInvoices();
       },
@@ -322,15 +320,13 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       this.generateTotalsOnlyInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope, this.paymentType),
       this.selectedCreateScope,
       this.selectedCreateSchoolYear,
-      this.paymentType,
+      this.paymentType === 'All' ? undefined : this.paymentType,
       auns).subscribe(
         data => {
-          console.log('InvoicesMonthlyCombinedListComponent.create(): data is ', data['reports']);
           this.ngxSpinnerService.hide();
           this.refreshInvoices();
         },
         error => {
-          console.log('InvoicesMonthlyCombinedListComponent.create(): error is ', error);
           this.ngxSpinnerService.hide();
         }
       );
@@ -348,11 +344,9 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     const modal = this.ngbModal.open(downloadFormatContent, { centered: true, size: 'sm' });
     modal.result.then(
       (result) => {
-        console.log('InvoicesMonthlyCombinedListComponent.displayDownloadFormatDialog(): result is ', result);
         this.downloadInvoiceByFormat(report, this.selectedDownloadFormat);
       },
       (reason) => {
-        console.log('InvoicesMonthlyCombinedListComponent.displayDownloadFormatDialog(): reason is ', reason);
       }
     );
   }
@@ -361,7 +355,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.ngxSpinnerService.show();
     this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
-        console.log('InvoiceListComponent.downloadInvoiceByFormat():  data is ', data);
         this.ngxSpinnerService.hide();
         if (format.toLowerCase().includes('excel')) {
           this.fileSaverService.saveInvoiceAsExcelFile(data, report);
@@ -371,7 +364,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       },
       error => {
         this.ngxSpinnerService.hide();
-        console.log('InvoiceListComponent.downloadInvoiceByFormat():  error is ', error);
       }
     );
   }
@@ -382,11 +374,9 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
     modal.result.then(
       (result) => {
-        console.log('InvoicesMonthlyCombinedListComponent.createBulkInvoice(): result is ', result);
         this.ngxSpinnerService.show();
       },
       (reason) => {
-        console.log('InvoicesMonthlyCombinedListComponent.createBulkInvoice(): reason is ', reason);
       }
     );
   }
