@@ -122,18 +122,25 @@ namespace models.Reporters
 				if (refunds.ContainsKey(d.SchoolDistrict.Aun))
 					refund = (double)refunds[d.SchoolDistrict.Aun].Sum(r => r.Amount);
 
+
 				return new AccountsReceivableAsOfSchoolDistrict
 				{
 					Aun = d.SchoolDistrict.Aun,
 					Name = d.SchoolDistrict.Name,
 					PaymentType = d.SchoolDistrict.PaymentType,
-					RegularEducationDue = ((double)d.SchoolDistrict.RegularRate * ((double)d.RegularEnrollments.Values.Sum() / 12)).Round(),
-					SpecialEducationDue = ((double)d.SchoolDistrict.SpecialRate * ((double)d.SpecialEnrollments.Values.Sum() / 12)).Round(),
+					RegularEducationDue = CalculateDue((double)d.SchoolDistrict.RegularRate, d.RegularEnrollments.Values.Sum()),
+					SpecialEducationDue = CalculateDue((double)d.SchoolDistrict.SpecialRate, d.SpecialEnrollments.Values.Sum()),
 					PaidByDistrict = check.Round(),
 					PaidByPDE = unipay.Round(),
 					Refunded = refund.Round(),
 				};
 			}).ToList();
+
+			double CalculateDue(double rate, double enrollments)
+			{
+				const double epsilon = 0.0000000001D;
+				return ((rate * (enrollments / 12)) + epsilon).Round();
+			}
 		}
 
 		public class Config
