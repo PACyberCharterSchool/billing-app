@@ -5,7 +5,7 @@ namespace models
 	public class Refund
 	{
 		public int Id { get; set; }
-		public decimal Amount { get; set; }
+		public double Amount { get; set; }
 		public string CheckNumber { get; set; }
 		public DateTime Date { get; set; }
 		public string SchoolYear { get; set; }

@@ -17,7 +17,7 @@ namespace api.Dtos
 		[JsonConverter(typeof(PaymentTypeJsonConverter))]
 		public PaymentType Type { get; set; }
 
-		public decimal Amount { get; set; }
+		public double Amount { get; set; }
 		public string SchoolYear { get; set; }
 		public DateTime Created { get; set; }
 		public DateTime LastUpdated { get; set; }

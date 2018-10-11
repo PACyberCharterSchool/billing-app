@@ -12,14 +12,14 @@ namespace models.Reporters
 	{
 		public int Aun { get; set; }
 		public string Name { get; set; }
-		public decimal RegularEducationDue { get; set; }
-		public decimal SpecialEducationDue { get; set; }
-		public decimal TotalDue => (RegularEducationDue + SpecialEducationDue).Round();
-		public decimal PaidByDistrict { get; set; }
-		public decimal PaidByPDE { get; set; }
-		public decimal Refunded { get; set; }
-		public decimal TotalPaid => (PaidByDistrict + PaidByPDE - Refunded).Round();
-		public decimal NetDue => (TotalDue - TotalPaid).Round();
+		public double RegularEducationDue { get; set; }
+		public double SpecialEducationDue { get; set; }
+		public double TotalDue => (RegularEducationDue + SpecialEducationDue).Round();
+		public double PaidByDistrict { get; set; }
+		public double PaidByPDE { get; set; }
+		public double Refunded { get; set; }
+		public double TotalPaid => (PaidByDistrict + PaidByPDE - Refunded).Round();
+		public double NetDue => (TotalDue - TotalPaid).Round();
 	}
 
 	public class UniPayInvoiceSummaryReport
@@ -108,8 +108,8 @@ namespace models.Reporters
 
 			return districts.Values.OrderBy(d => d.SchoolDistrict.Name).Select(d =>
 			{
-				var check = 0m;
-				var unipay = 0m;
+				var check = 0D;
+				var unipay = 0D;
 				if (payments.ContainsKey(d.SchoolDistrict.Aun))
 				{
 					var pp = payments[d.SchoolDistrict.Aun];
@@ -117,7 +117,7 @@ namespace models.Reporters
 					unipay = pp.Where(p => p.Type == PaymentType.UniPay).Sum(p => p.Amount);
 				}
 
-				var refund = 0m;
+				var refund = 0D;
 				if (refunds.ContainsKey(d.SchoolDistrict.Aun))
 					refund = refunds[d.SchoolDistrict.Aun].Sum(r => r.Amount);
 
@@ -125,8 +125,8 @@ namespace models.Reporters
 				{
 					Aun = d.SchoolDistrict.Aun,
 					Name = d.SchoolDistrict.Name,
-					RegularEducationDue = (d.SchoolDistrict.RegularRate * ((decimal)d.RegularEnrollments.Values.Sum() / 12)).Round(),
-					SpecialEducationDue = (d.SchoolDistrict.SpecialRate * ((decimal)d.SpecialEnrollments.Values.Sum() / 12)).Round(),
+					RegularEducationDue = (d.SchoolDistrict.RegularRate * ((double)d.RegularEnrollments.Values.Sum() / 12)).Round(),
+					SpecialEducationDue = (d.SchoolDistrict.SpecialRate * ((double)d.SpecialEnrollments.Values.Sum() / 12)).Round(),
 					PaidByDistrict = check.Round(),
 					PaidByPDE = unipay.Round(),
 					Refunded = refund.Round(),

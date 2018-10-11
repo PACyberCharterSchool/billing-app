@@ -19,10 +19,10 @@ namespace models
 		public int Id { get; set; }
 		public int Aun { get; set; }
 		public string Name { get; set; }
-		public decimal Rate { get; set; }
-		public decimal? AlternateRate { get; set; }
-		public decimal SpecialEducationRate { get; set; }
-		public decimal? AlternateSpecialEducationRate { get; set; }
+		public double Rate { get; set; }
+		public double? AlternateRate { get; set; }
+		public double SpecialEducationRate { get; set; }
+		public double? AlternateSpecialEducationRate { get; set; }
 		public SchoolDistrictPaymentType PaymentType { get; set; }
 
 		public DateTime Created { get; set; }

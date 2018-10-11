@@ -16,9 +16,9 @@ namespace models.Reporters
 
 	public class TotalsOnlyTransaction
 	{
-		public decimal? Sd { get; set; }
-		public decimal? Pde { get; set; }
-		public decimal? Refund { get; set; }
+		public double? Sd { get; set; }
+		public double? Pde { get; set; }
+		public double? Refund { get; set; }
 	}
 
 	public class TotalsOnlyTransactions : Dictionary<string, TotalsOnlyTransaction> { }
@@ -31,15 +31,15 @@ namespace models.Reporters
 		public string Scope { get; set; }
 		public DateTime Prepared { get; set; }
 		public TotalsOnlyEnrollments Enrollments { get; set; }
-		public decimal RegularDue { get; set; }
-		public decimal SpecialDue { get; set; }
-		public decimal TotalDue { get; set; }
+		public double RegularDue { get; set; }
+		public double SpecialDue { get; set; }
+		public double TotalDue { get; set; }
 		public TotalsOnlyTransactions Transactions { get; set; }
-		public decimal TotalSd { get; set; }
-		public decimal TotalPde { get; set; }
-		public decimal TotalRefund { get; set; }
-		public decimal TotalPaid { get; set; }
-		public decimal NetDue { get; set; }
+		public double TotalSd { get; set; }
+		public double TotalPde { get; set; }
+		public double TotalRefund { get; set; }
+		public double TotalPaid { get; set; }
+		public double NetDue { get; set; }
 	}
 
 	public class TotalsOnlyInvoiceReporter : IReporter<TotalsOnlyInvoice, TotalsOnlyInvoiceReporter.Config>
@@ -89,17 +89,17 @@ namespace models.Reporters
 
 			return transactions;
 
-			decimal? SdForMonth(IDictionary<string, InvoiceTransaction> tt, Month month)
+			double? SdForMonth(IDictionary<string, InvoiceTransaction> tt, Month month)
 			{
 				return tt.ContainsKey(month.Name) ? tt[month.Name].Payment?.CheckAmount : null;
 			}
 
-			decimal? PdeForMonth(IDictionary<string, InvoiceTransaction> tt, Month month)
+			double? PdeForMonth(IDictionary<string, InvoiceTransaction> tt, Month month)
 			{
 				return tt.ContainsKey(month.Name) ? tt[month.Name].Payment?.UniPayAmount : null;
 			}
 
-			decimal? RefundForMonth(IDictionary<string, InvoiceTransaction> tt, Month month)
+			double? RefundForMonth(IDictionary<string, InvoiceTransaction> tt, Month month)
 			{
 				return tt.ContainsKey(month.Name) ? tt[month.Name].Refund : null;
 			}
@@ -128,9 +128,9 @@ namespace models.Reporters
 			report.TotalDue = (report.RegularDue + report.SpecialDue).Round();
 
 			report.Transactions = GetTransactions(bulk);
-			report.TotalSd = report.Transactions.Sum(t => t.Value.Sd.HasValue ? t.Value.Sd.Value : 0m).Round();
-			report.TotalPde = report.Transactions.Sum(t => t.Value.Pde.HasValue ? t.Value.Pde.Value : 0m).Round();
-			report.TotalRefund = report.Transactions.Sum(t => t.Value.Refund.HasValue ? t.Value.Refund.Value : 0m).Round();
+			report.TotalSd = report.Transactions.Sum(t => t.Value.Sd.HasValue ? t.Value.Sd.Value : 0D).Round();
+			report.TotalPde = report.Transactions.Sum(t => t.Value.Pde.HasValue ? t.Value.Pde.Value : 0D).Round();
+			report.TotalRefund = report.Transactions.Sum(t => t.Value.Refund.HasValue ? t.Value.Refund.Value : 0D).Round();
 			report.TotalPaid = ((report.TotalSd + report.TotalPde) - report.TotalRefund).Round();
 
 			report.NetDue = (report.TotalDue - report.TotalPaid).Round();

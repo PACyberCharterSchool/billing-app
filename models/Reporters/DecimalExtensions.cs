@@ -17,5 +17,13 @@ namespace models.Reporters
 				return null;
 			return result;
 		}
+
+		public static double? Round(this double? d, bool nullZero = false, int precision = 2)
+		{
+			var result = d.HasValue ? (double?)d.Value.Round() : null;
+			if (nullZero && (result.HasValue && result.Value == 0))
+				return null;
+			return result;
+		}
 	}
 }

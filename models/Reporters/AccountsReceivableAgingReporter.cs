@@ -10,9 +10,9 @@ namespace models.Reporters
 		public string Identifier { get; set; }
 		public string Type { get; set; }
 		public DateTime Date { get; set; }
-		public decimal? Amount { get; set; }
-		public decimal? WriteOff { get; set; }
-		public IList<decimal?> Buckets { get; set; }
+		public double? Amount { get; set; }
+		public double? WriteOff { get; set; }
+		public IList<double?> Buckets { get; set; }
 	}
 
 	public class AccountsReceivableAgingSchoolDistrict
@@ -20,16 +20,16 @@ namespace models.Reporters
 		public int Aun { get; set; }
 		public string Name { get; set; }
 		public IList<AccountsReceivableAgingTransaction> Transactions { get; set; }
-		public IList<decimal> Totals { get; set; }
-		public decimal Balance { get; set; }
+		public IList<double> Totals { get; set; }
+		public double Balance { get; set; }
 	}
 
 	public class AccountsReceivableAging
 	{
 		public DateTime? From { get; set; }
 		public IList<AccountsReceivableAgingSchoolDistrict> SchoolDistricts { get; set; }
-		public IList<decimal> GrandTotals { get; set; }
-		public decimal GrandBalance { get; set; }
+		public IList<double> GrandTotals { get; set; }
+		public double GrandBalance { get; set; }
 	}
 
 	public class AccountsReceivableAgingReporter : IReporter<AccountsReceivableAging, AccountsReceivableAgingReporter.Config>
@@ -205,7 +205,7 @@ namespace models.Reporters
 						previous = d;
 					}
 
-					var buckets = new decimal?[4];
+					var buckets = new double?[4];
 					var bi = 3;
 					if (transaction.Date >= now.LessDays(30))
 						bi = 0;
@@ -231,7 +231,7 @@ namespace models.Reporters
 							Date = p.Date,
 							Amount = -p.Amount,
 						};
-						var pbb = new decimal?[4];
+						var pbb = new double?[4];
 						pbb[bi] = -p.Amount;
 						pt.Buckets = pbb;
 
@@ -250,7 +250,7 @@ namespace models.Reporters
 						Type = PAYMENT_TYPE,
 						Date = p.Date,
 						Amount = -p.Amount,
-						Buckets = new decimal?[4] {
+						Buckets = new double?[4] {
 							-p.Amount, null, null, null,
 						}
 					});
@@ -262,11 +262,11 @@ namespace models.Reporters
 					Name = an.Name,
 					Transactions = transactions,
 				};
-				sd.Totals = new[] {
-					sd.Transactions.Sum(t => t.Buckets[0] ?? 0).Round(),
-					sd.Transactions.Sum(t => t.Buckets[1] ?? 0).Round(),
-					sd.Transactions.Sum(t => t.Buckets[2] ?? 0).Round(),
-					sd.Transactions.Sum(t => t.Buckets[3] ?? 0).Round(),
+				sd.Totals = new double[] {
+					sd.Transactions.Sum(t => t.Buckets[0] ?? 0),
+					sd.Transactions.Sum(t => t.Buckets[1] ?? 0),
+					sd.Transactions.Sum(t => t.Buckets[2] ?? 0),
+					sd.Transactions.Sum(t => t.Buckets[3] ?? 0),
 				};
 				sd.Balance = sd.Totals.Sum().Round();
 
@@ -275,10 +275,10 @@ namespace models.Reporters
 
 			return results;
 
-			decimal GetTotal(BulkInvoiceSchoolDistrict d)
+			double GetTotal(BulkInvoiceSchoolDistrict d)
 			{
-				var regular = (d.SchoolDistrict.RegularRate * ((decimal)d.RegularEnrollments.Values.Sum() / 12)).Round();
-				var special = (d.SchoolDistrict.SpecialRate * ((decimal)d.SpecialEnrollments.Values.Sum() / 12)).Round();
+				var regular = (d.SchoolDistrict.RegularRate * ((double)d.RegularEnrollments.Values.Sum() / 12)).Round();
+				var special = (d.SchoolDistrict.SpecialRate * ((double)d.SpecialEnrollments.Values.Sum() / 12)).Round();
 				return (regular + special).Round();
 			}
 		}

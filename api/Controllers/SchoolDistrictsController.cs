@@ -87,16 +87,16 @@ namespace api.Controllers
 
 			[BindRequired]
 			[Range(0, double.PositiveInfinity)]
-			public decimal Rate { get; set; }
+			public double Rate { get; set; }
 
 			[Range(0, double.PositiveInfinity)]
-			public decimal? AlternateRate { get; set; }
+			public double? AlternateRate { get; set; }
 
 			[Range(0, double.PositiveInfinity)]
-			public decimal SpecialEducationRate { get; set; }
+			public double SpecialEducationRate { get; set; }
 
 			[Range(0, double.PositiveInfinity)]
-			public decimal? AlternateSpecialEducationRate { get; set; }
+			public double? AlternateSpecialEducationRate { get; set; }
 
 			[Required]
 			[JsonConverter(typeof(SchoolDistrictPaymentTypeJsonConverter))]
@@ -167,8 +167,8 @@ namespace api.Controllers
 				{
 					Aun = (int)sheet.Cells[i, aunIndex].IntValue,
 					Name = sheet.Cells[i, nameIndex].StringValue,
-					Rate = (decimal)sheet.Cells[i, rateIndex].DoubleValue,
-					SpecialEducationRate = (decimal)sheet.Cells[i, specialRateIndex].DoubleValue,
+					Rate = sheet.Cells[i, rateIndex].DoubleValue,
+					SpecialEducationRate = sheet.Cells[i, specialRateIndex].DoubleValue,
 					PaymentType = string.IsNullOrWhiteSpace(ptype) ? null : SchoolDistrictPaymentType.FromString(ptype),
 				});
 			}

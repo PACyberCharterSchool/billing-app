@@ -9,7 +9,7 @@ namespace models.Reporters
 	public class CsiuAccount
 	{
 		public string Number { get; set; }
-		public decimal Amount { get; set; }
+		public double Amount { get; set; }
 		public string Description { get; set; }
 	}
 
@@ -30,9 +30,9 @@ namespace models.Reporters
 
 		private class Amounts
 		{
-			public decimal Regular { get; set; }
-			public decimal Special { get; set; }
-			public decimal Received { get; set; }
+			public double Regular { get; set; }
+			public double Special { get; set; }
+			public double Received { get; set; }
 		}
 
 		private IList<CsiuAccount> GetAccounts(DateTime asOf, string schoolYear, IList<int> auns = null)
@@ -105,8 +105,8 @@ namespace models.Reporters
 
 			void FillAmounts(Amounts a, BulkInvoiceSchoolDistrict d)
 			{
-				a.Regular -= d.SchoolDistrict.RegularRate * ((decimal)d.RegularEnrollments.Values.Sum() / 12);
-				a.Special -= d.SchoolDistrict.SpecialRate * ((decimal)d.SpecialEnrollments.Values.Sum() / 12);
+				a.Regular -= d.SchoolDistrict.RegularRate * ((double)d.RegularEnrollments.Values.Sum() / 12);
+				a.Special -= d.SchoolDistrict.SpecialRate * ((double)d.SpecialEnrollments.Values.Sum() / 12);
 
 				var tt = d.Transactions.AsDictionary().Values.Where(t => t.Payment != null || t.Refund.HasValue);
 				var check = tt.

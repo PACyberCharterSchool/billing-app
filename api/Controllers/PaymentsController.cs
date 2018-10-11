@@ -63,7 +63,7 @@ namespace api.Controllers
 
 				[Required]
 				[Range(0, double.PositiveInfinity)]
-				public decimal Amount { get; set; }
+				public double Amount { get; set; }
 
 				[Required]
 				[RegularExpression(@"^\d{4}\-\d{4}$")]
@@ -227,7 +227,7 @@ namespace api.Controllers
 					Date = new DateTime(year, month.Number, 1),
 					ExternalId = "PDE",
 					Type = PaymentType.UniPay,
-					Amount = (decimal)sheet.Cells[i, amountIndex].DoubleValue,
+					Amount = (double)sheet.Cells[i, amountIndex].DoubleValue,
 					SchoolYear = schoolYear,
 					SchoolDistrict = districts.GetByAun(sheet.Cells[i, aunIndex].IntValue),
 				});
