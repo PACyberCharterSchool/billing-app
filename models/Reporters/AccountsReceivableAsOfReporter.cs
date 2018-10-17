@@ -97,13 +97,13 @@ namespace models.Reporters
 
 			var payments = _context.Payments.
 				Where(p => auns.Contains(p.SchoolDistrict.Aun)).
-				Where(p => p.SchoolYear == schoolYear).
+				Where(p => p.SchoolYear == schoolYear && p.Date <= asOf).
 				GroupBy(p => p.SchoolDistrict.Aun).
 				ToDictionary(g => g.Key, g => g.ToList());
 
 			var refunds = _context.Refunds.
 				Where(r => auns.Contains(r.SchoolDistrict.Aun)).
-				Where(r => r.SchoolYear == schoolYear).
+				Where(r => r.SchoolYear == schoolYear && r.Date <= asOf).
 				GroupBy(r => r.SchoolDistrict.Aun).
 				ToDictionary(g => g.Key, g => g.ToList());
 
