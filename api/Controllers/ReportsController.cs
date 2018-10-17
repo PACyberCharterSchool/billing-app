@@ -1331,7 +1331,7 @@ namespace api.Controllers
 			ws.Cells[2, 1].SetStyle(headerStyle);
 
 			ws.Cells.Merge(3, 1, 1, columnHeaders.Length);
-			ws.Cells[3, 1].PutValue($"Submission for {result.AsOf.ToString("MMMM")} {result.AsOf.Year} UniPay");
+			ws.Cells[3, 1].PutValue($"Submission for {result.AsOf.AddMonths(1).ToString("MMMM")} {result.AsOf.Year} UniPay");
 			ws.Cells[3, 1].SetStyle(headerStyle);
 
 			ws.Cells.StandardWidthInch = 1;
