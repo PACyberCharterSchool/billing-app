@@ -23,7 +23,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
   public direction: number;
   private isDescending: boolean;
   public searchText: string;
-  public asOfDate;
+  public fromDate;
   public selectedAcademicYear: string;
   public schoolYears: string[];
   public selectedDownloadFormat: string;
@@ -121,17 +121,26 @@ export class AccountsReceivableAgingComponent implements OnInit {
   }
 
   private generateAccountsReceivableAgingReportName(): string {
-    return 'AccountsReceivableAging_' +
-      this.selectedAcademicYear + '_' + `${this.asOfDate.month}-${this.asOfDate.day}-${this.asOfDate.year}`;
+    let date: Date = new Date(new Date().getFullYear(), 0, 1);
+    if (this.fromDate) {
+      date = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
+    }
+
+    return `AccountsReceivableAging_${this.selectedAcademicYear}_${date.getMonth() + 1}_${date.getDate()}_${date.getFullYear()}`;
   }
 
   public onCreateSubmit(): void {
+    let from: Date;
+    if (this.fromDate) {
+      from = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
+    }
+
     this.ngxSpinnerService.show();
     this.spinnerMsg = 'Generating accounts receivable as of report.  Please wait...';
     this.reportsService.createAccountsReceivableAging(
       this.generateAccountsReceivableAgingReportName(),
       this.selectedAcademicYear,
-      new Date(this.asOfDate.year, this.asOfDate.month - 1, this.asOfDate.day)).subscribe(
+      from).subscribe(
         data => {
           this.ngxSpinnerService.hide();
           this.refreshAccountsReceivableAgingList();

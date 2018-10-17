@@ -219,7 +219,7 @@ export class ReportsService {
       'name': name,
       'schoolYear': schoolYear.replace(/\s+/g, ''),
       'accountsReceivableAging': {
-        'from': from.toLocaleDateString('en-US'),
+        'from': from ? from.toLocaleDateString('en-US') : undefined,
         'auns': auns
       }
     });
@@ -248,7 +248,7 @@ export class ReportsService {
     schoolYear: string,
     paymentType: string,
     auns?: number[]
-    ): Observable<Report> {
+  ): Observable<Report> {
     const url: string = this.apiReportsUrl;
     const reportMeta: Object = Object.assign({}, {
       'reportType': ReportType.TotalsOnly,
