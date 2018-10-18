@@ -1,5 +1,7 @@
 <div class='row invoices-title-row align-items-center'>
-  <div class='col-2'><h4>Invoices</h4></div>
+  <div class='col-2'>
+    <h4>Invoices</h4>
+  </div>
   <div class='col-7'>
     <input type='text' [(ngModel)]='searchText' />
     <button type='button' class='btn btn-primary' (click)='filterInvoices()'>SEARCH</button>
@@ -9,7 +11,8 @@
     <div class='row'>
       <div class='col-12'>
         <div ngbDropdown class="d-inline-block">
-          <button class="btn btn-outline-primary" id="dropdownScope" ngbDropdownToggle>{{selectedScope}}</button>
+          <button class="btn btn-outline-primary" id="dropdownScope"
+            ngbDropdownToggle>{{selectedScope}}</button>
           <div ngbDropdownMenu aria-labelledby="dropdownScope">
             <button class='dropdown-item' *ngFor='let scope of scopes' (click)='filterByScope(scope)'>{{scope}}</button>
           </div>
@@ -20,8 +23,10 @@
 </div>
 <div class='row invoices-action-row align-items-center'>
   <div class='col-auto'>
-    <button type='button' class='btn btn-primary' (click)='createInvoice()'>CREATE INDIVIDUAL</button>
-    <button type='button' class='btn btn-primary' (click)='createInvoices()'>CREATE MULTIPLE</button>
+    <button type='button' class='btn btn-primary' (click)='createInvoice()'>CREATE
+      INDIVIDUAL</button>
+    <button type='button' class='btn btn-primary' (click)='createInvoices()'>CREATE
+      MULTIPLE</button>
   </div>
 </div>
 <div class='row invoices-list-row align-items-center'>
@@ -31,14 +36,17 @@
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
             {{k | normalizeFieldName}}
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }"
+              aria-hidden="true"></i>
           </th>
           <th>Invoice</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor='let report of reports | orderBy: {property: property, direction: direction}'>
-          <td *ngFor='let v of listDisplayableValues(report)' placement='top' ngbTooltip='{{v | normalizeFieldValue}}'>{{v | normalizeFieldValue}}</td>
+          <td *ngFor='let v of listDisplayableValues(report)' placement='top'
+            ngbTooltip='{{v | normalizeFieldValue}}'>{{v |
+            normalizeFieldValue}}</td>
           <td>
             <button class='dropdown-item btn btn-primary' (click)='displayDownloadFormatDialog(downloadFormatContent, "invoice", report)'>Download</button>
           </td>
@@ -59,9 +67,11 @@
     <div class='row align-items-center'>
       <div class='col-12 text-center'>
         <div ngbDropdown class="d-inline-block">
-          <button type='button' class="btn btn-outline-primary" id="dropdownDownloadFormat" ngbDropdownToggle>Format type</button>
+          <button type='button' class="btn btn-outline-primary" id="dropdownDownloadFormat"
+            ngbDropdownToggle>{{ selectedDownloadFormat || 'Format type' }}</button>
           <div ngbDropdownMenu aria-labelledby="dropdownDownloadFormat">
-            <button type='button' class='dropdown-item' *ngFor='let format of downloadFormats' (click)='setSelectedDownloadFormat(format)'>{{format}}</button>
+            <button type='button' class='dropdown-item' *ngFor='let format of downloadFormats'
+              (click)='setSelectedDownloadFormat(format)'>{{format}}</button>
           </div>
         </div>
       </div>

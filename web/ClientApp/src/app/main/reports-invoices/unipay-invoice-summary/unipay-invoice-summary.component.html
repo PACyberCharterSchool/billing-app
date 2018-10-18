@@ -1,5 +1,7 @@
 <div class='row up-invoice-summary-title-row align-items-center'>
-  <div class='col-4'><h4>UniPay Invoice Summary</h4></div>
+  <div class='col-4'>
+    <h4>UniPay Invoice Summary</h4>
+  </div>
   <div class='col-7'>
     <input type='text' [(ngModel)]='searchText' />
     <button type='button' class='btn btn-primary' (click)='filterUniPayInvoieSummaryBySearch()'>SEARCH</button>
@@ -18,19 +20,18 @@
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
             {{k | normalizeFieldName}}
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }"
+              aria-hidden="true"></i>
           </th>
           <th>Download</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor='let report of reports | orderBy: {property: property, direction: direction}'>
-          <td *ngFor='let v of listDisplayableValues(report)'>{{v | normalizeFieldValue}}</td>
+          <td *ngFor='let v of listDisplayableValues(report)'>{{v |
+            normalizeFieldValue}}</td>
           <td>
-            <button
-              type='button'
-              class='btn btn-primary'
-              (click)='displayDownloadUniPayInvoiceSummaryFormatDialog(downloadReportTypeContent, report)'>
+            <button type='button' class='btn btn-primary' (click)='displayDownloadUniPayInvoiceSummaryFormatDialog(downloadReportTypeContent, report)'>
               Download
             </button>
           </td>
@@ -54,10 +55,12 @@
         </div>
         <div class='col-6'>
           <div class='input-group'>
-            <input required class='form-control' placeholder='mm-dd-yyyy' required
-                    name='dpAsOf' [(ngModel)]='asOfDate' ngbDatepicker #dAsOf='ngbDatepicker' (ngModelChange)='onDateChanged()'>
+            <input required class='form-control' placeholder='mm-dd-yyyy'
+              required name='dpAsOf' [(ngModel)]='asOfDate' ngbDatepicker
+              #dAsOf='ngbDatepicker' (ngModelChange)='onDateChanged()'>
             <div class='input-group-append'>
-              <button class='btn btn-outline-secondary' (click)='dAsOf.toggle()' type='button'>
+              <button class='btn btn-outline-secondary' (click)='dAsOf.toggle()'
+                type='button'>
                 <i class="fa fa-calendar fa-2x"></i>
               </button>
             </div>
@@ -70,9 +73,11 @@
         </div>
         <div class='col-6'>
           <div ngbDropdown class='d-inline-block'>
-            <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown' required>{{selectedAcademicYear}}</button>
+            <button type='button' ngbDropdownToggle class='btn btn-outline-primary'
+              id='academicYearDropdown' required>{{selectedAcademicYear}}</button>
             <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown'>
-              <button type='button' class='dropdown-item' *ngFor='let y of schoolYears' (click)='setSelectedAcademicYear(y)'>{{y}}</button>
+              <button type='button' class='dropdown-item' *ngFor='let y of schoolYears'
+                (click)='setSelectedAcademicYear(y)'>{{y}}</button>
             </div>
           </div>
         </div>
@@ -102,12 +107,10 @@
       </div>
       <div class='col-6'>
         <div ngbDropdown class="d-inline-block">
-          <button type='button' class="btn btn-outline-primary" id="dropdownDownloadFormat" ngbDropdownToggle>Format type</button>
+          <button type='button' class="btn btn-outline-primary" id="dropdownDownloadFormat"
+            ngbDropdownToggle>{{ selectedDownloadFormat || 'Format type' }}</button>
           <div ngbDropdownMenu aria-labelledby="dropdownDownloadFormat">
-            <button
-              type='button'
-              class='dropdown-item'
-              *ngFor='let format of downloadFormats'
+            <button type='button' class='dropdown-item' *ngFor='let format of downloadFormats'
               (click)=setSelectedDownloadFormat(format)>
               {{format}}
             </button>

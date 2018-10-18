@@ -111,7 +111,7 @@
       <div class='col-6'>
         <div ngbDropdown class="d-inline-block">
           <button type='button' class="btn btn-outline-primary" id="dropdownDownloadFormat"
-            ngbDropdownToggle>Format type</button>
+            ngbDropdownToggle>{{ selectedDownloadFormat || 'Format type' }}</button>
           <div ngbDropdownMenu aria-labelledby="dropdownDownloadFormat">
             <button type='button' class='dropdown-item' *ngFor='let format of downloadFormats'
               (click)=setSelectedDownloadFormat(format)>
