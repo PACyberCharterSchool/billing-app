@@ -24,8 +24,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
   private isDescending: boolean;
   public searchText: string;
   public fromDate;
-  public selectedAcademicYear: string;
-  public schoolYears: string[];
+  public asOfDate;
   public selectedDownloadFormat: string;
   public downloadFormats: string[] = [
     'Microsoft Excel',
@@ -46,7 +45,6 @@ export class AccountsReceivableAgingComponent implements OnInit {
     this.skip = 0;
     this.spinnerMsg = '';
     this.refreshAccountsReceivableAgingList();
-    this.schoolYears = this.academicYearsService.getAcademicYears();
   }
 
   public refreshAccountsReceivableAgingList(): void {
@@ -73,8 +71,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
         (i) => {
           const re = new RegExp(this.searchText, 'gi');
           if (
-            i.name.search(re) !== -1 ||
-            i.schoolYear.search(re) !== -1
+            i.name.search(re) !== -1
           ) {
             return true;
           }
@@ -88,7 +85,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
   listDisplayableFields() {
     if (this.allReports) {
       const fields = this.utilitiesService.objectKeys(this.allReports[0]);
-      const rejected = ['data', 'xlsx', 'type', 'id', 'approved', 'scope'];
+      const rejected = ['schoolYear', 'data', 'xlsx', 'type', 'id', 'approved', 'scope'];
       return fields.filter((i) => !rejected.includes(i));
     }
   }
@@ -121,12 +118,17 @@ export class AccountsReceivableAgingComponent implements OnInit {
   }
 
   private generateAccountsReceivableAgingReportName(): string {
-    let date: Date = new Date(new Date().getFullYear(), 0, 1);
+    let name = 'AccountsReceivableAging';
+
     if (this.fromDate) {
-      date = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
+      name += `_${this.fromDate.year}-${this.fromDate.month}-${this.fromDate.day}`;
     }
 
-    return `AccountsReceivableAging_${this.selectedAcademicYear}_${date.getMonth() + 1}_${date.getDate()}_${date.getFullYear()}`;
+    if (this.asOfDate) {
+      name += `_${this.asOfDate.year}-${this.asOfDate.month}-${this.asOfDate.day}`;
+    }
+
+    return name;
   }
 
   public onCreateSubmit(): void {
@@ -135,12 +137,17 @@ export class AccountsReceivableAgingComponent implements OnInit {
       from = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
     }
 
+    let asOf: Date;
+    if (this.asOfDate) {
+      asOf = new Date(this.asOfDate.year, this.asOfDate.month - 1, this.asOfDate.day);
+    }
+
     this.ngxSpinnerService.show();
     this.spinnerMsg = 'Generating accounts receivable as of report.  Please wait...';
     this.reportsService.createAccountsReceivableAging(
       this.generateAccountsReceivableAgingReportName(),
-      this.selectedAcademicYear,
-      from).subscribe(
+      from,
+      asOf).subscribe(
         data => {
           this.ngxSpinnerService.hide();
           this.refreshAccountsReceivableAgingList();
@@ -169,10 +176,6 @@ export class AccountsReceivableAgingComponent implements OnInit {
         console.log('AccountsReceivableAgingComponent.downloadReportByFormat():  error is ', error);
       }
     );
-  }
-
-  public setSelectedAcademicYear(year: string) {
-    this.selectedAcademicYear = year;
   }
 
   public displayDownloadAccountsReceivableAgingFormatDialog(downloadReportTypeContent, report: Report): void {

@@ -212,14 +212,14 @@ export class ReportsService {
     return this.httpClient.post<any>(url, reportMeta, this.headers);
   }
 
-  public createAccountsReceivableAging(name: string, schoolYear: string, from: Date, auns?: number[]): Observable<Report> {
+  public createAccountsReceivableAging(name: string, from: Date, asOf: Date, auns?: number[]): Observable<Report> {
     const url: string = this.apiReportsUrl;
     const reportMeta: Object = Object.assign({}, {
       'reportType': ReportType.AccountsReceivableAging,
       'name': name,
-      'schoolYear': schoolYear.replace(/\s+/g, ''),
       'accountsReceivableAging': {
         'from': from ? from.toLocaleDateString('en-US') : undefined,
+        'asOf': asOf ? asOf.toLocaleDateString('en-US') : undefined,
         'auns': auns
       }
     });

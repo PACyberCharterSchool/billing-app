@@ -124,6 +124,7 @@ namespace api.Controllers
 		public class CreateAccountsReceivableAgingReport
 		{
 			public DateTime? From { get; set; }
+			public DateTime? AsOf { get; set; }
 
 			public IList<int> Auns { get; set; }
 		}
@@ -566,6 +567,7 @@ namespace api.Controllers
 			var result = reporter.GenerateReport(new AccountsReceivableAgingReporter.Config
 			{
 				From = create.AccountsReceivableAging.From,
+				AsOf = create.AccountsReceivableAging.AsOf,
 				Auns = create.AccountsReceivableAging.Auns,
 			});
 

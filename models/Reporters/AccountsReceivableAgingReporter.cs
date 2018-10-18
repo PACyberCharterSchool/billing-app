@@ -27,6 +27,7 @@ namespace models.Reporters
 	public class AccountsReceivableAging
 	{
 		public DateTime? From { get; set; }
+		public DateTime AsOf { get; set; }
 		public IList<AccountsReceivableAgingSchoolDistrict> SchoolDistricts { get; set; }
 		public IList<double> GrandTotals { get; set; }
 		public double GrandBalance { get; set; }
@@ -45,7 +46,7 @@ namespace models.Reporters
 		public class Config
 		{
 			public DateTime? From { get; set; }
-			public DateTime AsOf { get; set; }
+			public DateTime? AsOf { get; set; }
 			public IList<int> Auns { get; set; }
 		}
 
@@ -64,9 +65,11 @@ namespace models.Reporters
 			return dd.Select(d => new AunNames { Aun = d.Aun, Name = d.Name }).ToList();
 		}
 
-		private IList<BulkInvoice> GetInvoices(DateTime? from)
+		private IList<BulkInvoice> GetInvoices(DateTime? from, DateTime asOf)
 		{
-			var invoices = _context.Reports.Where(r => r.Type == ReportType.BulkInvoice || r.Type == ReportType.Invoice);
+			var invoices = _context.Reports.
+				Where(r => r.Type == ReportType.BulkInvoice || r.Type == ReportType.Invoice).
+				Where(r => r.Created <= asOf.AddDays(1).Date);
 			if (from.HasValue)
 				invoices = invoices.Where(r => r.Created >= from.Value);
 
@@ -77,11 +80,11 @@ namespace models.Reporters
 				ToList();
 		}
 
-		private IDictionary<int, Queue<Payment>> GetPayments(DateTime? from, DateTime now, IList<int> auns)
+		private IDictionary<int, Queue<Payment>> GetPayments(DateTime? from, DateTime asOf, IList<int> auns)
 		{
 			var payments = _context.Payments.
 				Where(p => auns.Contains(p.SchoolDistrict.Aun)).
-				Where(p => p.Date <= now.AddDays(1).Date);
+				Where(p => p.Date <= asOf.AddDays(1).Date);
 			if (from.HasValue)
 				payments = payments.Where(p => p.Date >= from.Value);
 
@@ -91,13 +94,13 @@ namespace models.Reporters
 				ToDictionary(g => g.Key, g => new Queue<Payment>(g.ToList()));
 		}
 
-		private IDictionary<int, Queue<Refund>> GetRefunds(DateTime? from, DateTime now, IList<int> auns)
+		private IDictionary<int, Queue<Refund>> GetRefunds(DateTime? from, DateTime asOf, IList<int> auns)
 		{
 			var refunds = _context.Refunds.
 				Where(r => auns.Contains(r.SchoolDistrict.Aun)).
-				Where(r => r.Date <= now.AddDays(1).Date);
+				Where(r => r.Date <= asOf.AddDays(1).Date);
 			if (from.HasValue)
-				refunds = refunds.Where(r => r.Date >= from.Value && r.Date <= now.AddDays(1).Date);
+				refunds = refunds.Where(r => r.Date >= from.Value && r.Date <= asOf.AddDays(1).Date);
 
 			return refunds.
 				OrderBy(r => r.Date).
@@ -119,12 +122,15 @@ namespace models.Reporters
 			}
 		}
 
-		private IList<AccountsReceivableAgingSchoolDistrict> GetSchoolDistricts(DateTime? from, IList<int> auns = null)
+		private IList<AccountsReceivableAgingSchoolDistrict> GetSchoolDistricts(
+			DateTime? from,
+			DateTime asOf,
+			IList<int> auns = null)
 		{
 			var aunNames = GetAunNames(auns);
 			auns = aunNames.Select(an => an.Aun).ToList();
 
-			var invoices = GetInvoices(from).OrderBy(i => i.Scope).ThenBy(i => i.Prepared);
+			var invoices = GetInvoices(from, asOf).OrderBy(i => i.Scope).ThenBy(i => i.Prepared);
 			var districts = new Dictionary<int, Queue<InvoiceDistrict>>();
 			foreach (var i in invoices)
 			{
@@ -142,9 +148,8 @@ namespace models.Reporters
 				}
 			}
 
-			var now = DateTime.Now.Date;
-			var payments = GetPayments(from, now, auns);
-			var refunds = GetRefunds(from, now, auns);
+			var payments = GetPayments(from, asOf, auns);
+			var refunds = GetRefunds(from, asOf, auns);
 
 			var results = new List<AccountsReceivableAgingSchoolDistrict>();
 			foreach (var an in aunNames.OrderBy(an => an.Name))
@@ -207,11 +212,11 @@ namespace models.Reporters
 
 					var buckets = new double?[4];
 					var bi = 3;
-					if (transaction.Date >= now.LessDays(30))
+					if (transaction.Date >= asOf.LessDays(30))
 						bi = 0;
-					else if (transaction.Date >= now.LessDays(60) && transaction.Date <= now.LessDays(31))
+					else if (transaction.Date >= asOf.LessDays(60) && transaction.Date <= asOf.LessDays(31))
 						bi = 1;
-					else if (transaction.Date >= now.LessDays(90) && transaction.Date <= now.LessDays(61))
+					else if (transaction.Date >= asOf.LessDays(90) && transaction.Date <= asOf.LessDays(61))
 						bi = 2;
 					else
 						bi = 3;
@@ -285,10 +290,12 @@ namespace models.Reporters
 
 		public AccountsReceivableAging GenerateReport(Config config)
 		{
+			var asOf = config.AsOf.HasValue ? config.AsOf.Value : DateTime.Now.Date;
 			var report = new AccountsReceivableAging
 			{
 				From = config.From,
-				SchoolDistricts = GetSchoolDistricts(config.From, config.Auns),
+				AsOf = asOf,
+				SchoolDistricts = GetSchoolDistricts(config.From, asOf, config.Auns),
 			};
 
 			report.GrandTotals = new[] {
