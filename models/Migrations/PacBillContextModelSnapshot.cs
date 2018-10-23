@@ -124,7 +124,7 @@ namespace models.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal>("Amount");
+                    b.Property<double>("Amount");
 
                     b.Property<DateTime>("Created");
 
@@ -163,7 +163,7 @@ namespace models.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal>("Amount");
+                    b.Property<double>("Amount");
 
                     b.Property<string>("CheckNumber");
 
@@ -225,9 +225,9 @@ namespace models.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal?>("AlternateRate");
+                    b.Property<double?>("AlternateRate");
 
-                    b.Property<decimal?>("AlternateSpecialEducationRate");
+                    b.Property<double?>("AlternateSpecialEducationRate");
 
                     b.Property<int>("Aun");
 
@@ -239,13 +239,13 @@ namespace models.Migrations
 
                     b.Property<string>("PaymentType")
                         .ValueGeneratedOnAdd()
-                        .HasDefaultValue("ACH");
+                        .HasDefaultValue("UniPay");
 
-                    b.Property<decimal>("Rate")
+                    b.Property<double>("Rate")
                         .ValueGeneratedOnAdd()
-                        .HasDefaultValue(0m);
+                        .HasDefaultValue(0.0);
 
-                    b.Property<decimal>("SpecialEducationRate");
+                    b.Property<double>("SpecialEducationRate");
 
                     b.HasKey("Id");
 

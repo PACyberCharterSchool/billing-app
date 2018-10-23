@@ -59,6 +59,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   private schoolDistricts: SchoolDistrict[];
   public toSchoolDistrictDate;
   public toPDEDate;
+  public paymentType: string;
 
   constructor(
     private globals: Globals,
@@ -77,48 +78,34 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   ngOnInit() {
     this.selectedCreateTemplateName = 'Select Bulk Invoice Template';
     this.selectedCurrentScope = 'Select billing period';
-    this.spinnerMsg = 'Loading bulk invoices.  Please wait...';
+    this.allBulkReports = [];
+    this.bulkReports = [];
 
-    this.ngxSpinnerService.show();
-    this.reportsService.getBulkInvoices(null, null).subscribe(
-      data => {
-        console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
-        this.bulkReports = this.allBulkReports = data['reports'];
-        this.ngxSpinnerService.hide();
-      },
-      error => {
-        console.log('InvoicesListComponent.ngOnInit(): error is ', error);
-        this.ngxSpinnerService.hide();
-      }
-    );
-
+    this.refreshInvoices();
     this.templatesService.getTemplates(this.skip).subscribe(
       data => {
-        console.log(`InvoicesListComponent.ngOnInit(): data is ${data}.`);
         this.templates = data['templates'];
       },
       error => {
-        console.log(`InvoicesListComponent.ngOnInit(): error is ${error}.`);
+        console.log(`InvoicesMonthlyCombinedListComponent.ngOnInit(): error is ${error}.`);
       }
     );
 
     this.studentRecordsService.getHeaders(true).subscribe(
       data => {
-        console.log(`InvoicesListComponent.ngOnInit(): data is ${data}.`);
         this.scopes = data['scopes'];
       },
       error => {
-        console.log(`InvoicesListComponent.ngOnInit(): error is ${error}.`);
+        console.log(`InvoicesMonthlyCombinedListComponent.ngOnInit(): error is ${error}.`);
       }
     );
 
     this.schoolDistrictsService.getSchoolDistricts().subscribe(
       data => {
-        console.log('InvoicesListComponent.ngOnInit():  data is ', data);
         this.schoolDistricts = data['schoolDistricts'];
       },
       error => {
-        console.log('InvoicesListComponent.ngOnInit():  error is ', error);
+        console.log('InvoicesMonthlyCombinedListComponent.ngOnInit():  error is ', error);
       }
     );
 
@@ -154,6 +141,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
   refreshInvoices(): void {
     this.spinnerMsg = 'Loading bulk invoices.  Please wait...';
+    this.bulkReports = this.allBulkReports = [];
     this.ngxSpinnerService.show();
     this.reportsService.getReportsByMeta({
       'Type': ReportType.BulkInvoice,
@@ -161,16 +149,35 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       'Approved': null,
       'SchoolYear': null
     }).subscribe(
-        data => {
-          console.log(`InvoicesListComponent.refreshInvoices(): data is ${data}.`);
-          this.ngxSpinnerService.hide();
-          this.bulkReports = this.allBulkReports = data['reports'];
-        },
-        error => {
-          this.ngxSpinnerService.hide();
-          console.log(`InvoicesListComponent.refreshInvoices(): error is ${error}.`);
-        }
-      );
+      data => {
+        this.ngxSpinnerService.hide();
+        this.allBulkReports = this.allBulkReports.concat(data['reports']);
+        this.bulkReports = this.allBulkReports;
+      },
+      error => {
+        this.ngxSpinnerService.hide();
+        console.log(`InvoicesMonthlyCombinedListComponent.refreshInvoices(): error is ${error}.`);
+      }
+    );
+
+    this.spinnerMsg = 'Loading totals only invoices.  Please wait...';
+    this.ngxSpinnerService.show();
+    this.reportsService.getReportsByMeta({
+      'Type': ReportType.TotalsOnly,
+      'Name': '',
+      'Approved': null,
+      'SchoolYear': null
+    }).subscribe(
+      data => {
+        this.ngxSpinnerService.hide();
+        this.allBulkReports = this.allBulkReports.concat(data['reports']);
+        this.bulkReports = this.allBulkReports;
+      },
+      error => {
+        this.ngxSpinnerService.hide();
+        console.log(`InvoicesMonthlyCombinedListComponent.refreshInvoices(): error is ${error}.`);
+      }
+    );
   }
 
   setSelectedDownloadFormat(format: string): void {
@@ -180,7 +187,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   listDisplayableFields() {
     if (this.allBulkReports) {
       const fields = this.utilitiesService.objectKeys(this.allBulkReports[0]);
-      const rejected = ['data', 'xlsx', 'type', 'id', 'pdf'];
+      const rejected = ['data', 'xlsx', 'type', 'id', 'pdf', 'approved'];
       return fields.filter((i) => !rejected.includes(i));
     }
   }
@@ -195,14 +202,27 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   filterByScope(scope: string): void {
     this.selectedCurrentScope = scope;
     this.ngxSpinnerService.show();
+    this.bulkReports = this.allBulkReports = [];
+
     this.reportsService.getBulkInvoices(null, scope).subscribe(
       data => {
-        this.bulkReports = this.allBulkReports = data['reports'];
+        this.allBulkReports = this.allBulkReports.concat(data['reports']);
+        this.bulkReports = this.allBulkReports;
         this.ngxSpinnerService.hide();
       },
       error => {
-        console.log('StudentActivityListComponent.filterByScope():  error is ', error);
+        console.log('InvoicesMonthlyCombinedListComponent.filterByScope():  error is ', error);
         this.ngxSpinnerService.hide();
+      }
+    );
+
+    this.reportsService.getTotalsOnly().subscribe(
+      data => {
+        this.allBulkReports = this.allBulkReports.concat(data['reports']);
+        this.bulkReports = this.allBulkReports;
+      },
+      error => {
+        console.log('InvoicesMonthlyCombinedListComponent.filterByScope():  error is ', error);
       }
     );
   }
@@ -225,56 +245,41 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     return this.academicYearsService.getAcademicYears();
   }
 
-  private getInvoiceCreateParams(): number[] {
-    let auns: number[];
-
-    switch (this.invoiceRecipient) {
-      case 'SD':
-        auns = this.schoolDistricts.filter((sd) => sd.paymentType === PaymentType.Check).map((sd) => +sd.aun);
-        break;
-      case 'PDE':
-        auns = this.schoolDistricts.filter((sd) => sd.paymentType === 'ACH').map((sd) => +sd.aun);
-        break;
-      case 'All':
-        auns = null;
-        break;
-    }
-
-    return auns;
-  }
-
   private isTotalsOnly(): boolean {
     return this.invoiceRecipient === 'Totals';
   }
 
-  create(): void {
+  private doCreateBulkInvoice(): void {
     this.spinnerMsg = 'Creating bulk invoice.  Please wait...';
     this.ngxSpinnerService.show();
-    const auns: number[] = this.getInvoiceCreateParams();
-    const totalsOnly = this.isTotalsOnly();
+
+    let paymentType: string;
+    if (this.invoiceRecipient === 'SD') {
+      paymentType = 'Check';
+    } else if (this.invoiceRecipient === 'PDE') {
+      paymentType = 'UniPay';
+    }
 
     this.reportsService.createBulkInvoice(
       {
-        'reportType': 'BulkInvoice',
-        'schoolYear': this.selectedCreateSchoolYear.replace(/\s+/g, ''),
-        'name': this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope),
-        'bulkInvoice': {
-          'toSchoolDistrict': new Date(
+        reportType: 'BulkInvoice',
+        schoolYear: this.selectedCreateSchoolYear.replace(/\s+/g, ''),
+        name: this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope),
+        bulkInvoice: {
+          toSchoolDistrict: new Date(
             this.toSchoolDistrictDate.year,
             this.toSchoolDistrictDate.month - 1,
             this.toSchoolDistrictDate.day).toLocaleDateString('en-US'),
-          'toPDE': new Date(
+          toPDE: new Date(
             this.toPDEDate.year,
             this.toPDEDate.month - 1,
             this.toPDEDate.day).toLocaleDateString('en-US'),
-          'scope': this.selectedCreateScope,
-          'auns': auns,
-          'totalsOnly': totalsOnly,
+          scope: this.selectedCreateScope,
+          paymentType: paymentType,
         }
       }
     ).subscribe(
       data => {
-        console.log('InvoicesMonthlyCombinedListComponent.create(): data is ', data['reports']);
         this.ngxSpinnerService.hide();
         this.refreshInvoices();
       },
@@ -285,15 +290,40 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     );
   }
 
+  private doCreateTotalsOnlyInvoice(): void {
+    this.spinnerMsg = 'Creating totals only invoice.  Please wait...';
+    this.ngxSpinnerService.show();
+
+    this.reportsService.createTotalsOnlyInvoice(
+      this.generateTotalsOnlyInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope, this.paymentType),
+      this.selectedCreateScope,
+      this.selectedCreateSchoolYear,
+      this.paymentType === 'All' ? undefined : this.paymentType).subscribe(
+        data => {
+          this.ngxSpinnerService.hide();
+          this.refreshInvoices();
+        },
+        error => {
+          this.ngxSpinnerService.hide();
+        }
+      );
+  }
+
+  create(): void {
+    if (this.isTotalsOnly()) {
+      this.doCreateTotalsOnlyInvoice();
+    } else {
+      this.doCreateBulkInvoice();
+    }
+  }
+
   displayDownloadFormatDialog(downloadFormatContent, report: Report): void {
     const modal = this.ngbModal.open(downloadFormatContent, { centered: true, size: 'sm' });
     modal.result.then(
       (result) => {
-        console.log('InvoicesListComponent.displayDownloadFormatDialog(): result is ', result);
         this.downloadInvoiceByFormat(report, this.selectedDownloadFormat);
       },
       (reason) => {
-        console.log('InvoicesListComponent.displayDownloadFormatDialog(): reason is ', reason);
       }
     );
   }
@@ -302,7 +332,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.ngxSpinnerService.show();
     this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
-        console.log('InvoiceListComponent.downloadInvoiceByFormat():  data is ', data);
         this.ngxSpinnerService.hide();
         if (format.toLowerCase().includes('excel')) {
           this.fileSaverService.saveInvoiceAsExcelFile(data, report);
@@ -312,7 +341,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       },
       error => {
         this.ngxSpinnerService.hide();
-        console.log('InvoiceListComponent.downloadInvoiceByFormat():  error is ', error);
       }
     );
   }
@@ -323,11 +351,9 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
     modal.result.then(
       (result) => {
-        console.log('InvoicesListComponent.createBulkInvoice(): result is ', result);
         this.ngxSpinnerService.show();
       },
       (reason) => {
-        console.log('InvoicesListComponent.createBulkInvoice(): reason is ', reason);
       }
     );
   }
@@ -352,7 +378,23 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   private generateBulkInvoiceName(schoolYear: string, scope: string): string {
-    return 'BulkInvoice_' + scope + '_' + schoolYear + this.generateInvoiceRecipientFileNameTag();
+    return 'BulkInvoice_' + scope + '_' + schoolYear.replace(/\s+/g, '') + this.generateInvoiceRecipientFileNameTag();
+  }
+
+  private generateTotalsOnlyInvoiceName(schoolYear: string, scope: string, paymentType: string): string {
+    let name = 'TotalsOnly_' + scope + '_' + schoolYear.replace(/\s+/g, '');
+    let tag: string;
+    if (paymentType === undefined || paymentType === 'All') {
+      tag = '';
+    } else {
+      tag = paymentType;
+    }
+
+    if (tag !== '') {
+      name += '_' + tag;
+    }
+
+    return name;
   }
 
   private selectSchoolYear(year: string): void {

@@ -107,7 +107,7 @@ namespace models.Migrations
                     Name = table.Column<string>(nullable: true),
                     Rate = table.Column<decimal>(nullable: false, defaultValue: 0m),
                     AlternateRate = table.Column<decimal>(nullable: true),
-                    PaymentType = table.Column<string>(nullable: true, defaultValue: "ACH"),
+                    PaymentType = table.Column<string>(nullable: true, defaultValue: "Check"),
                     Created = table.Column<DateTime>(nullable: false),
                     LastUpdated = table.Column<DateTime>(nullable: false)
                 },

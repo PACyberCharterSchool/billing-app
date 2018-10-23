@@ -9,12 +9,14 @@ namespace models.Reporters
 	public class CsiuAccount
 	{
 		public string Number { get; set; }
-		public decimal Amount { get; set; }
+		public double Amount { get; set; }
 		public string Description { get; set; }
 	}
 
 	public class CsiuReport
 	{
+		public DateTime AsOf { get; set; }
+		public string SchoolYear { get; set; }
 		public IEnumerable<CsiuAccount> Accounts { get; set; }
 	}
 
@@ -28,12 +30,12 @@ namespace models.Reporters
 
 		private class Amounts
 		{
-			public decimal Regular { get; set; }
-			public decimal Special { get; set; }
-			public decimal Received { get; set; }
+			public double Regular { get; set; }
+			public double Special { get; set; }
+			public double Received { get; set; }
 		}
 
-		private IList<CsiuAccount> GetAccounts(DateTime asOf, IList<int> auns = null)
+		private IList<CsiuAccount> GetAccounts(DateTime asOf, string schoolYear, IList<int> auns = null)
 		{
 			if (auns == null)
 				auns = GetAuns();
@@ -79,7 +81,6 @@ namespace models.Reporters
 
 			var month = asOf.ToString("MM");
 			var year = asOf.ToString("yy");
-			var schoolYear = SchoolYearFromAsOf();
 			return new List<CsiuAccount>
 			{
 				new CsiuAccount
@@ -104,8 +105,8 @@ namespace models.Reporters
 
 			void FillAmounts(Amounts a, BulkInvoiceSchoolDistrict d)
 			{
-				a.Regular -= d.SchoolDistrict.RegularRate * ((decimal)d.RegularEnrollments.Values.Sum() / 12);
-				a.Special -= d.SchoolDistrict.SpecialRate * ((decimal)d.SpecialEnrollments.Values.Sum() / 12);
+				a.Regular -= d.SchoolDistrict.RegularRate * ((double)d.RegularEnrollments.Values.Sum() / 12);
+				a.Special -= d.SchoolDistrict.SpecialRate * ((double)d.SpecialEnrollments.Values.Sum() / 12);
 
 				var tt = d.Transactions.AsDictionary().Values.Where(t => t.Payment != null || t.Refund.HasValue);
 				var check = tt.
@@ -118,18 +119,6 @@ namespace models.Reporters
 					Sum(t => t.Refund.HasValue ? t.Refund.Value : 0);
 				a.Received += (check + unipay) - refund;
 			}
-
-			string SchoolYearFromAsOf()
-			{
-				var m = asOf.Month;
-				var y = asOf.Year;
-				if (Month.ByNumber()[m].FirstYear)
-					return $"{Year(y)}{Year(y + 1)}";
-				else
-					return $"{Year(y - 1)}{Year(y)}";
-
-				string Year(int i) => i.ToString().Substring(2, 2);
-			}
 		}
 
 		public class Config
@@ -138,11 +127,26 @@ namespace models.Reporters
 			public IList<int> Auns { get; set; }
 		}
 
+		private string SchoolYearFromAsOf(DateTime asOf)
+		{
+			var m = asOf.Month;
+			var y = asOf.Year;
+			if (Month.ByNumber()[m].FirstYear)
+				return $"{Year(y)}{Year(y + 1)}";
+			else
+				return $"{Year(y - 1)}{Year(y)}";
+
+			string Year(int i) => i.ToString().Substring(2, 2);
+		}
+
 		public CsiuReport GenerateReport(Config config)
 		{
+			var schoolYear = SchoolYearFromAsOf(config.AsOf);
 			return new CsiuReport
 			{
-				Accounts = GetAccounts(config.AsOf, config.Auns),
+				AsOf = config.AsOf,
+				SchoolYear = schoolYear,
+				Accounts = GetAccounts(config.AsOf, schoolYear, config.Auns),
 			};
 		}
 	}

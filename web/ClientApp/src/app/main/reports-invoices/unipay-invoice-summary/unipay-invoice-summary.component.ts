@@ -11,11 +11,11 @@ import { FileSaverService } from '../../../services/file-saver.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
 
 @Component({
-  selector: 'app-accounts-receivable-aging',
-  templateUrl: './accounts-receivable-aging.component.html',
-  styleUrls: ['./accounts-receivable-aging.component.scss']
+  selector: 'app-unipay-invoice-summary',
+  templateUrl: './unipay-invoice-summary.component.html',
+  styleUrls: ['./unipay-invoice-summary.component.scss']
 })
-export class AccountsReceivableAgingComponent implements OnInit {
+export class UnipayInvoiceSummaryComponent implements OnInit {
   public reports: Report[];
   public allReports: Report[];
   private skip: number;
@@ -23,8 +23,9 @@ export class AccountsReceivableAgingComponent implements OnInit {
   public direction: number;
   private isDescending: boolean;
   public searchText: string;
-  public fromDate;
   public asOfDate;
+  public selectedAcademicYear: string;
+  public schoolYears: string[];
   public selectedDownloadFormat: string;
   public downloadFormats: string[] = [
     'Microsoft Excel',
@@ -44,17 +45,18 @@ export class AccountsReceivableAgingComponent implements OnInit {
   ngOnInit() {
     this.skip = 0;
     this.spinnerMsg = '';
-    this.refreshAccountsReceivableAgingList();
+    this.refreshUniPayInvoiceSummaryList();
+    this.schoolYears = this.academicYearsService.getAcademicYears();
   }
 
-  public refreshAccountsReceivableAgingList(): void {
-    this.reportsService.getAccountsReceivableAging().subscribe(
+  public refreshUniPayInvoiceSummaryList(): void {
+    this.reportsService.getUniPayInvoiceSummary().subscribe(
       data => {
         this.allReports = this.reports = data['reports'];
-        console.log('AccountsReceivableAgingComponent.ngOnInit():  reports are ', data['reports']);
+        console.log('UnipayInvoiceSummaryComponent.ngOnInit():  reports are ', data['reports']);
       },
       error => {
-        console.log('AccountsReceivableAgingomponent.ngOnInit():  error is ', error);
+        console.log('UnipayInvoiceSummaryComponent.ngOnInit():  error is ', error);
       }
     );
   }
@@ -65,13 +67,14 @@ export class AccountsReceivableAgingComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
-  public filterAccountsReceivableAgingBySearch(): void {
+  public filterUniPayInvoiceSummaryBySearch(): void {
     if (this.searchText) {
       this.reports = this.allReports.filter(
         (i) => {
           const re = new RegExp(this.searchText, 'gi');
           if (
-            i.name.search(re) !== -1
+            i.name.search(re) !== -1 ||
+            i.schoolYear.search(re) !== -1
           ) {
             return true;
           }
@@ -85,7 +88,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
   listDisplayableFields() {
     if (this.allReports) {
       const fields = this.utilitiesService.objectKeys(this.allReports[0]);
-      const rejected = ['schoolYear', 'data', 'xlsx', 'type', 'id', 'approved', 'scope'];
+      const rejected = ['data', 'xlsx', 'type', 'id', 'approved', 'scope'];
       return fields.filter((i) => !rejected.includes(i));
     }
   }
@@ -97,7 +100,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
     return this.utilitiesService.objectValues(selected);
   }
 
-  public displayCreateAccountsReceivableAgingDialog(createContent): void {
+  public displayCreateUniPayInvoiceSummaryDialog(createContent): void {
     const modal = this.ngbModalService.open(createContent, { centered: true });
     modal.result.then(
       (result) => {
@@ -117,53 +120,35 @@ export class AccountsReceivableAgingComponent implements OnInit {
     );
   }
 
-  private generateAccountsReceivableAgingReportName(): string {
-    let name = 'AccountsReceivableAging';
-
-    if (this.fromDate) {
-      name += `_${this.fromDate.year}-${this.fromDate.month}-${this.fromDate.day}`;
-    }
-
-    if (this.asOfDate) {
-      name += `_${this.asOfDate.year}-${this.asOfDate.month}-${this.asOfDate.day}`;
-    }
-
-    return name;
+  private generateUniPayInvoiceSummaryReportName(): string {
+    return 'UniPayInvoiceSummary_' +
+      this.selectedAcademicYear.replace(/\s+/g, '') + '_' + `${this.asOfDate.month}-${this.asOfDate.day}-${this.asOfDate.year}`;
   }
 
   public onCreateSubmit(): void {
-    let from: Date;
-    if (this.fromDate) {
-      from = new Date(this.fromDate.year, this.fromDate.month - 1, this.fromDate.day);
-    }
-
-    let asOf: Date;
-    if (this.asOfDate) {
-      asOf = new Date(this.asOfDate.year, this.asOfDate.month - 1, this.asOfDate.day);
-    }
-
     this.ngxSpinnerService.show();
-    this.spinnerMsg = 'Generating accounts receivable as of report.  Please wait...';
-    this.reportsService.createAccountsReceivableAging(
-      this.generateAccountsReceivableAgingReportName(),
-      from,
-      asOf).subscribe(
+    this.spinnerMsg = 'Generating UniPay invoice summary report.  Please wait...';
+    this.reportsService.createUniPayInvoiceSummary(
+      this.generateUniPayInvoiceSummaryReportName(),
+      this.selectedAcademicYear,
+      new Date(this.asOfDate.year, this.asOfDate.month - 1, this.asOfDate.day)).subscribe(
         data => {
           this.ngxSpinnerService.hide();
-          this.refreshAccountsReceivableAgingList();
+          this.refreshUniPayInvoiceSummaryList();
         },
         error => {
           this.ngxSpinnerService.hide();
-          this.refreshAccountsReceivableAgingList();
+          this.refreshUniPayInvoiceSummaryList();
         }
       );
   }
 
   public downloadReportByFormat(report: Report, format: string): void {
     this.ngxSpinnerService.show();
+    this.spinnerMsg = 'Generating UniPay invoice report format.  Please wait...';
     this.reportsService.getReportDataByFormat(report, format.includes('Microsoft Excel') ? 'excel' : 'pdf').subscribe(
       data => {
-        console.log('AccountsReceivableAgingComponent.downloadReportByFormat():  data is ', data);
+        console.log('UnipayInvoiceSummaryComponent.downloadReportByFormat():  data is ', data);
         this.ngxSpinnerService.hide();
         if (format.toLowerCase().includes('excel')) {
           this.fileSaverService.saveInvoiceAsExcelFile(data, report);
@@ -173,16 +158,20 @@ export class AccountsReceivableAgingComponent implements OnInit {
       },
       error => {
         this.ngxSpinnerService.hide();
-        console.log('AccountsReceivableAgingComponent.downloadReportByFormat():  error is ', error);
+        console.log('UnipayInvoiceSummaryComponent.downloadReportByFormat():  error is ', error);
       }
     );
   }
 
-  public displayDownloadAccountsReceivableAgingFormatDialog(downloadReportTypeContent, report: Report): void {
+  public setSelectedAcademicYear(year: string) {
+    this.selectedAcademicYear = year;
+  }
+
+  public displayDownloadUniPayInvoiceSummaryFormatDialog(downloadReportTypeContent, report: Report): void {
     const modal = this.ngbModalService.open(downloadReportTypeContent, { centered: true });
     modal.result.then(
       (result) => {
-        console.log('AccountsReceivableAgingComponent.displayDownloadAccountsReceivableAgingFormatDialog():  download');
+        console.log('UnipayInvoiceSummaryComponent.displayDownloadAccountsReceivableAsOfFormatDialog():  download');
         this.downloadReportByFormat(report, this.selectedDownloadFormat);
       },
       (reason) => {
@@ -196,6 +185,4 @@ export class AccountsReceivableAgingComponent implements OnInit {
   public setSelectedDownloadFormat(format: string): void {
     this.selectedDownloadFormat = format;
   }
-
-
 }

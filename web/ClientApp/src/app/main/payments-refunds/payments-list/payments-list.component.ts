@@ -29,6 +29,8 @@ export class PaymentsListComponent implements OnInit {
   private schoolDistricts: SchoolDistrict[];
   private skip: number;
   private selectedBulkImportFile;
+  public spinnerMsg: string;
+  public dateModel: any;
 
   constructor(
     private globals: Globals,
@@ -108,14 +110,18 @@ export class PaymentsListComponent implements OnInit {
   }
 
   refreshPaymentList() {
+    this.spinnerMsg = 'Loading payments list.  Please wait...';
+    this.ngxSpinnerService.show();
     this.paymentsService.getPayments(this.skip).subscribe(
       data => {
         this.allPayments = data['payments'];
         this.payments = data['payments'].filter((p) => p.split === 1);
+        this.ngxSpinnerService.hide();
         console.log('PaymentsListComponent.ngOnInit(): payments are ', this.allPayments);
       },
       error => {
         console.log('PaymentsListComponent.ngOnInit(): error is ', error);
+        this.ngxSpinnerService.hide();
       }
     );
   }
@@ -219,8 +225,13 @@ export class PaymentsListComponent implements OnInit {
         this.selectedBulkImportFile[0],
       );
 
+      let date: Date;
+      if (this.dateModel) {
+        date = new Date(this.dateModel.year, this.dateModel.month - 1, this.dateModel.day);
+      }
+
       this.ngxSpinnerService.show();
-      this.paymentsService.updatePDEPayments(importData).subscribe(
+      this.paymentsService.updatePDEPayments(date, importData).subscribe(
         data => {
           console.log('PaymentListComponent.doImport():  ', data['schoolDistricts']);
           this.ngxSpinnerService.hide();

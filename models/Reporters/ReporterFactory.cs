@@ -5,14 +5,20 @@ namespace models.Reporters
 {
 	public interface IReporterFactory
 	{
+		IReporter<AccountsReceivableAging, AccountsReceivableAgingReporter.Config> CreateAccountsReceivableAgingReporter(PacBillContext context);
 		IReporter<AccountsReceivableAsOf, AccountsReceivableAsOfReporter.Config> CreateAccountsReceivableAsOfReporter(PacBillContext context);
 		IReporter<BulkInvoice, BulkInvoiceReporter.Config> CreateBulkInvoiceReporter(PacBillContext context);
 		IReporter<BulkStudentInformation, BulkStudentInformationReporter.Config> CreateBulkStudentInformationReporter(PacBillContext context);
 		IReporter<CsiuReport, CsiuReporter.Config> CreateCsiuReporter(PacBillContext context);
+		IReporter<TotalsOnlyInvoice, TotalsOnlyInvoiceReporter.Config> CreateTotalsOnlyInvoiceReporter(PacBillContext context);
+		IReporter<UniPayInvoiceSummaryReport, UniPayInvoiceSummaryReporter.Config> CreateUniPayInvoiceSummaryReporter(PacBillContext context);
 	}
 
 	public class ReporterFactory : IReporterFactory
 	{
+		public IReporter<AccountsReceivableAging, AccountsReceivableAgingReporter.Config> CreateAccountsReceivableAgingReporter(PacBillContext context)
+			=> new AccountsReceivableAgingReporter(context);
+
 		public IReporter<AccountsReceivableAsOf, AccountsReceivableAsOfReporter.Config> CreateAccountsReceivableAsOfReporter(PacBillContext context)
 			=> new AccountsReceivableAsOfReporter(context);
 
@@ -24,5 +30,11 @@ namespace models.Reporters
 
 		public IReporter<CsiuReport, CsiuReporter.Config> CreateCsiuReporter(PacBillContext context)
 			=> new CsiuReporter(context);
+
+		public IReporter<TotalsOnlyInvoice, TotalsOnlyInvoiceReporter.Config> CreateTotalsOnlyInvoiceReporter(PacBillContext context)
+			=> new TotalsOnlyInvoiceReporter(context);
+
+		public IReporter<UniPayInvoiceSummaryReport, UniPayInvoiceSummaryReporter.Config> CreateUniPayInvoiceSummaryReporter(PacBillContext context)
+			=> new UniPayInvoiceSummaryReporter(context);
 	}
 }

@@ -39,7 +39,7 @@ namespace api.Controllers
 		{
 			[BindRequired]
 			[Range(0, double.PositiveInfinity)]
-			public decimal Amount { get; set; }
+			public double Amount { get; set; }
 
 			// [Required]
 			[MinLength(1)]

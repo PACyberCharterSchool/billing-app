@@ -2,10 +2,12 @@ export enum ReportType {
   Invoice = 'Invoice',
   StudentInformation = 'StudentInformation',
   BulkInvoice = 'BulkInvoice',
+  TotalsOnly = 'TotalsOnlyInvoice',
   BulkStudentInformation = 'BulkStudentInformation',
   AccountsReceivableAsOf = 'AccountsReceivableAsOf',
   AccountsReceivableAging = 'AccountsReceivableAging',
-  CSIU = 'Csiu'
+  CSIU = 'Csiu',
+  UniPayInvoiceSummary = 'UniPayInvoiceSummary'
 }
 
 class ReportMetadata {

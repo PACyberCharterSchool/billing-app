@@ -1,20 +1,20 @@
-<div class='row csiu-title-row align-items-center'>
+<div class='row up-invoice-summary-title-row align-items-center'>
   <div class='col-4'>
-    <h4>CSIU Reports</h4>
+    <h4>UniPay Invoice Summary</h4>
   </div>
   <div class='col-7'>
     <input type='text' [(ngModel)]='searchText' />
-    <button type='button' class='btn btn-primary' (click)='filterCSIUList()'>SEARCH</button>
-    <button type='button' class='btn btn-outline-primary' (click)='refreshCSIUList()'>RESET</button>
+    <button type='button' class='btn btn-primary' (click)='filterUniPayInvoieSummaryBySearch()'>SEARCH</button>
+    <button type='button' class='btn btn-outline-primary' (click)='refreshUniPayInvoiceSummaryList()'>RESET</button>
   </div>
 </div>
-<div class='row csiu-action-row align-items-center'>
+<div class='row up-invoice-summary-action-row align-items-center'>
   <div class='col-12'>
-    <button type='button' class='btn btn-primary' (click)='displayCreateCSIUDialog(createContent)'>CREATE</button>
+    <button type='button' class='btn btn-primary' (click)='displayCreateUniPayInvoiceSummaryDialog(createContent)'>CREATE</button>
   </div>
 </div>
-<div class='row csiu-list-row align-items-center'>
-  <div class='col-12 csiu-list-col'>
+<div class='row up-invoice-summary-list-row align-items-center'>
+  <div class='col-12 up-invoice-summary-list-col'>
     <table class='table table-fixed table-striped'>
       <thead>
         <tr>
@@ -31,7 +31,7 @@
           <td *ngFor='let v of listDisplayableValues(report)'>{{v |
             normalizeFieldValue}}</td>
           <td>
-            <button type='button' class='btn btn-primary' (click)='displayDownloadCSIUFormatDialog(downloadReportTypeContent, report)'>
+            <button type='button' class='btn btn-primary' (click)='displayDownloadUniPayInvoiceSummaryFormatDialog(downloadReportTypeContent, report)'>
               Download
             </button>
           </td>
@@ -42,7 +42,7 @@
 </div>
 <ng-template #createContent let-c='close' let-d='dismiss'>
   <div class='modal-header'>
-    <h4 class='modal-title'>Create CSIU Report</h4>
+    <h4 class='modal-title'>Create UniPay Invoice Summary Report</h4>
     <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -67,19 +67,21 @@
           </div>
         </div>
       </div>
-      <!-- <div class='form-group row align-items-center'>
+      <div class='form-group row align-items-center'>
         <div class='col-6'>
           <label>Academic Year</label>
         </div>
         <div class='col-6'>
           <div ngbDropdown class='d-inline-block'>
-            <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown' required>{{selectedAcademicYear}}</button>
+            <button type='button' ngbDropdownToggle class='btn btn-outline-primary'
+              id='academicYearDropdown' required>{{selectedAcademicYear}}</button>
             <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown'>
-              <button type='button' class='dropdown-item' *ngFor='let y of schoolYears' (click)='setSelectedAcademicYear(y)'>{{y}}</button>
+              <button type='button' class='dropdown-item' *ngFor='let y of schoolYears'
+                (click)='setSelectedAcademicYear(y)'>{{y}}</button>
             </div>
           </div>
         </div>
-      </div> -->
+      </div>
     </div>
     <div class='modal-footer'>
       <div class='row d-flex justify-content-end'>

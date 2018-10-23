@@ -63,7 +63,7 @@ namespace api.Controllers
 
 				[Required]
 				[Range(0, double.PositiveInfinity)]
-				public decimal Amount { get; set; }
+				public double Amount { get; set; }
 
 				[Required]
 				[RegularExpression(@"^\d{4}\-\d{4}$")]
@@ -191,7 +191,7 @@ namespace api.Controllers
 			return Ok();
 		}
 
-		private static IList<Payment> XlsxToPayments(ISchoolDistrictRepository districts, Stream stream)
+		private static IList<Payment> XlsxToPayments(ISchoolDistrictRepository districts, DateTime? date, Stream stream)
 		{
 			var wb = new Workbook(stream);
 			var sheet = wb.Worksheets[0];
@@ -224,10 +224,10 @@ namespace api.Controllers
 				payments.Add(new Payment
 				{
 					Split = 1,
-					Date = new DateTime(year, month.Number, 1),
-					ExternalId = "PDE",
+					Date = date.HasValue ? date.Value : new DateTime(year, month.Number, 1),
+					ExternalId = "PDE UNIPAY",
 					Type = PaymentType.UniPay,
-					Amount = (decimal)sheet.Cells[i, amountIndex].DoubleValue,
+					Amount = (double)sheet.Cells[i, amountIndex].DoubleValue,
 					SchoolYear = schoolYear,
 					SchoolDistrict = districts.GetByAun(sheet.Cells[i, aunIndex].IntValue),
 				});
@@ -236,8 +236,8 @@ namespace api.Controllers
 			return payments;
 		}
 
-		private static Dictionary<string, Func<ISchoolDistrictRepository, Stream, IList<Payment>>> _parsers =
-			new Dictionary<string, Func<ISchoolDistrictRepository, Stream, IList<Payment>>>
+		private static Dictionary<string, Func<ISchoolDistrictRepository, DateTime?, Stream, IList<Payment>>> _parsers =
+			new Dictionary<string, Func<ISchoolDistrictRepository, DateTime?, Stream, IList<Payment>>>
 			{
 				{"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", XlsxToPayments},
 			};
@@ -247,7 +247,7 @@ namespace api.Controllers
 		[ProducesResponseType(typeof(PaymentsResponse), 201)]
 		[ProducesResponseType(typeof(ErrorResponse), 400)]
 		[ProducesResponseType(typeof(ErrorResponse), 409)]
-		public async Task<IActionResult> Upload(IFormFile file)
+		public async Task<IActionResult> Upload([FromQuery]DateTime? date, IFormFile file)
 		{
 			if (file == null)
 				return new BadRequestObjectResult(
@@ -261,7 +261,7 @@ namespace api.Controllers
 			IList<Payment> payments;
 			try
 			{
-				payments = parse(_districts, file.OpenReadStream());
+				payments = parse(_districts, date, file.OpenReadStream());
 			}
 			catch (ArgumentException e)
 			{

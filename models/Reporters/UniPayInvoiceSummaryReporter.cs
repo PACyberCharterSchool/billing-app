@@ -8,11 +8,10 @@ using System.IO;
 
 namespace models.Reporters
 {
-	public class AccountsReceivableAsOfSchoolDistrict
+	public class UniPayInvoiceSummarySchoolDistrict
 	{
 		public int Aun { get; set; }
 		public string Name { get; set; }
-		public string PaymentType { get; set; }
 		public double RegularEducationDue { get; set; }
 		public double SpecialEducationDue { get; set; }
 		public double TotalDue => (RegularEducationDue + SpecialEducationDue).Round();
@@ -23,20 +22,21 @@ namespace models.Reporters
 		public double NetDue => (TotalDue - TotalPaid).Round();
 	}
 
-	public class AccountsReceivableAsOf
+	public class UniPayInvoiceSummaryReport
 	{
 		public string SchoolYear { get; set; }
 		public DateTime AsOf { get; set; }
-		public IEnumerable<AccountsReceivableAsOfSchoolDistrict> SchoolDistricts { get; set; }
+		public IEnumerable<UniPayInvoiceSummarySchoolDistrict> SchoolDistricts { get; set; }
 	}
 
-	public class AccountsReceivableAsOfReporter : IReporter<AccountsReceivableAsOf, AccountsReceivableAsOfReporter.Config>
+	public class UniPayInvoiceSummaryReporter : IReporter<UniPayInvoiceSummaryReport, UniPayInvoiceSummaryReporter.Config>
 	{
 		private readonly PacBillContext _context;
 
-		public AccountsReceivableAsOfReporter(PacBillContext context) => _context = context;
+		public UniPayInvoiceSummaryReporter(PacBillContext context) => _context = context;
 
-		private IList<int> GetAuns() => _context.SchoolDistricts.Select(d => d.Aun).ToList();
+		private IList<int> GetAuns() => _context.SchoolDistricts.Where(d => d.PaymentType.Value == PaymentType.UniPay.ToString()).Select(d => d.Aun).ToList();
+
 
 		private static IList<string> ScopesFromAsOf(DateTime asOf)
 		{
@@ -67,13 +67,12 @@ namespace models.Reporters
 				return new JsonSerializer().Deserialize<BulkInvoice>(new JsonTextReader(tr));
 		}
 
-		private IList<AccountsReceivableAsOfSchoolDistrict> GetSchoolDistricts(
+		private IList<UniPayInvoiceSummarySchoolDistrict> GetSchoolDistricts(
 			DateTime asOf,
-			string schoolYear,
-			IList<int> auns = null)
+			string schoolYear
+			)
 		{
-			if (auns == null)
-				auns = GetAuns();
+			var auns = GetAuns();
 
 			var scopes = ScopesFromAsOf(asOf);
 			var invoices = _context.Reports.
@@ -97,13 +96,13 @@ namespace models.Reporters
 
 			var payments = _context.Payments.
 				Where(p => auns.Contains(p.SchoolDistrict.Aun)).
-				Where(p => p.SchoolYear == schoolYear && p.Date <= asOf).
+				Where(p => p.SchoolYear == schoolYear).
 				GroupBy(p => p.SchoolDistrict.Aun).
 				ToDictionary(g => g.Key, g => g.ToList());
 
 			var refunds = _context.Refunds.
 				Where(r => auns.Contains(r.SchoolDistrict.Aun)).
-				Where(r => r.SchoolYear == schoolYear && r.Date <= asOf).
+				Where(r => r.SchoolYear == schoolYear).
 				GroupBy(r => r.SchoolDistrict.Aun).
 				ToDictionary(g => g.Key, g => g.ToList());
 
@@ -114,49 +113,40 @@ namespace models.Reporters
 				if (payments.ContainsKey(d.SchoolDistrict.Aun))
 				{
 					var pp = payments[d.SchoolDistrict.Aun];
-					check = (double)pp.Where(p => p.Type == PaymentType.Check).Sum(p => p.Amount);
-					unipay = (double)pp.Where(p => p.Type == PaymentType.UniPay).Sum(p => p.Amount);
+					check = pp.Where(p => p.Type == PaymentType.Check).Sum(p => p.Amount);
+					unipay = pp.Where(p => p.Type == PaymentType.UniPay).Sum(p => p.Amount);
 				}
 
 				var refund = 0D;
 				if (refunds.ContainsKey(d.SchoolDistrict.Aun))
-					refund = (double)refunds[d.SchoolDistrict.Aun].Sum(r => r.Amount);
+					refund = refunds[d.SchoolDistrict.Aun].Sum(r => r.Amount);
 
-
-				return new AccountsReceivableAsOfSchoolDistrict
+				return new UniPayInvoiceSummarySchoolDistrict
 				{
 					Aun = d.SchoolDistrict.Aun,
 					Name = d.SchoolDistrict.Name,
-					PaymentType = d.SchoolDistrict.PaymentType,
-					RegularEducationDue = CalculateDue((double)d.SchoolDistrict.RegularRate, d.RegularEnrollments.Values.Sum()),
-					SpecialEducationDue = CalculateDue((double)d.SchoolDistrict.SpecialRate, d.SpecialEnrollments.Values.Sum()),
+					RegularEducationDue = (d.SchoolDistrict.RegularRate * ((double)d.RegularEnrollments.Values.Sum() / 12)).Round(),
+					SpecialEducationDue = (d.SchoolDistrict.SpecialRate * ((double)d.SpecialEnrollments.Values.Sum() / 12)).Round(),
 					PaidByDistrict = check.Round(),
 					PaidByPDE = unipay.Round(),
 					Refunded = refund.Round(),
 				};
 			}).ToList();
-
-			double CalculateDue(double rate, double enrollments)
-			{
-				const double epsilon = 0.0000000001D;
-				return ((rate * (enrollments / 12)) + epsilon).Round();
-			}
 		}
 
 		public class Config
 		{
 			public string SchoolYear { get; set; }
 			public DateTime AsOf { get; set; }
-			public IList<int> Auns { get; set; }
 		}
 
-		public AccountsReceivableAsOf GenerateReport(Config config)
+		public UniPayInvoiceSummaryReport GenerateReport(Config config)
 		{
-			var report = new AccountsReceivableAsOf
+			var report = new UniPayInvoiceSummaryReport
 			{
 				SchoolYear = config.SchoolYear,
 				AsOf = config.AsOf,
-				SchoolDistricts = GetSchoolDistricts(config.AsOf, config.SchoolYear, config.Auns),
+				SchoolDistricts = GetSchoolDistricts(config.AsOf, config.SchoolYear),
 			};
 
 			return report;

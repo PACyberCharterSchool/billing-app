@@ -355,7 +355,7 @@ namespace models.Migrations
 
                     b.Property<string>("PaymentType")
                         .ValueGeneratedOnAdd()
-                        .HasDefaultValue("ACH");
+                        .HasDefaultValue("Check");
 
                     b.Property<decimal>("Rate")
                         .ValueGeneratedOnAdd()

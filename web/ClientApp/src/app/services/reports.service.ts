@@ -59,6 +59,19 @@ export class ReportsService {
     return this.getReportsByMeta(reportMeta);
   }
 
+  public getTotalsOnly(): Observable<Report[]> {
+    const reportMeta: Object = Object.assign({}, { 'Type': ReportType.TotalsOnly });
+    return this.getReportsByMeta(reportMeta);
+  }
+
+  public getUniPayInvoiceSummary(): Observable<Report[]> {
+    const reportMeta: Object = Object.assign({}, {
+      'Type': ReportType.UniPayInvoiceSummary,
+    });
+
+    return this.getReportsByMeta(reportMeta);
+  }
+
   // HTTP GET /api/reports/:name
   public getReportDataByFormat(report: Report, format: string): Observable<any> {
     const url = this.apiReportsUrl + `/${report.name}`;
@@ -199,15 +212,65 @@ export class ReportsService {
     return this.httpClient.post<any>(url, reportMeta, this.headers);
   }
 
-  public createCSIU(name: string, schoolYear: string, asOf: Date, auns?: number[]): Observable<Report> {
+  public createAccountsReceivableAging(name: string, from: Date, asOf: Date, auns?: number[]): Observable<Report> {
+    const url: string = this.apiReportsUrl;
+    const reportMeta: Object = Object.assign({}, {
+      'reportType': ReportType.AccountsReceivableAging,
+      'name': name,
+      'accountsReceivableAging': {
+        'from': from ? from.toLocaleDateString('en-US') : undefined,
+        'asOf': asOf ? asOf.toLocaleDateString('en-US') : undefined,
+        'auns': auns
+      }
+    });
+
+    return this.httpClient.post<any>(url, reportMeta, this.headers);
+  }
+
+  public createCSIU(name: string, asOf: Date, auns?: number[]): Observable<Report> {
     const url: string = this.apiReportsUrl;
     const reportMeta: Object = Object.assign({}, {
       'reportType': ReportType.CSIU,
-      'schoolYear': schoolYear.replace(/\s+/g, ''),
+      // 'schoolYear': schoolYear.replace(/\s+/g, ''),
       'name': name,
       'csiu': {
         'asOf': asOf.toLocaleDateString('en-US'),
         'auns': auns
+      }
+    });
+
+    return this.httpClient.post<any>(url, reportMeta, this.headers);
+  }
+
+  public createTotalsOnlyInvoice(
+    name: string,
+    scope: string,
+    schoolYear: string,
+    paymentType: string,
+    auns?: number[]
+  ): Observable<Report> {
+    const url: string = this.apiReportsUrl;
+    const reportMeta: Object = Object.assign({}, {
+      'reportType': ReportType.TotalsOnly,
+      'schoolYear': schoolYear.replace(/\s+/g, ''),
+      'name': name,
+      'totalsOnlyInvoice': {
+        'scope': scope,
+        'auns': auns,
+        'paymentType': paymentType
+      }
+    });
+    return this.httpClient.post<any>(url, reportMeta, this.headers);
+  }
+
+  public createUniPayInvoiceSummary(name: string, schoolYear: string, asOf: Date): Observable<Report> {
+    const url: string = this.apiReportsUrl;
+    const reportMeta: Object = Object.assign({}, {
+      'reportType': ReportType.UniPayInvoiceSummary,
+      'schoolYear': schoolYear.replace(/\s+/g, ''),
+      'name': name,
+      'uniPayInvoiceSummary': {
+        'asOf': new Date(Date.now()).toLocaleDateString('en-US')
       }
     });
 

@@ -30,7 +30,7 @@ export class AdministrationPaymentRateUpdateFormComponent implements OnInit {
     console.log('AdministrationPaymentRateUpdateComponent.onSubmit():  schoolDistrict is ', this.schoolDistrict);
     this.schoolDistrict['aun'] = this.schoolDistrict.aun;
     this.schoolDistrict['name'] = this.schoolDistrict.name;
-    this.schoolDistrict['paymentType'] = this.paymentType === 'SD' ? 'Check' : 'ACH';
+    this.schoolDistrict['paymentType'] = this.paymentType === 'SD' ? 'Check' : 'UniPay';
 
     if (+this.schoolDistrict.alternateRate === 0.0) {
       delete this.schoolDistrict['alternateRate'];

@@ -38,7 +38,7 @@ namespace models.Reporters.Exporters
 						return token.Value<DateTime>();
 
 					case JTokenType.Float:
-						return Math.Round(token.Value<float>(), 2);
+						return token.Value<double>();
 
 					case JTokenType.Integer:
 						return token.Value<ulong>();
@@ -106,22 +106,25 @@ namespace models.Reporters.Exporters
 				var sheet = wb.Worksheets[s];
 				Cells cells = sheet.Cells;
 
-				for (int r = 0; r < cells.MaxDataRow + 1; r++) {
+				for (int r = 0; r < cells.MaxDataRow + 1; r++)
+				{
 					Row row = cells.Rows[r];
 					if (row.IsBlank)
 						continue;
-					for (int c = 0; c < cells.MaxDataColumn + 1; c++) {
-						if (cells[r,c].Type == CellValueType.IsString) {
-							if (ContainsToken(cells[r,c].StringValue))
+					for (int c = 0; c < cells.MaxDataColumn + 1; c++)
+					{
+						if (cells[r, c].Type == CellValueType.IsString)
+						{
+							if (ContainsToken(cells[r, c].StringValue))
 							{
-								var value = GetValue(data, cells[r,c].StringValue);
+								var value = GetValue(data, cells[r, c].StringValue);
 								if (value != null)
 								{
-									cells[r,c].PutValue(value);
+									cells[r, c].PutValue(value);
 								}
 								else
 								{
-									cells[r,c].PutValue((string)null);
+									cells[r, c].PutValue((string)null);
 								}
 							}
 						}
