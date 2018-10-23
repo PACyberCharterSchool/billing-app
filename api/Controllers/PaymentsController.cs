@@ -225,7 +225,7 @@ namespace api.Controllers
 				{
 					Split = 1,
 					Date = new DateTime(year, month.Number, 1),
-					ExternalId = "PDE",
+					ExternalId = "PDE UNIPAY",
 					Type = PaymentType.UniPay,
 					Amount = (double)sheet.Cells[i, amountIndex].DoubleValue,
 					SchoolYear = schoolYear,
