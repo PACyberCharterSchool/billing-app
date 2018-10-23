@@ -1,5 +1,7 @@
 <div class='row payments-title-row align-items-center'>
-  <div class='col-2'><h4>Payments</h4></div>
+  <div class='col-2'>
+    <h4>Payments</h4>
+  </div>
   <div class='col-7'>
     <input type='text' [(ngModel)]='searchText' />
     <button type='button' class='btn btn-primary' (click)='filterPaymentRecords()'>SEARCH</button>
@@ -8,10 +10,12 @@
 </div>
 <div class='row payments-action-row align-items-center'>
   <div class='col-auto create-payment-col'>
-    <button type='button' class='btn btn-primary' (click)='createPayment()'>ADD NEW</button>
+    <button type='button' class='btn btn-primary' (click)='createPayment()'>ADD
+      NEW</button>
   </div>
   <div class='col-auto'>
-    <button type='button' class='btn btn-primary' (click)='importPDEPayments(importPDEPaymentsContent)'>IMPORT PAYMENTS TO PDE</button>
+    <button type='button' class='btn btn-primary' (click)='importPDEPayments(importPDEPaymentsContent)'>IMPORT
+      PAYMENTS TO PDE</button>
   </div>
 </div>
 <div class='row payments-list-row align-items-center justify-content-center'>
@@ -21,12 +25,14 @@
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
             {{k | normalizeFieldName}}
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }"
+              aria-hidden="true"></i>
           </th>
         </tr>
       </thead>
       <tbody infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]='false'>
-        <tr *ngFor='let payment of payments | orderBy: {property: property, direction: direction}' (click)='editPayment(payment)'>
+        <tr *ngFor='let payment of payments | orderBy: {property: property, direction: direction}'
+          (click)='editPayment(payment)'>
           <td>{{isSplitPayment(payment) ? 'Yes' : 'No'}}</td>
           <td>{{payment?.date | date: 'MM/dd/yyyy'}}</td>
           <td>{{payment?.externalId}}</td>
@@ -54,17 +60,31 @@
     <div class='col-12'>
       <form #selectPDEPaymentsFileForm (ngSubmit)='c("Import clicked."); doImport()'>
         <div class='modal-body'>
+          <div class='form-group row align-items-center'>
+            <div class='col-6'>
+              <label>Payment Date:</label>
+            </div>
+            <div class='col-6'>
+              <div class='input-group'>
+                <input class='form-control' placeholder='mm-dd-yyyy' name='dp'
+                  [(ngModel)]='dateModel' ngbDatepicker #dDate='ngbDatepicker'>
+                <div class='input-group-append'>
+                  <button class='btn btn-outline-secondary' (click)='dDate.toggle()'
+                    type='button'>
+                    <i class="fa fa-calendar fa-2x"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class='form-group col-12'>
             <div class='col-6'>
               <label>Select payment data file:</label>
             </div>
             <div class='col-6'>
-              <input type='file'
-                [(ngModel)]='fileName'
-                [ngModelOptions]='{standalone: true}'
+              <input type='file' [(ngModel)]='fileName' [ngModelOptions]='{standalone: true}'
                 accept='text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                (change)='setImportPaymentsUrl($event)'
-                />
+                (change)='setImportPaymentsUrl($event)' />
             </div>
           </div>
         </div>

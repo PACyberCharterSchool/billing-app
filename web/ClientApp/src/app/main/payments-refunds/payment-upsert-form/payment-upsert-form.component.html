@@ -8,16 +8,18 @@
     </div>
   </div>
   <div class='col-12'>
-    <form appAcademicYearConflictValidator #paymentUpsertForm='ngForm' (ngSubmit)='paymentUpsertForm.form.valid && onSubmit(paymentUpsertForm)'>
+    <form appAcademicYearConflictValidator #paymentUpsertForm='ngForm'
+      (ngSubmit)='paymentUpsertForm.form.valid && onSubmit(paymentUpsertForm)'>
       <div class='modal-body'>
         <div class='col-12 payment-not-upserted-error' [style.visibility]="upsertError ? 'visible' : 'hidden'">
-          Payment error:  {{upsertError}}
+          Payment error: {{upsertError}}
         </div>
         <div class='col-12'>
           <div class='form-group row align-items-center' *ngIf='op === "create"'>
             <div class='col-6'></div>
             <div class='col-6'>
-              <button type='button' class='btn btn-outline-primary' (click)='isSplit = !isSplit' [attr.aria-expanded]="!isSplit" aria-controls="collapseSplit">SPLIT</button>
+              <button type='button' class='btn btn-outline-primary' (click)='isSplit = !isSplit'
+                [attr.aria-expanded]="!isSplit" aria-controls="collapseSplit">SPLIT</button>
             </div>
           </div>
           <div class='form-group row align-items-center'>
@@ -27,12 +29,16 @@
                   <label>School District Name</label>
                 </div>
                 <div class='col-5'>
-                  <div [style.visibility]="((paymentUpsertForm.submitted && typeaheadSchoolDistrict.invalid) || (typeaheadSchoolDistrict.invalid && (typeaheadSchoolDistrict.dirty || typeaheadSchoolDistrict.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+                  <div [style.visibility]="((paymentUpsertForm.submitted && typeaheadSchoolDistrict.invalid) || (typeaheadSchoolDistrict.invalid && (typeaheadSchoolDistrict.dirty || typeaheadSchoolDistrict.touched))) ? 'visible' : 'hidden'"
+                    class='alert alert-danger'>Invalid</div>
                 </div>
               </div>
             </div>
             <div class='col-6'>
-              <input required id='typeaheadSchoolDistrict' name='typeaheadSchoolDistrict' #typeaheadSchoolDistrict='ngModel' type='text' class='form-control' [(ngModel)]='schoolDistrictNameModel' [ngModelOptions]="{standalone: true}" [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
+              <input required id='typeaheadSchoolDistrict' name='typeaheadSchoolDistrict'
+                #typeaheadSchoolDistrict='ngModel' type='text' class='form-control'
+                [(ngModel)]='schoolDistrictNameModel' [ngModelOptions]="{standalone: true}"
+                [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
             </div>
           </div>
           <div class='form-group row align-items-center'>
@@ -50,12 +56,15 @@
                   <label>Payment Amount</label>
                 </div>
                 <div class='col-5'>
-                  <div [style.visibility]="((paymentUpsertForm.submitted && paymentAmount.invalid) || (paymentAmount.invalid && (paymentAmount.dirty || paymentAmount.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+                  <div [style.visibility]="((paymentUpsertForm.submitted && paymentAmount.invalid) || (paymentAmount.invalid && (paymentAmount.dirty || paymentAmount.touched))) ? 'visible' : 'hidden'"
+                    class='alert alert-danger'>Invalid</div>
                 </div>
               </div>
             </div>
             <div class='col-6'>
-              <input currencyMask [options]='{ align: "left", allowNegative: false }' class='form-control' id='paymentAmount' name='paymentAmount' [(ngModel)]='amount' required #paymentAmount='ngModel' />
+              <input currencyMask [options]='{ align: "left", allowNegative: false }'
+                class='form-control' id='paymentAmount' name='paymentAmount'
+                [(ngModel)]='amount' required #paymentAmount='ngModel' />
             </div>
           </div>
           <div class='form-group row align-items-center'>
@@ -65,16 +74,19 @@
                   <label>Payment Date</label>
                 </div>
                 <div class='col-5'>
-                  <div [style.visibility]="((paymentUpsertForm.submitted && dValue.invalid) || (dValue.invalid && (dValue.dirty || dValue.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+                  <div [style.visibility]="((paymentUpsertForm.submitted && dValue.invalid) || (dValue.invalid && (dValue.dirty || dValue.touched))) ? 'visible' : 'hidden'"
+                    class='alert alert-danger'>Invalid</div>
                 </div>
               </div>
             </div>
             <div class='col-6'>
               <div class='input-group'>
                 <input class='form-control' required placeholder='mm-dd-yyyy'
-                  name='dp' [(ngModel)]='dateModel' ngbDatepicker #dValue='ngModel' #d='ngbDatepicker' (ngModelChange)='onDateChanged()' value='{{date | date: "MM/dd/yyyy"' />
+                  name='dp' [(ngModel)]='dateModel' ngbDatepicker #dValue='ngModel'
+                  #d='ngbDatepicker' (ngModelChange)='onDateChanged()' value='{{date | date: "MM/dd/yyyy"}}' />
                 <div class='input-group-append'>
-                  <button class='btn btn-outline-secondary' (click)='d.toggle()' type='button'>
+                  <button class='btn btn-outline-secondary' (click)='d.toggle()'
+                    type='button'>
                     <i class="fa fa-calendar fa-2x"></i>
                   </button>
                 </div>
@@ -88,12 +100,15 @@
                   <label>Check #</label>
                 </div>
                 <div class='col-5'>
-                  <div [style.visibility]="((paymentUpsertForm.submitted && paymentId.invalid) || (paymentId.invalid && (paymentId.dirty || paymentId.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+                  <div [style.visibility]="((paymentUpsertForm.submitted && paymentId.invalid) || (paymentId.invalid && (paymentId.dirty || paymentId.touched))) ? 'visible' : 'hidden'"
+                    class='alert alert-danger'>Invalid</div>
                 </div>
               </div>
             </div>
             <div class='col-6'>
-              <input type='text' class='form-control' id='paymentId' name='paymentId' #paymentId='ngModel' [(ngModel)]='checkNumber' [ngModelOptions]='{standalone: true}' required />
+              <input type='text' class='form-control' id='paymentId' name='paymentId'
+                #paymentId='ngModel' [(ngModel)]='checkNumber' [ngModelOptions]='{standalone: true}'
+                required />
             </div>
           </div>
           <div class='form-group row align-items-center'>
@@ -103,15 +118,18 @@
                   <label>Academic Year</label>
                 </div>
                 <div class='col-5'>
-                  <div id='academicYearAlert' [style.visibility]="academicYearVisibility ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+                  <div id='academicYearAlert' [style.visibility]="academicYearVisibility ? 'visible' : 'hidden'"
+                    class='alert alert-danger'>Invalid</div>
                 </div>
               </div>
             </div>
             <div class='col-6'>
               <div ngbDropdown class='d-inline-block'>
-                <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdownToggle' name='academicYearDropdownToggle'>{{selectedAcademicYear}}</button>
+                <button type='button' ngbDropdownToggle class='btn btn-outline-primary'
+                  id='academicYearDropdownToggle' name='academicYearDropdownToggle'>{{selectedAcademicYear}}</button>
                 <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdownToggle'>
-                  <button type='button' class='dropdown-item' *ngFor='let y of schoolYears' (click)='setSelectedAcademicYear(y)'>{{y}}</button>
+                  <button type='button' class='dropdown-item' *ngFor='let y of schoolYears'
+                    (click)='setSelectedAcademicYear(y)'>{{y}}</button>
                 </div>
               </div>
             </div>
@@ -127,12 +145,15 @@
                         <label>Split Amount</label>
                       </div>
                       <div class='col-5'>
-                        <div [style.visibility]="((paymentUpsertForm.submitted && splitPaymentAmount.invalid) || (splitPaymentAmount.invalid && (splitPaymentAmount.dirty || splitPaymentAmount.touched))) ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+                        <div [style.visibility]="((paymentUpsertForm.submitted && splitPaymentAmount.invalid) || (splitPaymentAmount.invalid && (splitPaymentAmount.dirty || splitPaymentAmount.touched))) ? 'visible' : 'hidden'"
+                          class='alert alert-danger'>Invalid</div>
                       </div>
                     </div>
                   </div>
                   <div class='col-6' id='split-payment-amt-input'>
-                    <input currencyMask required class='form-control' id='splitAmount' name='splitAmount' [(ngModel)]='splitAmount' #splitPaymentAmount='ngModel' />
+                    <input currencyMask required class='form-control' id='splitAmount'
+                      name='splitAmount' [(ngModel)]='splitAmount'
+                      #splitPaymentAmount='ngModel' />
                   </div>
                 </div>
               </div>
@@ -152,15 +173,18 @@
                     <label>Split Academic Year</label>
                   </div>
                   <div class='col-5'>
-                    <div id='splitAcademicYearAlert' [style.visibility]="academicYearSplitVisibility ? 'visible' : 'hidden'" class='alert alert-danger'>Invalid</div>
+                    <div id='splitAcademicYearAlert' [style.visibility]="academicYearSplitVisibility ? 'visible' : 'hidden'"
+                      class='alert alert-danger'>Invalid</div>
                   </div>
                 </div>
               </div>
               <div class='col-6'>
                 <div ngbDropdown class='d-inline-block'>
-                  <button type='button' ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown2' name='academicYearDropdown2'>{{selectedAcademicYearSplit}}</button>
+                  <button type='button' ngbDropdownToggle class='btn btn-outline-primary'
+                    id='academicYearDropdown2' name='academicYearDropdown2'>{{selectedAcademicYearSplit}}</button>
                   <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown2'>
-                    <button type='button' class='dropdown-item' *ngFor='let y of schoolYears' (click)='setSelectedAcademicYearSplit(y)'>{{y}}</button>
+                    <button type='button' class='dropdown-item' *ngFor='let y of schoolYears'
+                      (click)='setSelectedAcademicYearSplit(y)'>{{y}}</button>
                   </div>
                 </div>
               </div>

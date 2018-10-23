@@ -30,6 +30,7 @@ export class PaymentsListComponent implements OnInit {
   private skip: number;
   private selectedBulkImportFile;
   public spinnerMsg: string;
+  public dateModel: any;
 
   constructor(
     private globals: Globals,
@@ -224,8 +225,13 @@ export class PaymentsListComponent implements OnInit {
         this.selectedBulkImportFile[0],
       );
 
+      let date: Date;
+      if (this.dateModel) {
+        date = new Date(this.dateModel.year, this.dateModel.month - 1, this.dateModel.day);
+      }
+
       this.ngxSpinnerService.show();
-      this.paymentsService.updatePDEPayments(importData).subscribe(
+      this.paymentsService.updatePDEPayments(date, importData).subscribe(
         data => {
           console.log('PaymentListComponent.doImport():  ', data['schoolDistricts']);
           this.ngxSpinnerService.hide();

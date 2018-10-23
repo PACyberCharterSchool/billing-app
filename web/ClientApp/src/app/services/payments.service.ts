@@ -45,8 +45,11 @@ export class PaymentsService {
     return this.httpClient.put<Payment>(url, reqBody, this.headers);
   }
 
-  public updatePDEPayments(paymentData: FormData): Observable<Payment[]> {
-    const url = this.apiPaymentsUrl + `?file=${paymentData}`;
+  public updatePDEPayments(date: Date, paymentData: FormData): Observable<Payment[]> {
+    let url = this.apiPaymentsUrl + `?file=${paymentData}`;
+    if (date) {
+      url += `&date=${date.toLocaleDateString('en-US')}`
+    }
     return this.httpClient.put<any>(url, this.serializePDEPaymentRequestBodyObject(paymentData));
   }
 
@@ -54,7 +57,7 @@ export class PaymentsService {
     Object.keys(paymentData).forEach(
       k => {
         const v = paymentData[k];
-        if (typeof(v) === 'object') {
+        if (typeof (v) === 'object') {
           paymentData.set(k, JSON.stringify(v));
         } else {
           paymentData.set(k, v);
