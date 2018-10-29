@@ -25,13 +25,13 @@ namespace models.Reporters
 		public string CheckNumber { get; set; }
 		public double? CheckAmount { get; set; }
 		public double? UniPayAmount { get; set; }
-		public string Date { get; set; }
+		public DateTime Date { get; set; }
 	}
 
 	public class InvoiceTransaction
 	{
-		public InvoicePayment Payment { get; set; }
-		public double? Refund { get; set; }
+		public IList<InvoicePayment> Payments { get; set; }
+		public IList<double> Refunds { get; set; }
 	}
 
 	public class InvoiceTransactions
@@ -242,22 +242,21 @@ namespace models.Reporters
 							Where(p => p.Date >= start && p.Date <= end).
 							ToList();
 
-						if (districtPayments.Count > 0)
+						foreach (var districtPayment in districtPayments)
 						{
-							transaction.Payment = new InvoicePayment
+							var payment = new InvoicePayment
 							{
-								Type = districtPayments[0].Type.Value,
-								CheckNumber = String.Join("\n", districtPayments.Select(p => p.ExternalId)),
-								CheckAmount = districtPayments.Where(p => p.Type == PaymentType.Check).Sum(p => p.Amount),
-								UniPayAmount = districtPayments.Where(p => p.Type == PaymentType.UniPay).Sum(p => p.Amount),
-								Date = String.Join("\n", districtPayments.Select(p => p.Date.ToString("M/d/yyyy"))),
+								Type = districtPayment.Type.Value,
+								CheckNumber = districtPayment.ExternalId,
+								CheckAmount = districtPayment.Type == PaymentType.Check ? districtPayment.Amount : (double?)null,
+								UniPayAmount = districtPayment.Type == PaymentType.UniPay ? districtPayment.Amount : (double?)null,
+								Date = districtPayment.Date,
 							};
 
-							if (transaction.Payment.CheckAmount == 0)
-								transaction.Payment.CheckAmount = null;
+							if (transaction.Payments == null)
+								transaction.Payments = new List<InvoicePayment>();
 
-							if (transaction.Payment.UniPayAmount == 0)
-								transaction.Payment.UniPayAmount = null;
+							transaction.Payments.Add(payment);
 						}
 					}
 
@@ -266,8 +265,14 @@ namespace models.Reporters
 						var districtRefunds = refunds[aun].
 							Where(r => r.Date >= start && r.Date <= end).
 							ToList();
-						if (districtRefunds.Count > 0)
-							transaction.Refund = districtRefunds.Sum(r => (double?)r.Amount);
+
+						foreach (var districtRefund in districtRefunds)
+						{
+							if (transaction.Refunds == null)
+								transaction.Refunds = new List<double>();
+
+							transaction.Refunds.Add(districtRefund.Amount);
+						}
 					}
 
 					property.SetValue(transactions, transaction);

@@ -108,16 +108,16 @@ namespace models.Reporters
 				a.Regular -= d.SchoolDistrict.RegularRate * ((double)d.RegularEnrollments.Values.Sum() / 12);
 				a.Special -= d.SchoolDistrict.SpecialRate * ((double)d.SpecialEnrollments.Values.Sum() / 12);
 
-				var tt = d.Transactions.AsDictionary().Values.Where(t => t.Payment != null || t.Refund.HasValue);
+				var tt = d.Transactions.AsDictionary().Values.Where(t => t.Payments != null || t.Refunds != null);
 				var check = tt.
-					Where(t => t.Payment != null && t.Payment.CheckAmount.HasValue).
-					Sum(t => t.Payment.CheckAmount.Value);
+					Where(t => t.Payments != null && t.Payments.Any(p => p.Type == PaymentType.Check.Value)).
+					Sum(t => t.Payments.Sum(p => p.CheckAmount));
 				var unipay = tt.
-					Where(t => t.Payment != null && t.Payment.UniPayAmount.HasValue).
-					Sum(t => t.Payment.UniPayAmount.Value);
+					Where(t => t.Payments != null && t.Payments.Any(p => p.Type == PaymentType.UniPay.Value)).
+					Sum(t => t.Payments.Sum(p => p.UniPayAmount));
 				var refund = tt.
-					Sum(t => t.Refund.HasValue ? t.Refund.Value : 0);
-				a.Received += (check + unipay) - refund;
+					Sum(t => t.Refunds != null ? t.Refunds.Sum() : 0);
+				a.Received += ((check ?? 0) + (unipay ?? 0)) - refund;
 			}
 		}
 
