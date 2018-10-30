@@ -273,12 +273,24 @@ namespace api.Controllers
 					{
 						var cell = ws.Cells[next, c];
 
-						const string pattern = @"Payments\[(\d+)\]";
-						var matches = Regex.Matches(cell.StringValue, pattern);
-						if (matches.Count > 0)
 						{
-							var match = matches[0];
-							cell.PutValue(Regex.Replace(cell.StringValue, pattern, $"Payments[{n}]"));
+							const string pattern = @"Payments\[(\d+)\]";
+							var matches = Regex.Matches(cell.StringValue, pattern);
+							if (matches.Count > 0)
+							{
+								var match = matches[0];
+								cell.PutValue(Regex.Replace(cell.StringValue, pattern, $"Payments[{n}]"));
+							}
+						}
+
+						{
+							const string pattern = @"Refunds\[(\d+)\]";
+							var matches = Regex.Matches(cell.StringValue, pattern);
+							if (matches.Count > 0)
+							{
+								var match = matches[0];
+								cell.PutValue(Regex.Replace(cell.StringValue, pattern, $"Refunds[{n}]"));
+							}
 						}
 					}
 				}
