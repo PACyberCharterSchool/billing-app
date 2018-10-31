@@ -91,17 +91,35 @@ namespace models.Reporters
 
 			double? SdForMonth(IDictionary<string, InvoiceTransaction> tt, Month month)
 			{
-				return tt.ContainsKey(month.Name) ? tt[month.Name].Payments.Sum(p => p.CheckAmount) : null;
+				if (!tt.ContainsKey(month.Name))
+					return null;
+
+				if (tt[month.Name].Payments == null)
+					return null;
+
+				return tt[month.Name].Payments.Sum(p => p.CheckAmount ?? 0);
 			}
 
 			double? PdeForMonth(IDictionary<string, InvoiceTransaction> tt, Month month)
 			{
-				return tt.ContainsKey(month.Name) ? tt[month.Name].Payments.Sum(p => p.UniPayAmount) : null;
+				if (!tt.ContainsKey(month.Name))
+					return null;
+
+				if (tt[month.Name].Payments == null)
+					return null;
+
+				return tt[month.Name].Payments.Sum(p => p.UniPayAmount ?? 0);
 			}
 
 			double? RefundForMonth(IDictionary<string, InvoiceTransaction> tt, Month month)
 			{
-				return tt.ContainsKey(month.Name) ? tt[month.Name].Refunds.Sum() : (double?)null;
+				if (!tt.ContainsKey(month.Name))
+					return null;
+
+				if (tt[month.Name].Refunds == null)
+					return null;
+
+				return tt[month.Name].Refunds.Sum();
 			}
 		}
 
