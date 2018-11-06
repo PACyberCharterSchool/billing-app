@@ -18,7 +18,11 @@ namespace models
 
 		public static T FromString(string value)
 		{
-			return GetAll().First(t => t.Value.ToLower() == value.ToLower());
+			var s = GetAll().FirstOrDefault(t => t.Value.ToLower() == value.ToLower());
+			if (s == null)
+				throw new ArgumentException($"{typeof(T).Name} does not contain value '{value}'");
+
+			return s;
 		}
 
 		private static IList<T> _fields;
