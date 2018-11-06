@@ -80,7 +80,6 @@ export class InvoicesListComponent implements OnInit {
 
     this.reportsService.getInvoices(null, null, null, null).subscribe(
       data => {
-        console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
         this.reports = this.allReports = data['reports'];
         this.ngxSpinnerService.hide();
       },
@@ -92,7 +91,6 @@ export class InvoicesListComponent implements OnInit {
 
     this.templatesService.getTemplates(this.skip).subscribe(
       data => {
-        console.log(`InvoiceCreateFormComponent.ngOnInit(): data is ${data}.`);
         this.templates = data['templates'];
       },
       error => {
@@ -106,7 +104,7 @@ export class InvoicesListComponent implements OnInit {
     this.selectedScope = 'Select billing period...';
   }
 
-  sort(property) {
+  sort(property: string): void {
     this.isDescending = !this.isDescending; // change the direction
     this.property = property;
     this.direction = this.isDescending ? 1 : -1;
