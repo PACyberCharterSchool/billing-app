@@ -110,6 +110,14 @@ export class InvoicesListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
+  getSortClass(property: string): object {
+    return {
+      'fa-sort': this.property !== property,
+      'fa-sort-desc': this.property === property && this.isDescending,
+      'fa-sort-asc': this.property === property && !this.isDescending,
+    };
+  }
+
   filterInvoices() {
     this.reports = this.allReports.filter(
       (i) => {
