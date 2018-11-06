@@ -231,6 +231,72 @@ namespace api.Controllers
 				}
 		}
 
+		private void HandleMultipleTransactions(Worksheet ws, InvoiceTransactions transactions)
+		{
+			var monthRows = new Dictionary<string, int> {
+				{"July", 18},
+				{"August", 19},
+				{"September", 20},
+				{"October", 21},
+				{"November", 22},
+				{"December", 23},
+				{"January", 24},
+				{"February", 25},
+				{"March", 26},
+				{"April", 27},
+				{"May", 28},
+				{"June", 29},
+			};
+
+			// Reverse to work bottom-up, preserving row indexes.
+			foreach (var transaction in transactions.AsDictionary().Reverse())
+			{
+				int num = 0;
+				if (transaction.Value.Payments != null)
+					num = transaction.Value.Payments.Count;
+
+				if (transaction.Value.Refunds != null && transaction.Value.Refunds.Count > num)
+					num = transaction.Value.Refunds.Count;
+
+				if (num <= 1)
+					continue;
+
+				// We don't want to clone the 0th row, as it already exists.
+				for (var n = 1; n < num; n++)
+				{
+					var row = monthRows[transaction.Key];
+					var next = row + n;
+					ws.Cells.InsertRow(next);
+					ws.Cells.CopyRow(ws.Cells, row, next);
+
+					for (var c = 5; c <= 11; c++)
+					{
+						var cell = ws.Cells[next, c];
+
+						{
+							const string pattern = @"Payments\[(\d+)\]";
+							var matches = Regex.Matches(cell.StringValue, pattern);
+							if (matches.Count > 0)
+							{
+								var match = matches[0];
+								cell.PutValue(Regex.Replace(cell.StringValue, pattern, $"Payments[{n}]"));
+							}
+						}
+
+						{
+							const string pattern = @"Refunds\[(\d+)\]";
+							var matches = Regex.Matches(cell.StringValue, pattern);
+							if (matches.Count > 0)
+							{
+								var match = matches[0];
+								cell.PutValue(Regex.Replace(cell.StringValue, pattern, $"Refunds[{n}]"));
+							}
+						}
+					}
+				}
+			}
+		}
+
 		private void CloneStudentItemizationSheets(
 			Workbook src,
 			Workbook wb,
@@ -334,13 +400,11 @@ namespace api.Controllers
 			var wb = new Workbook();
 
 			var districts = invoice.Districts.ToList();
-			var summaryPages = new List<int>();
 			for (int i = 0; i < districts.Count; i++)
 			{
 				var district = districts[i];
 				CloneInvoiceSummarySheet(source, wb, i, district.SchoolDistrict.Name);
-
-				summaryPages.Add(wb.Worksheets.Last().Index);
+				HandleMultipleTransactions(wb.Worksheets.Last(), district.Transactions);
 
 				var studentCount = district.Students.Count();
 				if (studentCount > 0)
@@ -350,28 +414,6 @@ namespace api.Controllers
 			// generate xlsx
 			var json = JsonConvert.SerializeObject(invoice);
 			wb = _exporter.Export(wb, JsonConvert.DeserializeObject(json));
-
-			// do this after data is actually in cells
-			foreach (var p in summaryPages)
-			{
-				var sheet = wb.Worksheets[p];
-
-				for (var r = 18; r <= 29; r++)
-				{
-					if (!sheet.Cells[r, 6].StringValue.Contains('\n'))
-						continue;
-
-					for (var c = 6; c <= 7; c++)
-					{
-						var style = sheet.Cells[r, c].GetStyle();
-						style.IsTextWrapped = true;
-						sheet.Cells[r, c].SetStyle(style);
-					}
-
-					var newlines = sheet.Cells[r, 6].StringValue.Count(s => s == '\n');
-					sheet.Cells.SetRowHeight(r, sheet.Cells.GetRowHeight(r) * (newlines + 1));
-				}
-			}
 
 			// create report
 			Report report;
