@@ -135,7 +135,7 @@ export class InvoicesListComponent implements OnInit {
   refreshInvoices(): void {
     this.spinnerMsg = 'Loading invoices.  Please wait...';
     this.ngxSpinnerService.show();
-    this.reportsService.getReportsByMeta({'Type': ReportType.Invoice, 'Name': '', 'Approved': null, 'SchoolYear': null}).subscribe(
+    this.reportsService.getReportsByMeta({ 'Type': ReportType.Invoice, 'Name': '', 'SchoolYear': null }).subscribe(
       data => {
         console.log(`InvoicesListComponent.refreshInvoices(): data is ${data}.`);
         this.reports = this.allReports = data['reports'];
@@ -151,7 +151,7 @@ export class InvoicesListComponent implements OnInit {
   listDisplayableFields() {
     if (this.allReports) {
       const fields = this.utilitiesService.objectKeys(this.allReports[0]);
-      const rejected = ['data', 'xlsx', 'type', 'id', 'pdf'];
+      const rejected = ['data', 'xlsx', 'type', 'id', 'pdf', 'approved'];
       return fields.filter((i) => !rejected.includes(i));
     }
   }
