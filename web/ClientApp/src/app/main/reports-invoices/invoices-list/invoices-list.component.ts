@@ -28,9 +28,9 @@ export class InvoicesListComponent implements OnInit {
   public reports: Report[];
   private allReports: Report[];
   private skip: number;
-  public property: string;
-  public direction: number;
-  private isDescending: boolean;
+  public property = 'name';
+  private isDescending = false;
+  public direction = -1;
   public searchText: string;
   public statuses: string[] = [
     'Approved',

@@ -54,7 +54,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let report of reports | orderBy: {property: property, direction: direction}">
+        <tr *ngFor="let report of reports | orderBy: {property: [property, 'name'], direction: direction}">
           <td placement="top" ngbTooltip="{{report.schoolYear}}">{{report.schoolYear}}</td>
           <td placement="top" ngbTooltip="{{report.scope}}">{{report.scope}}</td>
           <td placement="top" ngbTooltip="{{report.name}}" class="col-4">{{report.name}}</td>
