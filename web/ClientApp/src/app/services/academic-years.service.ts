@@ -1,29 +1,26 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 const baseYear = '2000';
 
+class YearsResponse {
+  years: string[];
+}
+
 @Injectable()
 export class AcademicYearsService {
-  private academicYears: string[];
+  private years: string[];
 
-  constructor() {
-    this.initAcademicYearChronology();
-  }
-
-  initAcademicYearChronology() {
-    const currentDate = new Date();
-    let currentYear = +baseYear;
-    this.academicYears = [];
-
-    while (currentYear <= currentDate.getFullYear()) {
-      this.academicYears.push(`${currentYear.toString()} - ${(currentYear + 1).toString()}`);
-      currentYear++;
-    }
-
-    this.academicYears.sort((a, b) => (a > b ? -1 : 1));
+  constructor(private http: HttpClient) {
+    this.http.get<YearsResponse>('/api/calendars/years', {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      })
+    }).subscribe(res => this.years = res.years);
   }
 
   getAcademicYears(): string[] {
-    return this.academicYears;
+    return this.years;
   }
 }

@@ -27,7 +27,6 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
   private calendarImportFormData: FormData = new FormData();
   public selectedAcademicYear: string;
   public selectedImportAcademicYear: string;
-  public schoolYears: string[];
   public calendarSchoolYears: string[];
 
   constructor(
@@ -38,29 +37,27 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
     private ngbModal: NgbModal,
     private globals: Globals
   ) {
-    this.selectedAcademicYear = globals.currentSchoolYear;
     this.direction = 1;
     this.property = 'schoolDay';
   }
 
   ngOnInit() {
-    this.schoolCalendarService.getByYear(this.globals.currentSchoolYear).subscribe(
-      data => {
-        console.log('AdministrationSchoolCalendarComponent.ngOnInit(): school calendar is ', data['calendar']);
-        this.schoolCalendar = data['calendar'];
-        this.days = this.schoolCalendar.days;
-      },
-      error => {
-        console.log('AdministrationSchoolCalendarComponent.ngOnInit(): error is ', error);
-      }
-    );
-
-    this.schoolYears = this.academicYearsService.getAcademicYears();
-
     this.schoolCalendarService.getAcademicYears().subscribe(
       data => {
         this.calendarSchoolYears = data['years'];
+        this.selectedAcademicYear = this.calendarSchoolYears[0];
         console.log('AdministrationSchoolCalendarComponent.ngOnInit(): data is ', data['years']);
+
+        this.schoolCalendarService.getByYear(this.selectedAcademicYear).subscribe(
+          data2 => {
+            console.log('AdministrationSchoolCalendarComponent.ngOnInit(): school calendar is ', data2['calendar']);
+            this.schoolCalendar = data2['calendar'];
+            this.days = this.schoolCalendar.days;
+          },
+          error => {
+            console.log('AdministrationSchoolCalendarComponent.ngOnInit(): error is ', error);
+          }
+        );
       },
       error => {
         console.log('AdministrationSchoolCalendarComponent.ngOnInit():  error is ', error);
