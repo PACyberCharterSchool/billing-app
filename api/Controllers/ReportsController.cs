@@ -1621,7 +1621,7 @@ namespace api.Controllers
 			var reports = new List<Report>();
 			var now = DateTime.Now;
 			var names = _districts.GetManyNames();
-			var stamp = new Random(DateTime.Now.Millisecond).Next();
+			var stamp = DateTime.Now.ToString("YYYYMMddHHmmss");
 
 			foreach (var name in names)
 			{
@@ -1632,7 +1632,7 @@ namespace api.Controllers
 					reports.Add(CreateInvoice(now, invoiceTemplate, new CreateReport
 					{
 						ReportType = create.ReportType,
-						Name = $"{create.Invoice.Scope}_{sd.Name}_{stamp}",
+						Name = $"Invoice_{sd.Name}_{create.Invoice.Scope}_{stamp}",
 						SchoolYear = create.SchoolYear,
 						Invoice = new CreateInvoiceReport
 						{
