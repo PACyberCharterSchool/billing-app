@@ -20,7 +20,7 @@ import { InvoiceCreateFormComponent } from '../invoice-create-form/invoice-creat
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { NgxSpinnerService } from 'ngx-spinner';
-import moment = require('moment');
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-invoices-monthly-combined-list',

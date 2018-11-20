@@ -9,7 +9,7 @@ import { UtilitiesService } from '../../../services/utilities.service';
 import { ReportsService } from '../../../services/reports.service';
 import { FileSaverService } from '../../../services/file-saver.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
-import moment = require('moment');
+import * as moment from 'moment';
 import { Globals } from '../../../globals';
 
 @Component({

@@ -12,7 +12,7 @@ import { FileSaverService } from '../../../services/file-saver.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
 import { Globals } from '../../../globals';
-import moment = require('moment');
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-csiu-list',
