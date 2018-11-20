@@ -10,7 +10,7 @@ import { FileSaverService } from '../../../services/file-saver.service';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
-import moment = require('moment');
+import * as moment from 'moment';
 import { Globals } from '../../../globals';
 
 @Component({
