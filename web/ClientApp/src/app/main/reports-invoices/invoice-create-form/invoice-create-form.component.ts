@@ -20,7 +20,7 @@ import { Observable } from 'rxjs/Observable';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 
 import { NgxSpinnerService } from 'ngx-spinner';
-import moment = require('moment');
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-invoice-create-form',
