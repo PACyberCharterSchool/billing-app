@@ -20,6 +20,7 @@ import { Observable } from 'rxjs/Observable';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 
 import { NgxSpinnerService } from 'ngx-spinner';
+import moment = require('moment');
 
 @Component({
   selector: 'app-invoice-create-form',
@@ -192,7 +193,7 @@ export class InvoiceCreateFormComponent implements OnInit {
   private buildInvoiceCreationInfo(): Object {
     return {
       reportType: ReportType.Invoice,
-      name: this.selectedScope + this.selectedSchoolDistrict.name + '_INVOICE_',
+      name: `Invoice_${this.selectedSchoolDistrict.name}_${this.selectedScope}_${moment().format(this.globals.dateFormat)}`,
       schoolYear: this.selectedSchoolYear.replace(/\s+/g, ''),
       invoice: {
         // asOf: new Date(Date.now()).toLocaleDateString('en-US'),

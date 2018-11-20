@@ -31,24 +31,37 @@
 </div>
 <div class='row invoices-list-row align-items-center'>
   <div class='col-12 invoices-list-col'>
-    <table class='table table-fixed table-striped'>
+    <table class="table table-fixed table-striped">
       <thead>
         <tr>
-          <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
-            {{k | normalizeFieldName}}
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }"
-              aria-hidden="true"></i>
+          <th (click)="sort('schoolYear')">
+            Academic Year
+            <i class="fa" [ngClass]="getSortClass('schoolYear')" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('scope')">
+            Billing Period
+            <i class="fa" [ngClass]="getSortClass('scope')" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('name')" class="col-4">
+            Name
+            <i class="fa" [ngClass]="getSortClass('name')" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('created')">
+            Created
+            <i class="fa" [ngClass]="getSortClass('created')" aria-hidden="true"></i>
           </th>
           <th>Invoice</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor='let report of reports | orderBy: {property: property, direction: direction}'>
-          <td *ngFor='let v of listDisplayableValues(report)' placement='top'
-            ngbTooltip='{{v | normalizeFieldValue}}'>{{v |
-            normalizeFieldValue}}</td>
+        <tr *ngFor="let report of reports | orderBy: {property: [property, 'name'], direction: direction}">
+          <td placement="top" ngbTooltip="{{report.schoolYear}}">{{report.schoolYear}}</td>
+          <td placement="top" ngbTooltip="{{report.scope}}">{{report.scope}}</td>
+          <td placement="top" ngbTooltip="{{report.name}}" class="col-4">{{report.name}}</td>
+          <td placement="top" ngbTooltip="{{report.created | normalizeFieldValue}}">{{report.created
+            | normalizeFieldValue}}</td>
           <td>
-            <button class='dropdown-item btn btn-primary' (click)='displayDownloadFormatDialog(downloadFormatContent, "invoice", report)'>Download</button>
+            <button class="dropdown-item btn btn-primary" (click)="displayDownloadFormatDialog(downloadFormatContent, 'invoice', report)">Download</button>
           </td>
         </tr>
       </tbody>

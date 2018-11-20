@@ -28,9 +28,9 @@ export class InvoicesListComponent implements OnInit {
   public reports: Report[];
   private allReports: Report[];
   private skip: number;
-  public property: string;
-  public direction: number;
-  private isDescending: boolean;
+  public property = 'name';
+  private isDescending = false;
+  public direction = -1;
   public searchText: string;
   public statuses: string[] = [
     'Approved',
@@ -80,7 +80,6 @@ export class InvoicesListComponent implements OnInit {
 
     this.reportsService.getInvoices(null, null, null, null).subscribe(
       data => {
-        console.log('InvoicesListComponent.ngOnInit(): invoices are ', data['reports']);
         this.reports = this.allReports = data['reports'];
         this.ngxSpinnerService.hide();
       },
@@ -92,7 +91,6 @@ export class InvoicesListComponent implements OnInit {
 
     this.templatesService.getTemplates(this.skip).subscribe(
       data => {
-        console.log(`InvoiceCreateFormComponent.ngOnInit(): data is ${data}.`);
         this.templates = data['templates'];
       },
       error => {
@@ -106,10 +104,18 @@ export class InvoicesListComponent implements OnInit {
     this.selectedScope = 'Select billing period...';
   }
 
-  sort(property) {
+  sort(property: string): void {
     this.isDescending = !this.isDescending; // change the direction
     this.property = property;
     this.direction = this.isDescending ? 1 : -1;
+  }
+
+  getSortClass(property: string): object {
+    return {
+      'fa-sort': this.property !== property,
+      'fa-sort-desc': this.property === property && this.isDescending,
+      'fa-sort-asc': this.property === property && !this.isDescending,
+    };
   }
 
   filterInvoices() {
@@ -135,7 +141,7 @@ export class InvoicesListComponent implements OnInit {
   refreshInvoices(): void {
     this.spinnerMsg = 'Loading invoices.  Please wait...';
     this.ngxSpinnerService.show();
-    this.reportsService.getReportsByMeta({'Type': ReportType.Invoice, 'Name': '', 'Approved': null, 'SchoolYear': null}).subscribe(
+    this.reportsService.getReportsByMeta({ 'Type': ReportType.Invoice, 'Name': '', 'SchoolYear': null }).subscribe(
       data => {
         console.log(`InvoicesListComponent.refreshInvoices(): data is ${data}.`);
         this.reports = this.allReports = data['reports'];
@@ -151,7 +157,7 @@ export class InvoicesListComponent implements OnInit {
   listDisplayableFields() {
     if (this.allReports) {
       const fields = this.utilitiesService.objectKeys(this.allReports[0]);
-      const rejected = ['data', 'xlsx', 'type', 'id', 'pdf'];
+      const rejected = ['data', 'xlsx', 'type', 'id', 'pdf', 'approved'];
       return fields.filter((i) => !rejected.includes(i));
     }
   }

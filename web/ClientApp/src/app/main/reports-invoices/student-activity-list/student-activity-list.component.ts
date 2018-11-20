@@ -10,6 +10,8 @@ import { FileSaverService } from '../../../services/file-saver.service';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
+import moment = require('moment');
+import { Globals } from '../../../globals';
 
 @Component({
   selector: 'app-student-activity-list',
@@ -31,6 +33,7 @@ export class StudentActivityListComponent implements OnInit {
   public scopes: string[];
 
   constructor(
+    private globals: Globals,
     private utilitiesService: UtilitiesService,
     private ngbModal: NgbModal,
     private reportsService: ReportsService,
@@ -121,13 +124,8 @@ export class StudentActivityListComponent implements OnInit {
   filterStudentActivityReports(): void {
   }
 
-  private generateBulkActivityName(schoolYear: string, asOfDate: string): string {
-    const billingDate: Date = new Date(asOfDate);
-    const months: string[] = [
-      'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-
-    return 'BulkActivity_' + this.selectedCreateScope + '_' + schoolYear;
+  private generateBulkActivityName(): string {
+    return `Activity_${this.selectedCreateScope}_${moment().format(this.globals.dateFormat)}`;
   }
 
   getSchoolYears(): string[] {
@@ -142,7 +140,7 @@ export class StudentActivityListComponent implements OnInit {
     this.reportsService.createBulkActivity(
       {
         'schoolYear': this.selectedCreateSchoolYear.replace(/\s+/g, ''),
-        'name': this.generateBulkActivityName(this.selectedCreateSchoolYear, this.selectedCreateScope),
+        'name': this.generateBulkActivityName(),
         'bulkStudentInformation': {
           'asOf': new Date(Date.now()).toLocaleString('en-US'),
           'scope': this.selectedCreateScope
