@@ -86,16 +86,22 @@ namespace import
 
 			var month = int.Parse(last.Scope.Substring(last.Scope.Length - 2));
 			var year = int.Parse(last.Scope.Substring(0, 4));
+
+			if (!last.Locked)
+				return FormatScope(year, month);
+
 			if (month >= 12)
 			{
-				month = 0;
+				month = 1;
 				year = now.Year + 1;
 			}
 
-			if (!last.Locked)
-				return $"{year.ToString("0000")}.{(month).ToString("00")}";
-			else
-				return $"{year.ToString("0000")}.{(++month).ToString("00")}";
+			return FormatScope(year, month);
+
+			string FormatScope(int y, int m)
+			{
+				return $"{y.ToString("0000")}.{m.ToString("00")}";
+			}
 		}
 
 		private static bool IsRecon(string filename) => filename.ToLower().Contains("recon");
