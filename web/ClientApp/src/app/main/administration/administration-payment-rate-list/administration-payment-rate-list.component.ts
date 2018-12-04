@@ -62,7 +62,7 @@ export class AdministrationPaymentRateListComponent implements OnInit {
 
   private convertCurrencyValues(schoolDistricts: SchoolDistrict[]): SchoolDistrict[] {
     if (schoolDistricts) {
-      const setSchoolDistrictRates: (sd: SchoolDistrict) => SchoolDistrict = function(sd: SchoolDistrict): SchoolDistrict {
+      const setSchoolDistrictRates: (sd: SchoolDistrict) => SchoolDistrict = function (sd: SchoolDistrict): SchoolDistrict {
         sd.rate = (+sd.rate).toFixed(2);
         sd.alternateRate = (+sd.alternateRate).toFixed(2);
         sd.specialEducationRate = (+sd.specialEducationRate).toFixed(2);
@@ -81,6 +81,10 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     this.isDescending = !this.isDescending; // change the direction
     this.property = property;
     this.direction = this.isDescending ? 1 : -1;
+  }
+
+  getSortClass(property: string): object {
+    return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
   }
 
   filterSchoolDistrictRecords() {

@@ -24,9 +24,7 @@
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
             {{k | normalizeFieldName}}
-            <!-- TODO(Erik): these icons don't work -->
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }"
-              aria-hidden="true"></i>
+            <i class="fa" [ngClass]="getSortClass(k)" aria-hidden="true"></i>
           </th>
         </tr>
       </thead>
