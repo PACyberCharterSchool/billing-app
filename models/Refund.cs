@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace models
 {
@@ -7,6 +8,7 @@ namespace models
 		public int Id { get; set; }
 		public double Amount { get; set; }
 		public string CheckNumber { get; set; }
+		[Column(TypeName = "date")]
 		public DateTime Date { get; set; }
 		public string SchoolYear { get; set; }
 		public string Username { get; set; }
