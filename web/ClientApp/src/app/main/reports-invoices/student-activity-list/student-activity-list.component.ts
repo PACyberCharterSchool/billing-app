@@ -1,13 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-
 import { Report } from '../../../models/report.model';
-
 import { UtilitiesService } from '../../../services/utilities.service';
 import { ReportsService } from '../../../services/reports.service';
 import { StudentRecordsService } from '../../../services/student-records.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
 import { FileSaverService } from '../../../services/file-saver.service';
-
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
 import * as moment from 'moment';
@@ -80,7 +77,7 @@ export class StudentActivityListComponent implements OnInit {
   listDisplayableFields() {
     if (this.allReports) {
       const fields = this.utilitiesService.objectKeys(this.allReports[0]);
-      const rejected = ['data', 'xlsx', 'type', 'id'];
+      const rejected = ['data', 'xlsx', 'type', 'id', 'approved'];
       return fields.filter((i) => !rejected.includes(i));
     }
   }
