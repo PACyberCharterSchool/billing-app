@@ -120,6 +120,14 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
+  getSortClass(property: string): object {
+    return {
+      'fa-sort': this.property !== property,
+      'fa-sort-desc': this.property === property && this.isDescending,
+      'fa-sort-asc': this.property === property && !this.isDescending,
+    };
+  }
+
   filterInvoices() {
     this.bulkReports = this.allBulkReports.filter(
       (i) => {
@@ -146,9 +154,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.ngxSpinnerService.show();
     this.reportsService.getReportsByMeta({
       'Type': ReportType.BulkInvoice,
-      'Name': '',
-      'Approved': null,
-      'SchoolYear': null
     }).subscribe(
       data => {
         this.ngxSpinnerService.hide();
@@ -165,9 +170,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.ngxSpinnerService.show();
     this.reportsService.getReportsByMeta({
       'Type': ReportType.TotalsOnly,
-      'Name': '',
-      'Approved': null,
-      'SchoolYear': null
     }).subscribe(
       data => {
         this.ngxSpinnerService.hide();
@@ -183,21 +185,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
   setSelectedDownloadFormat(format: string): void {
     this.selectedDownloadFormat = format;
-  }
-
-  listDisplayableFields() {
-    if (this.allBulkReports) {
-      const fields = this.utilitiesService.objectKeys(this.allBulkReports[0]);
-      const rejected = ['data', 'xlsx', 'type', 'id', 'pdf', 'approved'];
-      return fields.filter((i) => !rejected.includes(i));
-    }
-  }
-
-  listDisplayableValues(report: Report) {
-    const vkeys = this.listDisplayableFields();
-    const selected = this.utilitiesService.pick(report, vkeys);
-
-    return this.utilitiesService.objectValues(selected);
   }
 
   filterByScope(scope: string): void {
