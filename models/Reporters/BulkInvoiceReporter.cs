@@ -239,7 +239,7 @@ namespace models.Reporters
 					if (payments.ContainsKey(aun))
 					{
 						var districtPayments = payments[aun].
-							Where(p => p.Date >= start && p.Date <= end).
+							Where(p => p.Date.Date >= start.Date && p.Date.Date <= end.Date).
 							ToList();
 
 						foreach (var districtPayment in districtPayments)
@@ -263,7 +263,7 @@ namespace models.Reporters
 					if (refunds.ContainsKey(aun))
 					{
 						var districtRefunds = refunds[aun].
-							Where(r => r.Date >= start && r.Date <= end).
+							Where(r => r.Date.Date >= start.Date && r.Date.Date <= end.Date).
 							ToList();
 
 						foreach (var districtRefund in districtRefunds)

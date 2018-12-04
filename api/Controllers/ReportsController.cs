@@ -1026,7 +1026,7 @@ namespace api.Controllers
 				"The Pennsylvania Cyber Charter School\n" +
 				$"INVOICE for the {result.SchoolYear} SCHOOL YEAR\n" +
 				"Summary Information Sheet\n" +
-				$"For the Months of July {result.FirstYear} through April {result.SecondYear}" // TODO(Erik): second month?
+				$"For the Months of July {result.FirstYear} through {result.ScopeMonth} {result.SecondYear}" // TODO(Erik): second month?
 			);
 			ws.Cells.SetRowHeight(row, ws.Cells.GetRowHeight(row) * 3);
 			row++;

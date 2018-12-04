@@ -29,6 +29,8 @@ namespace models.Reporters
 		public int FirstYear => int.Parse(SchoolYear.Split("-")[0]);
 		public int SecondYear => int.Parse(SchoolYear.Split("-")[1]);
 		public string Scope { get; set; }
+		public DateTime ScopeDateTime => new DateTime(int.Parse(Scope.Substring(0, 4)), int.Parse(Scope.Substring(5, 2)), 1);
+		public string ScopeMonth => ScopeDateTime.ToString("MMMM");
 		public DateTime Prepared { get; set; }
 		public TotalsOnlyEnrollments Enrollments { get; set; }
 		public double RegularDue { get; set; }

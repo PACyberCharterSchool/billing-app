@@ -19,7 +19,7 @@ namespace models.Reporters
 		public static bool IsAfter(this DateTime time, Month month) => !time.IsBefore(month);
 
 		public static DateTime EndOfMonth(this DateTime time)
-			=> new DateTime(time.Year, time.Month, DateTime.DaysInMonth(time.Year, time.Month));
+			=> new DateTime(time.Year, time.Month, DateTime.DaysInMonth(time.Year, time.Month), 23, 59, 59);
 
 		public static DateTime LessDays(this DateTime time, int days) => time.Subtract(TimeSpan.FromDays(days));
 	}
