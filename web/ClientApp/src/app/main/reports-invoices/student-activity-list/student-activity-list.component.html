@@ -33,8 +33,7 @@
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
             {{k | normalizeFieldName}}
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }"
-              aria-hidden="true"></i>
+            <i class="fa" [ngClass]="getSortClass(k)" aria-hidden="true"></i>
           </th>
           <th>Download</th>
         </tr>
@@ -42,8 +41,11 @@
       <tbody>
         <tr *ngFor='let report of reports | orderBy: {property: property, direction: direction}'>
           <td *ngFor='let v of listDisplayableValues(report)'>{{v |
-            normalizeFieldValue}}</td>
-          <td><button type='button' class='btn btn-primary' (click)='downloadStudentActivityReport(report)'>Download</button></td>
+            normalizeFieldValue}}
+          </td>
+          <td>
+            <button type='button' class='btn btn-primary' (click)='downloadStudentActivityReport(report)'>Download</button>
+          </td>
         </tr>
       </tbody>
     </table>
