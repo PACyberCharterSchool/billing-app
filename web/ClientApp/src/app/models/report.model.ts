@@ -14,6 +14,7 @@ class ReportMetadata {
   id: number;
   type: string;
   schoolYear: string;
+  scope: string;
   name: string;
   approved: boolean;
   created: Date;

@@ -31,28 +31,47 @@
     <table class='table table-fixed table-striped'>
       <thead>
         <tr>
-          <th>Totals Only?</th>
-          <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
-            {{k | normalizeFieldName}}
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }"
-              aria-hidden="true"></i>
+          <th (click)="sort('type')">
+            Totals Only?
+            <i class="fa" [ngClass]="getSortClass('type')" aria-hidden="true"></i>
           </th>
-          <th>Download</th>
+          <th (click)="sort('schoolYear')">
+            Academic Year
+            <i class="fa" [ngClass]="getSortClass('schoolYear')" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('scope')">
+            Billing Period
+            <i class="fa" [ngClass]="getSortClass('scope')" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('name')" class="col-4">
+            Name
+            <i class="fa" [ngClass]="getSortClass('name')" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('created')">
+            Created
+            <i class="fa" [ngClass]="getSortClass('created')" aria-hidden="true"></i>
+          </th>
+          <th>
+            Download
+          </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor='let report of bulkReports | orderBy: {property: property, direction: direction}'>
+        <tr *ngFor="let report of bulkReports | orderBy: {property: [property, 'name'], direction: direction}">
           <td *ngIf='report.type === "TotalsOnlyInvoice"'>Yes</td>
           <td *ngIf='report.type !== "TotalsOnlyInvoice"'>No</td>
-          <td *ngFor='let v of listDisplayableValues(report)' placement='top'
-            ngbTooltip='{{v | normalizeFieldValue}}'>{{v |
-            normalizeFieldValue}}</td>
+          <td placement="top">{{report.schoolYear}}</td>
+          <td placement="top">{{report.scope}}</td>
+          <td placement="top" ngbTooltip="{{report.name}}" class="col-4">{{report.name}}</td>
+          <td placement="top" ngbTooltip="{{report.created}}">{{report.created
+            | normalizeFieldValue}}</td>
           <td><button type='button' class='btn btn-primary' (click)='displayDownloadFormatDialog(downloadFormatContent, report)'>Download</button></td>
         </tr>
       </tbody>
     </table>
   </div>
 </div>
+
 <ng-template #bulkCreateContent let-c='close' let-d='dismiss'>
   <div class='modal-header'>
     <h4 class='modal-title'>Create Combined Invoice</h4>
@@ -186,6 +205,7 @@
     </div>
   </form>
 </ng-template>
+
 <ng-template #downloadFormatContent let-c='close' let-d='dismiss'>
   <div class='modal-header'>
     <h4 class='modal-title'>Download as...</h4>

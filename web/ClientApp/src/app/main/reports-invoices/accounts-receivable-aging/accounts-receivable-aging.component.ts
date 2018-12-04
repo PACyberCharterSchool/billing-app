@@ -9,6 +9,8 @@ import { UtilitiesService } from '../../../services/utilities.service';
 import { ReportsService } from '../../../services/reports.service';
 import { FileSaverService } from '../../../services/file-saver.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
+import * as moment from 'moment';
+import { Globals } from '../../../globals';
 
 @Component({
   selector: 'app-accounts-receivable-aging',
@@ -33,6 +35,7 @@ export class AccountsReceivableAgingComponent implements OnInit {
   public spinnerMsg: string;
 
   constructor(
+    private globals: Globals,
     private ngbModalService: NgbModal,
     private ngxSpinnerService: NgxSpinnerService,
     private utilitiesService: UtilitiesService,
@@ -118,17 +121,33 @@ export class AccountsReceivableAgingComponent implements OnInit {
   }
 
   private generateAccountsReceivableAgingReportName(): string {
-    let name = 'AccountsReceivableAging';
+    const parts = new Array<string>();
+    parts.push('Aging');
 
     if (this.fromDate) {
-      name += `_${this.fromDate.year}-${this.fromDate.month}-${this.fromDate.day}`;
+      parts.push(`${this.fromDate.year}${this.fromDate.month}${this.fromDate.day}`);
     }
 
     if (this.asOfDate) {
-      name += `_${this.asOfDate.year}-${this.asOfDate.month}-${this.asOfDate.day}`;
+      parts.push(`${this.asOfDate.year}${this.asOfDate.month}${this.asOfDate.day}`);
     }
 
-    return name;
+    parts.push(`${moment().format(this.globals.dateFormat)}`);
+
+    return parts.join('_');
+    // let name = 'Aging';
+
+    // if (this.fromDate) {
+    //   name += `_${this.fromDate.year}${this.fromDate.month}${this.fromDate.day}`;
+    // }
+
+    // if (this.asOfDate) {
+    //   name += `_${this.asOfDate.year}${this.asOfDate.month}${this.asOfDate.day}`;
+    // }
+
+    // name += `_${moment().format(this.globals.dateFormat)}`;
+
+    // return name;
   }
 
   public onCreateSubmit(): void {

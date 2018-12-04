@@ -20,6 +20,7 @@ import { InvoiceCreateFormComponent } from '../invoice-create-form/invoice-creat
 import { NgbModal, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { NgxSpinnerService } from 'ngx-spinner';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-invoices-monthly-combined-list',
@@ -119,6 +120,14 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
+  getSortClass(property: string): object {
+    return {
+      'fa-sort': this.property !== property,
+      'fa-sort-desc': this.property === property && this.isDescending,
+      'fa-sort-asc': this.property === property && !this.isDescending,
+    };
+  }
+
   filterInvoices() {
     this.bulkReports = this.allBulkReports.filter(
       (i) => {
@@ -145,9 +154,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.ngxSpinnerService.show();
     this.reportsService.getReportsByMeta({
       'Type': ReportType.BulkInvoice,
-      'Name': '',
-      'Approved': null,
-      'SchoolYear': null
     }).subscribe(
       data => {
         this.ngxSpinnerService.hide();
@@ -164,9 +170,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.ngxSpinnerService.show();
     this.reportsService.getReportsByMeta({
       'Type': ReportType.TotalsOnly,
-      'Name': '',
-      'Approved': null,
-      'SchoolYear': null
     }).subscribe(
       data => {
         this.ngxSpinnerService.hide();
@@ -182,21 +185,6 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
 
   setSelectedDownloadFormat(format: string): void {
     this.selectedDownloadFormat = format;
-  }
-
-  listDisplayableFields() {
-    if (this.allBulkReports) {
-      const fields = this.utilitiesService.objectKeys(this.allBulkReports[0]);
-      const rejected = ['data', 'xlsx', 'type', 'id', 'pdf', 'approved'];
-      return fields.filter((i) => !rejected.includes(i));
-    }
-  }
-
-  listDisplayableValues(report: Report) {
-    const vkeys = this.listDisplayableFields();
-    const selected = this.utilitiesService.pick(report, vkeys);
-
-    return this.utilitiesService.objectValues(selected);
   }
 
   filterByScope(scope: string): void {
@@ -264,7 +252,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
       {
         reportType: 'BulkInvoice',
         schoolYear: this.selectedCreateSchoolYear.replace(/\s+/g, ''),
-        name: this.generateBulkInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope),
+        name: this.generateBulkInvoiceName(this.selectedCreateScope),
         bulkInvoice: {
           toSchoolDistrict: new Date(
             this.toSchoolDistrictDate.year,
@@ -295,7 +283,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.ngxSpinnerService.show();
 
     this.reportsService.createTotalsOnlyInvoice(
-      this.generateTotalsOnlyInvoiceName(this.selectedCreateSchoolYear, this.selectedCreateScope, this.paymentType),
+      this.generateTotalsOnlyInvoiceName(this.selectedCreateScope, this.paymentType),
       this.selectedCreateScope,
       this.selectedCreateSchoolYear,
       this.paymentType === 'All' ? undefined : this.paymentType).subscribe(
@@ -364,35 +352,22 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   onIssuedPDEDateChanged() {
   }
 
-  private generateInvoiceRecipientFileNameTag(): string {
-    switch (this.invoiceRecipient) {
-      case 'SD':
-        return 'SD_Only';
-      case 'PDE':
-        return 'PDE_Only';
-      case 'Totals':
-        return 'Totals_Only';
-      default:
-        return '';
+  private generateBulkInvoiceName(scope: string): string {
+    let name = `${scope}_Combined`;
+    if (this.invoiceRecipient !== '' && this.invoiceRecipient !== 'All') {
+      name += `_${this.invoiceRecipient}`;
     }
+    name += `_${moment().format(this.globals.dateFormat)}`;
+
+    return name;
   }
 
-  private generateBulkInvoiceName(schoolYear: string, scope: string): string {
-    return 'BulkInvoice_' + scope + '_' + schoolYear.replace(/\s+/g, '') + this.generateInvoiceRecipientFileNameTag();
-  }
-
-  private generateTotalsOnlyInvoiceName(schoolYear: string, scope: string, paymentType: string): string {
-    let name = 'TotalsOnly_' + scope + '_' + schoolYear.replace(/\s+/g, '');
-    let tag: string;
-    if (paymentType === undefined || paymentType === 'All') {
-      tag = '';
-    } else {
-      tag = paymentType;
+  private generateTotalsOnlyInvoiceName(scope: string, paymentType: string): string {
+    let name = `Totals_${scope}`;
+    if (paymentType !== undefined && paymentType !== 'All') {
+      name += `_${paymentType}`;
     }
-
-    if (tag !== '') {
-      name += '_' + tag;
-    }
+    name += `_${moment().format(this.globals.dateFormat)}`;
 
     return name;
   }

@@ -9,6 +9,8 @@ import { UtilitiesService } from '../../../services/utilities.service';
 import { ReportsService } from '../../../services/reports.service';
 import { FileSaverService } from '../../../services/file-saver.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
+import * as moment from 'moment';
+import { Globals } from '../../../globals';
 
 @Component({
   selector: 'app-accounts-receivable-as-of',
@@ -34,6 +36,7 @@ export class AccountsReceivableAsOfComponent implements OnInit {
   public spinnerMsg: string;
 
   constructor(
+    private globals: Globals,
     private ngbModalService: NgbModal,
     private ngxSpinnerService: NgxSpinnerService,
     private utilitiesService: UtilitiesService,
@@ -121,8 +124,7 @@ export class AccountsReceivableAsOfComponent implements OnInit {
   }
 
   private generateAccountsReceivableAsOfReportName(): string {
-    return 'AccountsReceivableAsOf_' +
-      this.selectedAcademicYear.replace(/\s+/g, '') + '_' + `${this.asOfDate.month}-${this.asOfDate.day}-${this.asOfDate.year}`;
+    return `AsOf_${this.selectedAcademicYear}_${moment().format(this.globals.dateFormat)}`;
   }
 
   public onCreateSubmit(): void {

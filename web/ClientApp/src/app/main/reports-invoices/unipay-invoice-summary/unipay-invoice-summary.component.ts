@@ -9,6 +9,9 @@ import { UtilitiesService } from '../../../services/utilities.service';
 import { ReportsService } from '../../../services/reports.service';
 import { FileSaverService } from '../../../services/file-saver.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
+import { PassThrough } from 'stream';
+import * as moment from 'moment';
+import { Globals } from '../../../globals';
 
 @Component({
   selector: 'app-unipay-invoice-summary',
@@ -34,6 +37,7 @@ export class UnipayInvoiceSummaryComponent implements OnInit {
   public spinnerMsg: string;
 
   constructor(
+    private globals: Globals,
     private ngbModalService: NgbModal,
     private ngxSpinnerService: NgxSpinnerService,
     private utilitiesService: UtilitiesService,
@@ -121,8 +125,14 @@ export class UnipayInvoiceSummaryComponent implements OnInit {
   }
 
   private generateUniPayInvoiceSummaryReportName(): string {
-    return 'UniPayInvoiceSummary_' +
-      this.selectedAcademicYear.replace(/\s+/g, '') + '_' + `${this.asOfDate.month}-${this.asOfDate.day}-${this.asOfDate.year}`;
+    const parts = new Array<string>();
+    parts.push('UniPayInvoiceSummary');
+
+    parts.push(this.selectedAcademicYear);
+    parts.push(`${this.asOfDate.year}${this.asOfDate.month}${this.asOfDate.day}`);
+    parts.push(moment().format(this.globals.dateFormat));
+
+    return parts.join('_');
   }
 
   public onCreateSubmit(): void {

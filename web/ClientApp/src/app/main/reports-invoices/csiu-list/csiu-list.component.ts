@@ -11,6 +11,8 @@ import { ReportsService } from '../../../services/reports.service';
 import { FileSaverService } from '../../../services/file-saver.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
+import { Globals } from '../../../globals';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-csiu-list',
@@ -38,6 +40,7 @@ export class CsiuListComponent implements OnInit {
   private schoolDistricts: SchoolDistrict[];
 
   constructor(
+    private globals: Globals,
     private ngbModalService: NgbModal,
     private ngxSpinnerService: NgxSpinnerService,
     private utilitiesService: UtilitiesService,
@@ -127,8 +130,7 @@ export class CsiuListComponent implements OnInit {
   }
 
   private generateCSIUReportName(): string {
-    const d: Date = new Date(this.asOfDate.year, this.asOfDate.month + 1, this.asOfDate.day);
-    return `CSIU_${d.getMonth() - 1}${d.getFullYear()}`;
+    return `CSIU_${this.asOfDate.year}${this.asOfDate.month}_${moment().format(this.globals.dateFormat)}`;
   }
 
   public onCreateSubmit(): void {
