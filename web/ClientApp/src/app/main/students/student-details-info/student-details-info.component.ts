@@ -11,6 +11,7 @@ import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { validateZipCode } from '../../../validators/zip';
 import { validateState } from '../../../validators/state';
+import { validateGrade } from '../../../validators/grade';
 
 @Component({
   selector: 'app-student-details-info',
@@ -81,7 +82,7 @@ export class StudentDetailsInfoComponent implements OnInit {
       }),
       studentInfo: this.fb.group({
         paSecuredId: this.fb.control(this.student.studentPaSecuredId, Validators.required),
-        gradeLevel: this.fb.control(this.student.studentGradeLevel, Validators.required),
+        gradeLevel: this.fb.control(this.student.studentGradeLevel, Validators.compose([Validators.required, validateGrade])),
         enrollmentDate: this.fb.control(this.student.studentEnrollmentDate, Validators.required),
         withdrawalDate: this.fb.control(this.student.studentWithdrawalDate),
         spedStatus: this.fb.control(this.student.studentIsSpecialEducation),
