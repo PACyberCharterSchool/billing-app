@@ -63,7 +63,7 @@ export class RefundsListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
-  getSortClass(property: string): void {
+  getSortClass(property: string): object {
     return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
   }
 
