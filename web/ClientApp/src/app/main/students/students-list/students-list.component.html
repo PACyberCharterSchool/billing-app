@@ -53,7 +53,7 @@
         </tr>
       </thead>
       <tbody infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]="false">
-        <tr *ngFor='let sr of studentRecords | orderBy: {property: property, direction: direction}'>
+        <tr *ngFor="let sr of studentRecords | orderBy: {property: [property, 'studentLastName', 'studentFirstName'], direction: direction}">
           <td *ngFor='let v of listDisplayableValues(sr)' (click)='showStudentDetails(sr)'
             ngbTooltip='{{v | normalizeFieldValue}}' placement='top'>
             {{v | normalizeFieldValue}}

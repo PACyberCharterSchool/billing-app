@@ -50,8 +50,8 @@ export class StudentsListComponent implements OnInit {
     private router: Router) {
     this.advancedSearchEnabled = false;
     this.isDescending = false;
-    this.property = 'paCyberId';
-    this.direction = 1;
+    this.property = 'schoolDistrictName';
+    this.direction = -1;
     this.skip = 0;
     this.studentRecords = this.allStudentRecords = [];
     this.scopes = [];
