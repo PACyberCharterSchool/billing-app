@@ -30,7 +30,6 @@
         <tr *ngFor='let refund of refunds | orderBy: {property: property, direction: direction}'
           (click)='editRefund(refund)'>
           <td>{{refund.amount | currency}}</td>
-          <td>{{refund.checkNumber}}</td>
           <td>{{refund.date | date: 'MM/dd/yyyy'}}</td>
           <td>{{refund.schoolYear}}</td>
           <td>{{refund.username}}</td>
