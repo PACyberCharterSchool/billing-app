@@ -77,6 +77,7 @@ export class StudentsListComponent implements OnInit {
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
         this.schoolDistricts = data['schoolDistricts'];
+        this.schoolDistricts = this.schoolDistricts.sort((a, b) => a.name.localeCompare(b.name));
       },
       error => {
         console.log('StudentsListComponent.ngOnInit():  error is ', error);
