@@ -10,6 +10,7 @@ import { Observable } from 'rxjs/Observable';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { validateZipCode } from '../../../validators/zip';
+import { validateState } from '../../../validators/state';
 
 @Component({
   selector: 'app-student-details-info',
@@ -39,7 +40,6 @@ export class StudentDetailsInfoComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log('StudentDetailsInfoComponent.ngOnInit(): route is ', this.activatedRoute.url);
     this.activatedRoute.params.subscribe(
       (params) => {
         this.scope = params['scope'];
@@ -51,11 +51,9 @@ export class StudentDetailsInfoComponent implements OnInit {
     this.currentStudentService.currentStudent.subscribe(s => {
       this.student = s;
     });
-    console.log('StudentDetailsInfoComponent.ngOnInit(): student is ', this.student);
 
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
-        console.log('StudentDetailsInfoComponent.ngOnInit():  data is ', data);
         this.schoolDistricts = data['schoolDistricts'];
       },
       error => {
@@ -78,8 +76,8 @@ export class StudentDetailsInfoComponent implements OnInit {
         street1: this.fb.control(this.student.studentStreet1, Validators.required),
         street2: this.fb.control(this.student.studentStreet2),
         city: this.fb.control(this.student.studentCity, Validators.required),
-        state: this.fb.control(this.student.studentState, Validators.required),
-        zip: this.fb.control(this.student.studentZipCode, [Validators.required, validateZipCode])
+        state: this.fb.control(this.student.studentState, Validators.compose([Validators.required, validateState])),
+        zip: this.fb.control(this.student.studentZipCode, Validators.compose([Validators.required, validateZipCode]))
       }),
       studentInfo: this.fb.group({
         paSecuredId: this.fb.control(this.student.studentPaSecuredId, Validators.required),
