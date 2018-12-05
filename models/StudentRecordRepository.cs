@@ -46,7 +46,8 @@ namespace models
 			header.Records = header.Records
 				.OrderBy(r => r.SchoolDistrictName)
 				.ThenBy(r => r.StudentLastName)
-				.ThenBy(r => r.StudentFirstName);
+				.ThenBy(r => r.StudentFirstName)
+				.ThenBy(r => r.StudentEnrollmentDate);
 
 			if (filter != null)
 				header.Records = header.Records.Filter(_parser, filter);
