@@ -134,7 +134,7 @@ export class StudentsListComponent implements OnInit {
     );
   }
 
-  sort(property) {
+  sort(property: string): void {
     this.isDescending = !this.isDescending; // change the direction
     this.property = property;
     this.direction = this.isDescending ? 1 : -1;
