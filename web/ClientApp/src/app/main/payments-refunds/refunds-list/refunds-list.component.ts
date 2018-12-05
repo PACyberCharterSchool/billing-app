@@ -1,17 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-
 import { Refund } from '../../../models/refund.model';
 import { SchoolDistrict } from '../../../models/school-district.model';
-
 import { UtilitiesService } from '../../../services/utilities.service';
 import { RefundsService } from '../../../services/refunds.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
-import { AcademicYearsService } from '../../../services/academic-years.service';
-
 import { RefundUpsertFormComponent } from '../refund-upsert-form/refund-upsert-form.component';
-
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
 import { Globals } from '../../../globals';
 
 @Component({
@@ -47,7 +41,6 @@ export class RefundsListComponent implements OnInit {
     this.refundsService.getRefunds(this.skip).subscribe(
       data => {
         this.allRefunds = this.refunds = data['refunds'];
-        console.log('RefundsListComponent.ngOnInit(): data is ', this.allRefunds);
       },
       error => {
         console.log('RefundsListComponent.ngOnInit(): error is ', error);
@@ -57,7 +50,6 @@ export class RefundsListComponent implements OnInit {
     this.schoolDistrictsService.getSchoolDistricts().subscribe(
       data => {
         this.schoolDistricts = data['schoolDistricts'];
-        console.log('RefundsListComponent.ngOnInit():  school district list is ', this.schoolDistricts);
       },
       error => {
         console.log('RefundsListComponent.ngOnInit():  error is ', error);
@@ -71,11 +63,14 @@ export class RefundsListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
+  getSortClass(property: string): void {
+    return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
+  }
+
   refreshRefundList() {
     this.refundsService.getRefunds(this.skip).subscribe(
       data => {
         this.allRefunds = this.refunds = data['refunds'];
-        console.log('PaymentsListComponent.ngOnInit(): payments are ', this.allRefunds);
       },
       error => {
         console.log('PaymentsListComponent.ngOnInit(): error is ', error);
@@ -127,7 +122,6 @@ export class RefundsListComponent implements OnInit {
 
     modal.result.then(
       (result) => {
-        console.log('RefundsListComponent.createRefund():  result is ', result);
         this.refreshRefundList();
       },
       (reason) => {
@@ -144,7 +138,6 @@ export class RefundsListComponent implements OnInit {
 
     modal.result.then(
       (result) => {
-        console.log('RefundsListComponent.editPayment():  result is ', result);
         this.refreshRefundList();
       },
       (reason) => {
