@@ -1,20 +1,15 @@
-import { Component, Input, OnInit } from '@angular/core';
-
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
-
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { StudentRecord } from '../../../models/student-record.model';
 import { SchoolDistrict } from '../../../models/school-district.model';
-
 import { CurrentStudentService } from '../../../services/current-student.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
 import { StudentRecordsService } from '../../../services/student-records.service';
-
 import { Observable } from 'rxjs/Observable';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
-
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { validateZipCode } from '../../../validators/zip';
 
 @Component({
   selector: 'app-student-details-info',
@@ -84,7 +79,7 @@ export class StudentDetailsInfoComponent implements OnInit {
         street2: this.fb.control(this.student.studentStreet2),
         city: this.fb.control(this.student.studentCity, Validators.required),
         state: this.fb.control(this.student.studentState, Validators.required),
-        zip: this.fb.control(this.student.studentZipCode, Validators.required)
+        zip: this.fb.control(this.student.studentZipCode, [Validators.required, validateZipCode])
       }),
       studentInfo: this.fb.group({
         paSecuredId: this.fb.control(this.student.studentPaSecuredId, Validators.required),
@@ -247,7 +242,7 @@ export class StudentDetailsInfoComponent implements OnInit {
          ${this.student.studentLastName} was successful`;
         this.ngbModal.open(confirmationDlgContent).result.then(
           result => {
-            this.router.navigate(['/students', { outlets: { 'action': ['list']}}]);
+            this.router.navigate(['/students', { outlets: { 'action': ['list'] } }]);
           },
           reason => {
           }
@@ -259,7 +254,7 @@ export class StudentDetailsInfoComponent implements OnInit {
            ${this.student.studentLastName}.  Error: ` + error;
         this.ngbModal.open(confirmationDlgContent).result.then(
           result => {
-            this.router.navigate(['/students', { outlets: { 'action': ['list']}}]);
+            this.router.navigate(['/students', { outlets: { 'action': ['list'] } }]);
           },
           reason => {
           }
