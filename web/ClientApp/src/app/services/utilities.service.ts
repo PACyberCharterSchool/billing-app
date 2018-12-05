@@ -36,8 +36,8 @@ export class UtilitiesService {
   }
 
   pick(obj, keys) {
-    return keys.map(k => k in obj ? {[k]: obj[k]} : {})
-               .reduce((res, o) => Object.assign(res, o), {});
+    return keys.map(k => k in obj ? { [k]: obj[k] } : {})
+      .reduce((res, o) => Object.assign(res, o), {});
   }
 
   isDateValue(val: string): boolean {
@@ -50,5 +50,13 @@ export class UtilitiesService {
     ];
 
     return moment(val, formats, true).isValid();
+  }
+
+  getSortClass(o: { property: string, isDescending: boolean }, property: string): object {
+    return {
+      'fa-sort': o.property !== property,
+      'fa-sort-desc': o.property === property && o.isDescending,
+      'fa-sort-asc': o.property === property && !o.isDescending,
+    };
   }
 }

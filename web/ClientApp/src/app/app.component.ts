@@ -9,8 +9,4 @@ import { Router } from '@angular/router';
 })
 export class AppComponent {
   title = 'PACBill';
-
-  public constructor(private router: Router) {
-    console.log('AppComponent.ctor():  routes are ', this.router.config);
-  }
 }

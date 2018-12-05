@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace models
 {
@@ -16,6 +17,7 @@ namespace models
 		public int Id { get; set; }
 		public string PaymentId { get; set; }
 		public int Split { get; set; }
+		[Column(TypeName = "date")]
 		public DateTime Date { get; set; }
 		public string ExternalId { get; set; }
 		public PaymentType Type { get; set; }
