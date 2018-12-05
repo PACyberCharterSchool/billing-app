@@ -68,13 +68,11 @@ export class StudentAdvancedFilterComponent implements OnInit {
     this.advancedFilterErrorMsg = '';
   }
 
-  public dateSelectedDOBDateHandler(date: Date) {
-    console.log('StudentAdvancedFilter.dateSelectedDOBDateHandler(): date is ', date);
+  public dateSelectedDOBDateHandler(date: Date): void {
     this.ngxSpinnerService.show();
     this.studentRecordsService.getHeaderByScopeByDob(this.scope, date).subscribe(
       data => {
         this.studentsUpdated.emit(data['header']['records']);
-        console.log('StudentAdvancedFilterComponent.dateSelectedDOBDateHandler():  data is ', data);
         this.ngxSpinnerService.hide();
       },
       error => {
@@ -92,7 +90,6 @@ export class StudentAdvancedFilterComponent implements OnInit {
         this.studentRecordsService.getHeaderByScopeByStartByEnd(this.scope, this.startDate, this.endDate).subscribe(
           data => {
             this.studentsUpdated.emit(data['header']['records']);
-            console.log('StudentAdvancedFilter.dateSelectedStartDateHandler():  data is ', data['header']['records']);
             this.ngxSpinnerService.hide();
           },
           error => {
@@ -107,7 +104,6 @@ export class StudentAdvancedFilterComponent implements OnInit {
       this.studentRecordsService.getHeaderByScopeByStart(this.scope, this.startDate).subscribe(
         data => {
           this.studentsUpdated.emit(data['header']['records']);
-          console.log('StudentAdvancedFilter.dateSelectedStartDateHandler():  data is ', data['header']['records']);
           this.ngxSpinnerService.hide();
         },
         error => {
@@ -125,7 +121,6 @@ export class StudentAdvancedFilterComponent implements OnInit {
       if (this.startDate <= this.endDate) {
         this.studentRecordsService.getHeaderByScopeByStartByEnd(this.scope, this.startDate, date).subscribe(
           data => {
-            console.log('StudentAdvancedFilterComponent.dateSelectedEndDateHandler():  data is ', data['header']['records']);
             this.studentRecords = data['header']['records'];
             this.ngxSpinnerService.hide();
           },
@@ -140,7 +135,6 @@ export class StudentAdvancedFilterComponent implements OnInit {
     } else {
       this.studentRecordsService.getHeaderByScopeByEnd(this.scope, date).subscribe(
         data => {
-          console.log('StudentAdvancedFilterComponent.dateSelectedEndDateHandler():  data is ', data['header']['records']);
           this.studentRecords = data['header']['records'];
           this.ngxSpinnerService.hide();
         },
@@ -173,7 +167,6 @@ export class StudentAdvancedFilterComponent implements OnInit {
       this.ngxSpinnerService.show();
       this.studentRecordsService.getHeaderByScopeByGrade(this.scope, grade).subscribe(
         data => {
-          console.log('StudentAdvancedFilterComponent.filterByGrade(): data is ', data);
           this.studentsUpdated.emit(data['header']['records']);
           this.ngxSpinnerService.hide();
         },
@@ -190,7 +183,6 @@ export class StudentAdvancedFilterComponent implements OnInit {
       this.ngxSpinnerService.show();
       this.studentRecordsService.getHeaderByScopeByDob(this.scope, dob).subscribe(
         data => {
-          console.log('StudentAdvancedFilterComponent.filterByDateOfBirth(): students are ', data);
           this.studentRecords = data['header']['records'];
           this.ngxSpinnerService.hide();
         },
@@ -209,7 +201,6 @@ export class StudentAdvancedFilterComponent implements OnInit {
       data => {
         this.studentsUpdated.emit(data['header']['records']);
         this.ngxSpinnerService.hide();
-        console.log('StudentAdvancedFilterComponent.filterByIep():  data is ', data);
       },
       error => {
         console.log('StudentAdvancedFilterComponent.filterByIep():  error is ', error);
