@@ -73,13 +73,8 @@ export class StudentActivityListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
-  // TODO(Erik): use utilitiesService when BA-361 merged in
   getSortClass(property: string): object {
-    return {
-      'fa-sort': this.property !== property,
-      'fa-sort-desc': this.property === property && this.isDescending,
-      'fa-sort-asc': this.property === property && !this.isDescending,
-    };
+    return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
   }
 
   listDisplayableFields() {
