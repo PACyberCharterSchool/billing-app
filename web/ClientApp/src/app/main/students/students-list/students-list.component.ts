@@ -140,6 +140,10 @@ export class StudentsListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
+  getSortClass(property: string): object {
+    return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
+  }
+
   showStudentDetails(studentRecord: StudentRecord) {
     if (this.canEdit) {
       const s: StudentRecord = this.studentRecords.find((student) => student.id === studentRecord.id);
