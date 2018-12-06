@@ -23,6 +23,7 @@ namespace models
 		public PaymentType Type { get; set; }
 		public double Amount { get; set; }
 		public string SchoolYear { get; set; }
+		public string Username { get; set; }
 		public DateTime Created { get; set; }
 		public DateTime LastUpdated { get; set; }
 
