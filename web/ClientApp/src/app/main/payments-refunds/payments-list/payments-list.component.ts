@@ -83,6 +83,10 @@ export class PaymentsListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
+  getSortClass(property: string): object {
+    return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
+  }
+
   filterPaymentRecords() {
     this.payments = this.allPayments.filter(
       (i) => {

@@ -23,9 +23,41 @@
     <table class='table table-fixed table-striped' *ngIf='payments?.length > 0'>
       <thead>
         <tr>
-          <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
-            {{k | normalizeFieldName}}
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }"
+          <th (click)="sort('split')">
+            Split?
+            <i class="fa" [ngClass]="getSortClass('split')" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('amount')">
+            Amount
+            <i class="fa" [ngClass]="getSortClass('amount')" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('externalId')">
+            SD/PDE #
+            <i class="fa" [ngClass]="getSortClass('externalId')" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('date')">
+            Date
+            <i class="fa" [ngClass]="getSortClass('date')" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('schoolYear')">
+            Academic Year
+            <i class="fa" [ngClass]="getSortClass('schoolYear')" aria-hidden="true"></i>
+          </th>
+          <!-- TODO(Erik): this data doesn't exist -->
+          <!-- <th>
+            Created By
+          </th> -->
+          <th (click)="sort('created')">
+            Created
+            <i class="fa" [ngClass]="getSortClass('created')" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('updated')">
+            Updated
+            <i class="fa" [ngClass]="getSortClass('updated')" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('schoolDistrict')">
+            School Dist.
+            <i class="fa" [ngClass]="getSortClass('schoolDistrict')"
               aria-hidden="true"></i>
           </th>
         </tr>
@@ -34,10 +66,11 @@
         <tr *ngFor='let payment of payments | orderBy: {property: property, direction: direction}'
           (click)='editPayment(payment)'>
           <td>{{isSplitPayment(payment) ? 'Yes' : 'No'}}</td>
-          <td>{{payment?.date | date: 'MM/dd/yyyy'}}</td>
-          <td>{{payment?.externalId}}</td>
           <td>{{getPaymentAmount(payment) | currency}}</td>
+          <td>{{payment?.externalId}}</td>
+          <td>{{payment?.date | date: 'MM/dd/yyyy'}}</td>
           <td>{{payment?.schoolYear}}</td>
+          <!-- <td>Created By</td> -->
           <td>{{payment?.created | date: 'MM/dd/yyyy'}}</td>
           <td>{{payment?.lastUpdated | date: 'MM/dd/yyyy'}}</td>
           <td placeholder='top' ngbTooltip='{{payment?.schoolDistrict.name}}'>{{payment?.schoolDistrict.name}}</td>
