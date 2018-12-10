@@ -177,11 +177,12 @@ namespace api.Controllers
 			{
 				try
 				{
-					_audits.Create(new AuditRecord {
+					_audits.Create(new AuditRecord
+					{
 						Username = username,
 						Activity = AuditRecordActivity.UPDATE_SCHOOL_CALENDAR,
 						Timestamp = DateTime.Now,
-						Identifier = calendar.Id.ToString(),
+						Identifier = calendar.SchoolYear,
 						Field = null,
 						Next = null,
 						Previous = null,
