@@ -28,13 +28,13 @@ namespace api.Controllers
 	{
 		private readonly PacBillContext _context;
 		private readonly IStudentRecordRepository _records;
-		private readonly IAuditRecordRepository _audits;
+		private readonly IAuditRepository _audits;
 		private readonly ILogger<StudentRecordsController> _logger;
 
 		public StudentRecordsController(
 			PacBillContext context,
 			 IStudentRecordRepository records,
-			 IAuditRecordRepository audits,
+			 IAuditRepository audits,
 			 ILogger<StudentRecordsController> logger)
 		{
 			_context = context;
@@ -325,18 +325,20 @@ namespace api.Controllers
 				try
 				{
 					_records.Update(current);
-					_audits.CreateMany(delta.Select(d => new AuditRecord
+					_audits.Create(new AuditHeader
 					{
 						Username = username,
-						Activity = AuditRecordActivity.EDIT_STUDENT_RECORD,
+						Activity = AuditActivity.EDIT_STUDENT_RECORD,
 						Timestamp = DateTime.Now,
 						Identifier = current.StudentId,
-						Field = d.Key,
-						Next = d.Value.Next,
-						Previous = d.Value.Previous,
-					}).ToList());
+						Details = delta.Select(d => new AuditDetail
+						{
+							Field = d.Key,
+							Previous = d.Value.Previous,
+							Next = d.Value.Next,
+						}).ToList(),
+					});
 					_context.SaveChanges();
-
 					tx.Commit();
 				}
 				catch (Exception)

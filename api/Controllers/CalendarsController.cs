@@ -22,13 +22,13 @@ namespace api.Controllers
 	{
 		private readonly PacBillContext _context;
 		private readonly ICalendarRepository _calendars;
-		private readonly IAuditRecordRepository _audits;
+		private readonly IAuditRepository _audits;
 		private readonly ILogger<CalendarsController> _logger;
 
 		public CalendarsController(
 			PacBillContext context,
 			ICalendarRepository calendars,
-			IAuditRecordRepository audits,
+			IAuditRepository audits,
 			ILogger<CalendarsController> logger)
 		{
 			_context = context;
@@ -177,15 +177,13 @@ namespace api.Controllers
 			{
 				try
 				{
-					_audits.Create(new AuditRecord
+					// TODO(Erik): details for each day changed
+					_audits.Create(new AuditHeader
 					{
 						Username = username,
-						Activity = AuditRecordActivity.UPDATE_SCHOOL_CALENDAR,
+						Activity = AuditActivity.UPDATE_SCHOOL_CALENDAR,
 						Timestamp = DateTime.Now,
 						Identifier = calendar.SchoolYear,
-						Field = null,
-						Next = null,
-						Previous = null,
 					});
 					_context.SaveChanges();
 
