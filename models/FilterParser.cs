@@ -93,7 +93,11 @@ namespace models
 			{"ge", (s, v, t) => Expression.GreaterThanOrEqual(s, Expression.Constant(v, t))},
 			{"lt", (s, v, t) => Expression.LessThan(s, Expression.Constant(v, t))},
 			{"le", (s, v, t) => Expression.LessThanOrEqual(s, Expression.Constant(v, t))},
-			{"has", (s, v, t) => Expression.Call(s, typeof(string).GetMethod("Contains"), Expression.Constant(v, t))},
+			{"has", (s, v, t) => {
+				var member = Expression.Call(s, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
+				var value = Expression.Call(Expression.Constant(v, t), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
+				return Expression.Call(member, typeof(string).GetMethod("Contains"), value);
+			}},
 			{"bgn", (s, v, t) => Expression.Call(s, typeof(string).GetMethod("StartsWith", new[]{typeof(string)}), Expression.Constant(v, t))},
 			{"end", (s, v, t) => Expression.Call(s, typeof(string).GetMethod("EndsWith", new[]{typeof(string)}), Expression.Constant(v, t))},
 		};

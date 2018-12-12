@@ -50,8 +50,8 @@ export class StudentsListComponent implements OnInit {
     private router: Router) {
     this.advancedSearchEnabled = false;
     this.isDescending = false;
-    this.property = 'paCyberId';
-    this.direction = 1;
+    this.property = 'schoolDistrictName';
+    this.direction = -1;
     this.skip = 0;
     this.studentRecords = this.allStudentRecords = [];
     this.scopes = [];
@@ -77,6 +77,7 @@ export class StudentsListComponent implements OnInit {
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
         this.schoolDistricts = data['schoolDistricts'];
+        this.schoolDistricts = this.schoolDistricts.sort((a, b) => a.name.localeCompare(b.name));
       },
       error => {
         console.log('StudentsListComponent.ngOnInit():  error is ', error);
@@ -134,10 +135,14 @@ export class StudentsListComponent implements OnInit {
     );
   }
 
-  sort(property) {
+  sort(property: string): void {
     this.isDescending = !this.isDescending; // change the direction
     this.property = property;
     this.direction = this.isDescending ? 1 : -1;
+  }
+
+  getSortClass(property: string): object {
+    return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
   }
 
   showStudentDetails(studentRecord: StudentRecord) {

@@ -48,16 +48,16 @@
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
             {{k | normalizeFieldName}}
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }"
-              aria-hidden="true"></i>
+            <i class="fa" [ngClass]="getSortClass(k)" aria-hidden="true"></i>
           </th>
         </tr>
       </thead>
       <tbody infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]="false">
-        <tr *ngFor='let sr of studentRecords | orderBy: {property: property, direction: direction}'>
+        <tr *ngFor="let sr of studentRecords | orderBy: {property: [property, 'studentLastName', 'studentFirstName', 'studentEnrollmentDate'], direction: direction}">
           <td *ngFor='let v of listDisplayableValues(sr)' (click)='showStudentDetails(sr)'
-            ngbTooltip='{{v | normalizeFieldValue}}' placement='top'>{{v |
-            normalizeFieldValue}}</td>
+            ngbTooltip='{{v | normalizeFieldValue}}' placement='top'>
+            {{v | normalizeFieldValue}}
+          </td>
         </tr>
       </tbody>
     </table>
