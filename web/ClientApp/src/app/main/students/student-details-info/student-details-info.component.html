@@ -4,212 +4,193 @@
       <div class='col-12 student-school-info-col card card-outline-secondary'>
         <div class='card-header'>
           <div class='col-12 student-bio-info-col'>
-            <h2>{{student.studentFirstName}} {{student.studentMiddleInitial}} {{student.studentLastName}}</h2>
-            <h4>{{student.studentDateOfBirth | date: 'MM/dd/yyyy'}} &#8226; {{student.studentStreet1}} {{student.studentStreet2}} {{student.studentCity}}, {{student.studentState}} {{student.studentZipCode}}</h4>
+            <h2>{{student.studentFirstName}} {{student.studentMiddleInitial}}
+              {{student.studentLastName}}</h2>
+            <h4>{{student.studentDateOfBirth | date: 'MM/dd/yyyy'}} &#8226;
+              {{student.studentStreet1}} {{student.studentStreet2}}
+              {{student.studentCity}}, {{student.studentState}}
+              {{student.studentZipCode}}</h4>
           </div>
         </div>
         <div class='card-body'>
-          <form
-            appEnrollmentWithdrawalDateConflictValidator
-            appFormerCurrentIepDateConflictValidator
-            class='form'
-            role='form'
-            [formGroup]='studentDetailForm'
-            (ngSubmit)='updateStudentInfo(confirmationContent)'>
-            <div class='row'>
-              <div class='col-6 form-group flex-nowrap' formGroupName='personalInfo'>
+          <form appEnrollmentWithdrawalDateConflictValidator
+            appFormerCurrentIepDateConflictValidator class='form' role='form'
+            [formGroup]='studentDetailForm' (ngSubmit)='updateStudentInfo(confirmationContent)'>
+            <div class='row flex-wrap'>
+              <div class='col-5 form-group flex-nowrap' formGroupName='personalInfo'>
                 <h4>Personal Information</h4>
                 <div class='row align-items-center'>
-                  <div class='col-3'>
-                    <label>
-                      First Name
-                    </label>
-                  </div>
+                  <label class="col-3">First Name</label>
                   <div class='col-9'>
                     <input type='text' class='form-control' formControlName='firstName' />
                   </div>
                 </div>
                 <div class='row align-items-center'>
-                  <div class='col-3'>
-                    <label>Middle Initial</label>
-                  </div>
+                  <label class="col-3">Middle Initial</label>
                   <div class='col-9'>
                     <input type='text' class='form-control' formControlName='middleInitial' />
                   </div>
                 </div>
                 <div class='row align-items-center'>
-                  <div class='col-3'>
-                    <label>Last Name</label>
-                  </div>
+                  <label class="col-3">Last Name</label>
                   <div class='col-9'>
                     <input type='text' class='form-control' formControlName='lastName' />
                   </div>
                 </div>
                 <div class='row align-items-center'>
-                  <div class='col-3'>
-                    <label>Date of Birth</label>
-                  </div>
+                  <label class="col-3">Date of Birth</label>
                   <div class='col-9 d-flex align-items-center'>
-                    <input type='text' class='form-control' ngbDatepicker formControlName='dateOfBirth' #dDateOfBirth='ngbDatepicker' />
+                    <input type='text' class='form-control' ngbDatepicker
+                      formControlName='dateOfBirth' #dDateOfBirth='ngbDatepicker' />
                     <div class='input-group-append'>
-                      <button class='btn btn-outline-secondary' (click)='dDateOfBirth.toggle()' type='button'>
+                      <button class='btn btn-outline-secondary' (click)='dDateOfBirth.toggle()'
+                        type='button'>
                         <i class="fa fa-calendar fa-2x"></i>
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class='col-6 form-group flex-nowrap' formGroupName='addressInfo'>
+
+              <div class='col-5 form-group flex-nowrap' formGroupName='addressInfo'>
                 <h4>Address Information</h4>
                 <div class='row align-items-center'>
-                  <div class='col-3'>
-                    <label>Street Address 1</label>
-                  </div>
+                  <label class="col-3">Street Address 1</label>
                   <div class='col-9'>
                     <input type='text' class='form-control' formControlName='street1' />
                   </div>
                 </div>
                 <div class='row align-items-center'>
-                  <div class='col-3'>
-                    <label>Street Address 2</label>
-                  </div>
+                  <label class="col-3">Street Address 2</label>
                   <div class='col-9'>
                     <input type='text' class='form-control' formControlName='street2' />
                   </div>
                 </div>
                 <div class='row align-items-center'>
-                  <div class='col-3'>
-                    <label>City</label>
-                  </div>
+                  <label class="col-3">City</label>
                   <div class='col-9'>
                     <input type='text' class='form-control' formControlName='city' />
                   </div>
                 </div>
                 <div class='row align-items-center'>
-                  <div class='col-3'>
-                    <label>State</label>
-                  </div>
+                  <!-- TODO(Erik): should really be a dropdown -->
+                  <label class="col-3">State</label>
                   <div class='col-9'>
                     <input type='text' class='form-control' formControlName='state' />
                   </div>
                 </div>
                 <div class='row align-items-center'>
-                  <div class='col-3'>
-                    <label>Zip</label>
-                  </div>
+                  <label class="col-3">Zip</label>
                   <div class='col-9'>
                     <input type='text' class='form-control' formControlName='zip' />
                   </div>
                 </div>
-            </div>
-          </div>
-          <div class='row'>
-            <div class='col-12 form-group' formGroupName='studentInfo'>
-              <h4>Student Information</h4>
-              <div class='row align-items-center'>
-                <div class='col-3'>
-                  <label>School District</label>
-                </div>
-                <div class='col-9'>
-                  <label for='typeahead-school-district'></label>
-                  <input id='typeahead-school-district' type='text' class='form-control' formControlName='schoolDistrict' [ngbTypeahead]='search' (selectItem)='setSelectedSchoolDistrict($event)' />
-                </div>
               </div>
-              <div class='row align-items-center'>
-                <div class='col-3'>
-                  <label>PA Secured ID</label>
-                </div>
-                <div class='col-9'>
-                  <input type='text' class='form-control' formControlName='paSecuredId' />
-                </div>
-              </div>
-              <div class='row align-items-center'>
-                <div class='col-3'>
-                  <label>Grade Level</label>
-                </div>
-                <div class='col-9'>
-                  <input type='number' class='form-control' formControlName='gradeLevel' />
-                </div>
-              </div>
-              <div class='row align-items-center'>
-                <div class='col-3'>
-                  <label>Enrollment Date</label>
-                </div>
-                <div class='col-9 d-flex align-items-center'>
-                  <input type='text' class='form-control' ngbDatepicker formControlName='enrollmentDate' #dEnrollmentDate='ngbDatepicker' />
-                  <div class='input-group-append'>
-                    <button class='btn btn-outline-secondary' (click)='dEnrollmentDate.toggle()' type='button'>
-                      <i class="fa fa-calendar fa-2x"></i>
-                    </button>
+
+              <div class='col-5 form-group' formGroupName='studentInfo'>
+                <h4>Student Information</h4>
+                <div class='row align-items-center'>
+                  <label class="col-3">School District</label>
+                  <div class='col-9'>
+                    <label for='typeahead-school-district'></label>
+                    <input id='typeahead-school-district' type='text' class='form-control'
+                      formControlName='schoolDistrict' [ngbTypeahead]='search'
+                      (selectItem)='setSelectedSchoolDistrict($event)' />
                   </div>
                 </div>
-              </div>
-              <div class='row align-items-center'>
-                <div class='col-3'>
-                  <label>Withdrawal Date</label>
-                </div>
-                <div class='col-9 d-flex align-items-center'>
-                  <input type='text' class='form-control' ngbDatepicker formControlName='withdrawalDate' #dWithdrawalDate='ngbDatepicker' />
-                  <div class='input-group-append'>
-                    <button class='btn btn-outline-secondary' (click)='dWithdrawalDate.toggle()' type='button'>
-                      <i class="fa fa-calendar fa-2x"></i>
-                    </button>
+                <div class='row align-items-center'>
+                  <label class="col-3">PA Secured ID</label>
+                  <div class='col-9'>
+                    <input type='text' class='form-control' formControlName='paSecuredId' />
                   </div>
                 </div>
-              </div>
-              <div class='row align-items-center'>
-                <div class='col-3'>
-                  <label>SPED Status</label>
-                </div>
-                <div class='col-9'>
-                  <div class='btn-group btn-group-toggle' ngbRadioGroup name='spedStatus' formControlName='spedStatus'>
-                    <label ngbButtonLabel class='btn-primary'>
-                      <input ngbButton type='radio' [value]='true' /> Yes
-                    </label>
-                    <label ngbButtonLabel class='btn-primary'>
-                      <input ngbButton type='radio' [value]='false' /> No
-                    </label>
+                <div class='row align-items-center'>
+                  <label class="col-3">Grade Level</label>
+                  <div class='col-9'>
+                    <input type='text' class='form-control' formControlName='gradeLevel' />
                   </div>
                 </div>
-              </div>
-              <div class='row align-items-center'>
-                <div class='col-3'>
-                  <label>Current IEP Date</label>
-                </div>
-                <div class='col-9 d-flex align-items-center'>
-                  <input type='text' class='form-control' ngbDatepicker formControlName='currentIepDate' #dCurrentIepDate='ngbDatepicker' />
-                  <div class='input-group-append'>
-                    <button class='btn btn-outline-secondary' (click)='dCurrentIepDate.toggle()' type='button'>
-                      <i class="fa fa-calendar fa-2x"></i>
-                    </button>
+                <div class='row align-items-center'>
+                  <label class="col-3">Enrollment Date</label>
+                  <div class='col-9 d-flex align-items-center'>
+                    <input type='text' class='form-control' ngbDatepicker
+                      formControlName='enrollmentDate' #dEnrollmentDate='ngbDatepicker' />
+                    <div class='input-group-append'>
+                      <button class='btn btn-outline-secondary' (click)='dEnrollmentDate.toggle()'
+                        type='button'>
+                        <i class="fa fa-calendar fa-2x"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class='row align-items-center'>
-                <div class='col-3'>
-                  <label>Prior IEP Date</label>
+                <div class='row align-items-center'>
+                  <label class="col-3">Withdrawal Date</label>
+                  <div class='col-9 d-flex align-items-center'>
+                    <input type='text' class='form-control' ngbDatepicker
+                      formControlName='withdrawalDate' #dWithdrawalDate='ngbDatepicker' />
+                    <div class='input-group-append'>
+                      <button class='btn btn-outline-secondary' (click)='dWithdrawalDate.toggle()'
+                        type='button'>
+                        <i class="fa fa-calendar fa-2x"></i>
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div class='col-9 d-flex align-items-center'>
-                  <input type='text' class='form-control' ngbDatepicker formControlName='formerIepDate' #dFormerIepDate='ngbDatepicker' />
-                  <div class='input-group-append'>
-                    <button class='btn btn-outline-secondary' (click)='dFormerIepDate.toggle()' type='button'>
-                      <i class="fa fa-calendar fa-2x"></i>
-                    </button>
+                <div class='row align-items-center'>
+                  <label class="col-3">SPED Status</label>
+                  <div class='col-9'>
+                    <div class='btn-group btn-group-toggle' ngbRadioGroup name='spedStatus'
+                      formControlName='spedStatus'>
+                      <label ngbButtonLabel class='btn-primary'>
+                        <input ngbButton type='radio' [value]='true' /> Yes
+                      </label>
+                      <label ngbButtonLabel class='btn-primary'>
+                        <input ngbButton type='radio' [value]='false' /> No
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class='row align-items-center'>
+                  <label class="col-3">Current IEP Date</label>
+                  <div class='col-9 d-flex align-items-center'>
+                    <input type='text' class='form-control' ngbDatepicker
+                      formControlName='currentIepDate' #dCurrentIepDate='ngbDatepicker' />
+                    <div class='input-group-append'>
+                      <button class='btn btn-outline-secondary' (click)='dCurrentIepDate.toggle()'
+                        type='button'>
+                        <i class="fa fa-calendar fa-2x"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class='row align-items-center'>
+                  <label class="col-3">Prior IEP Date</label>
+                  <div class='col-9 d-flex align-items-center'>
+                    <input type='text' class='form-control' ngbDatepicker
+                      formControlName='formerIepDate' #dFormerIepDate='ngbDatepicker' />
+                    <div class='input-group-append'>
+                      <button class='btn btn-outline-secondary' (click)='dFormerIepDate.toggle()'
+                        type='button'>
+                        <i class="fa fa-calendar fa-2x"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            </div>
-            <button type='submit' class='btn btn-success btn-lg float-right' [disabled]='!studentDetailForm.valid'>UPDATE</button>
+            <button type='submit' class='btn btn-success btn-lg float-right'
+              [disabled]='!studentDetailForm.valid'>UPDATE</button>
           </form>
         </div>
       </div>
     </div>
   </div>
 </div>
+
 <ng-template #confirmationContent let-c='close' let-d='dismiss'>
   <div class='modal-header'>
-    <h4 class='modal-title'>Update student {{student.studentFirstName}} {{student.studentLastName}}</h4>
+    <h4 class='modal-title'>Update student {{student.studentFirstName}}
+      {{student.studentLastName}}</h4>
     <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
       <span aria-hidden="true">&times;</span>
     </button>
