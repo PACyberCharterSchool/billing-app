@@ -144,11 +144,12 @@ namespace api.Controllers
 			{
 				try
 				{
-					_audits.Create(new AuditRecord {
+					_audits.Create(new AuditRecord
+					{
 						Username = username,
 						Activity = AuditRecordActivity.UPDATE_TEMPLATE,
 						Timestamp = DateTime.Now,
-						Identifier = template.Id.ToString(),
+						Identifier = $"{template.ReportType}_{template.SchoolYear}",
 						Field = null,
 						Next = null,
 						Previous = null,
