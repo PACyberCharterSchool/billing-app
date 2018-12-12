@@ -163,8 +163,7 @@ namespace api.Controllers
 				return new BadRequestObjectResult(
 					new ErrorResponse($"Invalid file Content-Type '{file.ContentType}'."));
 
-			var parse = _parsers[file.ContentType]; var calendar = parse(year, file.OpenReadStream());
-
+			var calendar = _parsers[file.ContentType](year, file.OpenReadStream());
 			calendar = await Task.Run(() => _context.SaveChanges(() => _calendars.CreateOrUpdate(calendar)));
 
 			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
