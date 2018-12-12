@@ -1,5 +1,7 @@
 <div class='row refunds-title-row align-items-center'>
-  <div class='col-2'><h4>Refunds</h4></div>
+  <div class='col-2'>
+    <h4>Refunds</h4>
+  </div>
   <div class='col-7 search-refund-col'>
     <input type='text' [(ngModel)]='searchText' />
     <button type='button' class='btn btn-primary' (click)='filterRefundRecords()'>SEARCH</button>
@@ -8,7 +10,9 @@
 </div>
 <div class='row refunds-action-row align-items-center'>
   <div class='col-6'>
-    <button type='button' class='btn btn-primary' (click)='createRefund()'>ADD NEW</button>
+    <button type='button' class='btn btn-primary' (click)='createRefund()'>
+      ADD NEW
+    </button>
   </div>
 </div>
 <div class='row refunds-list-row align-items-center'>
@@ -18,14 +22,14 @@
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
             {{k | normalizeFieldName}}
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+            <i class="fa" [ngClass]="getSortClass(k)" aria-hidden="true"></i>
           </th>
         </tr>
       </thead>
       <tbody infiniteScroll>
-        <tr *ngFor='let refund of refunds | orderBy: {property: property, direction: direction}' (click)='editRefund(refund)'>
+        <tr *ngFor='let refund of refunds | orderBy: {property: property, direction: direction}'
+          (click)='editRefund(refund)'>
           <td>{{refund.amount | currency}}</td>
-          <td>{{refund.checkNumber}}</td>
           <td>{{refund.date | date: 'MM/dd/yyyy'}}</td>
           <td>{{refund.schoolYear}}</td>
           <td>{{refund.username}}</td>
