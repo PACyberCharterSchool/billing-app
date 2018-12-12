@@ -19,6 +19,7 @@ using CsvHelper;
 using Aspose.Cells;
 using System.Text.RegularExpressions;
 using models.Common;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace api.Controllers
 {
@@ -89,6 +90,7 @@ namespace api.Controllers
 			if (!ModelState.IsValid)
 				return new BadRequestObjectResult(new ErrorsResponse(ModelState));
 
+			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
 			var payments = new List<Payment>();
 			for (var i = 0; i < create.Splits.Count; i++)
 			{
@@ -103,6 +105,7 @@ namespace api.Controllers
 					Split = i + 1,
 					Amount = split.Amount,
 					SchoolYear = split.SchoolYear,
+					Username = username,
 				});
 			}
 
@@ -267,6 +270,10 @@ namespace api.Controllers
 			{
 				return new BadRequestObjectResult(new ErrorResponse(e));
 			}
+
+			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+			foreach (var payment in payments)
+				payment.Username = username;
 
 			using (var tx = _context.Database.BeginTransaction())
 			{

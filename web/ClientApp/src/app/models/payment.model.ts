@@ -19,4 +19,5 @@ export class Payment {
   schoolYearSplit: string;
   lastUpdated: Date;
   schoolDistrict: SchoolDistrict;
+  username: string;
 }
