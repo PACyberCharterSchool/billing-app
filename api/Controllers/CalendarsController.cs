@@ -115,14 +115,9 @@ namespace api.Controllers
 			fopts.LookInType = LookInType.Values;
 			fopts.LookAtType = LookAtType.EntireContent;
 
-			// var header = sheet.GetRow(0);
-			// var dayIndex = header.Cells.FindIndex(c => c.StringCellValue == "DAY");
 			var dayIndex = sheet.Cells.Find("DAY", null, fopts).Column;
-			// var dateIndex = header.Cells.FindIndex(c => c.StringCellValue == "DATE");
 			var dateIndex = sheet.Cells.Find("DATE", null, fopts).Column;
-			// var schoolDayIndex = header.Cells.FindIndex(c => c.StringCellValue == "SCHOOL DAY");
 			var schoolDayIndex = sheet.Cells.Find("SCHOOL DAY", null, fopts).Column;
-			// var membershipIndex = header.Cells.FindIndex(c => c.StringCellValue == "MEMBERSHIP");
 			var membershipIndex = sheet.Cells.Find("MEMBERSHIP", null, fopts).Column;
 
 			var calendar = new Calendar
@@ -138,10 +133,10 @@ namespace api.Controllers
 
 				calendar.Days.Add(new CalendarDay
 				{
-					DayOfWeek = row.GetCellByIndex(dayIndex).StringValue,
-					Date = DateTime.FromOADate(row.GetCellByIndex(dateIndex).IntValue), // days since epoch
-					SchoolDay = (byte)row.GetCellByIndex(schoolDayIndex).IntValue,
-					Membership = (byte)row.GetCellByIndex(membershipIndex).IntValue,
+					DayOfWeek = row.GetCellOrNull(dateIndex).StringValue,
+					Date = DateTime.FromOADate(row.GetCellOrNull(dateIndex).IntValue), // days since epoch
+					SchoolDay = (byte)row.GetCellOrNull(schoolDayIndex).IntValue,
+					Membership = (byte)row.GetCellOrNull(membershipIndex).IntValue,
 				});
 			}
 
