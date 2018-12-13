@@ -164,13 +164,12 @@ namespace api.Controllers
 					new ErrorResponse($"Invalid file Content-Type '{file.ContentType}'."));
 
 			var calendar = _parsers[file.ContentType](year, file.OpenReadStream());
-			calendar = await Task.Run(() => _context.SaveChanges(() => _calendars.CreateOrUpdate(calendar)));
-
 			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
 			using (var tx = _context.Database.BeginTransaction())
 			{
 				try
 				{
+					calendar = _calendars.CreateOrUpdate(calendar);
 					// TODO(Erik): details for each day changed
 					_audits.Create(new AuditHeader
 					{
