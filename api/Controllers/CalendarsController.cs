@@ -153,7 +153,7 @@ namespace api.Controllers
 		[Authorize(Policy = "ADM=")]
 		[ProducesResponseType(typeof(CalendarResponse), 201)]
 		[ProducesResponseType(typeof(ErrorResponse), 400)]
-		public async Task<IActionResult> Upload(string year, IFormFile file)
+		public IActionResult Upload(string year, IFormFile file)
 		{
 			if (file == null)
 				return new BadRequestObjectResult(
