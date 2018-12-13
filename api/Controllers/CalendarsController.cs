@@ -74,18 +74,14 @@ namespace api.Controllers
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> Get(string year)
 		{
-			try
-			{
-				var calendar = await Task.Run(() => _calendars.Get(year));
-				return new ObjectResult(new CalendarResponse
-				{
-					Calendar = calendar,
-				});
-			}
-			catch (NotFoundException)
-			{
+			var calendar = await Task.Run(() => _calendars.Get(year));
+			if (calendar == null)
 				return NotFound();
-			}
+
+			return new ObjectResult(new CalendarResponse
+			{
+				Calendar = calendar,
+			});
 		}
 
 		private static Calendar CsvToCalendar(string year, Stream stream)

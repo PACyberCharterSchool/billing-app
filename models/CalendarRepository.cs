@@ -77,14 +77,7 @@ namespace models
 
 		public Calendar CreateOrUpdate(Calendar update) => CreateOrUpdate(DateTime.Now, update);
 
-		public Calendar Get(string year)
-		{
-			var calendar = _calendars.SingleOrDefault(c => c.SchoolYear == year);
-			if (calendar == null)
-				throw new NotFoundException(typeof(Calendar), year);
-
-			return calendar;
-		}
+		public Calendar Get(string year) => _calendars.SingleOrDefault(c => c.SchoolYear == year);
 
 		public IEnumerable<Calendar> GetMany()
 		{
