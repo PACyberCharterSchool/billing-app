@@ -28,6 +28,7 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
   public selectedAcademicYear: string;
   public selectedImportAcademicYear: string;
   public calendarSchoolYears: string[];
+  public importSchoolYears: string[];
 
   constructor(
     private schoolCalendarService: SchoolCalendarService,
@@ -37,15 +38,31 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
     private ngbModal: NgbModal,
     private globals: Globals
   ) {
-    this.direction = 1;
+    this.isDescending = false;
+    this.direction = -1;
     this.property = 'schoolDay';
+  }
+
+  private setImportSchoolYears(years: string[]): void {
+    this.importSchoolYears = years.map(y => y);
+
+    if (years.length === 0) {
+      return;
+    }
+
+    const last = years[years.length - 1];
+    const fy = parseInt(last.substring(0, 4), 10);
+    const sy = parseInt(last.substring(5, 9), 10);
+    this.importSchoolYears.push(`${fy + 1}-${sy + 1}`);
   }
 
   ngOnInit() {
     this.schoolCalendarService.getAcademicYears().subscribe(
       data => {
         this.calendarSchoolYears = data['years'];
-        this.selectedAcademicYear = this.calendarSchoolYears[0];
+        this.setImportSchoolYears(data['years']);
+
+        this.selectedAcademicYear = this.calendarSchoolYears[this.calendarSchoolYears.length - 1];
         console.log('AdministrationSchoolCalendarComponent.ngOnInit(): data is ', data['years']);
 
         this.schoolCalendarService.getByYear(this.selectedAcademicYear).subscribe(
