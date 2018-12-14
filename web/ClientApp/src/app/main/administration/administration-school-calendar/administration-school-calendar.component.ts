@@ -71,6 +71,10 @@ export class AdministrationSchoolCalendarComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
+  getSortClass(property: string): object {
+    return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
+  }
+
   listDisplayableFields() {
     if (this.schoolCalendar && this.schoolCalendar.days && this.schoolCalendar.days.length > 0) {
       const rejected = ['id', 'lazyLoader'];
