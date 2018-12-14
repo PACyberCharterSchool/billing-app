@@ -11,14 +11,16 @@
     <div ngbDropdown class='d-inline-block'>
       <button ngbDropdownToggle class='btn btn-outline-primary' id='availableAcademicYearsDropdown'>{{selectedAcademicYear}}</button>
       <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='availableAcademicYearsDropdown'>
-        <button class='dropdown-item' *ngFor='let y of calendarSchoolYears' (click)='filterCalendarSchoolYear(y)'>{{y}}</button>
+        <button class='dropdown-item' *ngFor='let y of calendarSchoolYears'
+          (click)='filterCalendarSchoolYear(y)'>{{y}}</button>
       </div>
     </div>
   </div>
 </div>
 <div class='row calendar-select-row align-items-center'>
   <div class='col-12'>
-    <button type='button' class='btn btn-primary' (click)='importSchoolYearCalendar(importCalendarContent)'>IMPORT CALENDAR</button>
+    <button type='button' class='btn btn-primary' (click)='importSchoolYearCalendar(importCalendarContent)'>IMPORT
+      CALENDAR</button>
   </div>
 </div>
 <div class='row calendar-list-row align-items-center justify-content-center'>
@@ -34,13 +36,15 @@
       </thead>
       <tbody>
         <tr *ngFor='let day of days | orderBy: {property: property, direction: direction}'>
-          <td *ngFor='let v of listDisplayableValues(day)'>{{v | normalizeFieldValue}}</td>
+          <td *ngFor='let v of listDisplayableValues(day)'>{{v |
+            normalizeFieldValue}}</td>
         </tr>
       </tbody>
     </table>
     <p *ngIf='days?.length <= 0'>No school calendars are imported.</p>
   </div>
 </div>
+
 <ng-template #importCalendarContent let-c='close' let-d='dismiss'>
   <div class='modal-header'>
     <h4 class='modal-title'>Import Calendar</h4>
@@ -51,15 +55,12 @@
   <div class='modal-body'>
     <div class='row align-items-center'>
       <div class='col-6 justify-content-left'>
-        <label class='text-align-left' for='calendar-file-selector'>Select Calendar File:</label>
+        <label class='text-align-left' for='calendar-file-selector'>Select
+          Calendar File:</label>
       </div>
       <div class='col-6'>
-        <input
-          type='file'
-          accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
-          id='calendarFileSelector'
-          #calendarFileSelector
-          (change)='handleFileSelection($event)' />
+        <input type='file' accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel'
+          id='calendarFileSelector' #calendarFileSelector (change)='handleFileSelection($event)' />
       </div>
     </div>
     <div class='row align-items-center'>
@@ -69,9 +70,11 @@
       <div class='col-6'>
         <div class='row align-items-center justify-content-center'>
           <div ngbDropdown class='d-inline-block'>
-            <button ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown'></button>
+            <button ngbDropdownToggle class='btn btn-outline-primary' id='academicYearDropdown'>
+              {{ selectedImportAcademicYear || '' }}</button>
             <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='academicYearDropdown'>
-              <button class='dropdown-item' *ngFor='let y of schoolYears' (click)='selectImportAcademicYear(y)'>{{y}}</button>
+              <button class='dropdown-item' *ngFor='let y of importSchoolYears'
+                (click)='selectImportAcademicYear(y)'>{{y}}</button>
             </div>
           </div>
         </div>
