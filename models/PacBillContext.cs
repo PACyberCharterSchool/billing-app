@@ -28,6 +28,11 @@ namespace models
 				HasIndex(e => e.SchoolYear).
 				IsUnique();
 
+			builder.Entity<Calendar>().
+				HasMany(c => c.Days).
+				WithOne(d => d.Calendar).
+				OnDelete(DeleteBehavior.Cascade);
+
 			builder.Entity<Payment>().
 				HasIndex(e => new { e.PaymentId, e.Split }).
 				IsUnique();
