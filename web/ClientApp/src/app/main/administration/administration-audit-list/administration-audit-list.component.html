@@ -1,5 +1,7 @@
 <div class='row audits-title-row align-items-center'>
-  <div class='col-2'><h4>Audits</h4></div>
+  <div class='col-2'>
+    <h4>Audits</h4>
+  </div>
   <div class='col-7'>
     <input type='text' [(ngModel)]='searchText' />
     <button type='button' class='btn btn-primary' (click)='filterAuditRecordsBySearch()'>SEARCH</button>
@@ -11,7 +13,8 @@
     <div ngbDropdown class='d-inline-block'>
       <button ngbDropdownToggle class='btn btn-outline-primary' id='auditTypeDropdown'>Activity</button>
       <div ngbDropdownMenu class='dropdown-menu' aria-labelled-by='auditTypeDropdown'>
-        <button class='dropdown-item' *ngFor='let item of auditTypes' (click)='filterAuditRecordsBySelectedAuditType(item)'>{{item | interpretAuditType}}</button>
+        <button class='dropdown-item' *ngFor='let item of auditTypes' (click)='filterAuditRecordsBySelectedAuditType(item)'>{{item
+          | interpretAuditType}}</button>
       </div>
     </div>
   </div>
@@ -23,26 +26,44 @@
     <table class='table table-fixed table-striped'>
       <thead>
         <tr>
-          <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
-            {{k | normalizeFieldName}}
-            <i class='fa' [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+          <th (click)="sort('username')">
+            Created By
+            <i class="fa" [ngClass]="getSortClass('username')" aria-hidden="true"></i>
           </th>
-          <th>
-            Details
-            <i class='fa' [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+          <th (click)="sort('activity')">
+            Activity
+            <i class="fa" [ngClass]="getSortClass('activity')" aria-hidden="true"></i>
           </th>
+          <th (click)="sort('timestamp')">
+            Date Modified
+            <i class="fa" [ngClass]="getSortClass('timestamp')" aria-hidden="true"></i>
+          </th>
+          <th (click)="sort('identifier')">
+            Identifier
+            <i class="fa" [ngClass]="getSortClass('identifier')" aria-hidden="true"></i>
+          </th>
+          <th>Details</th>
         </tr>
       </thead>
       <tbody infiniteScroll>
         <ng-container *ngFor='let ar of audits | orderBy: {property: property, direction: direction}'>
           <tr>
-            <td *ngFor='let v of listDisplayableValues(ar)'>{{v | normalizeFieldValue}}</td>
-            <td><i class='fa' [ngClass]="{'fa-angle-left': !isExpandedAuditRecord(ar), 'fa-angle-down': isExpandedAuditRecord(ar)}" (click)='collapsed=!collapsed; setSelectedAuditRecord(ar)'></i></td>
+            <td>{{ ar.username | normalizeFieldValue }}</td>
+            <td>{{ ar.activity | normalizeFieldValue }}</td>
+            <td>{{ ar.timestamp | normalizeFieldValue }}</td>
+            <td>{{ ar.identifier | normalizeFieldValue }}</td>
+            <td>
+              <i *ngIf="ar.details.length > 0" class='fa' [ngClass]="getExpandedClass(ar)"
+                (click)='collapsed=!collapsed; setSelectedAuditRecord(ar)'></i>
+            </td>
           </tr>
-          <tr *ngIf='isExpandedAuditRecord(ar)'>
-            <td>Old Value:</td><td>{{selectedAuditRecord.previous}}</td>
-            <td>New Value:</td><td>{{selectedAuditRecord.next}}</td>
-          </tr>
+          <ng-container *ngIf="isExpandedAuditRecord(ar)">
+            <tr *ngFor="let detail of ar.details">
+              <td>Field: {{ detail.field }}</td>
+              <td>Old Value: {{ detail.previous || 'BLANK' }}</td>
+              <td>New Value: {{ detail.next || 'BLANK' }}</td>
+            </tr>
+          </ng-container>
         </ng-container>
       </tbody>
     </table>
