@@ -11,8 +11,6 @@ namespace models
 {
 	public interface ICalendarRepository
 	{
-		Calendar CreateOrUpdate(DateTime time, Calendar update);
-		Calendar CreateOrUpdate(Calendar create);
 		Calendar Get(string year);
 
 		IEnumerable<string> GetYears();
@@ -42,40 +40,6 @@ namespace models
 			nameof(CalendarDay.Id),
 			nameof(CalendarDay.Calendar),
 		};
-
-		public Calendar CreateOrUpdate(DateTime time, Calendar update)
-		{
-			var calendar = _calendars.SingleOrDefault(c => c.SchoolYear == update.SchoolYear);
-			if (calendar == null)
-			{
-				update.Created = time;
-				update.LastUpdated = time;
-				_context.Add(update);
-				return update;
-			}
-
-			MergeProperties(calendar, update, _excludedCalendarFields);
-			calendar.LastUpdated = time;
-
-			if (calendar.Days.Count < update.Days.Count)
-				foreach (var day in update.Days.Skip(calendar.Days.Count))
-					calendar.Days.Add(day);
-			else if (calendar.Days.Count > update.Days.Count)
-			{
-				var deletes = calendar.Days.Skip(update.Days.Count);
-				calendar.Days = calendar.Days.Take(update.Days.Count).ToList();
-
-				_context.RemoveRange(deletes);
-			}
-
-			for (var i = 0; i < calendar.Days.Count; i++)
-				MergeProperties(calendar.Days[i], update.Days[i], _excludedDaysFields);
-
-			_context.Update(calendar);
-			return calendar;
-		}
-
-		public Calendar CreateOrUpdate(Calendar update) => CreateOrUpdate(DateTime.Now, update);
 
 		public Calendar Get(string year) => _calendars.SingleOrDefault(c => c.SchoolYear == year);
 

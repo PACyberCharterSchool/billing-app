@@ -159,23 +159,65 @@ namespace api.Controllers
 				return new BadRequestObjectResult(
 					new ErrorResponse($"Invalid file Content-Type '{file.ContentType}'."));
 
-			var calendar = _parsers[file.ContentType](year, file.OpenReadStream());
+			var input = _parsers[file.ContentType](year, file.OpenReadStream());
 			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+
+			Calendar calendar;
 			using (var tx = _context.Database.BeginTransaction())
 			{
 				try
 				{
-					calendar = _calendars.CreateOrUpdate(calendar);
-					// TODO(Erik): details for each day changed
-					_audits.Create(new AuditHeader
+					calendar = _calendars.Get(input.SchoolYear);
+					if (calendar == null)
 					{
-						Username = username,
-						Activity = AuditActivity.UPDATE_SCHOOL_CALENDAR,
-						Timestamp = DateTime.Now,
-						Identifier = calendar.SchoolYear,
-					});
-					_context.SaveChanges();
+						calendar = input;
+						calendar.Created = DateTime.Now;
+						calendar.LastUpdated = calendar.Created;
+						_context.Add(calendar);
+					}
+					else
+					{
+						var details = new List<AuditDetail>();
+						var added = input.Days.Where(id => !calendar.Days.Any(cd => cd.Date == id.Date));
+						Console.WriteLine("Added:");
+						foreach (var add in added)
+							Console.WriteLine($"\t{add.Date}");
 
+						foreach (var add in added)
+							details.Add(new AuditDetail
+							{
+								Field = "Day",
+								Next = add.Date.ToString("MM/dd/yyyy"),
+							});
+
+						var removed = calendar.Days.Where(cd => !input.Days.Any(id => id.Date == cd.Date));
+						Console.WriteLine("Removed:");
+						foreach (var remove in removed)
+							Console.WriteLine($"\t{remove.Date}");
+
+						foreach (var remove in removed)
+							details.Add(new AuditDetail
+							{
+								Field = "Day",
+								Previous = remove.Date.ToString("MM/dd/yyyy"),
+							});
+
+						_context.Remove(calendar);
+						input.Created = calendar.Created;
+						input.LastUpdated = DateTime.Now;
+						_context.Add(input);
+						calendar = input;
+						_audits.Create(new AuditHeader
+						{
+							Username = username,
+							Activity = AuditActivity.UPDATE_SCHOOL_CALENDAR,
+							Timestamp = DateTime.Now,
+							Identifier = calendar.SchoolYear,
+							Details = details,
+						});
+					}
+
+					_context.SaveChanges();
 					tx.Commit();
 				}
 				catch (Exception)
