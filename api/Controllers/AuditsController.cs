@@ -17,40 +17,40 @@ namespace api.Controllers
 {
 	[Route("/api/[controller]")]
 	public class AuditsController : Controller
-  {
+	{
 		private readonly PacBillContext _context;
-    private readonly IAuditRecordRepository _audits;
+		private readonly IAuditRepository _audits;
 		private readonly ILogger<AuditsController> _logger;
 
-    public AuditsController(
-      PacBillContext context,
-      IAuditRecordRepository audits,
-      ILogger<AuditsController> logger
-    )
-    {
-      _context = context;
-      _audits = audits;
-      _logger = logger;
-    }
+		public AuditsController(
+			PacBillContext context,
+			IAuditRepository audits,
+			ILogger<AuditsController> logger
+		)
+		{
+			_context = context;
+			_audits = audits;
+			_logger = logger;
+		}
 
 		public struct AuditsResponse
 		{
-			public IList<AuditDto> Audits { get; set; }
+			public IList<AuditHeaderDto> Audits { get; set; }
 		}
 
-    [HttpGet]
+		[HttpGet]
 		[Authorize(Policy = "PAY+")]
 		[ProducesResponseType(typeof(AuditsResponse), 200)]
 		public async Task<IActionResult> GetMany()
-    {
+		{
 			var audits = await Task.Run(() => _audits.GetMany());
 			if (audits == null)
-				audits = new List<AuditRecord>();
+				audits = new List<AuditHeader>();
 
 			return new ObjectResult(new AuditsResponse
 			{
-				Audits = audits.Select(a => new AuditDto(a)).ToList(),
+				Audits = audits.Select(a => new AuditHeaderDto(a)).ToList(),
 			});
-    }
-  }
+		}
+	}
 }

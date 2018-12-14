@@ -67,7 +67,7 @@ namespace api
 				opt.UseLazyLoadingProxies();
 				opt.ConfigureWarnings(b => b.Ignore(CoreEventId.DetachedLazyLoadingWarning));
 			});
-			services.AddTransient<IAuditRecordRepository, AuditRecordRepository>();
+			services.AddTransient<IAuditRepository, AuditRepository>();
 			services.AddTransient<ICalendarRepository, CalendarRepository>();
 			services.AddTransient<IPaymentRepository, PaymentRepository>();
 			services.AddTransient<IRefundRepository, RefundRepository>();

@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -7,7 +8,10 @@ namespace models
 	{
 		public PacBillContext(DbContextOptions<PacBillContext> options) : base(options) { }
 
+		[Obsolete("Use AuditHeaders", true)]
 		public DbSet<AuditRecord> AuditRecords { get; set; }
+
+		public DbSet<AuditHeader> AuditHeaders { get; set; }
 		public DbSet<Calendar> Calendars { get; set; }
 		public DbSet<Payment> Payments { get; set; }
 		public DbSet<Refund> Refunds { get; set; }
@@ -23,6 +27,11 @@ namespace models
 			builder.Entity<Calendar>().
 				HasIndex(e => e.SchoolYear).
 				IsUnique();
+
+			builder.Entity<Calendar>().
+				HasMany(c => c.Days).
+				WithOne(d => d.Calendar).
+				OnDelete(DeleteBehavior.Cascade);
 
 			builder.Entity<Payment>().
 				HasIndex(e => new { e.PaymentId, e.Split }).

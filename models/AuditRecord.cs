@@ -3,13 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace models
 {
-	public static class AuditRecordActivity
-	{
-		public const string EDIT_STUDENT_RECORD = "EditStudentRecord";
-		public const string UPDATE_SCHOOL_CALENDAR = "UpdateSchoolCalendar";
-		public const string UPDATE_TEMPLATE = "UpdateTemplate";
-	}
-
+	// TODO(Erik): remove after production merge
+	[Obsolete("Use AuditHeader", true)]
 	public class AuditRecord
 	{
 		public int Id { get; set; }

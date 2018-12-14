@@ -5,13 +5,18 @@ export enum AuditRecordActivityType {
   SchoolDistricts = 'SchoolDistricts'
 }
 
+export class AuditDetail {
+  id: number;
+  field: string;
+  next?: string;
+  previous?: string;
+}
+
 export class AuditRecord {
   id: number;
   username: string;
   activity: string;
   timestamp: Date;
-  field: string;
   identifier: string;
-  next: any;
-  previous: any;
+  details: AuditDetail[];
 }
