@@ -137,7 +137,7 @@ export class InvoicesListComponent implements OnInit {
   refreshInvoices(): void {
     this.spinnerMsg = 'Loading invoices.  Please wait...';
     this.ngxSpinnerService.show();
-    this.reportsService.getReportsByMeta({ 'Type': ReportType.Invoice, 'Name': '', 'SchoolYear': null }).subscribe(
+    this.reportsService.getReportsByMeta({ type: ReportType.Invoice, name: '', schoolYear: null }).subscribe(
       data => {
         console.log(`InvoicesListComponent.refreshInvoices(): data is ${data}.`);
         this.reports = this.allReports = data['reports'];

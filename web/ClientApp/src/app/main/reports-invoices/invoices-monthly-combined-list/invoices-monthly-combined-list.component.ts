@@ -149,7 +149,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.bulkReports = this.allBulkReports = [];
     this.ngxSpinnerService.show();
     this.reportsService.getReportsByMeta({
-      'Type': ReportType.BulkInvoice,
+      type: ReportType.BulkInvoice,
     }).subscribe(
       data => {
         this.ngxSpinnerService.hide();
@@ -165,7 +165,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.spinnerMsg = 'Loading totals only invoices.  Please wait...';
     this.ngxSpinnerService.show();
     this.reportsService.getReportsByMeta({
-      'Type': ReportType.TotalsOnly,
+      type: ReportType.TotalsOnly,
     }).subscribe(
       data => {
         this.ngxSpinnerService.hide();
