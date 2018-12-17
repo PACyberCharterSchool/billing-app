@@ -1,12 +1,22 @@
 import { Injectable } from '@angular/core';
-
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
 import { Observable } from 'rxjs/Observable';
-
 import { Report, ReportType } from '../models/report.model';
-
 import { Globals } from '../globals';
+import { map } from 'rxjs/operators';
+import { UtilitiesService } from './utilities.service';
+
+export class ReportsResponse {
+  reports: Report[];
+}
+
+class ReportInfo {
+  type: string;
+  name?: string;
+  schoolYear?: string;
+  approved?: boolean;
+  scope?: string;
+}
 
 @Injectable()
 export class ReportsService {
@@ -22,54 +32,52 @@ export class ReportsService {
     private httpClient: HttpClient
   ) { }
 
+  private convertReport(r: Report): Report {
+    r.created = UtilitiesService.convertDate(r.created);
+    return r;
+  }
+
   // HTTP GET /api/reports
-  public getReportsByMeta(reportInfo: Object): Observable<Report[]> {
+  public getReportsByMeta(reportInfo: ReportInfo): Observable<ReportsResponse> {
     let url = this.apiReportsUrl;
 
-    if (reportInfo['Type']) { url += `?Type=${reportInfo['Type']}`; } // there will *always* be a Type
-    if (reportInfo['Name']) { url += `&Name=${reportInfo['Name']}`; }
-    if (reportInfo['SchoolYear']) { url += `&SchoolYear=${reportInfo['SchoolYear']}`; }
-    if (reportInfo['Approved']) { url += `&Approved=${reportInfo['Approved']}`; }
-    if (reportInfo['Scope']) { url += `&Scope=${reportInfo['Scope']}`; }
+    url += `?Type=${reportInfo.type}`;
+    if (reportInfo.name) {
+      url += `&Name=${reportInfo.name}`;
+    }
+    if (reportInfo.schoolYear) {
+      url += `&SchoolYear=${reportInfo.schoolYear}`;
+    }
+    if (reportInfo.approved) {
+      url += `&Approved=${reportInfo.approved}`;
+    }
+    if (reportInfo.scope) {
+      url += `&Scope=${reportInfo.scope}`;
+    }
 
-    return this.httpClient.get<Report[]>(url, this.headers);
+    return this.httpClient.get<ReportsResponse>(url, this.headers).pipe(map(res => {
+      return { reports: res.reports.map(this.convertReport) };
+    }));
   }
 
-  public getAccountsReceivableAsOf(): Observable<Report[]> {
-    const reportMeta: Object = Object.assign({}, {
-      'Type': ReportType.AccountsReceivableAsOf,
-    });
-
-    return this.getReportsByMeta(reportMeta);
+  public getAccountsReceivableAsOf(): Observable<ReportsResponse> {
+    return this.getReportsByMeta({ type: ReportType.AccountsReceivableAsOf });
   }
 
-  public getAccountsReceivableAging(): Observable<Report[]> {
-    const reportMeta: Object = Object.assign({}, {
-      'Type': ReportType.AccountsReceivableAging,
-    });
-
-    return this.getReportsByMeta(reportMeta);
+  public getAccountsReceivableAging(): Observable<ReportsResponse> {
+    return this.getReportsByMeta({ type: ReportType.AccountsReceivableAging });
   }
 
-  public getCSIU(): Observable<Report[]> {
-    const reportMeta: Object = Object.assign({}, {
-      'Type': ReportType.CSIU,
-    });
-
-    return this.getReportsByMeta(reportMeta);
+  public getCSIU(): Observable<ReportsResponse> {
+    return this.getReportsByMeta({ type: ReportType.CSIU });
   }
 
-  public getTotalsOnly(): Observable<Report[]> {
-    const reportMeta: Object = Object.assign({}, { 'Type': ReportType.TotalsOnly });
-    return this.getReportsByMeta(reportMeta);
+  public getTotalsOnly(): Observable<ReportsResponse> {
+    return this.getReportsByMeta({ type: ReportType.TotalsOnly });
   }
 
-  public getUniPayInvoiceSummary(): Observable<Report[]> {
-    const reportMeta: Object = Object.assign({}, {
-      'Type': ReportType.UniPayInvoiceSummary,
-    });
-
-    return this.getReportsByMeta(reportMeta);
+  public getUniPayInvoiceSummary(): Observable<ReportsResponse> {
+    return this.getReportsByMeta({ type: ReportType.UniPayInvoiceSummary });
   }
 
   // HTTP GET /api/reports/:name
@@ -86,15 +94,14 @@ export class ReportsService {
     return this.httpClient.get<any>(url, headers);
   }
 
-  public getInvoices(name: string, year: string, scope: string, approved: boolean): Observable<Report[]> {
-    const reportInfo: Object = Object.assign({}, { 'Type': ReportType.Invoice });
-
-    if (name) { reportInfo['Name'] = name; }
-    if (year) { reportInfo['SchoolYear'] = year; }
-    if (approved != null) { reportInfo['Approved'] = approved; }
-    if (scope) { reportInfo['Scope'] = scope; }
-
-    return this.getReportsByMeta(reportInfo);
+  public getInvoices(name?: string, year?: string, scope?: string, approved?: boolean): Observable<ReportsResponse> {
+    return this.getReportsByMeta({
+      type: ReportType.Invoice,
+      name: name,
+      schoolYear: year,
+      approved: approved,
+      scope: scope,
+    });
   }
 
   public getBulkInvoices(year: string, scope: string): Observable<any> {
@@ -157,15 +164,14 @@ export class ReportsService {
     return this.httpClient.post<any>(url, invoiceInfo, this.headers);
   }
 
-  public getActivities(name: string, year: string, scope: string, approved: boolean): Observable<Report[]> {
-    const reportInfo: Object = Object.assign({}, { 'Type': ReportType.BulkStudentInformation });
-
-    if (name) { reportInfo['Name'] = name; }
-    if (year) { reportInfo['SchoolYear'] = year; }
-    if (approved != null) { reportInfo['Approved'] = approved; }
-    if (scope) { reportInfo['Scope'] = scope; }
-
-    return this.getReportsByMeta(reportInfo);
+  public getActivities(name?: string, year?: string, scope?: string, approved?: boolean): Observable<ReportsResponse> {
+    return this.getReportsByMeta({
+      type: ReportType.BulkStudentInformation,
+      name: name,
+      schoolYear: year,
+      approved: approved,
+      scope: scope,
+    });
   }
 
   // HTTP POST /api/reports/many

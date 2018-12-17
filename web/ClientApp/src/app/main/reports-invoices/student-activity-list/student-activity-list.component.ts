@@ -9,6 +9,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
 import * as moment from 'moment';
 import { Globals } from '../../../globals';
+import { SearchService } from '../../../services/search.service';
 
 @Component({
   selector: 'app-student-activity-list',
@@ -37,7 +38,8 @@ export class StudentActivityListComponent implements OnInit {
     private studentRecordsService: StudentRecordsService,
     private academicYearsService: AcademicYearsService,
     private fileSaverService: FileSaverService,
-    private ngxSpinnerService: NgxSpinnerService
+    private ngxSpinnerService: NgxSpinnerService,
+    private searchService: SearchService,
   ) { }
 
   ngOnInit() {
@@ -57,7 +59,7 @@ export class StudentActivityListComponent implements OnInit {
 
     this.reportsService.getActivities(null, null, null, null).subscribe(
       data => {
-        this.reports = this.allReports = data['reports'];
+        this.reports = this.allReports = data.reports;
         this.ngxSpinnerService.hide();
       },
       error => {
@@ -95,7 +97,7 @@ export class StudentActivityListComponent implements OnInit {
   refreshActivityReports(): void {
     this.reportsService.getActivities(null, null, null, null).subscribe(
       data => {
-        this.reports = this.allReports = data['reports'];
+        this.reports = this.allReports = data.reports;
         this.ngxSpinnerService.hide();
       },
       error => {
@@ -110,7 +112,7 @@ export class StudentActivityListComponent implements OnInit {
     this.ngxSpinnerService.show();
     this.reportsService.getActivities(null, null, scope, null).subscribe(
       data => {
-        this.reports = this.allReports = data['reports'];
+        this.reports = this.allReports = data.reports;
         this.ngxSpinnerService.hide();
       },
       error => {
@@ -121,17 +123,13 @@ export class StudentActivityListComponent implements OnInit {
   }
 
   filterStudentActivityReports(): void {
-    this.reports = this.reports.filter(r => {
-      if (r.name.includes(this.searchText)) {
-        return true;
-      }
-
-      if (r.scope.includes(this.searchText)) {
-        return true;
-      }
-
-      return false;
-    });
+    this.reports = this.reports.filter(r =>
+      this.searchService.search(this.searchText, [
+        r.schoolYear,
+        r.scope,
+        r.name,
+        UtilitiesService.dateToString(r.created),
+      ]));
   }
 
   private generateBulkActivityName(): string {
