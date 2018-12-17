@@ -8,6 +8,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import {
   AdministrationPaymentRateUpdateFormComponent
 } from '../administration-payment-rate-update-form/administration-payment-rate-update-form.component';
+import { SearchService } from '../../../services/search.service';
 
 
 @Component({
@@ -32,7 +33,8 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     private utilitiesService: UtilitiesService,
     private ngbModal: NgbModal,
     private ngxSpinnerService: NgxSpinnerService,
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private searchService: SearchService,
   ) {
     this.model = new SchoolDistrict();
     this.property = 'name';
@@ -64,21 +66,26 @@ export class AdministrationPaymentRateListComponent implements OnInit {
   }
 
   filterSchoolDistrictRecords() {
-    this.schoolDistricts = this.allSchoolDistricts.filter(
-      (i) => {
-        const re = new RegExp(this.searchText, 'gi');
-        if (i &&
-          i.aun.toString().search(re) !== -1 ||
-          (i.name && i.name.search(re) !== -1) ||
-          (i.paymentType && i.paymentType.search(re) !== -1) ||
-          (i.rate && i.rate.toString().search(re) !== -1) ||
-          (i.alternateRate && i.alternateRate && i.alternateRate.toString().search(re) !== -1)) {
-          return true;
-        }
-        return false;
+    this.schoolDistricts = this.allSchoolDistricts.filter(d => {
+      console.log('filterSchoolDistrictRecords', 'd', d);
+      const values: string[] = [
+        d.aun.toString(),
+        d.name,
+        d.paymentType,
+        d.rate.toString(),
+        d.specialEducationRate.toString(),
+        UtilitiesService.dateToString(d.created),
+        UtilitiesService.dateToString(d.lastUpdated),
+      ];
+      if (d.alternateRate) {
+        values.push(d.alternateRate.toString());
       }
-    );
-    console.log('PaymentsListComponent.filterSchoolDistrictRecords():  schoolDistricts is ', this.schoolDistricts);
+      if (d.alternateSpecialEducationRate) {
+        values.push(d.alternateSpecialEducationRate.toString());
+      }
+
+      return this.searchService.search(this.searchText, values);
+    });
   }
 
   resetSchoolDistrictRecords() {

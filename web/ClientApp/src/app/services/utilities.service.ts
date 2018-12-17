@@ -4,8 +4,16 @@ import * as moment from 'moment';
 
 @Injectable()
 export class UtilitiesService {
+  static convertDate(d: string | Date): Date {
+    if (<string>d) {
+      return new Date(<string>d);
+    }
+    return <Date>d;
+  }
 
-  constructor() { }
+  static dateToString(d: Date): string {
+    return d.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
 
   objectKeys(obj) {
     if (obj) {
