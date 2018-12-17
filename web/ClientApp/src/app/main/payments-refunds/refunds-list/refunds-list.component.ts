@@ -7,6 +7,7 @@ import { SchoolDistrictService } from '../../../services/school-district.service
 import { RefundUpsertFormComponent } from '../refund-upsert-form/refund-upsert-form.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Globals } from '../../../globals';
+import { SearchService } from '../../../services/search.service';
 
 @Component({
   selector: 'app-refunds-list',
@@ -28,7 +29,8 @@ export class RefundsListComponent implements OnInit {
     private utilitiesService: UtilitiesService,
     private refundsService: RefundsService,
     private schoolDistrictsService: SchoolDistrictService,
-    private ngbModalService: NgbModal
+    private ngbModalService: NgbModal,
+    private searchService: SearchService,
   ) {
     this.property = 'schoolDistrictName';
     this.direction = 1;
@@ -40,7 +42,7 @@ export class RefundsListComponent implements OnInit {
     this.refreshRefundList();
     this.refundsService.getRefunds(this.skip).subscribe(
       data => {
-        this.allRefunds = this.refunds = data['refunds'];
+        this.allRefunds = this.refunds = data.refunds;
       },
       error => {
         console.log('RefundsListComponent.ngOnInit(): error is ', error);
@@ -49,7 +51,7 @@ export class RefundsListComponent implements OnInit {
 
     this.schoolDistrictsService.getSchoolDistricts().subscribe(
       data => {
-        this.schoolDistricts = data['schoolDistricts'];
+        this.schoolDistricts = data.schoolDistricts;
       },
       error => {
         console.log('RefundsListComponent.ngOnInit():  error is ', error);
@@ -70,7 +72,7 @@ export class RefundsListComponent implements OnInit {
   refreshRefundList() {
     this.refundsService.getRefunds(this.skip).subscribe(
       data => {
-        this.allRefunds = this.refunds = data['refunds'];
+        this.allRefunds = this.refunds = data.refunds;
       },
       error => {
         console.log('PaymentsListComponent.ngOnInit(): error is ', error);
@@ -96,19 +98,16 @@ export class RefundsListComponent implements OnInit {
   }
 
   filterRefundRecords() {
-    this.refunds = this.allRefunds.filter(
-      (i) => {
-        const re = new RegExp(this.searchText, 'gi');
-        if (
-          i.amount.toString().search(re) !== -1 ||
-          i.checkNumber.search(re) !== -1 ||
-          i.schoolDistrict.name.search(re) !== -1
-        ) {
-          return true;
-        }
-        return false;
-      }
-    );
+    this.refunds = this.allRefunds.filter(r =>
+      this.searchService.search(this.searchText, [
+        r.amount.toString(),
+        UtilitiesService.dateToString(r.date),
+        r.schoolYear,
+        r.username,
+        UtilitiesService.dateToString(r.created),
+        UtilitiesService.dateToString(r.lastUpdated),
+        r.schoolDistrict.name,
+      ]));
   }
 
   resetRefundRecords() {
