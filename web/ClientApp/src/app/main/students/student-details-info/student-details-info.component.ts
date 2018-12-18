@@ -13,6 +13,7 @@ import { validateZipCode } from '../../../validators/zip';
 import { validateState } from '../../../validators/state';
 import { validateGrade } from '../../../validators/grade';
 import { States } from '../../../models/states';
+import { Grades } from '../../../models/grades';
 
 @Component({
   selector: 'app-student-details-info',
@@ -31,6 +32,7 @@ export class StudentDetailsInfoComponent implements OnInit {
   public scope: string;
   public updateOpMessage: string;
   public states = States.map(s => s.abbreviation);
+  public grades = Grades;
 
   constructor(
     private currentStudentService: CurrentStudentService,
@@ -266,5 +268,9 @@ export class StudentDetailsInfoComponent implements OnInit {
 
   setSelectedState(state: string): void {
     this.studentDetailForm.get('addressInfo.state').setValue(state);
+  }
+
+  setSelectedGrade(grade: string): void {
+    this.studentDetailForm.get('studentInfo.gradeLevel').setValue(grade);
   }
 }

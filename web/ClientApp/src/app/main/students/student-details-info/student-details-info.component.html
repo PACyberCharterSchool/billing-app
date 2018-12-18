@@ -117,7 +117,19 @@
                 <div class='row align-items-center'>
                   <label class="col-3">Grade Level</label>
                   <div class='col-9'>
-                    <input type='text' class='form-control' formControlName='gradeLevel' />
+                    <div ngbDropdown class='d-inline-block'>
+                      <button type="button" ngbDropdownToggle class='btn btn-outline-primary'
+                        style="width: 100%;">{{
+                        studentDetailForm.get('studentInfo.gradeLevel').value
+                        ||
+                        'Select Grade'
+                        }}</button>
+                      <div ngbDropdownMenu class='dropdown-menu'
+                        aria-labelled-by='gradeDropdown'>
+                        <button type="button" class='dropdown-item' *ngFor='let grade of grades'
+                          (click)="setSelectedGrade(grade)">{{grade}}</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class='row align-items-center'>
