@@ -10,6 +10,7 @@ import { CurrentStudentService } from '../../../services/current-student.service
 import { UtilitiesService } from '../../../services/utilities.service';
 import { StudentAdvancedFilterComponent } from '../student-advanced-filter/student-advanced-filter.component';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { or, has } from '../../../models/querydsl.model';
 
 @Component({
   selector: 'app-students-list',
@@ -185,8 +186,31 @@ export class StudentsListComponent implements OnInit {
   }
 
   filterStudentListByNameOrId() {
+    const filter = or(
+      has('schoolDistrictName', this.searchText),
+      or(
+        has('studentId', this.searchText),
+        or(
+          has('studentFirstName', this.searchText),
+          or(
+            has('studentLastName', this.searchText),
+            or(
+              has('studentGradeLevel', this.searchText),
+              or(
+                has('studentStreet1', this.searchText),
+                or(
+                  has('studentStreet2', this.searchText),
+                  has('studentCity', this.searchText),
+                )
+              )
+            )
+          )
+        )
+      )
+    );
+
     if (this.searchText) {
-      this.studentRecordsService.getHeaderByScopeByNameById(this.currentScope, this.searchText).subscribe(
+      this.studentRecordsService.getHeadersByFilter(this.currentScope, filter).subscribe(
         data => {
           this.studentRecords = data['header']['records'];
         },
