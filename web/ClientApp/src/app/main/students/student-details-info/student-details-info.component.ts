@@ -12,6 +12,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { validateZipCode } from '../../../validators/zip';
 import { validateState } from '../../../validators/state';
 import { validateGrade } from '../../../validators/grade';
+import { States } from '../../../models/states';
 
 @Component({
   selector: 'app-student-details-info',
@@ -29,6 +30,7 @@ export class StudentDetailsInfoComponent implements OnInit {
   public selectedSchoolDistrict: SchoolDistrict;
   public scope: string;
   public updateOpMessage: string;
+  public states = States.map(s => s.abbreviation);
 
   constructor(
     private currentStudentService: CurrentStudentService,
@@ -55,7 +57,7 @@ export class StudentDetailsInfoComponent implements OnInit {
 
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
-        this.schoolDistricts = data['schoolDistricts'];
+        this.schoolDistricts = data.schoolDistricts;
       },
       error => {
         console.log('StudentDetailsInfoComponent.ngOnInit(): error is ', error);
@@ -260,5 +262,9 @@ export class StudentDetailsInfoComponent implements OnInit {
         );
       }
     );
+  }
+
+  setSelectedState(state: string): void {
+    this.studentDetailForm.get('addressInfo.state').setValue(state);
   }
 }

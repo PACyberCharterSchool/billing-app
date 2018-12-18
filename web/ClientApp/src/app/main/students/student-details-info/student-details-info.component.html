@@ -73,10 +73,20 @@
                   </div>
                 </div>
                 <div class='row align-items-center'>
-                  <!-- TODO(Erik): should really be a dropdown -->
                   <label class="col-3">State</label>
                   <div class='col-9'>
-                    <input type='text' class='form-control' formControlName='state' />
+                    <div ngbDropdown class='d-inline-block'>
+                      <button type="button" ngbDropdownToggle class='btn btn-outline-primary'
+                        style="width: 100%;">{{
+                        studentDetailForm.get('addressInfo.state').value ||
+                        'Select State'
+                        }}</button>
+                      <div ngbDropdownMenu class='dropdown-menu'
+                        aria-labelled-by='stateDropdown'>
+                        <button type="button" class='dropdown-item' *ngFor='let state of states'
+                          (click)="setSelectedState(state)">{{state}}</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class='row align-items-center'>
