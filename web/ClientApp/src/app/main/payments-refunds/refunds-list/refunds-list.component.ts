@@ -100,7 +100,7 @@ export class RefundsListComponent implements OnInit {
   filterRefundRecords() {
     this.refunds = this.allRefunds.filter(r =>
       this.searchService.search(this.searchText, [
-        r.amount.toString(),
+        r.amount.toFixed(2),
         UtilitiesService.dateToString(r.date),
         r.schoolYear,
         r.username,
