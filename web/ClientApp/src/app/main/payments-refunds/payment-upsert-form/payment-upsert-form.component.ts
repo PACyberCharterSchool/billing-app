@@ -1,18 +1,11 @@
-import { Component, Input, OnInit, ViewChild, ElementRef, ViewChildren } from '@angular/core';
-
-import { NgForm } from '@angular/forms';
-
+import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
-
 import { SchoolDistrict } from '../../../models/school-district.model';
-
 import { PaymentsService } from '../../../services/payments.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
-
 import { Payment, PaymentType } from '../../../models/payment.model';
-
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -21,7 +14,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./payment-upsert-form.component.scss']
 })
 export class PaymentUpsertFormComponent implements OnInit {
-  private paymentId: string;
   public amount: number;
   public splitAmount: number;
   public selectedSchoolDistrict: SchoolDistrict;
@@ -53,8 +45,6 @@ export class PaymentUpsertFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('op is ', this.op);
-    console.log('schoolDistricts are ', this.schoolDistricts);
     this.academicYearVisibility = false;
     this.academicYearSplitVisibility = false;
 
@@ -62,8 +52,8 @@ export class PaymentUpsertFormComponent implements OnInit {
 
     if (this.op === 'update') {
       this.schoolDistrictService.getSchoolDistrict(this.paymentRecord.schoolDistrict.id).subscribe(
-        data => {
-          this.selectedSchoolDistrict = data['schoolDistrict'];
+        res => {
+          this.selectedSchoolDistrict = res.schoolDistrict;
         }
       );
     }
@@ -75,19 +65,18 @@ export class PaymentUpsertFormComponent implements OnInit {
     }
   }
 
-  initPaymentRecord(payments: Object[]): void {
+  initPaymentRecord(payments: Payment[]): void {
     if (payments) {
-      this.paymentId = payments[0]['paymentId'];
       this.isSplit = payments.length > 1;
-      this.date = payments[0]['date'];
-      this.externalId = payments[0]['externalId'];
-      this.schoolDistrictNameModel = payments[0]['schoolDistrict']['name'];
-      this.amount = payments[0]['amount'];
-      this.selectedAcademicYear = payments[0]['schoolYear'];
+      this.date = payments[0].date;
+      this.externalId = payments[0].externalId;
+      this.schoolDistrictNameModel = payments[0].schoolDistrict.name;
+      this.amount = payments[0].amount;
+      this.selectedAcademicYear = payments[0].schoolYear;
 
       if (payments.length > 1) {
-        this.splitAmount = payments[1]['amount'];
-        this.selectedAcademicYearSplit = payments[1]['schoolYear'];
+        this.splitAmount = payments[1].amount;
+        this.selectedAcademicYearSplit = payments[1].schoolYear;
       }
 
       const date = new Date(this.paymentRecord.date);
@@ -99,8 +88,8 @@ export class PaymentUpsertFormComponent implements OnInit {
 
   updatePaymentComponentValues() {
     this.paymentsService.getPaymentsByPaymentId(this.paymentRecord.paymentId).subscribe(
-      data => {
-        this.initPaymentRecord(data['payments']);
+      res => {
+        this.initPaymentRecord(res.payments);
       },
       error => {
         console.log('PaymentUpsertFormComponent.ngOnInit():  error is ', error);
@@ -123,14 +112,14 @@ export class PaymentUpsertFormComponent implements OnInit {
     this.paymentRecord.split = this.isSplit ? 2 : 1;
     this.paymentRecord.amount = this.amount;
     this.paymentRecord.splitAmount = this.splitAmount;
-    this.paymentRecord.externalId  = this.checkNumber;
+    this.paymentRecord.externalId = this.checkNumber;
     this.paymentRecord.type = PaymentType.Check;
     this.paymentRecord.date = new Date(`${this.dateModel.month}/${this.dateModel.day}/${this.dateModel.year}`);
     this.paymentRecord.schoolYear = this.selectedAcademicYear ? this.selectedAcademicYear.replace(/\s+/g, '') : null;
     this.paymentRecord.schoolYearSplit = this.selectedAcademicYearSplit ? this.selectedAcademicYearSplit.replace(/\s+/g, '') : null;
   }
 
-  public onSubmit(form: NgForm): void {
+  public onSubmit(): void {
     if (this.areAcademicYearsEqual()) {
       this.academicYearSplitVisibility = true;
       this.academicYearVisibility = true;
@@ -140,9 +129,19 @@ export class PaymentUpsertFormComponent implements OnInit {
     this.updatePaymentRecord();
     if (this.op === 'create') {
       this.paymentsService.createPayment(this.paymentRecord).subscribe(
-        data => {
-          console.log('PaymentUpsertFormComponent.createPayment():  payment successfully created.');
-          this.activeModal.close('success');
+        () => {
+          this.payment = new Payment();
+
+          this.isSplit = false;
+          this.date = undefined;
+          this.externalId = undefined;
+          this.schoolDistrictNameModel = undefined;
+          this.amount = undefined;
+          this.selectedAcademicYear = undefined;
+          this.splitAmount = undefined;
+          this.selectedAcademicYearSplit = undefined;
+          this.dateModel = undefined;
+          this.checkNumber = undefined;
         },
         error => {
           console.log('PaymentUpsertFormComponent.createPayment():  payment error: ', error);
@@ -151,7 +150,7 @@ export class PaymentUpsertFormComponent implements OnInit {
       );
     } else if (this.op === 'update') {
       this.paymentsService.updatePayment(this.paymentRecord).subscribe(
-        data => {
+        () => {
           console.log('PaymentUpsertFormComponent.updatePayment():  payment successfully created.');
           this.activeModal.close('success');
         },
@@ -178,7 +177,11 @@ export class PaymentUpsertFormComponent implements OnInit {
   }
 
   onDateChanged() {
-    console.log('PaymentUpsertFormComponent.onDateChanged():  dateModel type is ', typeof(this.dateModel));
+    if (!this.dateModel) {
+      return;
+    }
+
+    console.log('PaymentUpsertFormComponent.onDateChanged():  dateModel type is ', typeof (this.dateModel));
     console.log('PaymentUpsertFormComponent.onDateChanged(): dateModel is ', this.dateModel);
     this.date = new Date(`${this.dateModel.month}/${this.dateModel.day}/${this.dateModel.year}`);
   }

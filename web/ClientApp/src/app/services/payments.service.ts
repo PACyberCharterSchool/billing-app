@@ -37,9 +37,9 @@ export class PaymentsService {
     }));
   }
 
-  public getPaymentsByPaymentId(paymentId: string): Observable<Payment[]> {
+  public getPaymentsByPaymentId(paymentId: string): Observable<PaymentsResponse> {
     const url = this.apiPaymentsUrl + `/${paymentId}`;
-    return this.httpClient.get<Payment[]>(url, this.headers);
+    return this.httpClient.get<PaymentsResponse>(url, this.headers);
   }
 
   public createPayment(payment: Payment): Observable<Payment> {
