@@ -225,7 +225,7 @@ namespace models.Reporters
 				foreach (var month in Month.AsEnumerable())
 				{
 					var property = typeof(InvoiceTransactions).GetProperty(month.Name);
-					if (period.IsBefore(month))
+					if (period.IsBefore(month, firstYear, secondYear))
 					{
 						property.SetValue(transactions, new InvoiceTransaction());
 						continue;
