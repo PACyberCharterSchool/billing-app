@@ -2,9 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-const baseYear = '2000';
-
-class YearsResponse {
+export class YearsResponse {
   years: string[];
 }
 
@@ -22,5 +20,13 @@ export class AcademicYearsService {
 
   getAcademicYears(): string[] {
     return this.years;
+  }
+
+  getSchoolYears(): Observable<YearsResponse> {
+    return this.http.get<YearsResponse>('/api/calendars/years', {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      })
+    });
   }
 }

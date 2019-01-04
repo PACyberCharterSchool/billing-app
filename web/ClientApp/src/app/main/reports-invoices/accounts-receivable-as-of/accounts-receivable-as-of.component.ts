@@ -49,7 +49,7 @@ export class AccountsReceivableAsOfComponent implements OnInit {
     this.skip = 0;
     this.spinnerMsg = '';
     this.refreshAccountsReceivableAsOfList();
-    this.schoolYears = this.academicYearsService.getAcademicYears();
+    this.academicYearsService.getSchoolYears().subscribe(res => this.schoolYears = res.years);
   }
 
   public refreshAccountsReceivableAsOfList(): void {
