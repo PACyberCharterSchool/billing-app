@@ -9,7 +9,7 @@
   </div>
   <div class='col-12'>
     <form appAcademicYearConflictValidator #paymentUpsertForm='ngForm'
-      (ngSubmit)='paymentUpsertForm.form.valid && onSubmit(paymentUpsertForm)'>
+      (ngSubmit)='paymentUpsertForm.form.valid && onSubmit()'>
       <div class='modal-body'>
         <div class='col-12 payment-not-upserted-error' [style.visibility]="upsertError ? 'visible' : 'hidden'">
           Payment error: {{upsertError}}
