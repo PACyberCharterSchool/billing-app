@@ -24,7 +24,6 @@ export class StudentsDetailComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.subscription = this.route.params.subscribe(
       params => {
-        console.log('StudentsDetailComponent.ngOnInit(): student id is ', params['id']);
         this.currentStudentService.currentStudent.subscribe((s) => this.student = s);
       }
     );

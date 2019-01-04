@@ -93,7 +93,7 @@ namespace import
 			if (month >= 12)
 			{
 				month = 0;
-				year = now.Year + 1;
+				year = year + 1;
 			}
 
 			return FormatScope(year, month + 1);

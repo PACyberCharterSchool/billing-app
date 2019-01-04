@@ -39,6 +39,7 @@ import { NgbPACDateParserFormatter } from './shared/ngb-pac-date-parser-formatte
 
 
 import { Globals } from './globals';
+import { SearchService } from './services/search.service';
 
 const tokenInterceptor = {
   provide: HTTP_INTERCEPTORS,
@@ -83,6 +84,7 @@ const pacbillProviders = [
   ReportsService,
   TemplatesService,
   SpreadsheetService,
+  SearchService,
   { provide: NgbDateParserFormatter, useClass: NgbPACDateParserFormatter }
 ];
 
@@ -90,6 +92,6 @@ const pacbillProviders = [
   declarations: pacbillDeclarations,
   imports: pacbillImports,
   providers: pacbillProviders,
-  bootstrap: [ AppComponent ]
+  bootstrap: [AppComponent]
 })
 export class AppModule { }

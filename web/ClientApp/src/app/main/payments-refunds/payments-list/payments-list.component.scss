@@ -43,7 +43,8 @@
       height: 100%;
 
       thead {
-        height: 60px;
+        display: inline-block;
+        width: 100%;
       }
 
       tbody {

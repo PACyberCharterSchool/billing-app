@@ -1,19 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-
 import { SchoolDistrict } from '../../../models/school-district.model';
-
 import { SchoolDistrictService } from '../../../services/school-district.service';
 import { UtilitiesService } from '../../../services/utilities.service';
-
 import { Globals } from '../../../globals';
-
 import { NgbModal, NgbActiveModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-
 import { NgxSpinnerService } from 'ngx-spinner';
-
 import {
   AdministrationPaymentRateUpdateFormComponent
 } from '../administration-payment-rate-update-form/administration-payment-rate-update-form.component';
+import { SearchService } from '../../../services/search.service';
 
 
 @Component({
@@ -38,43 +33,26 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     private utilitiesService: UtilitiesService,
     private ngbModal: NgbModal,
     private ngxSpinnerService: NgxSpinnerService,
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private searchService: SearchService,
   ) {
     this.model = new SchoolDistrict();
     this.property = 'name';
-    this.direction = 1;
+    this.direction = -1;
   }
 
   ngOnInit() {
     this.ngxSpinnerService.show();
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
-        this.schoolDistricts = this.allSchoolDistricts = this.convertCurrencyValues(data['schoolDistricts']);
-        console.log('AdministrationPaymentRateListComponent.ngOnInit(): school districts are ', data['schoolDistricts']);
+        this.schoolDistricts = this.allSchoolDistricts = data['schoolDistricts'];
         this.ngxSpinnerService.hide();
       },
       error => {
-        console.log('AdministrationPaymentRateListComponent.ngOnInit(): error is ', error);
+        console.log('AdministrationPaymentRateListComponent', 'ngOnInit', 'error', error);
         this.ngxSpinnerService.hide();
       }
     );
-  }
-
-  private convertCurrencyValues(schoolDistricts: SchoolDistrict[]): SchoolDistrict[] {
-    if (schoolDistricts) {
-      const setSchoolDistrictRates: (sd: SchoolDistrict) => SchoolDistrict = function(sd: SchoolDistrict): SchoolDistrict {
-        sd.rate = (+sd.rate).toFixed(2);
-        sd.alternateRate = (+sd.alternateRate).toFixed(2);
-        sd.specialEducationRate = (+sd.specialEducationRate).toFixed(2);
-        sd.alternateSpecialEducationRate = (+sd.alternateSpecialEducationRate).toFixed(2);
-
-        return sd;
-      };
-
-      const converted: SchoolDistrict[] = schoolDistricts.map(setSchoolDistrictRates);
-
-      return converted;
-    }
   }
 
   sort(property) {
@@ -83,22 +61,31 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
+  getSortClass(property: string): object {
+    return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
+  }
+
   filterSchoolDistrictRecords() {
-    this.schoolDistricts = this.allSchoolDistricts.filter(
-      (i) => {
-        const re = new RegExp(this.searchText, 'gi');
-        if (i &&
-          i.aun.toString().search(re) !== -1 ||
-          (i.name && i.name.search(re) !== -1) ||
-          (i.paymentType && i.paymentType.search(re) !== -1) ||
-          (i.rate && i.rate.toString().search(re) !== -1) ||
-          (i.alternateRate && i.alternateRate && i.alternateRate.toString().search(re) !== -1)) {
-          return true;
-        }
-        return false;
+    this.schoolDistricts = this.allSchoolDistricts.filter(d => {
+      console.log('filterSchoolDistrictRecords', 'd', d);
+      const values: string[] = [
+        d.aun.toString(),
+        d.name,
+        d.paymentType,
+        d.rate.toString(),
+        d.specialEducationRate.toString(),
+        UtilitiesService.dateToString(d.created),
+        UtilitiesService.dateToString(d.lastUpdated),
+      ];
+      if (d.alternateRate) {
+        values.push(d.alternateRate.toString());
       }
-    );
-    console.log('PaymentsListComponent.filterSchoolDistrictRecords():  schoolDistricts is ', this.schoolDistricts);
+      if (d.alternateSpecialEducationRate) {
+        values.push(d.alternateSpecialEducationRate.toString());
+      }
+
+      return this.searchService.search(this.searchText, values);
+    });
   }
 
   resetSchoolDistrictRecords() {
@@ -109,19 +96,16 @@ export class AdministrationPaymentRateListComponent implements OnInit {
   getAdditionalSchoolDistricts($event) {
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
-        this.schoolDistricts = this.schoolDistricts.concat(this.convertCurrencyValues(data['schoolDistricts']));
-        console.log('AdministrationPaymentRateListComponent.getPayments():  school districts are ', this.schoolDistricts);
+        this.schoolDistricts = this.schoolDistricts.concat(data['schoolDistricts']);
       },
       error => {
-        console.log('AdministrationPaymentRateListComponent.getPayments():  error is ', error);
+        console.log('AdministrationPaymentRateListComponent', 'getAdditionalSchoolDistricts', 'error', error);
       }
     );
   }
 
   refreshSchoolDistrict(sd: SchoolDistrict) {
-    console.log('AdministrationPaymentRateListComponent.refreshSchoolDistrict(): school district is ', sd);
     this.model = sd;
-    console.log('AdministrationPaymentRateListComponent.refreshSchoolDistrict(): model is ', this.model);
   }
 
   listDisplayableFields(): Object[] {
@@ -139,8 +123,7 @@ export class AdministrationPaymentRateListComponent implements OnInit {
   refreshSchoolDistrictList() {
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
-        this.schoolDistricts = this.allSchoolDistricts = this.convertCurrencyValues(data['schoolDistricts']);
-        console.log('success');
+        this.schoolDistricts = this.allSchoolDistricts = data['schoolDistricts'];
       },
       error => {
         console.log('error: ', error);
@@ -154,13 +137,11 @@ export class AdministrationPaymentRateListComponent implements OnInit {
     const modal = this.ngbModal.open(AdministrationPaymentRateUpdateFormComponent, { centered: true });
     modal.componentInstance.schoolDistrict = sd;
     modal.result.then(
-      (result) => {
+      () => {
         this.refreshSchoolDistrictList();
-        console.log(`Closed with: ${result}.`);
       },
-      (reason) => {
+      () => {
         this.refreshSchoolDistrictList();
-        console.log(`Dismissed: ${this.getDismissReasons(reason)}.`);
       }
     );
   }
@@ -177,7 +158,6 @@ export class AdministrationPaymentRateListComponent implements OnInit {
       this.ngxSpinnerService.show();
       this.schoolDistrictService.updateSchoolDistricts(importData).subscribe(
         data => {
-          console.log('AdministrationPaymentRateListComponent.bulkImportSchoolDistricts():  ', data['schoolDistricts']);
           this.schoolDistricts = this.allSchoolDistricts = data['schoolDistricts'];
           this.ngxSpinnerService.hide();
           this.ngbActiveModal.close('Update successful');

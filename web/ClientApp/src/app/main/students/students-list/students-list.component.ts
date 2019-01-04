@@ -1,22 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-
-import { Observable } from 'rxjs/Observable';
-
 import { Globals } from '../../../globals';
-
 import { StudentRecord } from '../../../models/student-record.model';
 import { SchoolDistrict } from '../../../models/school-district.model';
-
 import { StudentsService } from '../../../services/students.service';
 import { StudentRecordsService } from '../../../services/student-records.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
 import { CurrentStudentService } from '../../../services/current-student.service';
 import { UtilitiesService } from '../../../services/utilities.service';
-
 import { StudentAdvancedFilterComponent } from '../student-advanced-filter/student-advanced-filter.component';
-
 import { NgxSpinnerService } from 'ngx-spinner';
+import { or, has } from '../../../models/querydsl.model';
 
 @Component({
   selector: 'app-students-list',
@@ -55,19 +49,18 @@ export class StudentsListComponent implements OnInit {
     private utilitiesService: UtilitiesService,
     private spinnerService: NgxSpinnerService,
     private router: Router) {
-      this.advancedSearchEnabled = false;
-      this.isDescending = false;
-      this.property = 'paCyberId';
-      this.direction = 1;
-      this.skip = 0;
-      this.studentRecords = this.allStudentRecords = [];
-      this.scopes = [];
-    }
+    this.advancedSearchEnabled = false;
+    this.isDescending = false;
+    this.property = 'schoolDistrictName';
+    this.direction = -1;
+    this.skip = 0;
+    this.studentRecords = this.allStudentRecords = [];
+    this.scopes = [];
+  }
 
   ngOnInit() {
     this.studentRecordsService.getHeaders(null).subscribe(
       data => {
-        console.log('StudentsListComponent.ngOnInit(): data is ', data['scopes']);
         this.scopes = data['scopes'];
         if (this.scopes.length > 0) {
           this.currentScope = this.scopes[0];
@@ -85,7 +78,7 @@ export class StudentsListComponent implements OnInit {
     this.schoolDistrictService.getSchoolDistricts().subscribe(
       data => {
         this.schoolDistricts = data['schoolDistricts'];
-        console.log('StudentsListComponent.ngOnInit():  school districts are', this.schoolDistricts);
+        this.schoolDistricts = this.schoolDistricts.sort((a, b) => a.name.localeCompare(b.name));
       },
       error => {
         console.log('StudentsListComponent.ngOnInit():  error is ', error);
@@ -97,7 +90,6 @@ export class StudentsListComponent implements OnInit {
 
   public studentsUpdatedHandler(students: StudentRecord[]): void {
     this.studentRecords = students;
-    console.log('StudentsListComponent.studentsUpdatedHandler():  students are ', this.studentRecords);
   }
 
   public handleCommitClick(): void {
@@ -121,7 +113,6 @@ export class StudentsListComponent implements OnInit {
         this.studentRecords = data['header']['records'];
         this.canEdit = data['header']['locked'];
         this.currentScopeCommitState = this.canEdit ? 'Committed' : 'Not committed';
-        console.log('AdministrationImportStudentDataComponent.ngOnInit():  data is ', data);
         this.spinnerService.hide();
       },
       error => {
@@ -137,7 +128,6 @@ export class StudentsListComponent implements OnInit {
         this.studentRecords = this.studentRecords.concat(data['header']['records']);
         this.retrievingStudents = false;
         this.updateScrollingSkip();
-        console.log('StudentsListComponent.getStudents():  students are ', this.studentRecords);
       },
       error => {
         console.log('error');
@@ -146,18 +136,21 @@ export class StudentsListComponent implements OnInit {
     );
   }
 
-  sort(property) {
+  sort(property: string): void {
     this.isDescending = !this.isDescending; // change the direction
     this.property = property;
     this.direction = this.isDescending ? 1 : -1;
   }
 
+  getSortClass(property: string): object {
+    return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
+  }
+
   showStudentDetails(studentRecord: StudentRecord) {
-    console.log('StudentsListComponent.showStudentDetails():  studentId is ', studentRecord.id);
     if (this.canEdit) {
       const s: StudentRecord = this.studentRecords.find((student) => student.id === studentRecord.id);
       this.currentStudentService.changeStudent(s);
-      this.router.navigate(['/students', { outlets: {'action': [this.currentScope, studentRecord.id]} }]);
+      this.router.navigate(['/students', { outlets: { 'action': [this.currentScope, studentRecord.id] } }]);
     }
   }
 
@@ -174,7 +167,6 @@ export class StudentsListComponent implements OnInit {
   resetStudentList() {
     this.studentRecordsService.getHeaders(null).subscribe(
       data => {
-        console.log('StudentsListComponent.resetStudentList(): data is ', data['scopes']);
         this.scopes = data['scopes'];
         if (this.scopes.length > 0) {
           this.currentScope = this.scopes[0];
@@ -194,20 +186,31 @@ export class StudentsListComponent implements OnInit {
   }
 
   filterStudentListByNameOrId() {
-    if (this.searchText) {
-      // this.studentRecords = this.studentRecords.filter((s) => {
-      //   if (s.studentLastName.toLowerCase().includes(this.searchText.toLowerCase()) ||
-      //     s.studentId.toLowerCase().includes(this.searchText.toLowerCase()) ||
-      //     s.studentFirstName.toLowerCase().includes(this.searchText.toLowerCase()) ||
-      //     s.schoolDistrictName.toLowerCase().includes(this.searchText.toLowerCase()) ||
-      //     s.studentState.toLowerCase().includes(this.searchText.toLowerCase()) ||
-      //     s.studentStreet1.toLowerCase().includes(this.searchText.toLowerCase()) ||
-      //     s.studentStreet2.toLowerCase().includes(this.searchText.toLowerCase()) ||
-      //     s.studentCity.toLowerCase().includes(this.searchText.toLowerCase())) {
-      //       return true;
-      //   }
+    const filter = or(
+      has('schoolDistrictName', this.searchText),
+      or(
+        has('studentId', this.searchText),
+        or(
+          has('studentFirstName', this.searchText),
+          or(
+            has('studentLastName', this.searchText),
+            or(
+              has('studentGradeLevel', this.searchText),
+              or(
+                has('studentStreet1', this.searchText),
+                or(
+                  has('studentStreet2', this.searchText),
+                  has('studentCity', this.searchText),
+                )
+              )
+            )
+          )
+        )
+      )
+    );
 
-      this.studentRecordsService.getHeaderByScopeByNameById(this.currentScope, this.searchText).subscribe(
+    if (this.searchText) {
+      this.studentRecordsService.getHeadersByFilter(this.currentScope, filter).subscribe(
         data => {
           this.studentRecords = data['header']['records'];
         },

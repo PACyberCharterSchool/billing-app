@@ -1,14 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-
 import { Globals } from '../globals';
-
-import { environment } from '../../environments/environment';
-
 import { StudentRecordsHeader, StudentRecord } from '../models/student-record.model';
+import { Clause } from '../models/querydsl.model';
 
 @Injectable()
 export class StudentRecordsService {
@@ -31,7 +26,6 @@ export class StudentRecordsService {
   public getHeaders(locked: boolean): Observable<StudentRecordsHeader[]> {
     const url = this.apiSSRUrl + `/scopes` + (locked !== null ? `?Locked=${locked}` : ``);
     return this.httpClient.get<StudentRecordsHeader[]>(url, this.headers);
-    // return Observable.of(studentRecordsHeaders);
   }
 
   public getHeaderByScope(scope: string, skip: number): Observable<StudentRecordsHeader> {
@@ -127,6 +121,12 @@ export class StudentRecordsService {
 
   public getHeaderByScopeByNameById(scope: string, search: string): Observable<StudentRecordsHeader> {
     const url: string = this.buildStudentsNameAndIdQuery(scope, search);
+    return this.httpClient.get<StudentRecordsHeader>(url, this.headers);
+  }
+
+  public getHeadersByFilter(scope: string, clause: Clause): Observable<StudentRecordsHeader> {
+    const filter = clause.stringify();
+    const url = this.apiSSRUrl + `/header/${scope}/?filter=${filter}`;
     return this.httpClient.get<StudentRecordsHeader>(url, this.headers);
   }
 

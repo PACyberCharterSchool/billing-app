@@ -22,13 +22,13 @@ namespace api.Controllers
 	{
 		private readonly PacBillContext _context;
 		private readonly ICalendarRepository _calendars;
-		private readonly IAuditRecordRepository _audits;
+		private readonly IAuditRepository _audits;
 		private readonly ILogger<CalendarsController> _logger;
 
 		public CalendarsController(
 			PacBillContext context,
 			ICalendarRepository calendars,
-			IAuditRecordRepository audits,
+			IAuditRepository audits,
 			ILogger<CalendarsController> logger)
 		{
 			_context = context;
@@ -74,18 +74,14 @@ namespace api.Controllers
 		[ProducesResponseType(404)]
 		public async Task<IActionResult> Get(string year)
 		{
-			try
-			{
-				var calendar = await Task.Run(() => _calendars.Get(year));
-				return new ObjectResult(new CalendarResponse
-				{
-					Calendar = calendar,
-				});
-			}
-			catch (NotFoundException)
-			{
+			var calendar = await Task.Run(() => _calendars.Get(year));
+			if (calendar == null)
 				return NotFound();
-			}
+
+			return new ObjectResult(new CalendarResponse
+			{
+				Calendar = calendar,
+			});
 		}
 
 		private static Calendar CsvToCalendar(string year, Stream stream)
@@ -115,14 +111,9 @@ namespace api.Controllers
 			fopts.LookInType = LookInType.Values;
 			fopts.LookAtType = LookAtType.EntireContent;
 
-			// var header = sheet.GetRow(0);
-			// var dayIndex = header.Cells.FindIndex(c => c.StringCellValue == "DAY");
 			var dayIndex = sheet.Cells.Find("DAY", null, fopts).Column;
-			// var dateIndex = header.Cells.FindIndex(c => c.StringCellValue == "DATE");
 			var dateIndex = sheet.Cells.Find("DATE", null, fopts).Column;
-			// var schoolDayIndex = header.Cells.FindIndex(c => c.StringCellValue == "SCHOOL DAY");
 			var schoolDayIndex = sheet.Cells.Find("SCHOOL DAY", null, fopts).Column;
-			// var membershipIndex = header.Cells.FindIndex(c => c.StringCellValue == "MEMBERSHIP");
 			var membershipIndex = sheet.Cells.Find("MEMBERSHIP", null, fopts).Column;
 
 			var calendar = new Calendar
@@ -138,10 +129,10 @@ namespace api.Controllers
 
 				calendar.Days.Add(new CalendarDay
 				{
-					DayOfWeek = row.GetCellByIndex(dayIndex).StringValue,
-					Date = DateTime.FromOADate(row.GetCellByIndex(dateIndex).IntValue), // days since epoch
-					SchoolDay = (byte)row.GetCellByIndex(schoolDayIndex).IntValue,
-					Membership = (byte)row.GetCellByIndex(membershipIndex).IntValue,
+					DayOfWeek = row.GetCellOrNull(dateIndex).StringValue,
+					Date = DateTime.FromOADate(row.GetCellOrNull(dateIndex).IntValue), // days since epoch
+					SchoolDay = (byte)row.GetCellOrNull(schoolDayIndex).IntValue,
+					Membership = (byte)row.GetCellOrNull(membershipIndex).IntValue,
 				});
 			}
 
@@ -158,7 +149,7 @@ namespace api.Controllers
 		[Authorize(Policy = "ADM=")]
 		[ProducesResponseType(typeof(CalendarResponse), 201)]
 		[ProducesResponseType(typeof(ErrorResponse), 400)]
-		public async Task<IActionResult> Upload(string year, IFormFile file)
+		public IActionResult Upload(string year, IFormFile file)
 		{
 			if (file == null)
 				return new BadRequestObjectResult(
@@ -168,26 +159,65 @@ namespace api.Controllers
 				return new BadRequestObjectResult(
 					new ErrorResponse($"Invalid file Content-Type '{file.ContentType}'."));
 
-			var parse = _parsers[file.ContentType]; var calendar = parse(year, file.OpenReadStream());
-
-			calendar = await Task.Run(() => _context.SaveChanges(() => _calendars.CreateOrUpdate(calendar)));
-
+			var input = _parsers[file.ContentType](year, file.OpenReadStream());
 			var username = User.FindFirst(c => c.Type == JwtRegisteredClaimNames.Sub).Value;
+
+			Calendar calendar;
 			using (var tx = _context.Database.BeginTransaction())
 			{
 				try
 				{
-					_audits.Create(new AuditRecord {
-						Username = username,
-						Activity = AuditRecordActivity.UPDATE_SCHOOL_CALENDAR,
-						Timestamp = DateTime.Now,
-						Identifier = calendar.Id.ToString(),
-						Field = null,
-						Next = null,
-						Previous = null,
-					});
-					_context.SaveChanges();
+					calendar = _calendars.Get(input.SchoolYear);
+					if (calendar == null)
+					{
+						calendar = input;
+						calendar.Created = DateTime.Now;
+						calendar.LastUpdated = calendar.Created;
+						_context.Add(calendar);
+					}
+					else
+					{
+						var details = new List<AuditDetail>();
+						var added = input.Days.Where(id => !calendar.Days.Any(cd => cd.Date == id.Date));
+						Console.WriteLine("Added:");
+						foreach (var add in added)
+							Console.WriteLine($"\t{add.Date}");
 
+						foreach (var add in added)
+							details.Add(new AuditDetail
+							{
+								Field = "Day",
+								Next = add.Date.ToString("MM/dd/yyyy"),
+							});
+
+						var removed = calendar.Days.Where(cd => !input.Days.Any(id => id.Date == cd.Date));
+						Console.WriteLine("Removed:");
+						foreach (var remove in removed)
+							Console.WriteLine($"\t{remove.Date}");
+
+						foreach (var remove in removed)
+							details.Add(new AuditDetail
+							{
+								Field = "Day",
+								Previous = remove.Date.ToString("MM/dd/yyyy"),
+							});
+
+						_context.Remove(calendar);
+						input.Created = calendar.Created;
+						input.LastUpdated = DateTime.Now;
+						_context.Add(input);
+						calendar = input;
+						_audits.Create(new AuditHeader
+						{
+							Username = username,
+							Activity = AuditActivity.UPDATE_SCHOOL_CALENDAR,
+							Timestamp = DateTime.Now,
+							Identifier = calendar.SchoolYear,
+							Details = details,
+						});
+					}
+
+					_context.SaveChanges();
 					tx.Commit();
 				}
 				catch (Exception)

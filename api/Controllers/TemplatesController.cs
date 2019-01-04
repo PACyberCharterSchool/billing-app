@@ -24,13 +24,12 @@ namespace api.Controllers
 		private readonly PacBillContext _context;
 		private readonly ITemplateRepository _templates;
 		private readonly ILogger<TemplatesController> _logger;
-
-		private readonly IAuditRecordRepository _audits;
+		private readonly IAuditRepository _audits;
 
 		public TemplatesController(
 			PacBillContext context,
 			ITemplateRepository templates,
-			IAuditRecordRepository audits,
+			IAuditRepository audits,
 			ILogger<TemplatesController> logger)
 		{
 			_context = context;
@@ -144,17 +143,13 @@ namespace api.Controllers
 			{
 				try
 				{
-					_audits.Create(new AuditRecord {
+					_context.SaveChanges(() => _audits.Create(new AuditHeader
+					{
 						Username = username,
-						Activity = AuditRecordActivity.UPDATE_TEMPLATE,
+						Activity = AuditActivity.UPDATE_TEMPLATE,
 						Timestamp = DateTime.Now,
-						Identifier = template.Id.ToString(),
-						Field = null,
-						Next = null,
-						Previous = null,
-					});
-					_context.SaveChanges();
-
+						Identifier = $"{template.ReportType}_{template.SchoolYear}",
+					}));
 					tx.Commit();
 				}
 				catch (Exception)

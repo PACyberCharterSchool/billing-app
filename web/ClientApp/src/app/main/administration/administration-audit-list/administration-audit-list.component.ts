@@ -33,7 +33,8 @@ export class AdministrationAuditListComponent implements OnInit {
     private utilitiesService: UtilitiesService,
     private auditRecordService: AuditRecordsService
   ) {
-    this.property = 'date';
+    this.property = 'timestamp';
+    this.isDescending = true;
     this.direction = 1;
     this.allAudits = this.audits = [];
     this.skip = 0;
@@ -59,6 +60,10 @@ export class AdministrationAuditListComponent implements OnInit {
     this.isDescending = !this.isDescending; // change the direction
     this.property = property;
     this.direction = this.isDescending ? 1 : -1;
+  }
+
+  getSortClass(property: string): object {
+    return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
   }
 
   filterAuditRecordsBySearch() {
@@ -116,5 +121,12 @@ export class AdministrationAuditListComponent implements OnInit {
       }
     }
     return false;
+  }
+
+  getExpandedClass(ar: AuditRecord): object {
+    return {
+      'fa-angle-left': !this.isExpandedAuditRecord(ar),
+      'fa-angle-down': this.isExpandedAuditRecord(ar),
+    };
   }
 }

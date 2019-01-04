@@ -12,38 +12,46 @@
 </div>
 <div class='row school-district-action-row align-items-center justify-content-left'>
   <div class='col-2'>
-    <button type='button' class='btn btn-primary' (click)='importSchoolDistricts(importSchoolDistrictsContent)'>BULK IMPORT</button>
+    <button type='button' class='btn btn-primary' (click)='importSchoolDistricts(importSchoolDistrictsContent)'>BULK
+      IMPORT</button>
   </div>
 </div>
 <div class='row school-district-list-row align-items-center'>
   <div class='col-12'>
-    <table class='table table-static table-striped' infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]='false' *ngIf='schoolDistricts?.length > 0'>
+    <table class='table table-static table-striped' infiniteScroll (scrolled)='onScroll($event)'
+      [scrollWindow]='false' *ngIf='schoolDistricts?.length > 0'>
       <thead>
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
             {{k | normalizeFieldName}}
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+            <i class="fa" [ngClass]="getSortClass(k)" aria-hidden="true"></i>
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor='let sd of schoolDistricts | orderBy: {property: property, direction: direction}' (click)='editSchoolDistrictPaymentRate(sd)'>
+        <tr *ngFor="let sd of schoolDistricts | orderBy: {property: [property, 'name'], direction: direction}"
+          (click)="editSchoolDistrictPaymentRate(sd)">
           <td>{{sd.aun | normalizeFieldValue}}</td>
           <td placeholder='top' ngbTooltip='{{sd.name | normalizeFieldValue}}'>{{sd.name}}</td>
           <td>{{sd.rate | normalizeFieldValue | currency}}</td>
           <td>{{sd.alternateRate | normalizeFieldValue | currency}}</td>
           <td>{{sd.specialEducationRate | normalizeFieldValue | currency}}</td>
-          <td>{{sd.alternateSpecialEducationRate | normalizeFieldValue | currency}}</td>
+          <td>{{sd.alternateSpecialEducationRate | normalizeFieldValue |
+            currency}}</td>
           <td>{{sd.paymentType === 'Check' ? 'SD' : 'PDE'}}</td>
           <td>{{sd.created | date: 'MM/dd/yyyy'}}</td>
           <td>{{sd.lastUpdated | date: 'MM/dd/yyyy'}}</td>
         </tr>
       </tbody>
     </table>
-    <p *ngIf='schoolDistricts?.length == 0'>No school district records have been imported.</p>
+    <p *ngIf='schoolDistricts?.length == 0'>No school district records have
+      been imported.</p>
   </div>
 </div>
-<ngx-spinner size='large' loadingText='Retrieving school district records from PACBill database.  Please wait...' type='timer'></ngx-spinner>
+
+<ngx-spinner size='large' loadingText='Retrieving school district records from PACBill database.  Please wait...'
+  type='timer'></ngx-spinner>
+
 <ng-template #importSchoolDistrictsContent let-c='close' let-d='dismiss'>
   <div class='row align-items-center'>
     <div class='col-12'>
@@ -59,19 +67,16 @@
     <div class='col-12'>
       <form #selectSchoolDistrictsForm (ngSubmit)='c("Import clicked."); doImport()'>
         <div class='modal-body'>
-            <div class='form-group'>
-              <div class='col-6'>
-                <label>Select school district data file:</label>
-              </div>
-              <div class='col-6'>
-                <input type='file'
-                  [(ngModel)]='fileName'
-                  [ngModelOptions]='{standalone: true}'
-                  accept='text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                  (change)='setImportSchoolDistrictsUrl($event)'
-                  />
-              </div>
+          <div class='form-group'>
+            <div class='col-6'>
+              <label>Select school district data file:</label>
             </div>
+            <div class='col-6'>
+              <input type='file' [(ngModel)]='fileName' [ngModelOptions]='{standalone: true}'
+                accept='text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                (change)='setImportSchoolDistrictsUrl($event)' />
+            </div>
+          </div>
         </div>
         <div class='modal-footer'>
           <div class='form-group'>

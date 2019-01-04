@@ -1,18 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-
 import { Refund } from '../../../models/refund.model';
 import { SchoolDistrict } from '../../../models/school-district.model';
-
 import { UtilitiesService } from '../../../services/utilities.service';
 import { RefundsService } from '../../../services/refunds.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
-import { AcademicYearsService } from '../../../services/academic-years.service';
-
 import { RefundUpsertFormComponent } from '../refund-upsert-form/refund-upsert-form.component';
-
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
 import { Globals } from '../../../globals';
+import { SearchService } from '../../../services/search.service';
 
 @Component({
   selector: 'app-refunds-list',
@@ -34,7 +29,8 @@ export class RefundsListComponent implements OnInit {
     private utilitiesService: UtilitiesService,
     private refundsService: RefundsService,
     private schoolDistrictsService: SchoolDistrictService,
-    private ngbModalService: NgbModal
+    private ngbModalService: NgbModal,
+    private searchService: SearchService,
   ) {
     this.property = 'schoolDistrictName';
     this.direction = 1;
@@ -46,8 +42,7 @@ export class RefundsListComponent implements OnInit {
     this.refreshRefundList();
     this.refundsService.getRefunds(this.skip).subscribe(
       data => {
-        this.allRefunds = this.refunds = data['refunds'];
-        console.log('RefundsListComponent.ngOnInit(): data is ', this.allRefunds);
+        this.allRefunds = this.refunds = data.refunds;
       },
       error => {
         console.log('RefundsListComponent.ngOnInit(): error is ', error);
@@ -56,8 +51,7 @@ export class RefundsListComponent implements OnInit {
 
     this.schoolDistrictsService.getSchoolDistricts().subscribe(
       data => {
-        this.schoolDistricts = data['schoolDistricts'];
-        console.log('RefundsListComponent.ngOnInit():  school district list is ', this.schoolDistricts);
+        this.schoolDistricts = data.schoolDistricts;
       },
       error => {
         console.log('RefundsListComponent.ngOnInit():  error is ', error);
@@ -71,11 +65,14 @@ export class RefundsListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
+  getSortClass(property: string): object {
+    return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
+  }
+
   refreshRefundList() {
     this.refundsService.getRefunds(this.skip).subscribe(
       data => {
-        this.allRefunds = this.refunds = data['refunds'];
-        console.log('PaymentsListComponent.ngOnInit(): payments are ', this.allRefunds);
+        this.allRefunds = this.refunds = data.refunds;
       },
       error => {
         console.log('PaymentsListComponent.ngOnInit(): error is ', error);
@@ -86,7 +83,7 @@ export class RefundsListComponent implements OnInit {
   listDisplayableFields() {
     if (this.allRefunds) {
       const fields = this.utilitiesService.objectKeys(this.allRefunds[0]);
-      const rejected = ['id'];
+      const rejected = ['id', 'checkNumber'];
       return fields.filter((i) => !rejected.includes(i));
     }
   }
@@ -101,19 +98,16 @@ export class RefundsListComponent implements OnInit {
   }
 
   filterRefundRecords() {
-    this.refunds = this.allRefunds.filter(
-      (i) => {
-        const re = new RegExp(this.searchText, 'gi');
-        if (
-          i.amount.toString().search(re) !== -1 ||
-          i.checkNumber.search(re) !== -1 ||
-          i.schoolDistrict.name.search(re) !== -1
-        ) {
-          return true;
-        }
-        return false;
-      }
-    );
+    this.refunds = this.allRefunds.filter(r =>
+      this.searchService.search(this.searchText, [
+        r.amount.toFixed(2),
+        UtilitiesService.dateToString(r.date),
+        r.schoolYear,
+        r.username,
+        UtilitiesService.dateToString(r.created),
+        UtilitiesService.dateToString(r.lastUpdated),
+        r.schoolDistrict.name,
+      ]));
   }
 
   resetRefundRecords() {
@@ -127,7 +121,6 @@ export class RefundsListComponent implements OnInit {
 
     modal.result.then(
       (result) => {
-        console.log('RefundsListComponent.createRefund():  result is ', result);
         this.refreshRefundList();
       },
       (reason) => {
@@ -144,7 +137,6 @@ export class RefundsListComponent implements OnInit {
 
     modal.result.then(
       (result) => {
-        console.log('RefundsListComponent.editPayment():  result is ', result);
         this.refreshRefundList();
       },
       (reason) => {

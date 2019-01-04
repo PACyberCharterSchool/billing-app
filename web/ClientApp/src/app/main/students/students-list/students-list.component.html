@@ -7,7 +7,8 @@
   <div class='col-4'>
     <div class='row align-items-center'>
       <div ngbDropdown class='d-inline-block col-4'>
-        <button class='btn btn-outline-primary' id='dropdownStudentRecordScope' ngbDropdownToggle>{{currentScope}}</button>
+        <button class='btn btn-outline-primary' id='dropdownStudentRecordScope'
+          ngbDropdownToggle>{{currentScope}}</button>
         <div ngbDropdownMenu aria-labelledby='dropdownStudentRecordScope'>
           <button class='dropdown-item' *ngFor='let scope of scopes' (click)='filterByStudentRecordScope(scope)'>{{scope}}</button>
         </div>
@@ -16,7 +17,8 @@
         <span>{{currentScopeCommitState}}</span>
       </div>
       <div class='col-3'>
-        <button type='button' class='btn btn-primary' (click)='handleCommitClick()' [disabled]='canEdit'>COMMIT</button>
+        <button type='button' class='btn btn-primary' (click)='handleCommitClick()'
+          [disabled]='canEdit'>COMMIT</button>
       </div>
     </div>
   </div>
@@ -31,11 +33,14 @@
     </button>
   </div>
 </div>
+
 <div class='row advanced-search-tools-row align-items-center' *ngIf="advancedSearchEnabled">
   <div class='col-12'>
-    <app-student-advanced-filter #advancedStudentFilter [schoolDistricts]='schoolDistricts' [scope]='currentScope' (studentsUpdated)='studentsUpdatedHandler($event)'></app-student-advanced-filter>
+    <app-student-advanced-filter #advancedStudentFilter [schoolDistricts]='schoolDistricts'
+      [scope]='currentScope' (studentsUpdated)='studentsUpdatedHandler($event)'></app-student-advanced-filter>
   </div>
 </div>
+
 <div class='row student-list-view-row'>
   <div class='col-12' *ngIf='studentRecords?.length >= 0'>
     <table class='table table-striped table-fixed'>
@@ -43,16 +48,21 @@
         <tr>
           <th *ngFor='let k of listDisplayableFields()' (click)='sort(k)'>
             {{k | normalizeFieldName}}
-            <i class="fa" [ngClass]="{'fa-sort': column != k, 'fa-sort-asc': (column == k && isDescending), 'fa-sort-desc': (column == k && !isDescending) }" aria-hidden="true"></i>
+            <i class="fa" [ngClass]="getSortClass(k)" aria-hidden="true"></i>
           </th>
         </tr>
       </thead>
       <tbody infiniteScroll (scrolled)='onScroll($event)' [scrollWindow]="false">
-        <tr *ngFor='let sr of studentRecords | orderBy: {property: property, direction: direction}'>
-          <td *ngFor='let v of listDisplayableValues(sr)' (click)='showStudentDetails(sr)' ngbTooltip='{{v | normalizeFieldValue}}' placement='top'>{{v | normalizeFieldValue}}</td>
+        <tr *ngFor="let sr of studentRecords | orderBy: {property: [property, 'studentLastName', 'studentFirstName', 'studentEnrollmentDate'], direction: direction}">
+          <td *ngFor='let v of listDisplayableValues(sr)' (click)='showStudentDetails(sr)'
+            ngbTooltip='{{v | normalizeFieldValue}}' placement='top'>
+            {{v | normalizeFieldValue}}
+          </td>
         </tr>
       </tbody>
     </table>
   </div>
 </div>
-<ngx-spinner size='large' loadingText='Retrieving student records for scope {{currentScope}} from PACBill database.  Please wait...' type='timer'></ngx-spinner>
+
+<ngx-spinner size='large' loadingText='Retrieving student records for scope {{currentScope}} from PACBill database.  Please wait...'
+  type='timer'></ngx-spinner>

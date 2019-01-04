@@ -121,11 +121,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
   }
 
   getSortClass(property: string): object {
-    return {
-      'fa-sort': this.property !== property,
-      'fa-sort-desc': this.property === property && this.isDescending,
-      'fa-sort-asc': this.property === property && !this.isDescending,
-    };
+    return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
   }
 
   filterInvoices() {
@@ -153,7 +149,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.bulkReports = this.allBulkReports = [];
     this.ngxSpinnerService.show();
     this.reportsService.getReportsByMeta({
-      'Type': ReportType.BulkInvoice,
+      type: ReportType.BulkInvoice,
     }).subscribe(
       data => {
         this.ngxSpinnerService.hide();
@@ -169,7 +165,7 @@ export class InvoicesMonthlyCombinedListComponent implements OnInit {
     this.spinnerMsg = 'Loading totals only invoices.  Please wait...';
     this.ngxSpinnerService.show();
     this.reportsService.getReportsByMeta({
-      'Type': ReportType.TotalsOnly,
+      type: ReportType.TotalsOnly,
     }).subscribe(
       data => {
         this.ngxSpinnerService.hide();

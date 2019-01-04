@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
 import { Observable } from 'rxjs/Observable';
-
-import { environment } from '../../environments/environment';
-
 import { Payment } from '../models/payment.model';
-
 import { Globals } from '../globals';
+import { map } from 'rxjs/operators';
+import { UtilitiesService } from './utilities.service';
+
+export class PaymentsResponse {
+  payments: Payment[];
+}
 
 @Injectable()
 export class PaymentsService {
@@ -23,14 +23,23 @@ export class PaymentsService {
     this.apiPaymentsUrl = 'api/Payments';
   }
 
-  public getPayments(skip: number): Observable<Payment[]> {
-    const url = this.apiPaymentsUrl + `?skip=${skip}&take=${this.globals.take}`;
-    return this.httpClient.get<Payment[]>(url, this.headers);
+  private convertPayment(p: Payment): Payment {
+    p.date = UtilitiesService.convertDate(p.date);
+    p.created = UtilitiesService.convertDate(p.created);
+    p.lastUpdated = UtilitiesService.convertDate(p.lastUpdated);
+    return p;
   }
 
-  public getPaymentsByPaymentId(paymentId: string): Observable<Payment[]> {
+  public getPayments(skip: number): Observable<PaymentsResponse> {
+    const url = this.apiPaymentsUrl + `?skip=${skip}&take=${this.globals.take}`;
+    return this.httpClient.get<PaymentsResponse>(url, this.headers).pipe(map(res => {
+      return { payments: res.payments.map(this.convertPayment) };
+    }));
+  }
+
+  public getPaymentsByPaymentId(paymentId: string): Observable<PaymentsResponse> {
     const url = this.apiPaymentsUrl + `/${paymentId}`;
-    return this.httpClient.get<Payment[]>(url, this.headers);
+    return this.httpClient.get<PaymentsResponse>(url, this.headers);
   }
 
   public createPayment(payment: Payment): Observable<Payment> {
@@ -48,7 +57,7 @@ export class PaymentsService {
   public updatePDEPayments(date: Date, paymentData: FormData): Observable<Payment[]> {
     let url = this.apiPaymentsUrl + `?file=${paymentData}`;
     if (date) {
-      url += `&date=${date.toLocaleDateString('en-US')}`
+      url += `&date=${date.toLocaleDateString('en-US')}`;
     }
     return this.httpClient.put<any>(url, this.serializePDEPaymentRequestBodyObject(paymentData));
   }

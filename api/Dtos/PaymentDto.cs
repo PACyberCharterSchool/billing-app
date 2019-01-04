@@ -19,6 +19,7 @@ namespace api.Dtos
 
 		public double Amount { get; set; }
 		public string SchoolYear { get; set; }
+		public string Username { get; set; }
 		public DateTime Created { get; set; }
 		public DateTime LastUpdated { get; set; }
 
@@ -34,6 +35,7 @@ namespace api.Dtos
 			this.Type = model.Type;
 			this.Amount = model.Amount;
 			this.SchoolYear = model.SchoolYear;
+			this.Username = model.Username;
 			this.Created = model.Created;
 			this.LastUpdated = model.LastUpdated;
 			this.SchoolDistrict = new SchoolDistrictDto(model.SchoolDistrict);

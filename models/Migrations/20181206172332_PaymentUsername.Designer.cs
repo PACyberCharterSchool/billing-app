@@ -3,65 +3,23 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using models;
 
 namespace models.Migrations
 {
     [DbContext(typeof(PacBillContext))]
-    partial class PacBillContextModelSnapshot : ModelSnapshot
+    [Migration("20181206172332_PaymentUsername")]
+    partial class PaymentUsername
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.1.0-rc1-32029")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("models.AuditDetail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Field")
-                        .IsRequired();
-
-                    b.Property<int?>("HeaderId");
-
-                    b.Property<string>("Next");
-
-                    b.Property<string>("Previous");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HeaderId");
-
-                    b.ToTable("AuditDetails");
-                });
-
-            modelBuilder.Entity("models.AuditHeader", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Activity")
-                        .IsRequired();
-
-                    b.Property<string>("Identifier")
-                        .IsRequired();
-
-                    b.Property<DateTime>("Timestamp");
-
-                    b.Property<string>("Username")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AuditHeaders");
-                });
 
             modelBuilder.Entity("models.AuditRecord", b =>
                 {
@@ -411,13 +369,6 @@ namespace models.Migrations
                         .HasFilter("[ReportType] IS NOT NULL AND [SchoolYear] IS NOT NULL");
 
                     b.ToTable("Templates");
-                });
-
-            modelBuilder.Entity("models.AuditDetail", b =>
-                {
-                    b.HasOne("models.AuditHeader", "Header")
-                        .WithMany("Details")
-                        .HasForeignKey("HeaderId");
                 });
 
             modelBuilder.Entity("models.CalendarDay", b =>

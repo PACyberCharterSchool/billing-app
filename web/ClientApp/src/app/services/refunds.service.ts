@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
 import { Observable } from 'rxjs/Observable';
-
-import { environment } from '../../environments/environment';
-
 import { Refund } from '../models/refund.model';
-
 import { Globals } from '../globals';
+import { map } from 'rxjs/operators';
+import { UtilitiesService } from './utilities.service';
+
+export class RefundsResponse {
+  refunds: Refund[];
+}
 
 @Injectable()
 export class RefundsService {
@@ -23,9 +23,18 @@ export class RefundsService {
     this.apiRefundsUrl = 'api/Refunds';
   }
 
-  public getRefunds(skip: number): Observable<Refund[]> {
+  private convertRefund(r: Refund): Refund {
+    r.date = UtilitiesService.convertDate(r.date);
+    r.created = UtilitiesService.convertDate(r.created);
+    r.lastUpdated = UtilitiesService.convertDate(r.lastUpdated);
+    return r;
+  }
+
+  public getRefunds(skip: number): Observable<RefundsResponse> {
     const url = this.apiRefundsUrl + `?skip=${skip}&take=${this.globals.take}`;
-    return this.httpClient.get<Refund[]>(url, this.headers);
+    return this.httpClient.get<RefundsResponse>(url, this.headers).pipe(map(res => {
+      return { refunds: res.refunds.map(this.convertRefund) };
+    }));
   }
 
   public createRefund(refund: Refund): Observable<Refund> {

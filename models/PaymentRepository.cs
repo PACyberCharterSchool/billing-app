@@ -73,6 +73,7 @@ namespace models
 			nameof(Payment.Split),
 			nameof(Payment.Created),
 			nameof(Payment.LastUpdated),
+			nameof(Payment.Username),
 		};
 
 		public IList<Payment> UpdateMany(DateTime time, IList<Payment> us)

@@ -13,6 +13,7 @@ import { Globals } from '../../../globals';
 
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { SearchService } from '../../../services/search.service';
 
 @Component({
   selector: 'app-payments-list',
@@ -38,7 +39,8 @@ export class PaymentsListComponent implements OnInit {
     private paymentsService: PaymentsService,
     private schoolDistrictsService: SchoolDistrictService,
     private ngxSpinnerService: NgxSpinnerService,
-    private ngbModalService: NgbModal
+    private ngbModalService: NgbModal,
+    private searchService: SearchService,
   ) {
   }
 
@@ -51,8 +53,7 @@ export class PaymentsListComponent implements OnInit {
 
     this.schoolDistrictsService.getSchoolDistricts().subscribe(
       data => {
-        this.schoolDistricts = data['schoolDistricts'];
-        console.log('PaymentsListComponent.ngOnInit():  school district list is ', this.schoolDistricts);
+        this.schoolDistricts = data.schoolDistricts;
       },
       error => {
         console.log('PaymentsListComponent.ngOnInit():  error is ', error);
@@ -83,23 +84,23 @@ export class PaymentsListComponent implements OnInit {
     this.direction = this.isDescending ? 1 : -1;
   }
 
+  getSortClass(property: string): object {
+    return this.utilitiesService.getSortClass({ property: this.property, isDescending: this.isDescending }, property);
+  }
+
   filterPaymentRecords() {
-    this.payments = this.allPayments.filter(
-      (i) => {
-        const re = new RegExp(this.searchText, 'gi');
-        if (
-          i.externalId.toString().search(re) !== -1 ||
-          i.schoolDistrict.aun.toString().search(re) !== -1 ||
-          i.schoolDistrict.name.search(re) !== -1 ||
-          i.type.search(re) !== -1 ||
-          i.paymentId.search(re) !== -1
-        ) {
-          return true;
-        }
-        return false;
-      }
-    ).filter((p) => p.split === 1);
-    console.log('PaymentsListComponent.filterPaymentRecords():  payments is ', this.payments);
+    this.payments = this.allPayments.filter(p =>
+      this.searchService.search(this.searchText, [
+        this.isSplitPayment(p) ? 'Yes' : 'No',
+        p.amount.toFixed(2),
+        p.type.toString(),
+        UtilitiesService.dateToString(p.date),
+        p.schoolYear,
+        p.username,
+        UtilitiesService.dateToString(p.created),
+        UtilitiesService.dateToString(p.lastUpdated),
+        p.schoolDistrict.name,
+      ]));
   }
 
   resetPaymentRecords() {
@@ -114,10 +115,9 @@ export class PaymentsListComponent implements OnInit {
     this.ngxSpinnerService.show();
     this.paymentsService.getPayments(this.skip).subscribe(
       data => {
-        this.allPayments = data['payments'];
-        this.payments = data['payments'].filter((p) => p.split === 1);
+        this.allPayments = data.payments;
+        this.payments = data.payments.filter((p) => p.split === 1);
         this.ngxSpinnerService.hide();
-        console.log('PaymentsListComponent.ngOnInit(): payments are ', this.allPayments);
       },
       error => {
         console.log('PaymentsListComponent.ngOnInit(): error is ', error);
@@ -129,10 +129,10 @@ export class PaymentsListComponent implements OnInit {
   getAdditionalPayments($event) {
     this.paymentsService.getPayments(this.skip).subscribe(
       data => {
-        if (data['payments'].length > 0) {
-          this.allPayments = this.allPayments.concat(data['payments']);
-          this.payments = this.payments.concat(data['payments'].filter((p) => p.split === 1));
-          this.updateScrollingSkip(data['payments'].length > this.globals.take ? this.globals.take : data['payments'].length);
+        if (data.payments.length > 0) {
+          this.allPayments = this.allPayments.concat(data.payments);
+          this.payments = this.payments.concat(data.payments.filter((p) => p.split === 1));
+          this.updateScrollingSkip(data.payments.length > this.globals.take ? this.globals.take : data.payments.length);
         }
 
         console.log('PaymentsListComponent.getPayments():  payments are ', this.payments);

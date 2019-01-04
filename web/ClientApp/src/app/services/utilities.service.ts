@@ -4,8 +4,16 @@ import * as moment from 'moment';
 
 @Injectable()
 export class UtilitiesService {
+  static convertDate(d: string | Date): Date {
+    if (<string>d) {
+      return new Date(<string>d);
+    }
+    return <Date>d;
+  }
 
-  constructor() { }
+  static dateToString(d: Date): string {
+    return d.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
 
   objectKeys(obj) {
     if (obj) {
@@ -36,8 +44,8 @@ export class UtilitiesService {
   }
 
   pick(obj, keys) {
-    return keys.map(k => k in obj ? {[k]: obj[k]} : {})
-               .reduce((res, o) => Object.assign(res, o), {});
+    return keys.map(k => k in obj ? { [k]: obj[k] } : {})
+      .reduce((res, o) => Object.assign(res, o), {});
   }
 
   isDateValue(val: string): boolean {
@@ -50,5 +58,13 @@ export class UtilitiesService {
     ];
 
     return moment(val, formats, true).isValid();
+  }
+
+  getSortClass(o: { property: string, isDescending: boolean }, property: string): object {
+    return {
+      'fa-sort': o.property !== property,
+      'fa-sort-desc': o.property === property && o.isDescending,
+      'fa-sort-asc': o.property === property && !o.isDescending,
+    };
   }
 }

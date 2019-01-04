@@ -1,16 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
-
 import { Observable } from 'rxjs/Observable';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
-
 import { SchoolDistrict } from '../../../models/school-district.model';
-
 import { RefundsService } from '../../../services/refunds.service';
 import { SchoolDistrictService } from '../../../services/school-district.service';
 import { AcademicYearsService } from '../../../services/academic-years.service';
-
 import { Refund } from '../../../models/refund.model';
-
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -43,9 +38,6 @@ export class RefundUpsertFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('op is ', this.op);
-    console.log('schoolDistricts are ', this.schoolDistricts);
-
     this.schoolYears = this.academicYearsService.getAcademicYears();
 
     if (this.op === 'update') {
